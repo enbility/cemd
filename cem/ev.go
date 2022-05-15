@@ -6,7 +6,6 @@ import (
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/spine"
 	"github.com/DerAndereAndi/eebus-go/spine/model"
-	"github.com/DerAndereAndi/eebus-go/usecase"
 )
 
 type EVCommunicationStandardType string
@@ -33,7 +32,7 @@ type EVDelegate interface {
 
 // EV Commissioning and Configuration Use Case implementation
 type EV struct {
-	*usecase.UseCaseImpl
+	*spine.UseCaseImpl
 	service *service.EEBUSService
 
 	Delegate EVDelegate
@@ -51,7 +50,7 @@ func AddEVSupport(service *service.EEBUSService) (*EV, error) {
 
 	// add the use case
 	useCase := &EV{
-		UseCaseImpl: usecase.NewUseCase(
+		UseCaseImpl: spine.NewUseCase(
 			entity,
 			model.UseCaseNameTypeEVCommissioningAndConfiguration,
 			[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8}),
@@ -63,15 +62,15 @@ func AddEVSupport(service *service.EEBUSService) (*EV, error) {
 
 	// add the features
 	{
-		f := useCase.EntityFeature(entity, model.FeatureTypeTypeMeasurement, model.RoleTypeClient, "Measurement Client")
+		f := service.EntityFeature(entity, model.FeatureTypeTypeMeasurement, model.RoleTypeClient, "Measurement Client")
 		entity.AddFeature(f)
 	}
 	{
-		f := useCase.EntityFeature(entity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeClient, "Device Configuration Client")
+		f := service.EntityFeature(entity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeClient, "Device Configuration Client")
 		entity.AddFeature(f)
 	}
 	{
-		f := useCase.EntityFeature(entity, model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer, "Device Diagnosis Server")
+		f := service.EntityFeature(entity, model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer, "Device Diagnosis Server")
 		f.AddFunctionType(model.FunctionTypeDeviceDiagnosisStateData, true, false)
 
 		// Set the initial state
@@ -86,23 +85,23 @@ func AddEVSupport(service *service.EEBUSService) (*EV, error) {
 		entity.AddFeature(f)
 	}
 	{
-		f := useCase.EntityFeature(entity, model.FeatureTypeTypeLoadControl, model.RoleTypeClient, "LoadControl Client")
+		f := service.EntityFeature(entity, model.FeatureTypeTypeLoadControl, model.RoleTypeClient, "LoadControl Client")
 		entity.AddFeature(f)
 	}
 	{
-		f := useCase.EntityFeature(entity, model.FeatureTypeTypeIdentification, model.RoleTypeClient, "Identification Client")
+		f := service.EntityFeature(entity, model.FeatureTypeTypeIdentification, model.RoleTypeClient, "Identification Client")
 		entity.AddFeature(f)
 	}
 	{
-		f := useCase.EntityFeature(entity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient, "Electrical Connection Client")
+		f := service.EntityFeature(entity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient, "Electrical Connection Client")
 		entity.AddFeature(f)
 	}
 	{
-		f := useCase.EntityFeature(entity, model.FeatureTypeTypeTimeSeries, model.RoleTypeClient, "TimeSeries Client")
+		f := service.EntityFeature(entity, model.FeatureTypeTypeTimeSeries, model.RoleTypeClient, "TimeSeries Client")
 		entity.AddFeature(f)
 	}
 	{
-		f := useCase.EntityFeature(entity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeClient, "IncentiveTable Client")
+		f := service.EntityFeature(entity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeClient, "IncentiveTable Client")
 		entity.AddFeature(f)
 	}
 

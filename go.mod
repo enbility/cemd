@@ -2,7 +2,7 @@ module github.com/DerAndereAndi/eebus-go-cem
 
 go 1.18
 
-require github.com/DerAndereAndi/eebus-go v0.0.0
+require github.com/DerAndereAndi/eebus-go v0.0.0-20220515181302-794ec65711e9
 
 require (
 	github.com/ahmetb/go-linq/v3 v3.2.0 // indirect

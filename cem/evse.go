@@ -6,7 +6,6 @@ import (
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/spine"
 	"github.com/DerAndereAndi/eebus-go/spine/model"
-	"github.com/DerAndereAndi/eebus-go/usecase"
 )
 
 // Delegate Interface for the EVSE
@@ -16,7 +15,7 @@ type EVSEDelegate interface {
 }
 
 type EVSE struct {
-	*usecase.UseCaseImpl
+	*spine.UseCaseImpl
 
 	service *service.EEBUSService
 
@@ -29,7 +28,7 @@ func AddEVSESupport(service *service.EEBUSService) EVSE {
 
 	// add the use case
 	useCase := &EVSE{
-		UseCaseImpl: usecase.NewUseCase(
+		UseCaseImpl: spine.NewUseCase(
 			entity,
 			model.UseCaseNameTypeEVSECommissioningAndConfiguration,
 			[]model.UseCaseScenarioSupportType{1, 2}),
@@ -38,11 +37,11 @@ func AddEVSESupport(service *service.EEBUSService) EVSE {
 	spine.Events.Subscribe(useCase)
 
 	{
-		f := useCase.EntityFeature(entity, model.FeatureTypeTypeDeviceClassification, model.RoleTypeClient, "Device Classification Client")
+		f := service.EntityFeature(entity, model.FeatureTypeTypeDeviceClassification, model.RoleTypeClient, "Device Classification Client")
 		entity.AddFeature(f)
 	}
 	{
-		f := useCase.EntityFeature(entity, model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient, "Device Diagnosis Client")
+		f := service.EntityFeature(entity, model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient, "Device Diagnosis Client")
 		entity.AddFeature(f)
 	}
 
@@ -105,7 +104,7 @@ func (r *EVSE) HandleEvent(payload spine.EventPayload) {
 
 // request DeviceClassificationManufacturerData from a remote device
 func (r *EVSE) requestManufacturer(remoteDevice *spine.DeviceRemoteImpl) {
-	featureLocal, featureRemote, err := r.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceClassification, remoteDevice)
+	featureLocal, featureRemote, err := r.service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceClassification, remoteDevice)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -117,7 +116,7 @@ func (r *EVSE) requestManufacturer(remoteDevice *spine.DeviceRemoteImpl) {
 
 // request DeviceDiagnosisStateData from a remote device
 func (r *EVSE) requestDeviceDiagnosisState(remoteDevice *spine.DeviceRemoteImpl) {
-	featureLocal, featureRemote, err := r.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceDiagnosis, remoteDevice)
+	featureLocal, featureRemote, err := r.service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceDiagnosis, remoteDevice)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -137,7 +136,7 @@ func (r *EVSE) notifyDeviceDiagnosisState(operatingState *model.DeviceDiagnosisS
 		return
 	}
 
-	featureLocal, featureRemote, err := r.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceDiagnosis, remoteDevice)
+	featureLocal, featureRemote, err := r.service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceDiagnosis, remoteDevice)
 	if err != nil {
 		fmt.Println(err)
 		return
