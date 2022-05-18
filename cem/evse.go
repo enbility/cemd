@@ -111,7 +111,7 @@ func (r *EVSE) requestManufacturer(remoteDevice *spine.DeviceRemoteImpl) {
 	}
 
 	requestChannel := make(chan *model.DeviceClassificationManufacturerDataType)
-	featureLocal.RequestData(model.FunctionTypeDeviceClassificationManufacturerData, featureRemote, requestChannel)
+	_, _ = featureLocal.RequestData(model.FunctionTypeDeviceClassificationManufacturerData, featureRemote, requestChannel)
 }
 
 // request DeviceDiagnosisStateData from a remote device
@@ -123,12 +123,13 @@ func (r *EVSE) requestDeviceDiagnosisState(remoteDevice *spine.DeviceRemoteImpl)
 	}
 
 	requestChannel := make(chan *model.DeviceDiagnosisStateDataType)
-	featureLocal.RequestData(model.FunctionTypeDeviceDiagnosisStateData, featureRemote, requestChannel)
+	_, _ = featureLocal.RequestData(model.FunctionTypeDeviceDiagnosisStateData, featureRemote, requestChannel)
 
 	// subscribe to device diagnosis state updates
-	remoteDevice.Sender().Subscribe(featureLocal.Address(), featureRemote.Address(), model.FeatureTypeTypeDeviceDiagnosis)
+	_ = remoteDevice.Sender().Subscribe(featureLocal.Address(), featureRemote.Address(), model.FeatureTypeTypeDeviceDiagnosis)
 }
 
+/*
 // notify remote devices about the new device diagnosis state
 func (r *EVSE) notifyDeviceDiagnosisState(operatingState *model.DeviceDiagnosisStateDataType) {
 	remoteDevice := r.service.RemoteDeviceOfType(model.DeviceTypeTypeEnergyManagementSystem)
@@ -144,5 +145,6 @@ func (r *EVSE) notifyDeviceDiagnosisState(operatingState *model.DeviceDiagnosisS
 
 	featureLocal.SetData(model.FunctionTypeDeviceDiagnosisStateData, operatingState)
 
-	featureLocal.NotifyData(model.FunctionTypeDeviceDiagnosisStateData, featureRemote)
+	_, _ = featureLocal.NotifyData(model.FunctionTypeDeviceDiagnosisStateData, featureRemote)
 }
+*/

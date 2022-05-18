@@ -69,7 +69,7 @@ func (h *Cem) Setup(port, remoteSKI, certFile, keyFile string) error {
 	remoteService := service.ServiceDetails{
 		SKI: remoteSKI,
 	}
-	h.myService.RegisterRemoteService(remoteService)
+	_ = h.myService.RegisterRemoteService(remoteService)
 
 	return nil
 }
