@@ -52,40 +52,36 @@ func AddEVSESupport(service *service.EEBUSService) EVSE {
 func (r *EVSE) HandleEvent(payload spine.EventPayload) {
 	switch payload.EventType {
 	case spine.EventTypeDeviceChange:
-		if payload.ChangeType == spine.ElementChangeAdd {
+		switch payload.ChangeType {
+		case spine.ElementChangeAdd:
 			r.requestManufacturer(payload.Device)
 			r.requestDeviceDiagnosisState(payload.Device)
 		}
-		// case spine.EventTypeSubscriptionChange:
-		// 	switch payload.Data.(type) {
-		// 	case model.SubscriptionManagementRequestCallType:
-		// 		data := payload.Data.(model.SubscriptionManagementRequestCallType)
-		// 		if model.FunctionType(*data.ServerFeatureType) == model.FunctionTypeDeviceDiagnosisStateData {
-		// 			// only a CEM should send heartbeats to its remotes
-		// 			if r.service.ServiceDescription.DeviceType != model.DeviceTypeTypeEnergyManagementSystem {
-		// 				return
-		// 			}
-		// 			remoteDevice := r.service.RemoteDeviceForSki(payload.Ski)
-		// 			if remoteDevice == nil {
-		// 				fmt.Println("No remote device found for SKI:", payload.Ski)
-		// 				return
-		// 			}
-		// 			switch payload.ChangeType {
-		// 			case spine.ElementChangeAdd:
-		// 				// start sending heartbeats
-		// 				senderAddr := r.Entity.Device().FeatureByTypeAndRole(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer).Address()
-		// 				destinationAddr := remoteDevice.FeatureByTypeAndRole(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient).Address()
-		// 				if senderAddr == nil || destinationAddr == nil {
-		// 					fmt.Println("No sender or destination address found for SKI:", payload.Ski)
-		// 					return
-		// 				}
-		// 				remoteDevice.StartHearbeat(senderAddr, destinationAddr)
-		// 			case spine.ElementChangeRemove:
-		// 				// Stop sending heartbeats
-		// 				remoteDevice.StopHeartbeat()
-		// 			}
-		// 		}
-		// 	}
+	case spine.EventTypeSubscriptionChange:
+		switch payload.Data.(type) {
+		case model.SubscriptionManagementRequestCallType:
+			data := payload.Data.(model.SubscriptionManagementRequestCallType)
+			if *data.ServerFeatureType == model.FeatureTypeTypeDeviceDiagnosis {
+				remoteDevice := r.service.RemoteDeviceForSki(payload.Ski)
+				if remoteDevice == nil {
+					fmt.Println("No remote device found for SKI:", payload.Ski)
+					return
+				}
+				switch payload.ChangeType {
+				case spine.ElementChangeAdd:
+					// start sending heartbeats
+					senderAddr := r.Entity.Device().FeatureByTypeAndRole(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer).Address()
+					destinationAddr := remoteDevice.FeatureByTypeAndRole(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient).Address()
+					if senderAddr == nil || destinationAddr == nil {
+						fmt.Println("No sender or destination address found for SKI:", payload.Ski)
+						return
+					}
+					remoteDevice := r.service.RemoteDeviceForSki(payload.Ski)
+					remoteDevice.StartHeartbeatSend(senderAddr, destinationAddr)
+				}
+			}
+		}
+
 	case spine.EventTypeDataChange:
 		if payload.ChangeType == spine.ElementChangeUpdate {
 			switch payload.Data.(type) {
