@@ -92,13 +92,18 @@ func (h *Cem) RemoteServiceShipIDReported(ski string, shipID string) {
 // EVSEDelegate
 
 // handle device state updates from the remote EVSE device
-func (h *Cem) HandleEVSEDeviceState(ski string, failure bool, errorCode string) {
-	fmt.Println("EVSE Error State:", failure, errorCode)
+func (h *Cem) HandleEVSEDeviceState(ski string, failure bool) {
+	fmt.Println("EVSE Error State:", failure)
+}
+
+// handle device manufacturer updates from the remote EVSE device
+func (h *Cem) HandleEVSEDeviceManufacturerData(ski string, details ManufacturerDetails) {
+	fmt.Println("EVSE Manufacturer Data:", details)
 }
 
 // EVDelegate
 
 // handle device state updates from the remote EVSE device
-func (h *Cem) HandleEVEntityState(ski string, failure bool, errorCode string) {
-	fmt.Println("EV Error State:", failure, errorCode)
+func (h *Cem) HandleEVEntityState(ski string, failure bool) {
+	fmt.Println("EV Error State:", failure)
 }

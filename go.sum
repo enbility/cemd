@@ -1,5 +1,5 @@
-github.com/DerAndereAndi/eebus-go v0.0.0-20220520151305-978d3a2e62d5 h1:UbPu+3ZEV0ZnJjLUL6Yr4lCJdMMDceydvyifxTwETMc=
-github.com/DerAndereAndi/eebus-go v0.0.0-20220520151305-978d3a2e62d5/go.mod h1:BL8WCbGy+QjETBO0iG6eeTYXpQrOwC3J/4eREApKTQA=
+github.com/DerAndereAndi/eebus-go v0.0.0-20220522200132-fc5644df5302 h1:WFdoy0CtN+t4f94v+d1NypJvSLKuID/v3e/ukVsQgT8=
+github.com/DerAndereAndi/eebus-go v0.0.0-20220522200132-fc5644df5302/go.mod h1:BL8WCbGy+QjETBO0iG6eeTYXpQrOwC3J/4eREApKTQA=
 github.com/ahmetb/go-linq/v3 v3.2.0 h1:BEuMfp+b59io8g5wYzNoFe9pWPalRklhlhbiU3hYZDE=
 github.com/ahmetb/go-linq/v3 v3.2.0/go.mod h1:haQ3JfOeWK8HpVxMtHHEMPVgBKiYyQ+f1/kLZh/cj9U=
 github.com/cenkalti/backoff v2.2.1+incompatible h1:tNowT99t7UNflLxfYYSlKYsBpXdEet03Pg2g16Swow4=
