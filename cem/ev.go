@@ -206,7 +206,6 @@ func (e *EV) evConnected(entity *spine.EntityRemoteImpl) {
 	// get electrical connection parameter
 	// we ignore this scenario as it is a scoped request and we'll do
 	// full requests in the measurements use case
-	e.requestElectricalConnectionParameterDescriptionListData(entity)
 
 	// get device diagnosis state
 	e.requestDeviceDiagnosisState(entity)
