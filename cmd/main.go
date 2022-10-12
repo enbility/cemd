@@ -11,17 +11,18 @@ import (
 
 // main app
 func usage() {
-	fmt.Println("Usage: go run /cmd/main.go <serverport> <evse-ski> <crtfile> <keyfile>")
+	fmt.Println("Usage: go run /cmd/main.go <serverport> <evse-ski> <crtfile> <keyfile> <iface>")
 }
 
 func main() {
-	if len(os.Args) < 4 {
+	if len(os.Args) < 5 {
 		usage()
 		return
 	}
 
-	h := cem.NewCEM("Demo", "HEMS", "123456789", "Demo-HEMS-123456789")
-	if err := h.Setup(os.Args[1], os.Args[2], os.Args[3], os.Args[4]); err != nil {
+	h := cem.NewCEM("Demo", "HEMS", "123456789", "Demo-HEMS-0123456789")
+	ifaces := []string{os.Args[5]}
+	if err := h.Setup(os.Args[1], os.Args[2], os.Args[3], os.Args[4], ifaces); err != nil {
 		fmt.Println("Error: ", err)
 		return
 	}

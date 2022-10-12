@@ -1,6 +1,7 @@
 package cem
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/DerAndereAndi/eebus-go/service"
@@ -32,7 +33,7 @@ type EVSEDelegate interface {
 }
 
 type EVSE struct {
-	*spine.UseCaseImpl
+	entity *spine.EntityLocalImpl
 
 	service *service.EEBUSService
 
@@ -44,28 +45,27 @@ type EVSE struct {
 
 // Add EVSE support
 func AddEVSESupport(service *service.EEBUSService) *EVSE {
-	entity := service.LocalEntity()
-
 	// add the use case
-	useCase := &EVSE{
-		UseCaseImpl: spine.NewUseCase(
-			entity,
-			model.UseCaseNameTypeEVSECommissioningAndConfiguration,
-			[]model.UseCaseScenarioSupportType{1, 2}),
+	evse := &EVSE{
 		service: service,
+		entity:  service.LocalEntity(),
 	}
-	spine.Events.Subscribe(useCase)
+	spine.Events.Subscribe(evse)
+
+	_ = spine.NewUseCase(
+		evse.entity,
+		model.UseCaseNameTypeEVSECommissioningAndConfiguration,
+		model.SpecificationVersionType("1.0.1"),
+		[]model.UseCaseScenarioSupportType{1, 2})
 
 	{
-		f := service.EntityFeature(entity, model.FeatureTypeTypeDeviceClassification, model.RoleTypeClient, "Device Classification Client")
-		entity.AddFeature(f)
+		_ = evse.entity.GetOrAddFeature(model.FeatureTypeTypeDeviceClassification, model.RoleTypeClient, "Device Classification Client")
 	}
 	{
-		f := service.EntityFeature(entity, model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient, "Device Diagnosis Client")
-		entity.AddFeature(f)
+		_ = evse.entity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient, "Device Diagnosis Client")
 	}
 
-	return useCase
+	return evse
 }
 
 // get the remote device specific data element
@@ -102,9 +102,8 @@ func (e *EVSE) HandleEvent(payload spine.EventPayload) {
 				switch payload.ChangeType {
 				case spine.ElementChangeAdd:
 					// start sending heartbeats
-					senderAddr := e.Entity.Device().FeatureByTypeAndRole(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer).Address()
-					rEntity := remoteDevice.Entity([]model.AddressEntityType{1})
-					destinationAddr := remoteDevice.FeatureByEntityTypeAndRole(rEntity, model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient).Address()
+					senderAddr := e.entity.Device().FeatureByTypeAndRole(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer).Address()
+					destinationAddr := payload.Feature.Address()
 					if senderAddr == nil || destinationAddr == nil {
 						fmt.Println("No sender or destination address found for SKI:", payload.Ski)
 						return
@@ -132,18 +131,17 @@ func (e *EVSE) HandleEvent(payload spine.EventPayload) {
 }
 
 // request DeviceClassificationManufacturerData from a remote evse device
-func (e *EVSE) requestManufacturer(remoteDevice *spine.DeviceRemoteImpl) {
-	rEntity := remoteDevice.Entity([]model.AddressEntityType{1})
-	response := requestManufacturerDetailsForEntity(e.service, rEntity)
+func (e *EVSE) requestManufacturer(device *spine.DeviceRemoteImpl) {
+	response := requestManufacturerDetailsForEntity(e.service, device.Entity([]model.AddressEntityType{1}))
 	if response == nil {
 		return
 	}
 
-	evseData := e.dataForRemoteDevice(remoteDevice)
+	evseData := e.dataForRemoteDevice(device)
 	evseData.ManufacturerDetails = *response
 
 	if e.Delegate != nil {
-		e.Delegate.HandleEVSEDeviceManufacturerData(remoteDevice.Ski(), *response)
+		e.Delegate.HandleEVSEDeviceManufacturerData(device.Ski(), *response)
 	}
 }
 
@@ -156,11 +154,13 @@ func requestManufacturerDetailsForEntity(service *service.EEBUSService, entity *
 		return nil
 	}
 
-	requestChannel := make(chan *model.DeviceClassificationManufacturerDataType)
-	_, _ = featureLocal.RequestData(model.FunctionTypeDeviceClassificationManufacturerData, featureRemote, requestChannel)
+	data, fErr := featureLocal.RequestAndFetchData(model.FunctionTypeDeviceClassificationManufacturerData, featureRemote)
+	if fErr != nil {
+		fmt.Println(fErr.Description)
+		return nil
+	}
 
-	// wait for the response
-	response := <-requestChannel
+	response := data.(*model.DeviceClassificationManufacturerDataType)
 
 	details := &ManufacturerDetails{}
 
@@ -196,7 +196,11 @@ func (e *EVSE) requestDeviceDiagnosisState(remoteDevice *spine.DeviceRemoteImpl)
 		return
 	}
 
-	response := requestDeviceDiagnosisStateForEntity(e.service, rEntity)
+	response, err := requestDeviceDiagnosisStateForEntity(e.service, rEntity)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	failure := *response.OperatingState == model.DeviceDiagnosisOperatingStateTypeFailure
 	if e.Delegate != nil {
@@ -204,24 +208,28 @@ func (e *EVSE) requestDeviceDiagnosisState(remoteDevice *spine.DeviceRemoteImpl)
 	}
 
 	// subscribe to device diagnosis state updates
-	_ = remoteDevice.Sender().Subscribe(featureLocal.Address(), featureRemote.Address(), model.FeatureTypeTypeDeviceDiagnosis)
+	fErr := featureLocal.SubscribeAndWait(featureRemote.Device(), featureRemote.Address())
+	if fErr != nil {
+		fmt.Println(fErr.String())
+	}
 }
 
 // request DeviceDiagnosisStateData from a remote entity
-func requestDeviceDiagnosisStateForEntity(service *service.EEBUSService, entity *spine.EntityRemoteImpl) *model.DeviceDiagnosisStateDataType {
+func requestDeviceDiagnosisStateForEntity(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (*model.DeviceDiagnosisStateDataType, error) {
 	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceDiagnosis, entity)
 	if err != nil {
 		fmt.Println(err)
-		return nil
+		return nil, err
 	}
 
-	requestChannel := make(chan *model.DeviceDiagnosisStateDataType)
-	_, _ = featureLocal.RequestData(model.FunctionTypeDeviceDiagnosisStateData, featureRemote, requestChannel)
+	data, fErr := featureLocal.RequestAndFetchData(model.FunctionTypeDeviceDiagnosisStateData, featureRemote)
+	if fErr != nil {
+		return nil, errors.New(fErr.String())
+	}
 
-	// wait for the response
-	response := <-requestChannel
+	response := data.(*model.DeviceDiagnosisStateDataType)
 
-	return response
+	return response, nil
 }
 
 /*

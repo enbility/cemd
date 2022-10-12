@@ -26,14 +26,14 @@ func NewCEM(brand, model, serialNumber, identifier string) *Cem {
 	}
 }
 
-func (h *Cem) Setup(port, remoteSKI, certFile, keyFile string) error {
+func (h *Cem) Setup(port, remoteSKI, certFile, keyFile string, ifaces []string) error {
 	serviceDescription := &service.ServiceDescription{
 		Brand:        h.brand,
 		Model:        h.model,
 		SerialNumber: h.serialNumber,
 		Identifier:   h.identifier,
 		DeviceType:   model.DeviceTypeTypeEnergyManagementSystem,
-		Interfaces:   []string{"en0"},
+		Interfaces:   ifaces,
 	}
 
 	h.myService = service.NewEEBUSService(serviceDescription, h)
@@ -60,7 +60,7 @@ func (h *Cem) Setup(port, remoteSKI, certFile, keyFile string) error {
 	// Setup the supported UseCases and their features
 	evseSupport := AddEVSESupport(h.myService)
 	evseSupport.Delegate = h
-	evSupport, _ := AddEVSupport(h.myService)
+	evSupport := AddEVSupport(h.myService)
 	evSupport.Delegate = h
 
 	h.myService.Start()
@@ -69,7 +69,7 @@ func (h *Cem) Setup(port, remoteSKI, certFile, keyFile string) error {
 	remoteService := service.ServiceDetails{
 		SKI: remoteSKI,
 	}
-	_ = h.myService.RegisterRemoteService(remoteService)
+	h.myService.RegisterRemoteService(remoteService)
 
 	return nil
 }

@@ -1,37 +1,12 @@
 package cem
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/spine"
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
-
-type EVCommunicationStandardType string
-
-const (
-	EVCommunicationStandardTypeUnknown      EVCommunicationStandardType = "unknown"
-	EVCommunicationStandardTypeISO151182ED1 EVCommunicationStandardType = "iso15118-2ed1"
-	EVCommunicationStandardTypeISO151182ED2 EVCommunicationStandardType = "iso15118-2ed2"
-	EVCommunicationStandardTypeIEC61851     EVCommunicationStandardType = "iec61851"
-)
-
-type EVIdentificationType string
-
-const (
-	EVIdentificationTypeEUI48 EVIdentificationType = "eui48" // eui48 MAC address
-	EVIdentificationTypeEUI64 EVIdentificationType = "eui64" // eui64 MAC address
-)
-
-type EVData struct {
-	CommunicationStandard       EVCommunicationStandardType
-	AsymmetricChargingSupported bool
-	IdentificationType          EVIdentificationType
-	Identification              string
-	ManufacturerDetails         ManufacturerDetails
-}
 
 // Interface for the evCC use case for CEM device
 type EVDelegate interface {
@@ -41,7 +16,8 @@ type EVDelegate interface {
 
 // EV Commissioning and Configuration Use Case implementation
 type EV struct {
-	*spine.UseCaseImpl
+	entity *spine.EntityLocalImpl
+
 	service *service.EEBUSService
 
 	Delegate EVDelegate
@@ -52,38 +28,69 @@ type EV struct {
 
 // Register the use case and features for handling EVs
 // CEM will call this on startup
-func AddEVSupport(service *service.EEBUSService) (*EV, error) {
-	if service.ServiceDescription.DeviceType != model.DeviceTypeTypeEnergyManagementSystem {
-		return nil, errors.New("device type not supported")
-	}
-
-	// A CEM has all the features implemented in the main entity
-	entity := service.LocalEntity()
-
+func AddEVSupport(service *service.EEBUSService) *EV {
 	// add the use case
-	useCase := &EV{
-		UseCaseImpl: spine.NewUseCase(
-			entity,
-			model.UseCaseNameTypeEVCommissioningAndConfiguration,
-			[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8}),
+	ev := &EV{
 		service: service,
+		entity:  service.LocalEntity(),
 		data:    make(map[string]*EVData),
 	}
 
 	// subscribe to get incoming EV events
-	spine.Events.Subscribe(useCase)
+	spine.Events.Subscribe(ev)
+
+	// add use cases
+	_ = spine.NewUseCase(
+		ev.entity,
+		model.UseCaseNameTypeEVCommissioningAndConfiguration,
+		model.SpecificationVersionType("1.0.1"),
+		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
+
+	_ = spine.NewUseCase(
+		ev.entity,
+		model.UseCaseNameTypeMeasurementOfElectricityDuringEVCharging,
+		model.SpecificationVersionType("1.0.1"),
+		[]model.UseCaseScenarioSupportType{1, 2, 3})
+
+	_ = spine.NewUseCase(
+		ev.entity,
+		model.UseCaseNameTypeOverloadProtectionByEVChargingCurrentCurtailment,
+		model.SpecificationVersionType("1.0.0"),
+		[]model.UseCaseScenarioSupportType{1, 2, 3})
+
+	_ = spine.NewUseCase(
+		ev.entity,
+		model.UseCaseNameTypeOverloadProtectionByEVChargingCurrentCurtailment,
+		model.SpecificationVersionType("1.0.1"),
+		[]model.UseCaseScenarioSupportType{1, 2, 3})
+
+	_ = spine.NewUseCase(
+		ev.entity,
+		model.UseCaseNameTypeOptimizationOfSelfConsumptionDuringEVCharging,
+		model.SpecificationVersionType("1.0.1"),
+		[]model.UseCaseScenarioSupportType{1, 2, 3})
+
+	_ = spine.NewUseCase(
+		ev.entity,
+		model.UseCaseNameTypeEVStateOfCharge,
+		model.SpecificationVersionType("1.0.0"),
+		[]model.UseCaseScenarioSupportType{1})
+
+	_ = spine.NewUseCase(
+		ev.entity,
+		model.UseCaseNameTypeCoordinatedEVCharging,
+		model.SpecificationVersionType("1.0.1"),
+		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
 
 	// add the features
 	{
-		f := service.EntityFeature(entity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeClient, "Device Configuration Client")
-		entity.AddFeature(f)
+		_ = ev.entity.GetOrAddFeature(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeClient, "Device Configuration Client")
 	}
 	{
-		f := service.EntityFeature(entity, model.FeatureTypeTypeDeviceClassification, model.RoleTypeClient, "Device Classification Client")
-		entity.AddFeature(f)
+		_ = ev.entity.GetOrAddFeature(model.FeatureTypeTypeDeviceClassification, model.RoleTypeClient, "Device Classification Client")
 	}
 	{
-		f := service.EntityFeature(entity, model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer, "Device Diagnosis Server")
+		f := ev.entity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer, "Device Diagnosis Server")
 		f.AddFunctionType(model.FunctionTypeDeviceDiagnosisStateData, true, false)
 
 		// Set the initial state
@@ -94,100 +101,27 @@ func AddEVSupport(service *service.EEBUSService) (*EV, error) {
 		f.SetData(model.FunctionTypeDeviceDiagnosisStateData, deviceDiagnosisStateDate)
 
 		f.AddFunctionType(model.FunctionTypeDeviceDiagnosisHeartbeatData, true, false)
-
-		entity.AddFeature(f)
 	}
 	{
-		f := service.EntityFeature(entity, model.FeatureTypeTypeIdentification, model.RoleTypeClient, "Identification Client")
-		entity.AddFeature(f)
+		_ = ev.entity.GetOrAddFeature(model.FeatureTypeTypeIdentification, model.RoleTypeClient, "Identification Client")
 	}
 	{
-		f := service.EntityFeature(entity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient, "Electrical Connection Client")
-		entity.AddFeature(f)
+		_ = ev.entity.GetOrAddFeature(model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient, "Electrical Connection Client")
 	}
 
-	return useCase, nil
-}
-
-// get the remote device specific data element
-func (e *EV) dataForRemoteDevice(remoteDevice *spine.DeviceRemoteImpl) *EVData {
-	if evdata, ok := e.data[remoteDevice.Ski()]; ok {
-		return evdata
-	}
-
-	return &EVData{
-		CommunicationStandard:       EVCommunicationStandardTypeIEC61851,
-		AsymmetricChargingSupported: false,
-	}
+	return ev
 }
 
 // Invoke to remove an EV entity
 // Called when an EV was disconnected
 func (e *EV) UnregisterEV() {
 	// remove the entity
-	e.service.RemoveEntity(e.Entity)
+	e.service.RemoveEntity(e.entity)
 }
 
 // Invoked when an EV entity was added or removed
 func (e *EV) TriggerEntityUpdate() {
 
-}
-
-// Internal EventHandler Interface for the CEM
-func (e *EV) HandleEvent(payload spine.EventPayload) {
-	switch payload.EventType {
-	case spine.EventTypeDeviceChange:
-		switch payload.ChangeType {
-		case spine.ElementChangeAdd:
-			// check if an EV is already connected
-			remoteDevice := payload.Device
-			if remoteDevice == nil {
-				return
-			}
-			// Attention: We assume an EVSE only has 1 port!
-			entity := remoteDevice.Entity([]model.AddressEntityType{1, 1})
-			if !e.checkEntityBeingEV(entity) {
-				return
-			}
-			e.evConnected(entity)
-		}
-	case spine.EventTypeEntityChange:
-		switch payload.ChangeType {
-		case spine.ElementChangeAdd:
-			// EV connected
-			if !e.checkEntityBeingEV(payload.Entity) {
-				return
-			}
-			e.evConnected(payload.Entity)
-		case spine.ElementChangeRemove:
-			// EV disconnected
-			if !e.checkEntityBeingEV(payload.Entity) {
-				return
-			}
-			fmt.Println("EV DISCONNECTED")
-		}
-	case spine.EventTypeDataChange:
-		if payload.ChangeType == spine.ElementChangeUpdate {
-			switch payload.Data.(type) {
-			case *model.DeviceDiagnosisStateDataType:
-				if e.Delegate == nil {
-					return
-				}
-
-				deviceDiagnosisStateData := payload.Data.(*model.DeviceDiagnosisStateDataType)
-				failure := *deviceDiagnosisStateData.OperatingState == model.DeviceDiagnosisOperatingStateTypeFailure
-				e.Delegate.HandleEVEntityState(payload.Ski, failure)
-			}
-		}
-	}
-}
-
-// check if the provided entity is an EV
-func (e *EV) checkEntityBeingEV(entity *spine.EntityRemoteImpl) bool {
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return false
-	}
-	return true
 }
 
 // an EV was connected, trigger required communication
@@ -196,9 +130,6 @@ func (e *EV) evConnected(entity *spine.EntityRemoteImpl) {
 
 	// get ev configuration data
 	e.requestConfigurationKeyValueDescriptionListData(entity)
-
-	// get ev identification data
-	e.requestIdentitificationlistData(entity)
 
 	// get manufacturer details
 	e.requestManufacturer(entity)
@@ -211,147 +142,6 @@ func (e *EV) evConnected(entity *spine.EntityRemoteImpl) {
 	e.requestDeviceDiagnosisState(entity)
 }
 
-// request DeviceConfigurationKeyValueDescriptionListData from a remote entity
-func (e *EV) requestConfigurationKeyValueDescriptionListData(entity *spine.EntityRemoteImpl) {
-	featureLocal, featureRemote, err := e.service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceConfiguration, entity)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	requestChannel := make(chan *model.DeviceConfigurationKeyValueDescriptionListDataType, 1)
-	_, err = featureLocal.RequestData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, featureRemote, requestChannel)
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	data := <-requestChannel
-
-	fmt.Printf("DescriptionData: %#v\n", data)
-
-	e.requestConfigurationKeyValueListData(entity)
-}
-
-// request DeviceConfigurationKeyValueListDataType from a remote entity
-func (e *EV) requestConfigurationKeyValueListData(entity *spine.EntityRemoteImpl) {
-	featureLocal, featureRemote, err := e.service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceConfiguration, entity)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	requestChannel := make(chan *model.DeviceConfigurationKeyValueListDataType, 1)
-	_, err = featureLocal.RequestData(model.FunctionTypeDeviceConfigurationKeyValueListData, featureRemote, requestChannel)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	data := <-requestChannel
-
-	fmt.Printf("KeyValueData: %#v\n", data)
-
-	e.updateDeviceConfigurationData(entity)
-
-	// subscribe to device configuration state updates
-	_ = entity.Device().Sender().Subscribe(featureLocal.Address(), featureRemote.Address(), model.FeatureTypeTypeDeviceConfiguration)
-}
-
-// set the new device configuration data
-func (e *EV) updateDeviceConfigurationData(entity *spine.EntityRemoteImpl) {
-	_, featureRemote, err := e.service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceConfiguration, entity)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	descriptionData := featureRemote.Data(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData).(*model.DeviceConfigurationKeyValueDescriptionListDataType)
-	data := featureRemote.Data(model.FunctionTypeDeviceConfigurationKeyValueListData).(*model.DeviceConfigurationKeyValueListDataType)
-	if descriptionData == nil || data == nil {
-		return
-	}
-
-	evData := e.dataForRemoteDevice(entity.Device())
-
-	for _, descriptionItem := range descriptionData.DeviceConfigurationKeyValueDescriptionData {
-		for _, dataItem := range data.DeviceConfigurationKeyValueData {
-			if descriptionItem.KeyId == dataItem.KeyId {
-				if descriptionItem.KeyName == nil {
-					continue
-				}
-
-				switch *descriptionItem.KeyName {
-				case string(model.DeviceConfigurationKeyNameTypeCommunicationsStandard):
-					evData.CommunicationStandard = EVCommunicationStandardType(*dataItem.Value.String)
-				case string(model.DeviceConfigurationKeyNameTypeAsymmetricChargingSupported):
-					evData.AsymmetricChargingSupported = (*dataItem.Value.Boolean)
-				}
-			}
-		}
-	}
-
-	fmt.Printf("EV Communication Standard: %s\n", evData.CommunicationStandard)
-	fmt.Printf("EV Asymmetric Charging Supported: %t\n", evData.AsymmetricChargingSupported)
-}
-
-// request IdentificationListDataType from a remote entity
-func (e *EV) requestIdentitificationlistData(entity *spine.EntityRemoteImpl) {
-	knownEVData, ok := e.data[entity.Device().Ski()]
-	if !ok || knownEVData.CommunicationStandard == EVCommunicationStandardTypeUnknown || knownEVData.CommunicationStandard == EVCommunicationStandardTypeIEC61851 {
-		// identification requests only work with ISO connections to the EV
-		return
-	}
-
-	featureLocal, featureRemote, err := e.service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeIdentification, entity)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	requestChannel := make(chan *model.IdentificationListDataType, 1)
-	_, err = featureLocal.RequestData(model.FunctionTypeIdentificationListData, featureRemote, nil)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	data := <-requestChannel
-
-	e.updateIdentificationData(entity)
-
-	fmt.Printf("Identification: %#v\n", data)
-}
-
-// set the new identification data
-func (e *EV) updateIdentificationData(entity *spine.EntityRemoteImpl) {
-	_, featureRemote, err := e.service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeIdentification, entity)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	data := featureRemote.Data(model.FunctionTypeIdentificationListData).(*model.IdentificationListDataType)
-	if data == nil {
-		return
-	}
-
-	evData := e.dataForRemoteDevice(entity.Device())
-
-	for _, dataItem := range data.IdentificationData {
-		if dataItem.IdentificationType == nil {
-			continue
-		}
-
-		evData.IdentificationType = EVIdentificationType(*dataItem.IdentificationType)
-		evData.Identification = string(*dataItem.IdentificationValue)
-	}
-
-	fmt.Printf("EV Identification Type: %s\n", evData.IdentificationType)
-	fmt.Printf("EV Identification: %s\n", evData.Identification)
-}
-
 // request EV manufacturer details from a remote entity
 func (e *EV) requestManufacturer(entity *spine.EntityRemoteImpl) {
 	response := requestManufacturerDetailsForEntity(e.service, entity)
@@ -362,6 +152,8 @@ func (e *EV) requestManufacturer(entity *spine.EntityRemoteImpl) {
 	evData := e.dataForRemoteDevice(entity.Device())
 	evData.ManufacturerDetails = *response
 
+	fmt.Printf("Brand: %s\n", evData.ManufacturerDetails.BrandName)
+	fmt.Printf("Device: %s\n", evData.ManufacturerDetails.DeviceName)
 	fmt.Printf("Power Source: %s\n", evData.ManufacturerDetails.PowerSource)
 }
 
@@ -373,7 +165,11 @@ func (e *EV) requestDeviceDiagnosisState(entity *spine.EntityRemoteImpl) {
 		return
 	}
 
-	response := requestDeviceDiagnosisStateForEntity(e.service, entity)
+	response, err := requestDeviceDiagnosisStateForEntity(e.service, entity)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	if response == nil {
 		return
@@ -384,5 +180,8 @@ func (e *EV) requestDeviceDiagnosisState(entity *spine.EntityRemoteImpl) {
 	// model.DeviceDiagnosisOperatingStateTypeStandby
 
 	// subscribe to entity diagnosis state updates
-	_ = entity.Device().Sender().Subscribe(featureLocal.Address(), featureRemote.Address(), model.FeatureTypeTypeDeviceDiagnosis)
+	fErr := featureLocal.SubscribeAndWait(featureRemote.Device(), featureRemote.Address())
+	if fErr != nil {
+		fmt.Println(fErr.String())
+	}
 }
