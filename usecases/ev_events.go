@@ -1,4 +1,4 @@
-package cem
+package usecases
 
 import (
 	"fmt"
@@ -10,21 +10,6 @@ import (
 // Internal EventHandler Interface for the CEM
 func (e *EV) HandleEvent(payload spine.EventPayload) {
 	switch payload.EventType {
-	// case spine.EventTypeDeviceChange:
-	// 	switch payload.ChangeType {
-	// 	case spine.ElementChangeAdd:
-	// 		// check if an EV is already connected
-	// 		remoteDevice := payload.Device
-	// 		if remoteDevice == nil {
-	// 			return
-	// 		}
-	// 		// Attention: We assume an EVSE only has 1 port!
-	// 		entity := remoteDevice.Entity([]model.AddressEntityType{1, 1})
-	// 		if !e.checkEntityBeingEV(entity) {
-	// 			return
-	// 		}
-	// 		e.evConnected(entity)
-	// 	}
 	case spine.EventTypeEntityChange:
 		switch payload.ChangeType {
 		case spine.ElementChangeAdd:
@@ -44,13 +29,8 @@ func (e *EV) HandleEvent(payload spine.EventPayload) {
 		if payload.ChangeType == spine.ElementChangeUpdate {
 			switch payload.Data.(type) {
 			case *model.DeviceDiagnosisStateDataType:
-				if e.Delegate == nil {
-					return
-				}
+				// TODO: received diagnosis state
 
-				deviceDiagnosisStateData := payload.Data.(*model.DeviceDiagnosisStateDataType)
-				failure := *deviceDiagnosisStateData.OperatingState == model.DeviceDiagnosisOperatingStateTypeFailure
-				e.Delegate.HandleEVEntityState(payload.Ski, failure)
 			}
 		}
 	}

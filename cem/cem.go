@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/DerAndereAndi/eebus-go-cem/usecases"
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
@@ -58,10 +59,10 @@ func (h *Cem) Setup(port, remoteSKI, certFile, keyFile string, ifaces []string) 
 	}
 
 	// Setup the supported UseCases and their features
-	evseSupport := AddEVSESupport(h.myService)
-	evseSupport.Delegate = h
-	evSupport := AddEVSupport(h.myService)
-	evSupport.Delegate = h
+
+	// e-mobilty specific use cases
+	_ = usecases.NewEVSECommissioningAndConfiguration(h.myService)
+	_ = usecases.NewEVCommissioningAndConfiguration(h.myService)
 
 	h.myService.Start()
 	// defer h.myService.Shutdown()
@@ -87,23 +88,4 @@ func (h *Cem) RemoteServiceShipIDReported(ski string, shipID string) {
 	// we should associated the Ship ID with the SKI and store it
 	// so the next connection can start trusted
 	fmt.Println("SKI", ski, "has Ship ID:", shipID)
-}
-
-// EVSEDelegate
-
-// handle device state updates from the remote EVSE device
-func (h *Cem) HandleEVSEDeviceState(ski string, failure bool) {
-	fmt.Println("EVSE Error State:", failure)
-}
-
-// handle device manufacturer updates from the remote EVSE device
-func (h *Cem) HandleEVSEDeviceManufacturerData(ski string, details ManufacturerDetails) {
-	fmt.Println("EVSE Manufacturer Data:", details)
-}
-
-// EVDelegate
-
-// handle device state updates from the remote EVSE device
-func (h *Cem) HandleEVEntityState(ski string, failure bool) {
-	fmt.Println("EV Error State:", failure)
 }

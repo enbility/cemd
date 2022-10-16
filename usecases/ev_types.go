@@ -1,6 +1,9 @@
-package cem
+package usecases
 
-import "github.com/DerAndereAndi/eebus-go/spine"
+import (
+	"github.com/DerAndereAndi/eebus-go-cem/features"
+	"github.com/DerAndereAndi/eebus-go/spine"
+)
 
 type EVCommunicationStandardType string
 
@@ -23,7 +26,7 @@ type EVData struct {
 	AsymmetricChargingSupported bool
 	IdentificationType          EVIdentificationType
 	Identification              string
-	ManufacturerDetails         ManufacturerDetails
+	ManufacturerDetails         features.ManufacturerDetails
 }
 
 // get the remote device specific data element
