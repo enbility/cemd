@@ -7,6 +7,7 @@ import (
 
 	"github.com/DerAndereAndi/eebus-go-cem/usecases"
 	"github.com/DerAndereAndi/eebus-go/service"
+	"github.com/DerAndereAndi/eebus-go/spine"
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
@@ -58,7 +59,36 @@ func (h *Cem) Setup(port, remoteSKI, certFile, keyFile string, ifaces []string) 
 		return err
 	}
 
+	spine.Events.Subscribe(h)
+
 	// Setup the supported UseCases and their features
+	localEntity := h.myService.LocalEntity()
+
+	{
+		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeClient, "Device Configuration Client")
+	}
+	{
+		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceClassification, model.RoleTypeClient, "Device Classification Client")
+	}
+	{
+		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient, "Device Diagnosis Client")
+	}
+	{
+		f := localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer, "Device Diagnosis Server")
+		f.AddFunctionType(model.FunctionTypeDeviceDiagnosisStateData, true, false)
+
+		// Set the initial state
+		state := model.DeviceDiagnosisOperatingStateTypeNormalOperation
+		deviceDiagnosisStateDate := &model.DeviceDiagnosisStateDataType{
+			OperatingState: &state,
+		}
+		f.SetData(model.FunctionTypeDeviceDiagnosisStateData, deviceDiagnosisStateDate)
+
+		f.AddFunctionType(model.FunctionTypeDeviceDiagnosisHeartbeatData, true, false)
+	}
+	{
+		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeIdentification, model.RoleTypeClient, "Identification Client")
+	}
 
 	// e-mobilty specific use cases
 	_ = usecases.NewEVSECommissioningAndConfiguration(h.myService)

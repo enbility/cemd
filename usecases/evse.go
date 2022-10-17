@@ -13,8 +13,6 @@ type EVSECommissioningAndConfiguration struct {
 
 	// Delegate EVSEDelegate
 
-	connectedSKIs []string
-
 	// map connected remote entity to the remote SKI
 	remoteEntity map[string]*spine.EntityRemoteImpl
 
@@ -36,13 +34,6 @@ func NewEVSECommissioningAndConfiguration(service *service.EEBUSService) *EVSECo
 		model.UseCaseNameTypeEVSECommissioningAndConfiguration,
 		model.SpecificationVersionType("1.0.1"),
 		[]model.UseCaseScenarioSupportType{1, 2})
-
-	{
-		_ = evse.entity.GetOrAddFeature(model.FeatureTypeTypeDeviceClassification, model.RoleTypeClient, "Device Classification Client")
-	}
-	{
-		_ = evse.entity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient, "Device Diagnosis Client")
-	}
 
 	return evse
 }

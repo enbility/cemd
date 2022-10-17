@@ -39,22 +39,19 @@ func RequestElectricalConnection(service *service.EEBUSService, entity *spine.En
 	}
 
 	// request ElectricalConnectionParameterDescriptionListDataType from a remote entity
-	_, fErr := featureLocal.RequestAndFetchData(model.FunctionTypeElectricalConnectionParameterDescriptionListData, featureRemote)
-	if fErr != nil {
+	if _, fErr := featureLocal.RequestData(model.FunctionTypeElectricalConnectionParameterDescriptionListData, featureRemote); fErr != nil {
 		fmt.Println(fErr.String())
 		return err
 	}
 
 	// request ElectricalConnectionDescriptionListDataType from a remote entity
-	_, fErr = featureLocal.RequestAndFetchData(model.FunctionTypeElectricalConnectionDescriptionListData, featureRemote)
-	if fErr != nil {
+	if _, fErr := featureLocal.RequestData(model.FunctionTypeElectricalConnectionDescriptionListData, featureRemote); fErr != nil {
 		fmt.Println(fErr.String())
 		return err
 	}
 
 	// request ElectricalConnectionPermittedValueSetListDataType from a remote entity
-	_, fErr = featureLocal.RequestAndFetchData(model.FunctionTypeElectricalConnectionPermittedValueSetListData, featureRemote)
-	if fErr != nil {
+	if _, fErr := featureLocal.RequestData(model.FunctionTypeElectricalConnectionPermittedValueSetListData, featureRemote); fErr != nil {
 		fmt.Println(fErr.String())
 		return err
 	}

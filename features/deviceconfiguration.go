@@ -9,21 +9,21 @@ import (
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
-// request DeviceConfigurationKeyValueDescriptionListData from a remote entity
-func RequestDeviceConfigurationKeyValueDescriptionList(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (*model.MsgCounterType, error) {
+// request DeviceConfiguration data from a remote entity
+func RequestDeviceConfiguration(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
 	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceConfiguration, entity)
 	if err != nil {
 		fmt.Println(err)
-		return nil, err
+		return err
 	}
 
-	msgCounter, fErr := featureLocal.RequestData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, featureRemote)
-	if fErr != nil {
+	// request DeviceConfigurationKeyValueDescriptionListData from a remote entity
+	if _, fErr := featureLocal.RequestData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, featureRemote); fErr != nil {
 		fmt.Println(fErr.String())
-		return nil, errors.New(fErr.String())
+		return errors.New(fErr.String())
 	}
 
-	return msgCounter, nil
+	return nil
 }
 
 // request DeviceConfigurationKeyValueListDataType from a remote entity

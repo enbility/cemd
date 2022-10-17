@@ -19,53 +19,30 @@ type MeasurementType struct {
 }
 
 // request measurement data to properly interpret the corresponding data messages
-func RequestMeasurementDescriptionList(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (*model.MsgCounterType, error) {
+func RequestMeasurement(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
 	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
 	if err != nil {
 		fmt.Println(err)
-		return nil, err
+		return err
 	}
 
 	// request MeasurementDescriptionListData from a remote entity
-	msgCounter, fErr := featureLocal.RequestData(model.FunctionTypeMeasurementDescriptionListData, featureRemote)
-	if fErr != nil {
+	if _, fErr := featureLocal.RequestData(model.FunctionTypeMeasurementDescriptionListData, featureRemote); fErr != nil {
 		fmt.Println(fErr.String())
-		return nil, errors.New(fErr.String())
+		return errors.New(fErr.String())
 	}
 
-	return msgCounter, nil
-}
-
-// request FunctionTypeMeasurementConstraintsListData from a remote entity
-func RequestMeasurementConstraintsList(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (*model.MsgCounterType, error) {
-	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-
-	msgCounter, fErr := featureLocal.RequestData(model.FunctionTypeMeasurementConstraintsListData, featureRemote)
-	if fErr != nil {
+	// request FunctionTypeMeasurementConstraintsListData from a remote entity
+	if _, fErr := featureLocal.RequestData(model.FunctionTypeMeasurementConstraintsListData, featureRemote); fErr != nil {
 		fmt.Println(fErr.String())
-		return nil, errors.New(fErr.String())
+		return errors.New(fErr.String())
 	}
 
-	return msgCounter, nil
-}
-
-// request FunctionTypeMeasurementListData from a remote entity
-func RequestMeasurementList(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (*model.MsgCounterType, error) {
-	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-
-	msgCounter, fErr := featureLocal.RequestData(model.FunctionTypeMeasurementListData, featureRemote)
-	if fErr != nil {
+	// request FunctionTypeMeasurementListData from a remote entity
+	if _, fErr := featureLocal.RequestData(model.FunctionTypeMeasurementListData, featureRemote); fErr != nil {
 		fmt.Println(fErr.String())
-		return nil, errors.New(fErr.String())
+		return errors.New(fErr.String())
 	}
 
-	return msgCounter, nil
+	return nil
 }

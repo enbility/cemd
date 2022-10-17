@@ -1,9 +1,6 @@
 package usecases
 
 import (
-	"fmt"
-
-	"github.com/DerAndereAndi/eebus-go-cem/features"
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/spine"
 	"github.com/DerAndereAndi/eebus-go/spine/model"
@@ -83,30 +80,6 @@ func NewEVCommissioningAndConfiguration(service *service.EEBUSService) *EV {
 		model.SpecificationVersionType("1.0.1"),
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
 
-	// add the features
-	{
-		_ = ev.entity.GetOrAddFeature(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeClient, "Device Configuration Client")
-	}
-	{
-		_ = ev.entity.GetOrAddFeature(model.FeatureTypeTypeDeviceClassification, model.RoleTypeClient, "Device Classification Client")
-	}
-	{
-		f := ev.entity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer, "Device Diagnosis Server")
-		f.AddFunctionType(model.FunctionTypeDeviceDiagnosisStateData, true, false)
-
-		// Set the initial state
-		state := model.DeviceDiagnosisOperatingStateTypeNormalOperation
-		deviceDiagnosisStateDate := &model.DeviceDiagnosisStateDataType{
-			OperatingState: &state,
-		}
-		f.SetData(model.FunctionTypeDeviceDiagnosisStateData, deviceDiagnosisStateDate)
-
-		f.AddFunctionType(model.FunctionTypeDeviceDiagnosisHeartbeatData, true, false)
-	}
-	{
-		_ = ev.entity.GetOrAddFeature(model.FeatureTypeTypeIdentification, model.RoleTypeClient, "Identification Client")
-	}
-
 	return ev
 }
 
@@ -120,26 +93,4 @@ func (e *EV) UnregisterEV() {
 // Invoked when an EV entity was added or removed
 func (e *EV) TriggerEntityUpdate() {
 
-}
-
-// an EV was connected, trigger required communication
-func (e *EV) evConnected(entity *spine.EntityRemoteImpl) {
-	fmt.Println("EV CONNECTED")
-
-	// get ev configuration data
-	_, err := features.RequestDeviceConfigurationKeyValueDescriptionList(e.service, entity)
-	if err != nil {
-		return
-	}
-
-	// get manufacturer details
-	_, err = features.RequestManufacturerDetailsForEntity(e.service, entity)
-	if err != nil {
-		return
-	}
-
-	// get device diagnosis state
-	_, err = features.RequestDiagnosisStateForEntity(e.service, entity)
-
-	// get electrical connection parameter
 }
