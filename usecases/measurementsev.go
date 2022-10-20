@@ -31,13 +31,5 @@ func NewMeasurementOfElectricityDuringEVCharging(service *service.EEBUSService) 
 	// subscribe to get incoming Measurement events
 	spine.Events.Subscribe(useCase)
 
-	// add the features
-	{
-		_ = entity.GetOrAddFeature(model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient, "Electrical Connection Client")
-	}
-	{
-		_ = entity.GetOrAddFeature(model.FeatureTypeTypeMeasurement, model.RoleTypeClient, "Measurement Client")
-	}
-
 	return useCase
 }

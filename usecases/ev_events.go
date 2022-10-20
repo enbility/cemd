@@ -89,4 +89,9 @@ func (e *EV) evConnected(entity *spine.EntityRemoteImpl) {
 		return
 	}
 
+	// get identification
+	if err := features.RequestIdentification(e.service, entity); err != nil {
+		return
+	}
+
 }

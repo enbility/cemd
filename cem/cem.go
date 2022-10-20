@@ -87,13 +87,23 @@ func (h *Cem) Setup(port, remoteSKI, certFile, keyFile string, ifaces []string) 
 		f.AddFunctionType(model.FunctionTypeDeviceDiagnosisHeartbeatData, true, false)
 	}
 	{
+		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient, "Electrical Connection Client")
+	}
+	{
+		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeMeasurement, model.RoleTypeClient, "Measurement Client")
+	}
+	{
 		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeIdentification, model.RoleTypeClient, "Identification Client")
+	}
+	{
+		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeLoadControl, model.RoleTypeClient, "LoadControl Client")
 	}
 
 	// e-mobilty specific use cases
 	_ = usecases.NewEVSECommissioningAndConfiguration(h.myService)
 	_ = usecases.NewEVCommissioningAndConfiguration(h.myService)
 	_ = usecases.NewMeasurementOfElectricityDuringEVCharging(h.myService)
+	_ = usecases.NewOverloadProtection(h.myService)
 
 	h.myService.Start()
 	// defer h.myService.Shutdown()
