@@ -2,7 +2,6 @@ package usecases
 
 import (
 	"github.com/DerAndereAndi/eebus-go-cem/features"
-	"github.com/DerAndereAndi/eebus-go/spine"
 )
 
 type EVCommunicationStandardType string
@@ -29,6 +28,7 @@ type EVData struct {
 	ManufacturerDetails         features.ManufacturerDetails
 }
 
+/*
 // get the remote device specific data element
 func (e *EV) dataForRemoteDevice(remoteDevice *spine.DeviceRemoteImpl) *EVData {
 	if evdata, ok := e.data[remoteDevice.Ski()]; ok {
@@ -43,3 +43,4 @@ func (e *EV) dataForRemoteDevice(remoteDevice *spine.DeviceRemoteImpl) *EVData {
 
 	return evData
 }
+*/
