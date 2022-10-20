@@ -43,42 +43,25 @@ func NewEVCommissioningAndConfiguration(service *service.EEBUSService) *EV {
 		model.UseCaseNameTypeEVCommissioningAndConfiguration,
 		model.SpecificationVersionType("1.0.1"),
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
+	/*
+		_ = spine.NewUseCase(
+			ev.entity,
+			model.UseCaseNameTypeOptimizationOfSelfConsumptionDuringEVCharging,
+			model.SpecificationVersionType("1.0.1"),
+			[]model.UseCaseScenarioSupportType{1, 2, 3})
 
-	_ = spine.NewUseCase(
-		ev.entity,
-		model.UseCaseNameTypeMeasurementOfElectricityDuringEVCharging,
-		model.SpecificationVersionType("1.0.1"),
-		[]model.UseCaseScenarioSupportType{1, 2, 3})
+		_ = spine.NewUseCase(
+			ev.entity,
+			model.UseCaseNameTypeEVStateOfCharge,
+			model.SpecificationVersionType("1.0.0"),
+			[]model.UseCaseScenarioSupportType{1})
 
-	_ = spine.NewUseCase(
-		ev.entity,
-		model.UseCaseNameTypeOverloadProtectionByEVChargingCurrentCurtailment,
-		model.SpecificationVersionType("1.0.0"),
-		[]model.UseCaseScenarioSupportType{1, 2, 3})
-
-	_ = spine.NewUseCase(
-		ev.entity,
-		model.UseCaseNameTypeOverloadProtectionByEVChargingCurrentCurtailment,
-		model.SpecificationVersionType("1.0.1"),
-		[]model.UseCaseScenarioSupportType{1, 2, 3})
-
-	_ = spine.NewUseCase(
-		ev.entity,
-		model.UseCaseNameTypeOptimizationOfSelfConsumptionDuringEVCharging,
-		model.SpecificationVersionType("1.0.1"),
-		[]model.UseCaseScenarioSupportType{1, 2, 3})
-
-	_ = spine.NewUseCase(
-		ev.entity,
-		model.UseCaseNameTypeEVStateOfCharge,
-		model.SpecificationVersionType("1.0.0"),
-		[]model.UseCaseScenarioSupportType{1})
-
-	_ = spine.NewUseCase(
-		ev.entity,
-		model.UseCaseNameTypeCoordinatedEVCharging,
-		model.SpecificationVersionType("1.0.1"),
-		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
+		_ = spine.NewUseCase(
+			ev.entity,
+			model.UseCaseNameTypeCoordinatedEVCharging,
+			model.SpecificationVersionType("1.0.1"),
+			[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
+	*/
 
 	return ev
 }

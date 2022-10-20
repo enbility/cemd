@@ -93,6 +93,7 @@ func (h *Cem) Setup(port, remoteSKI, certFile, keyFile string, ifaces []string) 
 	// e-mobilty specific use cases
 	_ = usecases.NewEVSECommissioningAndConfiguration(h.myService)
 	_ = usecases.NewEVCommissioningAndConfiguration(h.myService)
+	_ = usecases.NewMeasurementOfElectricityDuringEVCharging(h.myService)
 
 	h.myService.Start()
 	// defer h.myService.Shutdown()
