@@ -20,7 +20,7 @@ type MeasurementType struct {
 
 // request measurement data to properly interpret the corresponding data messages
 func RequestMeasurement(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
-	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
+	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeMeasurement, entity)
 	if err != nil {
 		fmt.Println(err)
 		return err
