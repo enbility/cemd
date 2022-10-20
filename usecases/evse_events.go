@@ -30,7 +30,7 @@ func (e *EVSECommissioningAndConfiguration) HandleEvent(payload spine.EventPaylo
 				}
 
 				// don't proceed with the received possibly changeset, but the full dataset
-				_, err := features.GetManufacturerDetails(e.service, e.remoteEntity[payload.Ski])
+				_, err := features.GetManufacturerDetails(e.service, payload.Entity)
 				if err != nil {
 					return
 				}
