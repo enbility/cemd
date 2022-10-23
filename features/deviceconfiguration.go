@@ -9,6 +9,13 @@ import (
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
+type DeviceConfiguration struct {
+	Key   string
+	Value any
+	Type  model.DeviceConfigurationKeyValueTypeType
+	Unit  string
+}
+
 // request DeviceConfiguration data from a remote entity
 func RequestDeviceConfiguration(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
 	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceConfiguration, entity)
@@ -51,98 +58,58 @@ func RequestDeviceConfigurationKeyValueList(service *service.EEBUSService, entit
 	*/
 }
 
-/*
-// set the new device configuration data
-func updateDeviceConfigurationData(entity *spine.EntityRemoteImpl) {
-	_, featureRemote, err := e.service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceConfiguration, entity)
+// return current values for Device Configuration
+func GetDeviceConfigurationValues(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]DeviceConfiguration, error) {
+	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceConfiguration, entity)
 	if err != nil {
 		fmt.Println(err)
-		return
+		return nil, err
 	}
 
-	descriptionData := featureRemote.Data(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData).(*model.DeviceConfigurationKeyValueDescriptionListDataType)
-	data := featureRemote.Data(model.FunctionTypeDeviceConfigurationKeyValueListData).(*model.DeviceConfigurationKeyValueListDataType)
-	if descriptionData == nil || data == nil {
-		return
+	rDescData := featureRemote.Data(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData)
+	if rDescData == nil {
+		return nil, ErrMetadataNotAvailable
 	}
+	descData := rDescData.(*model.DeviceConfigurationKeyValueDescriptionListDataType)
 
-	evData := e.dataForRemoteDevice(entity.Device())
-
-	for _, descriptionItem := range descriptionData.DeviceConfigurationKeyValueDescriptionData {
-		for _, dataItem := range data.DeviceConfigurationKeyValueData {
-			if *descriptionItem.KeyId != *dataItem.KeyId {
-				continue
-			}
-
-			if descriptionItem.KeyName == nil {
-				continue
-			}
-
-			switch *descriptionItem.KeyName {
-			case string(model.DeviceConfigurationKeyNameTypeCommunicationsStandard):
-				evData.CommunicationStandard = EVCommunicationStandardType(*dataItem.Value.String)
-			case string(model.DeviceConfigurationKeyNameTypeAsymmetricChargingSupported):
-				evData.AsymmetricChargingSupported = (*dataItem.Value.Boolean)
-			}
+	ref := make(map[*model.DeviceConfigurationKeyIdType]model.DeviceConfigurationKeyValueDescriptionDataType)
+	for _, item := range descData.DeviceConfigurationKeyValueDescriptionData {
+		if item.KeyName == nil || item.KeyId == nil {
+			continue
 		}
+		ref[item.KeyId] = item
 	}
 
-	fmt.Printf("EV Communication Standard: %s\n", evData.CommunicationStandard)
-	fmt.Printf("EV Asymmetric Charging Supported: %t\n", evData.AsymmetricChargingSupported)
-
-	// get ev identification data
-	e.requestIdentitificationlistData(entity)
-}
-
-
-// request IdentificationListDataType from a remote entity
-func (e *EV) requestIdentitificationlistData(entity *spine.EntityRemoteImpl) {
-	knownEVData, ok := e.data[entity.Device().Ski()]
-	if !ok || knownEVData.CommunicationStandard == EVCommunicationStandardTypeUnknown || knownEVData.CommunicationStandard == EVCommunicationStandardTypeIEC61851 {
-		// identification requests only work with ISO connections to the EV
-		return
+	rData := featureRemote.Data(model.FunctionTypeDeviceConfigurationKeyValueListData)
+	if rData == nil {
+		return nil, ErrDataNotAvailable
 	}
 
-	featureLocal, featureRemote, err := e.service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeIdentification, entity)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	data := rData.(*model.DeviceConfigurationKeyValueListDataType)
+	var resultSet []DeviceConfiguration
 
-	_, fErr := featureLocal.RequestAndFetchData(model.FunctionTypeIdentificationListData, featureRemote)
-	if fErr != nil {
-		fmt.Println(fErr.String())
-	}
-
-	e.updateIdentificationData(entity)
-}
-
-// set the new identification data
-func (e *EV) updateIdentificationData(entity *spine.EntityRemoteImpl) {
-	_, featureRemote, err := e.service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeIdentification, entity)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	data := featureRemote.Data(model.FunctionTypeIdentificationListData).(*model.IdentificationListDataType)
-	if data == nil {
-		return
-	}
-
-	evData := e.dataForRemoteDevice(entity.Device())
-
-	for _, dataItem := range data.IdentificationData {
-		if dataItem.IdentificationType == nil {
+	for _, item := range data.DeviceConfigurationKeyValueData {
+		if item.KeyId == nil {
+			continue
+		}
+		desc, exists := ref[item.KeyId]
+		if !exists || desc.KeyName == nil {
 			continue
 		}
 
-		evData.IdentificationType = EVIdentificationType(*dataItem.IdentificationType)
-		evData.Identification = string(*dataItem.IdentificationValue)
+		result := DeviceConfiguration{
+			Key:   *desc.KeyName,
+			Value: item.Value,
+		}
+		if desc.ValueType != nil {
+			result.Type = *desc.ValueType
+		}
+		if desc.Unit != nil {
+			result.Unit = *desc.Unit
+		}
+
+		resultSet = append(resultSet, result)
 	}
 
-	fmt.Printf("EV Identification Type: %s\n", evData.IdentificationType)
-	fmt.Printf("EV Identification: %s\n", evData.Identification)
+	return resultSet, nil
 }
-
-*/

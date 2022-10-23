@@ -8,26 +8,12 @@ import (
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
-/*
-var phasesMapping = map[string]uint{
-	"a": 1,
-	"b": 2,
-	"c": 3,
-}
-*/
-
-type CurrentLimitType struct {
-	Min, Max, Default float64
-}
-
-type PowerLimitType struct {
-	Min, Max float64
-}
-
-type ElectricalConnectionType struct {
-	ConnectedPhases uint
-	LimitsPhase     map[uint]CurrentLimitType
-	LimitsPower     PowerLimitType
+type ElectricalLimit struct {
+	Min     float64
+	Max     float64
+	Default float64
+	Phase   model.ElectricalConnectionPhaseNameType
+	Type    model.ScopeTypeType
 }
 
 // request electrical connection data to properly interpret the corresponding data messages
@@ -59,69 +45,102 @@ func RequestElectricalConnection(service *service.EEBUSService, entity *spine.En
 	return nil
 }
 
-/*
-// set the new electrical connection data
-func updateData(featureRemote *spine.FeatureRemoteImpl, entity *spine.EntityRemoteImpl) {
-	paramDescriptionData := featureRemote.Data(model.FunctionTypeElectricalConnectionParameterDescriptionListData).(*model.ElectricalConnectionParameterDescriptionListDataType)
-	descriptionData := featureRemote.Data(model.FunctionTypeElectricalConnectionDescriptionListData).(*model.ElectricalConnectionDescriptionListDataType)
-	data := featureRemote.Data(model.FunctionTypeElectricalConnectionPermittedValueSetListData).(*model.ElectricalConnectionPermittedValueSetListDataType)
-	if descriptionData == nil || data == nil {
-		return
+// return current values for Identification
+func GetElectricalLimitValues(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]ElectricalLimit, error) {
+	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
 	}
 
-	deviceData := e.dataForRemoteDevice(entity.Device())
+	rData := featureRemote.Data(model.FunctionTypeElectricalConnectionParameterDescriptionListData)
+	if rData == nil {
+		return nil, ErrMetadataNotAvailable
+	}
+	paramDescriptionData := rData.(*model.ElectricalConnectionParameterDescriptionListDataType)
+	paramRef := make(map[*model.ElectricalConnectionParameterIdType]model.ElectricalConnectionParameterDescriptionDataType)
+	for _, item := range paramDescriptionData.ElectricalConnectionParameterDescriptionData {
+		if item.ParameterId == nil {
+			continue
+		}
+		paramRef[item.ParameterId] = item
+	}
 
-	for _, descriptionItem := range paramDescriptionData.ElectricalConnectionParameterDescriptionData {
+	rData = featureRemote.Data(model.FunctionTypeElectricalConnectionDescriptionListData)
+	if rData == nil {
+		return nil, ErrMetadataNotAvailable
+	}
+	descriptionData := rData.(*model.ElectricalConnectionDescriptionListDataType)
+	descRef := make(map[*model.ElectricalConnectionIdType]model.ElectricalConnectionDescriptionDataType)
+	for _, item := range descriptionData.ElectricalConnectionDescriptionData {
+		if item.ElectricalConnectionId == nil {
+			continue
+		}
+		descRef[item.ElectricalConnectionId] = item
+	}
 
-		for _, dataItem := range data.ElectricalConnectionPermittedValueSetData {
-			if descriptionItem.ParameterId != dataItem.ParameterId {
-				continue
+	data := featureRemote.Data(model.FunctionTypeElectricalConnectionPermittedValueSetListData).(*model.ElectricalConnectionPermittedValueSetListDataType)
+	if data == nil {
+		return nil, ErrDataNotAvailable
+	}
+
+	var resultSet []ElectricalLimit
+	for _, item := range data.ElectricalConnectionPermittedValueSetData {
+		if item.ParameterId == nil || item.ElectricalConnectionId == nil {
+			continue
+		}
+		param, exists := paramRef[item.ParameterId]
+		if !exists {
+			continue
+		}
+		// desc, exists := descRef[item.ElectricalConnectionId]
+		// if !exists {
+		// 	continue
+		// }
+
+		if len(item.PermittedValueSet) == 0 {
+			continue
+		}
+
+		var value, minValue, maxValue float64
+		hasValue := false
+		hasRange := false
+
+		for _, element := range item.PermittedValueSet {
+			// is a value set
+			if element.Value != nil && len(element.Value) > 0 {
+				value = element.Value[0].GetValue()
+				hasValue = true
 			}
-
-			if len(dataItem.PermittedValueSet) == 0 {
-				continue
+			// is a range set
+			if element.Range != nil && len(element.Range) > 0 {
+				minValue = element.Range[0].Min.GetValue()
+				maxValue = element.Range[0].Max.GetValue()
+				hasRange = true
 			}
+		}
 
-			var value, minValue, maxValue float64
-			hasValue := false
-			hasRange := false
-
-			for _, item := range dataItem.PermittedValueSet {
-				// is a value set
-				if item.Value != nil && len(item.Value) > 0 {
-					value = item.Value[0].GetValue()
-					hasValue = true
-				}
-				// is a range set
-				if item.Range != nil && len(item.Range) > 0 {
-					minValue = item.Range[0].Min.GetValue()
-					maxValue = item.Range[0].Max.GetValue()
-					hasRange = true
-				}
+		switch {
+		// AC Total Power Limits
+		case param.ScopeType != nil && *param.ScopeType == model.ScopeTypeTypeACPowerTotal && hasRange:
+			result := ElectricalLimit{
+				Min:  minValue,
+				Max:  maxValue,
+				Type: model.ScopeTypeTypeACPowerTotal,
 			}
-
-			switch {
-			// AC Total Power Limits
-			case descriptionItem.ScopeType != nil && *descriptionItem.ScopeType == model.ScopeTypeTypeACPowerTotal && hasRange:
-				deviceData.LimitsPower.Min = minValue
-				deviceData.LimitsPower.Max = maxValue
-			case descriptionItem.AcMeasuredPhases != nil && hasRange && hasValue:
-				// AC Phase Current Limits
-				phase, ok := phasesMapping[string(*descriptionItem.AcMeasuredPhases)]
-				if !ok {
-					continue
-				}
-				limits := CurrentLimitType{
-					Min:     minValue,
-					Max:     maxValue,
-					Default: value,
-				}
-
-				deviceData.LimitsPhase[phase] = limits
+			resultSet = append(resultSet, result)
+		case param.AcMeasuredPhases != nil && hasRange && hasValue:
+			// AC Phase Current Limits
+			result := ElectricalLimit{
+				Min:     minValue,
+				Max:     maxValue,
+				Default: value,
+				Phase:   *param.AcMeasuredPhases,
+				Type:    model.ScopeTypeTypeACCurrent,
 			}
+			resultSet = append(resultSet, result)
 		}
 	}
 
-	e.setDataForRemoteDevice(deviceData, entity.Device())
+	return resultSet, nil
 }
-*/
