@@ -45,7 +45,7 @@ func RequestElectricalConnection(service *service.EEBUSService, entity *spine.En
 	return nil
 }
 
-// return current values for Identification
+// return current values for Electrical Limits
 func GetElectricalLimitValues(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]ElectricalLimit, error) {
 	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
 	if err != nil {
