@@ -10,11 +10,6 @@ type EVSECommissioningAndConfiguration struct {
 	entity *spine.EntityLocalImpl
 
 	service *service.EEBUSService
-
-	// Delegate EVSEDelegate
-
-	// map connected remote entity to the remote SKI
-	remoteEntity map[string]*spine.EntityRemoteImpl
 }
 
 // Add EVSE support
