@@ -11,11 +11,14 @@ import (
 )
 
 type MeasurementType struct {
-	Timestamp                       time.Time
-	CurrentL1, CurrentL2, CurrentL3 float64
-	PowerL1, PowerL2, PowerL3       float64
-	ChargedEnergy                   float64
-	SoC                             float64
+	MeasurementId uint
+	Value         float64
+	ValueMin      float64
+	ValueMax      float64
+	ValueStep     float64
+	Unit          model.UnitOfMeasurementType
+	Scope         model.ScopeTypeType
+	Timestamp     time.Time
 }
 
 // request measurement data to properly interpret the corresponding data messages
@@ -45,4 +48,84 @@ func RequestMeasurement(service *service.EEBUSService, entity *spine.EntityRemot
 	}
 
 	return nil
+}
+
+// return current values for measurements
+func GetMeasurementValues(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]MeasurementType, error) {
+	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeMeasurement, entity)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	rData := featureRemote.Data(model.FunctionTypeMeasurementConstraintsListData)
+	// Constraints are optional, data may be empty
+	constraintsRef := make(map[*model.MeasurementIdType]model.MeasurementConstraintsDataType)
+	if rData != nil {
+		constraintsData := rData.(*model.MeasurementConstraintsListDataType)
+		for _, item := range constraintsData.MeasurementConstraintsData {
+			if item.MeasurementId == nil {
+				continue
+			}
+			constraintsRef[item.MeasurementId] = item
+		}
+	}
+
+	rData = featureRemote.Data(model.FunctionTypeMeasurementDescriptionListData)
+	if rData == nil {
+		return nil, ErrMetadataNotAvailable
+	}
+	descriptionData := rData.(*model.MeasurementDescriptionListDataType)
+	descRef := make(map[*model.MeasurementIdType]model.MeasurementDescriptionDataType)
+	for _, item := range descriptionData.MeasurementDescriptionData {
+		if item.MeasurementId == nil {
+			continue
+		}
+		descRef[item.MeasurementId] = item
+	}
+
+	data := featureRemote.Data(model.FunctionTypeMeasurementListData).(*model.MeasurementListDataType)
+	if data == nil {
+		return nil, ErrDataNotAvailable
+	}
+
+	var resultSet []MeasurementType
+	for _, item := range data.MeasurementData {
+		if item.MeasurementId == nil {
+			continue
+		}
+
+		desc, exists := descRef[item.MeasurementId]
+		if !exists {
+			continue
+		}
+
+		result := MeasurementType{
+			MeasurementId: uint(*item.MeasurementId),
+		}
+
+		if desc.ScopeType != nil {
+			result.Scope = *desc.ScopeType
+		}
+		if desc.Unit != nil {
+			result.Unit = *desc.Unit
+		}
+
+		constraint, exists := constraintsRef[item.MeasurementId]
+		if exists {
+			if constraint.ValueRangeMin != nil {
+				result.ValueMin = constraint.ValueRangeMin.GetValue()
+			}
+			if constraint.ValueRangeMax != nil {
+				result.ValueMax = constraint.ValueRangeMax.GetValue()
+			}
+			if constraint.ValueStepSize != nil {
+				result.ValueStep = constraint.ValueStepSize.GetValue()
+			}
+		}
+
+		resultSet = append(resultSet, result)
+	}
+
+	return resultSet, nil
 }
