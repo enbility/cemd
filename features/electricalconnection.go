@@ -23,7 +23,7 @@ type ElectricalLimitType struct {
 	Max          float64
 	Default      float64
 	Phase        model.ElectricalConnectionPhaseNameType
-	Type         model.ScopeTypeType
+	Scope        model.ScopeTypeType
 }
 
 // request electrical connection data to properly interpret the corresponding data messages
@@ -161,7 +161,7 @@ func GetElectricalLimitValues(service *service.EEBUSService, entity *spine.Entit
 				ConnectionID: uint(*item.ElectricalConnectionId),
 				Min:          minValue,
 				Max:          maxValue,
-				Type:         model.ScopeTypeTypeACPowerTotal,
+				Scope:        model.ScopeTypeTypeACPowerTotal,
 			}
 			resultSet = append(resultSet, result)
 
@@ -173,7 +173,7 @@ func GetElectricalLimitValues(service *service.EEBUSService, entity *spine.Entit
 				Max:          maxValue,
 				Default:      value,
 				Phase:        *param.AcMeasuredPhases,
-				Type:         model.ScopeTypeTypeACCurrent,
+				Scope:        model.ScopeTypeTypeACCurrent,
 			}
 			resultSet = append(resultSet, result)
 		}
