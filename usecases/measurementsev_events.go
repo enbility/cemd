@@ -10,6 +10,11 @@ import (
 
 // Internal EventHandler Interface for the CEM
 func (m *MeasurementOfElectricityDuringEVCharging) HandleEvent(payload spine.EventPayload) {
+	// we only care about events from an EV entity
+	if payload.Entity == nil || payload.Entity.EntityType() != model.EntityTypeTypeEV {
+		return
+	}
+
 	switch payload.EventType {
 	case spine.EventTypeDataChange:
 		if payload.ChangeType != spine.ElementChangeUpdate {

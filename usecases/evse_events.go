@@ -10,6 +10,11 @@ import (
 
 // Internal EventHandler Interface for the CEM
 func (e *EVSECommissioningAndConfiguration) HandleEvent(payload spine.EventPayload) {
+	// we only care about events from an EVSE entity
+	if payload.Entity == nil || payload.Entity.EntityType() != model.EntityTypeTypeEVSE {
+		return
+	}
+
 	switch payload.EventType {
 	case spine.EventTypeDeviceChange:
 		switch payload.ChangeType {
