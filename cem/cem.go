@@ -103,7 +103,7 @@ func (h *Cem) Setup(port, remoteSKI, certFile, keyFile string, ifaces []string) 
 	_ = usecases.NewEVSECommissioningAndConfiguration(h.myService)
 	_ = usecases.NewEVCommissioningAndConfiguration(h.myService)
 	_ = usecases.NewMeasurementOfElectricityDuringEVCharging(h.myService)
-	_ = usecases.NewOverloadProtection(h.myService)
+	_ = usecases.NewOverloadProtectionEV(h.myService)
 
 	h.myService.Start()
 	// defer h.myService.Shutdown()
