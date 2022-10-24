@@ -9,7 +9,7 @@ import (
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
-type DeviceConfiguration struct {
+type DeviceConfigurationType struct {
 	Key   string
 	Value any
 	Type  model.DeviceConfigurationKeyValueTypeType
@@ -59,7 +59,7 @@ func RequestDeviceConfigurationKeyValueList(service *service.EEBUSService, entit
 }
 
 // return current values for Device Configuration
-func GetDeviceConfigurationValues(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]DeviceConfiguration, error) {
+func GetDeviceConfigurationValues(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]DeviceConfigurationType, error) {
 	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceConfiguration, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -86,7 +86,7 @@ func GetDeviceConfigurationValues(service *service.EEBUSService, entity *spine.E
 	}
 
 	data := rData.(*model.DeviceConfigurationKeyValueListDataType)
-	var resultSet []DeviceConfiguration
+	var resultSet []DeviceConfigurationType
 
 	for _, item := range data.DeviceConfigurationKeyValueData {
 		if item.KeyId == nil {
@@ -97,7 +97,7 @@ func GetDeviceConfigurationValues(service *service.EEBUSService, entity *spine.E
 			continue
 		}
 
-		result := DeviceConfiguration{
+		result := DeviceConfigurationType{
 			Key:   *desc.KeyName,
 			Value: item.Value,
 		}

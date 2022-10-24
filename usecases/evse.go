@@ -15,9 +15,6 @@ type EVSECommissioningAndConfiguration struct {
 
 	// map connected remote entity to the remote SKI
 	remoteEntity map[string]*spine.EntityRemoteImpl
-
-	// map of device SKIs to EVSEData
-	// data map[string]*EVSEData
 }
 
 // Add EVSE support
@@ -37,16 +34,3 @@ func NewEVSECommissioningAndConfiguration(service *service.EEBUSService) *EVSECo
 
 	return evse
 }
-
-/*
-// get the remote device specific data element
-func (e *EVSECommissioningAndConfiguration) dataForRemoteDevice(remoteDevice *spine.DeviceRemoteImpl) *EVSEData {
-	if evsedata, ok := e.data[remoteDevice.Ski()]; ok {
-		return evsedata
-	}
-
-	return &EVSEData{
-		OperatingState: model.DeviceDiagnosisOperatingStateTypeNormalOperation,
-	}
-}
-*/

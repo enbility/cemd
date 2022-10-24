@@ -9,7 +9,7 @@ import (
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
-type DeviceDiagnosisDetails struct {
+type DeviceDiagnosisType struct {
 	OperatingState       model.DeviceDiagnosisOperatingStateType
 	PowerSupplyCondition model.PowerSupplyConditionType
 }
@@ -37,7 +37,7 @@ func RequestDiagnosisStateForEntity(service *service.EEBUSService, entity *spine
 }
 
 // get the current diagnosis state for an device entity
-func GetDeviceDiagnosisState(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (*DeviceDiagnosisDetails, error) {
+func GetDeviceDiagnosisState(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (*DeviceDiagnosisType, error) {
 	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceClassification, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -46,7 +46,7 @@ func GetDeviceDiagnosisState(service *service.EEBUSService, entity *spine.Entity
 
 	data := featureRemote.Data(model.FunctionTypeDeviceDiagnosisStateData).(*model.DeviceDiagnosisStateDataType)
 
-	details := &DeviceDiagnosisDetails{}
+	details := &DeviceDiagnosisType{}
 	if data.OperatingState != nil {
 		details.OperatingState = *data.OperatingState
 	}

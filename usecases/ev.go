@@ -19,9 +19,6 @@ type EV struct {
 	service *service.EEBUSService
 
 	Delegate EVDelegate
-
-	// map of device SKIs to EVData
-	data map[string]*EVData
 }
 
 // Register the use case and features for handling EVs
@@ -31,7 +28,6 @@ func NewEVCommissioningAndConfiguration(service *service.EEBUSService) *EV {
 	ev := &EV{
 		service: service,
 		entity:  service.LocalEntity(),
-		data:    make(map[string]*EVData),
 	}
 
 	// subscribe to get incoming EV events
@@ -52,12 +48,6 @@ func NewEVCommissioningAndConfiguration(service *service.EEBUSService) *EV {
 
 		_ = spine.NewUseCase(
 			ev.entity,
-			model.UseCaseNameTypeEVStateOfCharge,
-			model.SpecificationVersionType("1.0.0"),
-			[]model.UseCaseScenarioSupportType{1})
-
-		_ = spine.NewUseCase(
-			ev.entity,
 			model.UseCaseNameTypeCoordinatedEVCharging,
 			model.SpecificationVersionType("1.0.1"),
 			[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
@@ -71,9 +61,4 @@ func NewEVCommissioningAndConfiguration(service *service.EEBUSService) *EV {
 func (e *EV) UnregisterEV() {
 	// remove the entity
 	e.service.RemoveEntity(e.entity)
-}
-
-// Invoked when an EV entity was added or removed
-func (e *EV) TriggerEntityUpdate() {
-
 }

@@ -32,7 +32,10 @@ func (e *EV) HandleEvent(payload spine.EventPayload) {
 			switch payload.Data.(type) {
 			case *model.DeviceConfigurationKeyValueDescriptionListDataType:
 				// key value descriptions received, now get the data
-				_, _ = features.RequestDeviceConfigurationKeyValueList(e.service, payload.Entity)
+				_, err := features.RequestDeviceConfigurationKeyValueList(e.service, payload.Entity)
+				if err != nil {
+					fmt.Println("Error getting configuration key values:", err)
+				}
 
 			case *model.DeviceDiagnosisStateDataType:
 				// TODO: received diagnosis state

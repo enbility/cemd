@@ -9,7 +9,7 @@ import (
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
-type ManufacturerDetails struct {
+type ManufacturerType struct {
 	BrandName                      string
 	VendorName                     string
 	VendorCode                     string
@@ -47,7 +47,7 @@ func RequestManufacturerDetailsForEntity(service *service.EEBUSService, entity *
 }
 
 // get the current manufacturer details for a remote device entity
-func GetManufacturerDetails(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (*ManufacturerDetails, error) {
+func GetManufacturerDetails(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (*ManufacturerType, error) {
 	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceClassification, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -56,7 +56,7 @@ func GetManufacturerDetails(service *service.EEBUSService, entity *spine.EntityR
 
 	data := featureRemote.Data(model.FunctionTypeDeviceClassificationManufacturerData).(*model.DeviceClassificationManufacturerDataType)
 
-	details := &ManufacturerDetails{}
+	details := &ManufacturerType{}
 
 	if data.BrandName != nil {
 		details.BrandName = string(*data.BrandName)

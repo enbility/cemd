@@ -8,7 +8,7 @@ import (
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
-type Identification struct {
+type IdentificationType struct {
 	Identifier string
 	Type       model.IdentificationTypeType
 }
@@ -31,7 +31,7 @@ func RequestIdentification(service *service.EEBUSService, entity *spine.EntityRe
 }
 
 // return current values for Identification
-func GetIdentificationValues(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]Identification, error) {
+func GetIdentificationValues(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]IdentificationType, error) {
 	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceConfiguration, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -44,14 +44,14 @@ func GetIdentificationValues(service *service.EEBUSService, entity *spine.Entity
 	}
 
 	data := rData.(*model.IdentificationListDataType)
-	var resultSet []Identification
+	var resultSet []IdentificationType
 
 	for _, item := range data.IdentificationData {
 		if item.IdentificationValue == nil {
 			continue
 		}
 
-		result := Identification{
+		result := IdentificationType{
 			Identifier: string(*item.IdentificationValue),
 		}
 		if item.IdentificationType != nil {

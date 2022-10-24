@@ -1,6 +1,8 @@
 package usecases
 
 import (
+	"fmt"
+
 	"github.com/DerAndereAndi/eebus-go-cem/features"
 	"github.com/DerAndereAndi/eebus-go/spine"
 	"github.com/DerAndereAndi/eebus-go/spine/model"
@@ -8,11 +10,6 @@ import (
 
 // Internal EventHandler Interface for the CEM
 func (e *EVSECommissioningAndConfiguration) HandleEvent(payload spine.EventPayload) {
-	// if this is not an event for any connected SKIs, ignore it
-	// if !slices.Contains(e.connectedSKIs, payload.Ski) {
-	// 	return
-	// }
-
 	switch payload.EventType {
 	case spine.EventTypeDeviceChange:
 		switch payload.ChangeType {
@@ -24,27 +21,18 @@ func (e *EVSECommissioningAndConfiguration) HandleEvent(payload spine.EventPaylo
 		if payload.ChangeType == spine.ElementChangeUpdate {
 			switch payload.Data.(type) {
 			case *model.DeviceClassificationManufacturerDataType:
-				// ignore the dataset if it is not for the registered one for the SKI
-				if e.remoteEntity[payload.Ski] != payload.Entity {
-					return
-				}
-
-				// don't proceed with the received possibly changeset, but the full dataset
 				_, err := features.GetManufacturerDetails(e.service, payload.Entity)
 				if err != nil {
+					fmt.Println("Error getting manufacturer data:", err)
 					return
 				}
 
 				// TODO: provide the current data to the CEM
-
 			case *model.DeviceDiagnosisStateDataType:
-				// if e.Delegate == nil {
-				// 	return
-				// }
-
-				// deviceDiagnosisStateData := payload.Data.(model.DeviceDiagnosisStateDataType)
-				// failure := *deviceDiagnosisStateData.OperatingState == model.DeviceDiagnosisOperatingStateTypeFailure
-				// e.Delegate.HandleEVSEDeviceState(payload.Ski, failure)
+				_, err := features.GetDeviceDiagnosisState(e.service, payload.Entity)
+				if err != nil {
+					fmt.Println("Error getting device diagnosis state:", err)
+				}
 			}
 		}
 	}
