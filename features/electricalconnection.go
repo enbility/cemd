@@ -9,7 +9,7 @@ import (
 )
 
 // Details about the electrical connection
-type ElectricalDescription struct {
+type ElectricalDescriptionType struct {
 	ConnectionID            uint
 	PowerSupplyType         model.ElectricalConnectionVoltageTypeType
 	AcConnectedPhases       uint
@@ -17,7 +17,7 @@ type ElectricalDescription struct {
 }
 
 // Details about the limits of an electrical connection
-type ElectricalLimit struct {
+type ElectricalLimitType struct {
 	ConnectionID uint
 	Min          float64
 	Max          float64
@@ -56,7 +56,7 @@ func RequestElectricalConnection(service *service.EEBUSService, entity *spine.En
 }
 
 // return current values for Electrical Description
-func GetElectricalDescription(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]ElectricalDescription, error) {
+func GetElectricalDescription(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]ElectricalDescriptionType, error) {
 	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -68,14 +68,14 @@ func GetElectricalDescription(service *service.EEBUSService, entity *spine.Entit
 		return nil, ErrMetadataNotAvailable
 	}
 
-	var resultSet []ElectricalDescription
+	var resultSet []ElectricalDescriptionType
 
 	for _, item := range data.ElectricalConnectionDescriptionData {
 		if item.ElectricalConnectionId == nil {
 			continue
 		}
 
-		result := ElectricalDescription{}
+		result := ElectricalDescriptionType{}
 
 		if item.PowerSupplyType != nil {
 			result.PowerSupplyType = *item.PowerSupplyType
@@ -96,7 +96,7 @@ func GetElectricalDescription(service *service.EEBUSService, entity *spine.Entit
 // return current values for Electrical Limits
 //
 // EV only: Min power data is only provided via IEC61851 or using VAS in ISO15118-2.
-func GetElectricalLimitValues(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]ElectricalLimit, error) {
+func GetElectricalLimitValues(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]ElectricalLimitType, error) {
 	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -121,7 +121,7 @@ func GetElectricalLimitValues(service *service.EEBUSService, entity *spine.Entit
 		return nil, ErrDataNotAvailable
 	}
 
-	var resultSet []ElectricalLimit
+	var resultSet []ElectricalLimitType
 
 	for _, item := range data.ElectricalConnectionPermittedValueSetData {
 		if item.ParameterId == nil || item.ElectricalConnectionId == nil {
@@ -157,7 +157,7 @@ func GetElectricalLimitValues(service *service.EEBUSService, entity *spine.Entit
 		switch {
 		// AC Total Power Limits
 		case param.ScopeType != nil && *param.ScopeType == model.ScopeTypeTypeACPowerTotal && hasRange:
-			result := ElectricalLimit{
+			result := ElectricalLimitType{
 				ConnectionID: uint(*item.ElectricalConnectionId),
 				Min:          minValue,
 				Max:          maxValue,
@@ -167,7 +167,7 @@ func GetElectricalLimitValues(service *service.EEBUSService, entity *spine.Entit
 
 		case param.AcMeasuredPhases != nil && hasRange && hasValue:
 			// AC Phase Current Limits
-			result := ElectricalLimit{
+			result := ElectricalLimitType{
 				ConnectionID: uint(*item.ElectricalConnectionId),
 				Min:          minValue,
 				Max:          maxValue,
