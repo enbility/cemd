@@ -6,20 +6,20 @@ import (
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
-// Measurements of OverloadProtection Use Case implementation
-type OverloadProtection struct {
+// Overload Protection by EV Charging Current Curtailment Use Case implementation
+type OverloadProtectionEV struct {
 	*spine.UseCaseImpl
 	service *service.EEBUSService
 }
 
-// Register the use case and features for measurements
+// Register the use case and features for overload protection
 // CEM will call this on startup
-func NewOverloadProtection(service *service.EEBUSService) *OverloadProtection {
+func NewOverloadProtectionEV(service *service.EEBUSService) *OverloadProtectionEV {
 	// A CEM has all the features implemented in the main entity
 	entity := service.LocalEntity()
 
 	// add the use case
-	useCase := &OverloadProtection{
+	useCase := &OverloadProtectionEV{
 		UseCaseImpl: spine.NewUseCase(
 			entity,
 			model.UseCaseNameTypeOverloadProtectionByEVChargingCurrentCurtailment,

@@ -6,7 +6,7 @@ import (
 )
 
 // Internal EventHandler Interface for the CEM
-func (o *OverloadProtection) HandleEvent(payload spine.EventPayload) {
+func (o *OverloadProtectionEV) HandleEvent(payload spine.EventPayload) {
 	// we only care about events from an EV entity
 	if payload.Entity == nil || payload.Entity.EntityType() != model.EntityTypeTypeEV {
 		return
