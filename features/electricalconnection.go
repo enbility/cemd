@@ -8,12 +8,22 @@ import (
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
+// Details about the electrical connection
+type ElectricalDescription struct {
+	ConnectionID            uint
+	PowerSupplyType         model.ElectricalConnectionVoltageTypeType
+	AcConnectedPhases       uint
+	PositiveEnergyDirection model.EnergyDirectionType
+}
+
+// Details about the limits of an electrical connection
 type ElectricalLimit struct {
-	Min     float64
-	Max     float64
-	Default float64
-	Phase   model.ElectricalConnectionPhaseNameType
-	Type    model.ScopeTypeType
+	ConnectionID uint
+	Min          float64
+	Max          float64
+	Default      float64
+	Phase        model.ElectricalConnectionPhaseNameType
+	Type         model.ScopeTypeType
 }
 
 // request electrical connection data to properly interpret the corresponding data messages
@@ -45,7 +55,47 @@ func RequestElectricalConnection(service *service.EEBUSService, entity *spine.En
 	return nil
 }
 
+// return current values for Electrical Description
+func GetElectricalDescription(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]ElectricalDescription, error) {
+	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	data := featureRemote.Data(model.FunctionTypeElectricalConnectionDescriptionListData).(*model.ElectricalConnectionDescriptionListDataType)
+	if data == nil {
+		return nil, ErrMetadataNotAvailable
+	}
+
+	var resultSet []ElectricalDescription
+
+	for _, item := range data.ElectricalConnectionDescriptionData {
+		if item.ElectricalConnectionId == nil {
+			continue
+		}
+
+		result := ElectricalDescription{}
+
+		if item.PowerSupplyType != nil {
+			result.PowerSupplyType = *item.PowerSupplyType
+		}
+		if item.AcConnectedPhases != nil {
+			result.AcConnectedPhases = *item.AcConnectedPhases
+		}
+		if item.PositiveEnergyDirection != nil {
+			result.PositiveEnergyDirection = *item.PositiveEnergyDirection
+		}
+
+		resultSet = append(resultSet, result)
+	}
+
+	return resultSet, nil
+}
+
 // return current values for Electrical Limits
+//
+// EV only: Min power data is only provided via IEC61851 or using VAS in ISO15118-2.
 func GetElectricalLimitValues(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]ElectricalLimit, error) {
 	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
 	if err != nil {
@@ -66,25 +116,13 @@ func GetElectricalLimitValues(service *service.EEBUSService, entity *spine.Entit
 		paramRef[item.ParameterId] = item
 	}
 
-	rData = featureRemote.Data(model.FunctionTypeElectricalConnectionDescriptionListData)
-	if rData == nil {
-		return nil, ErrMetadataNotAvailable
-	}
-	descriptionData := rData.(*model.ElectricalConnectionDescriptionListDataType)
-	descRef := make(map[*model.ElectricalConnectionIdType]model.ElectricalConnectionDescriptionDataType)
-	for _, item := range descriptionData.ElectricalConnectionDescriptionData {
-		if item.ElectricalConnectionId == nil {
-			continue
-		}
-		descRef[item.ElectricalConnectionId] = item
-	}
-
 	data := featureRemote.Data(model.FunctionTypeElectricalConnectionPermittedValueSetListData).(*model.ElectricalConnectionPermittedValueSetListDataType)
 	if data == nil {
 		return nil, ErrDataNotAvailable
 	}
 
 	var resultSet []ElectricalLimit
+
 	for _, item := range data.ElectricalConnectionPermittedValueSetData {
 		if item.ParameterId == nil || item.ElectricalConnectionId == nil {
 			continue
@@ -93,10 +131,6 @@ func GetElectricalLimitValues(service *service.EEBUSService, entity *spine.Entit
 		if !exists {
 			continue
 		}
-		// desc, exists := descRef[item.ElectricalConnectionId]
-		// if !exists {
-		// 	continue
-		// }
 
 		if len(item.PermittedValueSet) == 0 {
 			continue
@@ -124,19 +158,22 @@ func GetElectricalLimitValues(service *service.EEBUSService, entity *spine.Entit
 		// AC Total Power Limits
 		case param.ScopeType != nil && *param.ScopeType == model.ScopeTypeTypeACPowerTotal && hasRange:
 			result := ElectricalLimit{
-				Min:  minValue,
-				Max:  maxValue,
-				Type: model.ScopeTypeTypeACPowerTotal,
+				ConnectionID: uint(*item.ElectricalConnectionId),
+				Min:          minValue,
+				Max:          maxValue,
+				Type:         model.ScopeTypeTypeACPowerTotal,
 			}
 			resultSet = append(resultSet, result)
+
 		case param.AcMeasuredPhases != nil && hasRange && hasValue:
 			// AC Phase Current Limits
 			result := ElectricalLimit{
-				Min:     minValue,
-				Max:     maxValue,
-				Default: value,
-				Phase:   *param.AcMeasuredPhases,
-				Type:    model.ScopeTypeTypeACCurrent,
+				ConnectionID: uint(*item.ElectricalConnectionId),
+				Min:          minValue,
+				Max:          maxValue,
+				Default:      value,
+				Phase:        *param.AcMeasuredPhases,
+				Type:         model.ScopeTypeTypeACCurrent,
 			}
 			resultSet = append(resultSet, result)
 		}
