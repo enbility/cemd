@@ -3,6 +3,7 @@ package features
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/spine"
@@ -10,10 +11,16 @@ import (
 )
 
 type DeviceConfigurationType struct {
-	Key   string
-	Value any
-	Type  model.DeviceConfigurationKeyValueTypeType
-	Unit  string
+	Key           string
+	ValueBool     bool
+	ValueDate     time.Time
+	ValueDatetime time.Time
+	ValueDuration time.Duration
+	ValueString   string
+	ValueTime     time.Time
+	ValueFloat    float64
+	Type          model.DeviceConfigurationKeyValueTypeType
+	Unit          string
 }
 
 // request DeviceConfiguration data from a remote entity
@@ -90,11 +97,49 @@ func GetDeviceConfigurationValues(service *service.EEBUSService, entity *spine.E
 		}
 
 		result := DeviceConfigurationType{
-			Key:   *desc.KeyName,
-			Value: item.Value,
+			Key: *desc.KeyName,
 		}
-		if desc.ValueType != nil {
-			result.Type = *desc.ValueType
+		if desc.ValueType == nil {
+			continue
+		}
+		result.Type = *desc.ValueType
+		switch *desc.ValueType {
+		case model.DeviceConfigurationKeyValueTypeTypeBoolean:
+			if item.Value.Boolean != nil {
+				result.ValueBool = bool(*item.Value.Boolean)
+			}
+		case model.DeviceConfigurationKeyValueTypeTypeDate:
+			if item.Value.Date != nil {
+				if value, err := model.GetDateFromString(*item.Value.Date); err == nil {
+					result.ValueDate = value
+				}
+			}
+		case model.DeviceConfigurationKeyValueTypeTypeDateTime:
+			if item.Value.DateTime != nil {
+				if value, err := model.GetDateTimeFromString(*item.Value.DateTime); err == nil {
+					result.ValueDatetime = value
+				}
+			}
+		case model.DeviceConfigurationKeyValueTypeTypeDuration:
+			if item.Value.Duration != nil {
+				if value, err := model.GetDurationFromString(*item.Value.Duration); err == nil {
+					result.ValueDuration = value
+				}
+			}
+		case model.DeviceConfigurationKeyValueTypeTypeString:
+			if item.Value.String != nil {
+				result.ValueString = string(*item.Value.String)
+			}
+		case model.DeviceConfigurationKeyValueTypeTypeTime:
+			if item.Value.Time != nil {
+				if value, err := model.GetTimeFromString(*item.Value.Time); err != nil {
+					result.ValueTime = value
+				}
+			}
+		case model.DeviceConfigurationKeyValueTypeTypeScalednumber:
+			if item.Value.ScaledNumber != nil {
+				result.ValueFloat = item.Value.ScaledNumber.GetValue()
+			}
 		}
 		if desc.Unit != nil {
 			result.Unit = *desc.Unit

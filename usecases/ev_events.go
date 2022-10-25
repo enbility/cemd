@@ -42,6 +42,15 @@ func (e *EV) HandleEvent(payload spine.EventPayload) {
 					fmt.Println("Error getting configuration key values:", err)
 				}
 
+			case *model.DeviceConfigurationKeyValueListDataType:
+				data, err := features.GetDeviceConfigurationValues(e.service, payload.Entity)
+				if err != nil {
+					fmt.Println("Error getting device configuration values:", err)
+					return
+				}
+
+				// TODO: provide the device configuration data
+				fmt.Printf("Device Configuration Values: %#v\n", data)
 			case *model.DeviceDiagnosisStateDataType:
 				// TODO: received diagnosis state
 
