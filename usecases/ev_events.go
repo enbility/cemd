@@ -63,7 +63,6 @@ func (e *EV) HandleEvent(payload spine.EventPayload) {
 
 				// TODO: provide the device configuration data
 				fmt.Printf("Identification Values: %#v\n", data)
-
 			}
 		}
 	}
@@ -128,6 +127,12 @@ func (e *EV) evConnected(entity *spine.EntityRemoteImpl) {
 
 	// get identification
 	if _, err := features.RequestIdentification(e.service, entity); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// get loadlimit parameter
+	if err := features.RequestLoadControlLimitDescription(e.service, entity); err != nil {
 		fmt.Println(err)
 		return
 	}
