@@ -30,7 +30,7 @@ func NewEVStateOfCharge(service *service.EEBUSService) *EVSoC {
 		evsoc.entity,
 		model.UseCaseNameTypeEVStateOfCharge,
 		model.SpecificationVersionType("1.0.0"),
-		[]model.UseCaseScenarioSupportType{1})
+		[]model.UseCaseScenarioSupportType{1, 2, 3, 4})
 
 	return evsoc
 }
