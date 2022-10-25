@@ -36,9 +36,13 @@ func RequestMeasurement(service *service.EEBUSService, entity *spine.EntityRemot
 	}
 
 	// request FunctionTypeMeasurementConstraintsListData from a remote entity
-	if _, fErr := featureLocal.RequestData(model.FunctionTypeMeasurementConstraintsListData, featureRemote); fErr != nil {
-		fmt.Println(fErr.String())
-		return errors.New(fErr.String())
+	fTypes := featureRemote.Operations()
+	_, exists := fTypes[model.FunctionTypeMeasurementConstraintsListData]
+	if exists {
+		if _, fErr := featureLocal.RequestData(model.FunctionTypeMeasurementConstraintsListData, featureRemote); fErr != nil {
+			fmt.Println(fErr.String())
+			return errors.New(fErr.String())
+		}
 	}
 
 	// request FunctionTypeMeasurementListData from a remote entity
