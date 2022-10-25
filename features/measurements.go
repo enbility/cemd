@@ -60,7 +60,7 @@ func GetMeasurementValues(service *service.EEBUSService, entity *spine.EntityRem
 
 	rData := featureRemote.Data(model.FunctionTypeMeasurementConstraintsListData)
 	// Constraints are optional, data may be empty
-	constraintsRef := make(map[*model.MeasurementIdType]model.MeasurementConstraintsDataType)
+	constraintsRef := make(map[model.MeasurementIdType]model.MeasurementConstraintsDataType)
 	switch constraintsData := rData.(type) {
 	case *model.MeasurementConstraintsListDataType:
 		if constraintsData != nil {
@@ -68,7 +68,7 @@ func GetMeasurementValues(service *service.EEBUSService, entity *spine.EntityRem
 				if item.MeasurementId == nil {
 					continue
 				}
-				constraintsRef[item.MeasurementId] = item
+				constraintsRef[*item.MeasurementId] = item
 			}
 		}
 	}
@@ -78,12 +78,12 @@ func GetMeasurementValues(service *service.EEBUSService, entity *spine.EntityRem
 		return nil, ErrMetadataNotAvailable
 	}
 	descriptionData := rData.(*model.MeasurementDescriptionListDataType)
-	descRef := make(map[*model.MeasurementIdType]model.MeasurementDescriptionDataType)
+	descRef := make(map[model.MeasurementIdType]model.MeasurementDescriptionDataType)
 	for _, item := range descriptionData.MeasurementDescriptionData {
 		if item.MeasurementId == nil {
 			continue
 		}
-		descRef[item.MeasurementId] = item
+		descRef[*item.MeasurementId] = item
 	}
 
 	data := featureRemote.Data(model.FunctionTypeMeasurementListData).(*model.MeasurementListDataType)
@@ -97,13 +97,18 @@ func GetMeasurementValues(service *service.EEBUSService, entity *spine.EntityRem
 			continue
 		}
 
-		desc, exists := descRef[item.MeasurementId]
+		desc, exists := descRef[*item.MeasurementId]
 		if !exists {
 			continue
 		}
 
 		result := MeasurementType{
 			MeasurementId: uint(*item.MeasurementId),
+		}
+		if item.Timestamp != nil {
+			if value, err := time.Parse(time.RFC3339, *item.Timestamp); err == nil {
+				result.Timestamp = value
+			}
 		}
 
 		if desc.ScopeType != nil {
@@ -113,7 +118,7 @@ func GetMeasurementValues(service *service.EEBUSService, entity *spine.EntityRem
 			result.Unit = *desc.Unit
 		}
 
-		constraint, exists := constraintsRef[item.MeasurementId]
+		constraint, exists := constraintsRef[*item.MeasurementId]
 		if exists {
 			if constraint.ValueRangeMin != nil {
 				result.ValueMin = constraint.ValueRangeMin.GetValue()
