@@ -48,14 +48,6 @@ func RequestDeviceConfigurationKeyValueList(service *service.EEBUSService, entit
 	}
 
 	return msgCounter, nil
-	/*
-	   // subscribe to device configuration state updates
-	   fErr = featureLocal.SubscribeAndWait(featureRemote.Device(), featureRemote.Address())
-
-	   	if fErr != nil {
-	   		fmt.Println(fErr.String())
-	   	}
-	*/
 }
 
 // return current values for Device Configuration
@@ -72,12 +64,12 @@ func GetDeviceConfigurationValues(service *service.EEBUSService, entity *spine.E
 	}
 	descData := rDescData.(*model.DeviceConfigurationKeyValueDescriptionListDataType)
 
-	ref := make(map[*model.DeviceConfigurationKeyIdType]model.DeviceConfigurationKeyValueDescriptionDataType)
+	ref := make(map[model.DeviceConfigurationKeyIdType]model.DeviceConfigurationKeyValueDescriptionDataType)
 	for _, item := range descData.DeviceConfigurationKeyValueDescriptionData {
 		if item.KeyName == nil || item.KeyId == nil {
 			continue
 		}
-		ref[item.KeyId] = item
+		ref[*item.KeyId] = item
 	}
 
 	rData := featureRemote.Data(model.FunctionTypeDeviceConfigurationKeyValueListData)
@@ -92,7 +84,7 @@ func GetDeviceConfigurationValues(service *service.EEBUSService, entity *spine.E
 		if item.KeyId == nil {
 			continue
 		}
-		desc, exists := ref[item.KeyId]
+		desc, exists := ref[*item.KeyId]
 		if !exists || desc.KeyName == nil {
 			continue
 		}

@@ -68,11 +68,3 @@ func SendDeviceDiagnosisState(service *service.EEBUSService, entity *spine.Entit
 
 	_, _ = featureLocal.NotifyData(model.FunctionTypeDeviceDiagnosisStateData, featureRemote)
 }
-
-/*
-	// subscribe to entity diagnosis state updates
-	fErr := featureLocal.SubscribeAndWait(featureRemote.Device(), featureRemote.Address())
-	if fErr != nil {
-		fmt.Println(fErr.String())
-	}
-*/
