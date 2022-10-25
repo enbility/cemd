@@ -105,6 +105,11 @@ func GetMeasurementValues(service *service.EEBUSService, entity *spine.EntityRem
 		result := MeasurementType{
 			MeasurementId: uint(*item.MeasurementId),
 		}
+
+		if item.Value != nil {
+			result.Value = item.Value.GetValue()
+		}
+
 		if item.Timestamp != nil {
 			if value, err := time.Parse(time.RFC3339, *item.Timestamp); err == nil {
 				result.Timestamp = value
