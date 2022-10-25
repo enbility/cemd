@@ -31,6 +31,12 @@ func (m *MeasurementOfElectricityDuringEVCharging) HandleEvent(payload spine.Eve
 
 			// TODO: provide the electrical description data
 			fmt.Printf("Electrical Description: %#v\n", data)
+		case *model.ElectricalConnectionParameterDescriptionListDataType:
+			_, err := features.RequestElectricalPermittedValueSet(m.service, payload.Entity)
+			if err != nil {
+				fmt.Println("Error getting electrical permitted values:", err)
+			}
+
 		case *model.ElectricalConnectionPermittedValueSetListDataType:
 			data, err := features.GetElectricalLimitValues(m.service, payload.Entity)
 			if err != nil {
@@ -40,6 +46,12 @@ func (m *MeasurementOfElectricityDuringEVCharging) HandleEvent(payload spine.Eve
 
 			// TODO: provide the electrical limit data
 			fmt.Printf("Electrical Permitted Values: %#v\n", data)
+		case *model.MeasurementDescriptionListDataType:
+			_, err := features.RequestMeasurementList(m.service, payload.Entity)
+			if err != nil {
+				fmt.Println("Error getting measurement values:", err)
+			}
+
 		case *model.MeasurementListDataType:
 			data, err := features.GetMeasurementValues(m.service, payload.Entity)
 			if err != nil {

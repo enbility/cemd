@@ -54,6 +54,16 @@ func (e *EV) HandleEvent(payload spine.EventPayload) {
 			case *model.DeviceDiagnosisStateDataType:
 				// TODO: received diagnosis state
 
+			case *model.IdentificationListDataType:
+				data, err := features.GetIdentificationValues(e.service, payload.Entity)
+				if err != nil {
+					fmt.Println("Error getting identification values:", err)
+					return
+				}
+
+				// TODO: provide the device configuration data
+				fmt.Printf("Identification Values: %#v\n", data)
+
 			}
 		}
 	}
@@ -83,31 +93,42 @@ func (e *EV) evConnected(entity *spine.EntityRemoteImpl) {
 
 	// get ev configuration data
 	if err := features.RequestDeviceConfiguration(e.service, entity); err != nil {
+		fmt.Println(err)
 		return
 	}
 
 	// get manufacturer details
 	if _, err := features.RequestManufacturerDetailsForEntity(e.service, entity); err != nil {
+		fmt.Println(err)
 		return
 	}
 
 	// get device diagnosis state
 	if _, err := features.RequestDiagnosisStateForEntity(e.service, entity); err != nil {
+		fmt.Println(err)
 		return
 	}
 
 	// get electrical connection parameter
-	if err := features.RequestElectricalConnection(e.service, entity); err != nil {
+	if err := features.RequestElectricalConnectionDescription(e.service, entity); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if err := features.RequestElectricalConnectionParameterDescription(e.service, entity); err != nil {
+		fmt.Println(err)
 		return
 	}
 
 	// get measurement parameters
-	if err := features.RequestMeasurement(e.service, entity); err != nil {
+	if err := features.RequestMeasurementDescription(e.service, entity); err != nil {
+		fmt.Println(err)
 		return
 	}
 
 	// get identification
-	if err := features.RequestIdentification(e.service, entity); err != nil {
+	if _, err := features.RequestIdentification(e.service, entity); err != nil {
+		fmt.Println(err)
 		return
 	}
 

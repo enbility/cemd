@@ -1,7 +1,6 @@
 package features
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/DerAndereAndi/eebus-go/service"
@@ -37,10 +36,11 @@ func RequestManufacturerDetailsForEntity(service *service.EEBUSService, entity *
 		return nil, err
 	}
 
-	msgCounter, fErr := featureLocal.RequestData(model.FunctionTypeDeviceClassificationManufacturerData, featureRemote)
-	if fErr != nil {
-		fmt.Println(fErr.String())
-		return nil, errors.New(fErr.String())
+	// request DeviceClassificationManufacturer from a remote entity
+	msgCounter, err := requestData(featureLocal, featureRemote, model.FunctionTypeDeviceClassificationManufacturerData)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
 	}
 
 	return msgCounter, nil

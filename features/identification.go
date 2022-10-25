@@ -13,26 +13,27 @@ type IdentificationType struct {
 	Type       model.IdentificationTypeType
 }
 
-// request identification data to properly interpret the corresponding data messages
-func RequestIdentification(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
+// request FunctionTypeIdentificationListData from a remote entity
+func RequestIdentification(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (*model.MsgCounterType, error) {
 	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeIdentification, entity)
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return nil, err
 	}
 
 	// request FunctionTypeIdentificationListDataType from a remote entity
-	if _, fErr := featureLocal.RequestData(model.FunctionTypeIdentificationListData, featureRemote); fErr != nil {
-		fmt.Println(fErr.String())
-		return err
+	msgCounter, err := requestData(featureLocal, featureRemote, model.FunctionTypeIdentificationListData)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
 	}
 
-	return nil
+	return msgCounter, nil
 }
 
 // return current values for Identification
 func GetIdentificationValues(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]IdentificationType, error) {
-	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceConfiguration, entity)
+	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeIdentification, entity)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

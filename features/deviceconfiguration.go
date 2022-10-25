@@ -1,7 +1,6 @@
 package features
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -32,9 +31,9 @@ func RequestDeviceConfiguration(service *service.EEBUSService, entity *spine.Ent
 	}
 
 	// request DeviceConfigurationKeyValueDescriptionListData from a remote entity
-	if _, fErr := featureLocal.RequestData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, featureRemote); fErr != nil {
-		fmt.Println(fErr.String())
-		return errors.New(fErr.String())
+	if _, err := requestData(featureLocal, featureRemote, model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData); err != nil {
+		fmt.Println(err)
+		return err
 	}
 
 	return nil
@@ -48,10 +47,11 @@ func RequestDeviceConfigurationKeyValueList(service *service.EEBUSService, entit
 		return nil, err
 	}
 
-	msgCounter, fErr := featureLocal.RequestData(model.FunctionTypeDeviceConfigurationKeyValueListData, featureRemote)
-	if fErr != nil {
-		fmt.Println(fErr.String())
-		return nil, errors.New(fErr.String())
+	// request FunctionTypeDeviceConfigurationKeyValueListData from a remote entity
+	msgCounter, err := requestData(featureLocal, featureRemote, model.FunctionTypeDeviceConfigurationKeyValueListData)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
 	}
 
 	return msgCounter, nil

@@ -1,7 +1,6 @@
 package features
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -21,37 +20,54 @@ type MeasurementType struct {
 	Timestamp     time.Time
 }
 
-// request measurement data to properly interpret the corresponding data messages
-func RequestMeasurement(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
+// request FunctionTypeMeasurementDescriptionListData from a remote device
+func RequestMeasurementDescription(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
 	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeMeasurement, entity)
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
 
-	// request MeasurementDescriptionListData from a remote entity
-	if _, fErr := featureLocal.RequestData(model.FunctionTypeMeasurementDescriptionListData, featureRemote); fErr != nil {
-		fmt.Println(fErr.String())
-		return errors.New(fErr.String())
-	}
-
-	// request FunctionTypeMeasurementConstraintsListData from a remote entity
-	fTypes := featureRemote.Operations()
-	_, exists := fTypes[model.FunctionTypeMeasurementConstraintsListData]
-	if exists {
-		if _, fErr := featureLocal.RequestData(model.FunctionTypeMeasurementConstraintsListData, featureRemote); fErr != nil {
-			fmt.Println(fErr.String())
-			return errors.New(fErr.String())
-		}
-	}
-
-	// request FunctionTypeMeasurementListData from a remote entity
-	if _, fErr := featureLocal.RequestData(model.FunctionTypeMeasurementListData, featureRemote); fErr != nil {
-		fmt.Println(fErr.String())
-		return errors.New(fErr.String())
+	if _, err := requestData(featureLocal, featureRemote, model.FunctionTypeMeasurementDescriptionListData); err != nil {
+		fmt.Println(err)
+		return err
 	}
 
 	return nil
+}
+
+// request FunctionTypeMeasurementConstraintsListData from a remote entity
+func RequestMeasurementConstraints(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
+	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeMeasurement, entity)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	if _, err := requestData(featureLocal, featureRemote, model.FunctionTypeMeasurementConstraintsListData); err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
+}
+
+// request FunctionTypeMeasurementListData from a remote entity
+func RequestMeasurementList(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (*model.MsgCounterType, error) {
+	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeMeasurement, entity)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	// request FunctionTypeMeasurementListData from a remote entity
+	msgCounter, err := requestData(featureLocal, featureRemote, model.FunctionTypeMeasurementListData)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return msgCounter, nil
 }
 
 // return current values for measurements

@@ -26,33 +26,53 @@ type ElectricalLimitType struct {
 	Scope        model.ScopeTypeType
 }
 
-// request electrical connection data to properly interpret the corresponding data messages
-func RequestElectricalConnection(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
+// request ElectricalConnectionDescriptionListDataType from a remote entity
+func RequestElectricalConnectionDescription(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
 	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
 
-	// request ElectricalConnectionParameterDescriptionListDataType from a remote entity
-	if _, fErr := featureLocal.RequestData(model.FunctionTypeElectricalConnectionParameterDescriptionListData, featureRemote); fErr != nil {
-		fmt.Println(fErr.String())
-		return err
-	}
-
-	// request ElectricalConnectionDescriptionListDataType from a remote entity
-	if _, fErr := featureLocal.RequestData(model.FunctionTypeElectricalConnectionDescriptionListData, featureRemote); fErr != nil {
-		fmt.Println(fErr.String())
-		return err
-	}
-
-	// request ElectricalConnectionPermittedValueSetListDataType from a remote entity
-	if _, fErr := featureLocal.RequestData(model.FunctionTypeElectricalConnectionPermittedValueSetListData, featureRemote); fErr != nil {
-		fmt.Println(fErr.String())
+	if _, err := requestData(featureLocal, featureRemote, model.FunctionTypeElectricalConnectionDescriptionListData); err != nil {
+		fmt.Println(err)
 		return err
 	}
 
 	return nil
+}
+
+// request FunctionTypeElectricalConnectionParameterDescriptionListData from a remote entity
+func RequestElectricalConnectionParameterDescription(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
+	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	if _, err := requestData(featureLocal, featureRemote, model.FunctionTypeElectricalConnectionParameterDescriptionListData); err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
+}
+
+// request FunctionTypeElectricalConnectionPermittedValueSetListData from a remote entity
+func RequestElectricalPermittedValueSet(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (*model.MsgCounterType, error) {
+	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	msgCounter, err := requestData(featureLocal, featureRemote, model.FunctionTypeElectricalConnectionPermittedValueSetListData)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return msgCounter, nil
 }
 
 // return current values for Electrical Description

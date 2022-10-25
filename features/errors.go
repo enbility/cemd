@@ -1,6 +1,8 @@
 package features
 
-import "errors"
+import (
+	"errors"
+)
 
 // ErrMetadataNotAvailable indicates that the meta data information is not available
 // e.g. decsriptions, constraints, ...
@@ -11,3 +13,7 @@ var ErrDataNotAvailable = errors.New("data not available")
 
 // ErrDataForMetadataKeyNotFound indicates that no data item is found for the given key
 var ErrDataForMetadataKeyNotFound = errors.New("data for key not found")
+
+var ErrFunctionNotSupported = errors.New("function is not supported")
+
+var ErrOperationOnFunctionNotSupported = errors.New("operation is not supported on function")

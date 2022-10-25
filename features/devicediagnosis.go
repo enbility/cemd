@@ -1,7 +1,6 @@
 package features
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/DerAndereAndi/eebus-go/service"
@@ -27,10 +26,11 @@ func RequestDiagnosisStateForEntity(service *service.EEBUSService, entity *spine
 		return nil, err
 	}
 
-	msgCounter, fErr := featureLocal.RequestData(model.FunctionTypeDeviceDiagnosisStateData, featureRemote)
-	if fErr != nil {
-		fmt.Println(fErr.String())
-		return nil, errors.New(fErr.String())
+	// request FunctionTypeDeviceDiagnosisStateData from a remote entity
+	msgCounter, err := requestData(featureLocal, featureRemote, model.FunctionTypeDeviceDiagnosisStateData)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
 	}
 
 	return msgCounter, nil
