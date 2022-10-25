@@ -108,12 +108,12 @@ func GetElectricalLimitValues(service *service.EEBUSService, entity *spine.Entit
 		return nil, ErrMetadataNotAvailable
 	}
 	paramDescriptionData := rData.(*model.ElectricalConnectionParameterDescriptionListDataType)
-	paramRef := make(map[*model.ElectricalConnectionParameterIdType]model.ElectricalConnectionParameterDescriptionDataType)
+	paramRef := make(map[model.ElectricalConnectionParameterIdType]model.ElectricalConnectionParameterDescriptionDataType)
 	for _, item := range paramDescriptionData.ElectricalConnectionParameterDescriptionData {
 		if item.ParameterId == nil {
 			continue
 		}
-		paramRef[item.ParameterId] = item
+		paramRef[*item.ParameterId] = item
 	}
 
 	data := featureRemote.Data(model.FunctionTypeElectricalConnectionPermittedValueSetListData).(*model.ElectricalConnectionPermittedValueSetListDataType)
@@ -127,7 +127,7 @@ func GetElectricalLimitValues(service *service.EEBUSService, entity *spine.Entit
 		if item.ParameterId == nil || item.ElectricalConnectionId == nil {
 			continue
 		}
-		param, exists := paramRef[item.ParameterId]
+		param, exists := paramRef[*item.ParameterId]
 		if !exists {
 			continue
 		}
