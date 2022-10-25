@@ -61,13 +61,15 @@ func GetMeasurementValues(service *service.EEBUSService, entity *spine.EntityRem
 	rData := featureRemote.Data(model.FunctionTypeMeasurementConstraintsListData)
 	// Constraints are optional, data may be empty
 	constraintsRef := make(map[*model.MeasurementIdType]model.MeasurementConstraintsDataType)
-	if rData != nil {
-		constraintsData := rData.(*model.MeasurementConstraintsListDataType)
-		for _, item := range constraintsData.MeasurementConstraintsData {
-			if item.MeasurementId == nil {
-				continue
+	switch constraintsData := rData.(type) {
+	case *model.MeasurementConstraintsListDataType:
+		if constraintsData != nil {
+			for _, item := range constraintsData.MeasurementConstraintsData {
+				if item.MeasurementId == nil {
+					continue
+				}
+				constraintsRef[item.MeasurementId] = item
 			}
-			constraintsRef[item.MeasurementId] = item
 		}
 	}
 
