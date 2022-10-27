@@ -61,7 +61,25 @@ func (h *Cem) Setup(port, remoteSKI, certFile, keyFile string, ifaces []string) 
 
 	spine.Events.Subscribe(h)
 
-	// Setup the supported UseCases and their features
+	// Setup the supported features and usecases
+	h.addSupportedFeatures()
+
+	// e-mobilty specific use cases
+	_ = usecases.NewEMobility(h.myService)
+
+	h.myService.Start()
+	// defer h.myService.Shutdown()
+
+	remoteService := service.ServiceDetails{
+		SKI: remoteSKI,
+	}
+	h.myService.RegisterRemoteService(remoteService)
+
+	return nil
+}
+
+// adds all the supported features to the local entity
+func (h *Cem) addSupportedFeatures() {
 	localEntity := h.myService.LocalEntity()
 
 	{
@@ -99,24 +117,6 @@ func (h *Cem) Setup(port, remoteSKI, certFile, keyFile string, ifaces []string) 
 		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeLoadControl, model.RoleTypeClient, "LoadControl Client")
 	}
 
-	// e-mobilty specific use cases
-	_ = usecases.NewEVSECommissioningAndConfiguration(h.myService)
-	_ = usecases.NewEVCommissioningAndConfiguration(h.myService)
-	_ = usecases.NewMeasurementOfElectricityDuringEVCharging(h.myService)
-	_ = usecases.NewEVStateOfCharge(h.myService)
-	_ = usecases.NewOverloadProtectionEV(h.myService)
-	_ = usecases.NewOptimizationOfSelfConsumptionEV(h.myService)
-	_ = usecases.NewCoordinatedChargingEV(h.myService)
-
-	h.myService.Start()
-	// defer h.myService.Shutdown()
-
-	remoteService := service.ServiceDetails{
-		SKI: remoteSKI,
-	}
-	h.myService.RegisterRemoteService(remoteService)
-
-	return nil
 }
 
 // EEBUSServiceDelegate
