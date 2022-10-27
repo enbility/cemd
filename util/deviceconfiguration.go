@@ -1,4 +1,4 @@
-package features
+package util
 
 import (
 	"fmt"
@@ -55,6 +55,71 @@ func RequestDeviceConfigurationKeyValueList(service *service.EEBUSService, entit
 	}
 
 	return msgCounter, nil
+}
+
+// returns if a provided scopetype in the device configuration descriptions is available or not
+// returns an error if no description data is available yet
+func GetDeviceConfigurationDescriptionKeyNameSupport(keyName model.DeviceConfigurationKeyNameType, service *service.EEBUSService, entity *spine.EntityRemoteImpl) (bool, error) {
+	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceConfiguration, entity)
+	if err != nil {
+		fmt.Println(err)
+		return false, err
+	}
+
+	data := featureRemote.Data(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData).(*model.DeviceConfigurationKeyValueDescriptionListDataType)
+	if data == nil {
+		return false, ErrDataNotAvailable
+	}
+	for _, item := range data.DeviceConfigurationKeyValueDescriptionData {
+		if item.KeyId == nil || item.KeyName == nil {
+			continue
+		}
+		if *item.KeyName == string(keyName) {
+			return true, nil
+		}
+	}
+
+	return false, ErrDataNotAvailable
+}
+
+// return current SoC for measurements
+func GetEVCommunicationStandard(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (*string, error) {
+	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceConfiguration, entity)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	descRef, err := deviceConfigurationKeyValueDescriptionListData(featureRemote)
+	if err != nil {
+		return nil, ErrMetadataNotAvailable
+	}
+
+	data := featureRemote.Data(model.FunctionTypeDeviceConfigurationKeyValueListData).(*model.DeviceConfigurationKeyValueListDataType)
+	if data == nil {
+		return nil, ErrDataNotAvailable
+	}
+
+	for _, item := range data.DeviceConfigurationKeyValueData {
+		if item.KeyId == nil {
+			continue
+		}
+
+		desc, exists := descRef[*item.KeyId]
+		if !exists {
+			continue
+		}
+
+		if desc.KeyName == nil || item.Value == nil {
+			continue
+		}
+
+		if *desc.KeyName == string(model.DeviceConfigurationKeyNameTypeCommunicationsStandard) {
+			return (*string)(item.Value.String), nil
+		}
+	}
+
+	return nil, ErrDataNotAvailable
 }
 
 // return current values for Device Configuration
@@ -149,4 +214,24 @@ func GetDeviceConfigurationValues(service *service.EEBUSService, entity *spine.E
 	}
 
 	return resultSet, nil
+}
+
+// helper
+
+type deviceConfigurationKeyValueDescriptionMap map[model.DeviceConfigurationKeyIdType]model.DeviceConfigurationKeyValueDescriptionDataType
+
+// return a map of DeviceConfigurationKeyValueDescriptionListDataType with keyId as key
+func deviceConfigurationKeyValueDescriptionListData(featureRemote *spine.FeatureRemoteImpl) (deviceConfigurationKeyValueDescriptionMap, error) {
+	data := featureRemote.Data(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData).(*model.DeviceConfigurationKeyValueDescriptionListDataType)
+	if data == nil {
+		return nil, ErrMetadataNotAvailable
+	}
+	ref := make(deviceConfigurationKeyValueDescriptionMap)
+	for _, item := range data.DeviceConfigurationKeyValueDescriptionData {
+		if item.KeyId == nil {
+			continue
+		}
+		ref[*item.KeyId] = item
+	}
+	return ref, nil
 }

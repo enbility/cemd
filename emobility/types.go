@@ -29,8 +29,8 @@ const (
 	EVChargeStrategyTypeTimedCharging  EVChargeStrategyType = "timedcharging"
 )
 
-// Interface for the evCC use case for CEM device
-type EMobilityI interface {
+// Interface for the emobility use cases for CEM device
+type EMobility interface {
 	// handle device state updates from the remote EV entity
 	HandleEVEntityState(ski string, failure bool)
 }

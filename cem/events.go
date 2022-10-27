@@ -8,7 +8,7 @@ import (
 )
 
 // Handle events from eebus-go library
-func (h *Cem) HandleEvent(payload spine.EventPayload) {
+func (h *CemImpl) HandleEvent(payload spine.EventPayload) {
 	switch payload.EventType {
 	case spine.EventTypeSubscriptionChange:
 		switch payload.Data.(type) {
@@ -19,7 +19,7 @@ func (h *Cem) HandleEvent(payload spine.EventPayload) {
 }
 
 // Handle subscription requests
-func (h *Cem) subscriptionRequestHandling(payload spine.EventPayload) {
+func (h *CemImpl) subscriptionRequestHandling(payload spine.EventPayload) {
 	data := payload.Data.(model.SubscriptionManagementRequestCallType)
 
 	// Heartbeat subscription requests

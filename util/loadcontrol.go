@@ -1,4 +1,4 @@
-package features
+package util
 
 import (
 	"fmt"
@@ -68,6 +68,31 @@ func RequestLoadControlLimitList(service *service.EEBUSService, entity *spine.En
 	return msgCounter, nil
 }
 
+// returns if a provided category in the load control descriptions is available or not
+// returns an error if no description data is available yet
+func GetLoadControlDescriptionCategorySupport(category model.LoadControlCategoryType, service *service.EEBUSService, entity *spine.EntityRemoteImpl) (bool, error) {
+	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeLoadControl, entity)
+	if err != nil {
+		fmt.Println(err)
+		return false, err
+	}
+
+	data := featureRemote.Data(model.FunctionTypeLoadControlLimitDescriptionListData).(*model.LoadControlLimitDescriptionListDataType)
+	if data == nil {
+		return false, ErrDataNotAvailable
+	}
+	for _, item := range data.LoadControlLimitDescriptionData {
+		if item.LimitId == nil || item.LimitCategory == nil {
+			continue
+		}
+		if *item.LimitCategory == category {
+			return true, nil
+		}
+	}
+
+	return false, ErrDataNotAvailable
+}
+
 func GetLoadControlLimitValues(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]LoadControlLimitType, error) {
 	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeLoadControl, entity)
 	if err != nil {
@@ -75,11 +100,10 @@ func GetLoadControlLimitValues(service *service.EEBUSService, entity *spine.Enti
 		return nil, err
 	}
 
-	rData := featureRemote.Data(model.FunctionTypeLoadControlLimitDescriptionListData)
-	if rData == nil {
+	descriptionData := featureRemote.Data(model.FunctionTypeLoadControlLimitDescriptionListData).(*model.LoadControlLimitDescriptionListDataType)
+	if descriptionData == nil {
 		return nil, ErrMetadataNotAvailable
 	}
-	descriptionData := rData.(*model.LoadControlLimitDescriptionListDataType)
 	descRef := make(map[model.LoadControlLimitIdType]model.LoadControlLimitDescriptionDataType)
 	for _, item := range descriptionData.LoadControlLimitDescriptionData {
 		if item.MeasurementId == nil {

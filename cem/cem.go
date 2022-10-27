@@ -11,7 +11,7 @@ import (
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
-type Cem struct {
+type CemImpl struct {
 	brand        string
 	model        string
 	serialNumber string
@@ -19,8 +19,8 @@ type Cem struct {
 	myService    *service.EEBUSService
 }
 
-func NewCEM(brand, model, serialNumber, identifier string) *Cem {
-	return &Cem{
+func NewCEM(brand, model, serialNumber, identifier string) *CemImpl {
+	return &CemImpl{
 		brand:        brand,
 		model:        model,
 		serialNumber: serialNumber,
@@ -28,7 +28,7 @@ func NewCEM(brand, model, serialNumber, identifier string) *Cem {
 	}
 }
 
-func (h *Cem) Setup(port, remoteSKI, certFile, keyFile string, ifaces []string) error {
+func (h *CemImpl) Setup(port, remoteSKI, certFile, keyFile string, ifaces []string) error {
 	serviceDescription := &service.ServiceDescription{
 		Brand:        h.brand,
 		Model:        h.model,
@@ -79,7 +79,7 @@ func (h *Cem) Setup(port, remoteSKI, certFile, keyFile string, ifaces []string) 
 }
 
 // adds all the supported features to the local entity
-func (h *Cem) addSupportedFeatures() {
+func (h *CemImpl) addSupportedFeatures() {
 	localEntity := h.myService.LocalEntity()
 
 	{
@@ -122,13 +122,13 @@ func (h *Cem) addSupportedFeatures() {
 // EEBUSServiceDelegate
 
 // handle a request to trust a remote service
-func (h *Cem) RemoteServiceTrustRequested(ski string) {
+func (h *CemImpl) RemoteServiceTrustRequested(ski string) {
 	// we directly trust it in this example
 	h.myService.UpdateRemoteServiceTrust(ski, true)
 }
 
 // report the Ship ID of a newly trusted connection
-func (h *Cem) RemoteServiceShipIDReported(ski string, shipID string) {
+func (h *CemImpl) RemoteServiceShipIDReported(ski string, shipID string) {
 	// we should associated the Ship ID with the SKI and store it
 	// so the next connection can start trusted
 	fmt.Println("SKI", ski, "has Ship ID:", shipID)

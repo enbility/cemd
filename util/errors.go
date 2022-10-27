@@ -1,4 +1,4 @@
-package features
+package util
 
 import (
 	"errors"
@@ -13,6 +13,12 @@ var ErrDataNotAvailable = errors.New("data not available")
 
 // ErrDataForMetadataKeyNotFound indicates that no data item is found for the given key
 var ErrDataForMetadataKeyNotFound = errors.New("data for key not found")
+
+var ErrNotSupported = errors.New("not supported")
+
+var ErrEntityNotFound = errors.New("entity not found")
+
+var ErrUsecCaseNotSupported = errors.New("usecase is not supported")
 
 var ErrFunctionNotSupported = errors.New("function is not supported")
 

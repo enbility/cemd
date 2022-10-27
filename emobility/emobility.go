@@ -6,16 +6,16 @@ import (
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
-type EMobility struct {
+type EMobilityImpl struct {
 	entity *spine.EntityLocalImpl
 
 	service *service.EEBUSService
 }
 
 // Add E-Mobility support
-func NewEMobility(service *service.EEBUSService) *EMobility {
+func NewEMobility(service *service.EEBUSService) *EMobilityImpl {
 	// add the use case
-	emobility := &EMobility{
+	emobility := &EMobilityImpl{
 		service: service,
 		entity:  service.LocalEntity(),
 	}
@@ -27,7 +27,7 @@ func NewEMobility(service *service.EEBUSService) *EMobility {
 }
 
 // add supported e-mobility usecases
-func (e *EMobility) addUseCases() {
+func (e *EMobilityImpl) addUseCases() {
 	_ = spine.NewUseCase(
 		e.entity,
 		model.UseCaseNameTypeEVSECommissioningAndConfiguration,
