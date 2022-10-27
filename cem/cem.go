@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/DerAndereAndi/eebus-go-cem/usecases"
+	"github.com/DerAndereAndi/eebus-go-cem/emobility"
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/spine"
 	"github.com/DerAndereAndi/eebus-go/spine/model"
@@ -65,7 +65,7 @@ func (h *Cem) Setup(port, remoteSKI, certFile, keyFile string, ifaces []string) 
 	h.addSupportedFeatures()
 
 	// e-mobilty specific use cases
-	_ = usecases.NewEMobility(h.myService)
+	_ = emobility.NewEMobility(h.myService)
 
 	h.myService.Start()
 	// defer h.myService.Shutdown()

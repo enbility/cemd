@@ -1,4 +1,4 @@
-package usecases
+package emobility
 
 import (
 	"fmt"

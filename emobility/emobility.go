@@ -1,4 +1,4 @@
-package usecases
+package emobility
 
 import (
 	"github.com/DerAndereAndi/eebus-go/service"
@@ -15,15 +15,15 @@ type EMobility struct {
 // Add E-Mobility support
 func NewEMobility(service *service.EEBUSService) *EMobility {
 	// add the use case
-	evse := &EMobility{
+	emobility := &EMobility{
 		service: service,
 		entity:  service.LocalEntity(),
 	}
-	spine.Events.Subscribe(evse)
+	spine.Events.Subscribe(emobility)
 
-	evse.addUseCases()
+	emobility.addUseCases()
 
-	return evse
+	return emobility
 }
 
 // add supported e-mobility usecases
