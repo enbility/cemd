@@ -26,9 +26,8 @@ func NewEMobility(service *service.EEBUSService) *EMobility {
 	return evse
 }
 
+// add supported e-mobility usecases
 func (e *EMobility) addUseCases() {
-	// add use cases
-
 	_ = spine.NewUseCase(
 		e.entity,
 		model.UseCaseNameTypeEVSECommissioningAndConfiguration,
