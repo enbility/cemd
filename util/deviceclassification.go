@@ -23,6 +23,11 @@ type ManufacturerType struct {
 	ManufacturerDescription        string
 }
 
+// subscribe to device classification
+func SubscribeDeviceClassificationForEntity(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
+	return subscribeToFeatureForEntity(service, model.FeatureTypeTypeDeviceClassification, entity)
+}
+
 // request DeviceClassificationManufacturerData from a remote device entity 1
 func RequestManufacturerDetailsForDevice(service *service.EEBUSService, device *spine.DeviceRemoteImpl) (*model.MsgCounterType, error) {
 	return RequestManufacturerDetailsForEntity(service, device.Entity([]model.AddressEntityType{1}))

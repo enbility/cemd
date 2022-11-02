@@ -1,5 +1,5 @@
-github.com/DerAndereAndi/eebus-go v0.0.0-20221026103730-5eefed6186cd h1:6Xoje0z4n9ZQ/ZA+OA5CAU0R5fCiFKKNdBj0IK/EBZQ=
-github.com/DerAndereAndi/eebus-go v0.0.0-20221026103730-5eefed6186cd/go.mod h1:jw+H6RT5CHKaNTlnHm7eQQNUKmzROCM2dTvKZF0uNGg=
+github.com/DerAndereAndi/eebus-go v0.0.0-20221102191023-57421742ee9b h1:813mmKugIMyVWsVihyICFY1aii3749Y1Pj9t8baYBSE=
+github.com/DerAndereAndi/eebus-go v0.0.0-20221102191023-57421742ee9b/go.mod h1:jw+H6RT5CHKaNTlnHm7eQQNUKmzROCM2dTvKZF0uNGg=
 github.com/ahmetb/go-linq/v3 v3.2.0 h1:BEuMfp+b59io8g5wYzNoFe9pWPalRklhlhbiU3hYZDE=
 github.com/ahmetb/go-linq/v3 v3.2.0/go.mod h1:haQ3JfOeWK8HpVxMtHHEMPVgBKiYyQ+f1/kLZh/cj9U=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

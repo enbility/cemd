@@ -22,6 +22,11 @@ type DeviceConfigurationType struct {
 	Unit          string
 }
 
+// subscribe to device diagnnosis
+func SubscribeDeviceConfigurationForEntity(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
+	return subscribeToFeatureForEntity(service, model.FeatureTypeTypeDeviceConfiguration, entity)
+}
+
 // request DeviceConfiguration data from a remote entity
 func RequestDeviceConfiguration(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
 	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceConfiguration, entity)
@@ -101,7 +106,7 @@ func GetEVCommunicationStandard(service *service.EEBUSService, entity *spine.Ent
 	}
 
 	for _, item := range data.DeviceConfigurationKeyValueData {
-		if item.KeyId == nil {
+		if item.KeyId == nil || item.Value == nil {
 			continue
 		}
 
@@ -110,7 +115,7 @@ func GetEVCommunicationStandard(service *service.EEBUSService, entity *spine.Ent
 			continue
 		}
 
-		if desc.KeyName == nil || item.Value == nil {
+		if desc.KeyName == nil {
 			continue
 		}
 

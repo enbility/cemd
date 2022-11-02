@@ -13,6 +13,11 @@ type IdentificationType struct {
 	Type       model.IdentificationTypeType
 }
 
+// subscribe to identification
+func SubscribeIdentificationForEntity(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
+	return subscribeToFeatureForEntity(service, model.FeatureTypeTypeIdentification, entity)
+}
+
 // request FunctionTypeIdentificationListData from a remote entity
 func RequestIdentification(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (*model.MsgCounterType, error) {
 	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeIdentification, entity)

@@ -46,6 +46,36 @@ func IsUsecaseSupported(usecase model.UseCaseNameType, actor model.UseCaseActorT
 	return false
 }
 
+// subscribe to a feature on an entity
+func subscribeToFeatureForEntity(service *service.EEBUSService, feature model.FeatureTypeType, entity *spine.EntityRemoteImpl) error {
+	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(feature, entity)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	if _, fErr := featureLocal.Subscribe(featureRemote.Device(), featureRemote.Address()); fErr != nil {
+		return errors.New(fErr.String())
+	}
+
+	return nil
+}
+
+// bin to a feature on an entity
+func bindToFeatureForEntity(service *service.EEBUSService, feature model.FeatureTypeType, entity *spine.EntityRemoteImpl) error {
+	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(feature, entity)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	if _, fErr := featureLocal.Bind(featureRemote.Device(), featureRemote.Address()); fErr != nil {
+		return errors.New(fErr.String())
+	}
+
+	return nil
+}
+
 // return the remote entity of a given type and device ski
 func EntityOfTypeForSki(service *service.EEBUSService, entityType model.EntityTypeType, ski string) (*spine.EntityRemoteImpl, error) {
 	rDevice := service.RemoteDeviceForSki(ski)

@@ -8,6 +8,11 @@ import (
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
+// subscribe to time series
+func SubscribeIncentiveTableForEntity(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
+	return subscribeToFeatureForEntity(service, model.FeatureTypeTypeIncentiveTable, entity)
+}
+
 // request FunctionTypeIncentiveTableDescriptionData from a remote entity
 func RequestIncentiveTableDescription(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
 	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeIncentiveTable, entity)

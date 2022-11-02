@@ -26,6 +26,11 @@ type ElectricalLimitType struct {
 	Scope        model.ScopeTypeType
 }
 
+// subscribe to electrical connection
+func SubscribeElectricalConnectionForEntity(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
+	return subscribeToFeatureForEntity(service, model.FeatureTypeTypeElectricalConnection, entity)
+}
+
 // request ElectricalConnectionDescriptionListDataType from a remote entity
 func RequestElectricalConnectionDescription(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
 	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)

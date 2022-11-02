@@ -17,6 +17,7 @@ type CemImpl struct {
 	serialNumber string
 	identifier   string
 	myService    *service.EEBUSService
+	emobility    *emobility.EMobilityImpl
 }
 
 func NewCEM(brand, model, serialNumber, identifier string) *CemImpl {
@@ -61,11 +62,12 @@ func (h *CemImpl) Setup(port, remoteSKI, certFile, keyFile string, ifaces []stri
 
 	spine.Events.Subscribe(h)
 
-	// Setup the supported features and usecases
-	h.addSupportedFeatures()
-
-	// e-mobilty specific use cases
-	_ = emobility.NewEMobility(h.myService)
+	// Setup the supported usecases and features
+	emobility.AddEmobilityFeatures(h.myService)
+	emobility.AddEmobilityUseCases(h.myService)
+	// TODO: emobility should be stored per remote SKI and
+	// only be set for the SKI if the device supports it
+	h.emobility = emobility.NewEMobility(h.myService, remoteSKI)
 
 	h.myService.Start()
 	// defer h.myService.Shutdown()
@@ -76,47 +78,6 @@ func (h *CemImpl) Setup(port, remoteSKI, certFile, keyFile string, ifaces []stri
 	h.myService.RegisterRemoteService(remoteService)
 
 	return nil
-}
-
-// adds all the supported features to the local entity
-func (h *CemImpl) addSupportedFeatures() {
-	localEntity := h.myService.LocalEntity()
-
-	{
-		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeClient, "Device Configuration Client")
-	}
-	{
-		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceClassification, model.RoleTypeClient, "Device Classification Client")
-	}
-	{
-		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient, "Device Diagnosis Client")
-	}
-	{
-		f := localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer, "Device Diagnosis Server")
-		f.AddFunctionType(model.FunctionTypeDeviceDiagnosisStateData, true, false)
-
-		// Set the initial state
-		state := model.DeviceDiagnosisOperatingStateTypeNormalOperation
-		deviceDiagnosisStateDate := &model.DeviceDiagnosisStateDataType{
-			OperatingState: &state,
-		}
-		f.SetData(model.FunctionTypeDeviceDiagnosisStateData, deviceDiagnosisStateDate)
-
-		f.AddFunctionType(model.FunctionTypeDeviceDiagnosisHeartbeatData, true, false)
-	}
-	{
-		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient, "Electrical Connection Client")
-	}
-	{
-		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeMeasurement, model.RoleTypeClient, "Measurement Client")
-	}
-	{
-		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeIdentification, model.RoleTypeClient, "Identification Client")
-	}
-	{
-		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeLoadControl, model.RoleTypeClient, "LoadControl Client")
-	}
-
 }
 
 // EEBUSServiceDelegate

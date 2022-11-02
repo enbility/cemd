@@ -49,6 +49,11 @@ type TimeSeriesConstraintsType struct {
 	SlotValueStep     float64       // Constraints
 }
 
+// subscribe to time series
+func SubscribeTimeSeriesForEntity(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
+	return subscribeToFeatureForEntity(service, model.FeatureTypeTypeTimeSeries, entity)
+}
+
 // request FunctionTypeTimeSeriesDescriptionListData from a remote entity
 func RequestTimeSeriesDescription(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
 	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeTimeSeries, entity)

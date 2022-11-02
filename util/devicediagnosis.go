@@ -13,6 +13,11 @@ type DeviceDiagnosisType struct {
 	PowerSupplyCondition model.PowerSupplyConditionType
 }
 
+// subscribe to device diagnnosis
+func SubscribeDeviceDiagnosisForEntity(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
+	return subscribeToFeatureForEntity(service, model.FeatureTypeTypeDeviceDiagnosis, entity)
+}
+
 // request DeviceDiagnosisStateData from a remote device entity 1
 func RequestDiagnosisStateForDevice(service *service.EEBUSService, device *spine.DeviceRemoteImpl) (*model.MsgCounterType, error) {
 	return RequestDiagnosisStateForEntity(service, device.Entity([]model.AddressEntityType{1}))
@@ -38,7 +43,7 @@ func RequestDiagnosisStateForEntity(service *service.EEBUSService, entity *spine
 
 // get the current diagnosis state for an device entity
 func GetDeviceDiagnosisState(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (*DeviceDiagnosisType, error) {
-	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceClassification, entity)
+	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeDeviceDiagnosis, entity)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

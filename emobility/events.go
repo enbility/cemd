@@ -10,6 +10,11 @@ import (
 
 // Internal EventHandler Interface for the CEM
 func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
+	// we only care about the registered SKI
+	if payload.Ski != e.ski {
+		return
+	}
+
 	// we only care about events from an EVSE or EV entity
 	if payload.Entity == nil {
 		return
@@ -20,7 +25,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 	}
 
 	switch payload.EventType {
-	case spine.EventTypeDeviceChange:
+	case spine.EventTypeEntityChange:
 		switch payload.ChangeType {
 		case spine.ElementChangeAdd:
 			switch entityType {
@@ -114,7 +119,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 			case *model.MeasurementDescriptionListDataType:
 				_, err := util.RequestMeasurementList(e.service, payload.Entity)
 				if err != nil {
-					fmt.Println("Error getting measurement values:", err)
+					fmt.Println("Error getting measurement list values:", err)
 				}
 
 			case *model.MeasurementListDataType:
@@ -162,6 +167,50 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 	fmt.Println("EV CONNECTED")
 
 	// TODO: add error handling
+
+	// subscribe
+	if err := util.SubscribeDeviceClassificationForEntity(e.service, entity); err != nil {
+		fmt.Println(err)
+		return
+	}
+	if err := util.SubscribeDeviceDiagnosisForEntity(e.service, entity); err != nil {
+		fmt.Println(err)
+		return
+	}
+	if err := util.SubscribeDeviceConfigurationForEntity(e.service, entity); err != nil {
+		fmt.Println(err)
+		return
+	}
+	if err := util.SubscribeMeasurementsForEntity(e.service, entity); err != nil {
+		fmt.Println(err)
+		return
+	}
+	if err := util.SubscribeElectricalConnectionForEntity(e.service, entity); err != nil {
+		fmt.Println(err)
+		return
+	}
+	if err := util.SubscribeIdentificationForEntity(e.service, entity); err != nil {
+		fmt.Println(err)
+		return
+	}
+	if err := util.SubscribeLoadControlForEntity(e.service, entity); err != nil {
+		fmt.Println(err)
+		return
+	}
+	// if err := util.SubscribeTimeSeriesForEntity(e.service, entity); err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// if err := util.SubscribeIncentiveTableForEntity(e.service, entity); err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+
+	// bindings
+	if err := util.BindLoadControlLimit(e.service, entity); err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	// get ev configuration data
 	if err := util.RequestDeviceConfiguration(e.service, entity); err != nil {

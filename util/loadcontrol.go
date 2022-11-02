@@ -19,6 +19,16 @@ type LoadControlLimitType struct {
 	Value         float64
 }
 
+// bind to load control so we can write limits
+func BindLoadControlLimit(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
+	return bindToFeatureForEntity(service, model.FeatureTypeTypeLoadControl, entity)
+}
+
+// subscribe to load control
+func SubscribeLoadControlForEntity(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
+	return subscribeToFeatureForEntity(service, model.FeatureTypeTypeLoadControl, entity)
+}
+
 // request FunctionTypeLoadControlLimitDescriptionListData from a remote device
 func RequestLoadControlLimitDescription(service *service.EEBUSService, entity *spine.EntityRemoteImpl) error {
 	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeLoadControl, entity)
@@ -159,4 +169,24 @@ func GetLoadControlLimitValues(service *service.EEBUSService, entity *spine.Enti
 	}
 
 	return resultSet, nil
+}
+
+// helper
+
+type loadControlLimitDescriptionMap map[model.LoadControlLimitIdType]model.LoadControlLimitDescriptionDataType
+
+// return a map of LoadControlLimitDescriptionListDataType with keyId as key
+func loadControlLimitDescriptionListData(featureRemote *spine.FeatureRemoteImpl) (loadControlLimitDescriptionMap, error) {
+	data := featureRemote.Data(model.FunctionTypeLoadControlLimitDescriptionListData).(*model.LoadControlLimitDescriptionListDataType)
+	if data == nil {
+		return nil, ErrMetadataNotAvailable
+	}
+	ref := make(loadControlLimitDescriptionMap)
+	for _, item := range data.LoadControlLimitDescriptionData {
+		if item.LimitId == nil {
+			continue
+		}
+		ref[*item.LimitId] = item
+	}
+	return ref, nil
 }
