@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/DerAndereAndi/eebus-go-cem/emobility"
 	"github.com/DerAndereAndi/eebus-go/service"
@@ -40,6 +41,7 @@ func (h *CemImpl) Setup(port, remoteSKI, certFile, keyFile string, ifaces []stri
 	}
 
 	h.myService = service.NewEEBUSService(serviceDescription, h)
+	h.myService.SetLogging(h)
 
 	var err error
 	var certificate tls.Certificate
@@ -93,4 +95,48 @@ func (h *CemImpl) RemoteServiceShipIDReported(ski string, shipID string) {
 	// we should associated the Ship ID with the SKI and store it
 	// so the next connection can start trusted
 	fmt.Println("SKI", ski, "has Ship ID:", shipID)
+}
+
+// Logging interface
+
+func (h *CemImpl) log(level string, args ...interface{}) {
+	t := time.Now()
+	fmt.Printf("%s: %s %s", t.Format(time.RFC3339), level, fmt.Sprintln(args...))
+}
+
+func (h *CemImpl) logf(level, format string, args ...interface{}) {
+	t := time.Now()
+	fmt.Printf("%s: %s %s\n", t.Format(time.RFC3339), level, fmt.Sprintf(format, args...))
+}
+
+func (h *CemImpl) Trace(args ...interface{}) {
+	h.log("TRACE", args...)
+}
+
+func (h *CemImpl) Tracef(format string, args ...interface{}) {
+	h.logf("TRACE", format, args...)
+}
+
+func (h *CemImpl) Debug(args ...interface{}) {
+	h.log("DEBUG", args...)
+}
+
+func (h *CemImpl) Debugf(format string, args ...interface{}) {
+	h.logf("DEBUG", format, args...)
+}
+
+func (h *CemImpl) Info(args ...interface{}) {
+	h.log("INFO", args...)
+}
+
+func (h *CemImpl) Infof(format string, args ...interface{}) {
+	h.logf("INFO", format, args...)
+}
+
+func (h *CemImpl) Error(args ...interface{}) {
+	h.log("ERROR", args...)
+}
+
+func (h *CemImpl) Errorf(format string, args ...interface{}) {
+	h.logf("ERROR", format, args...)
 }
