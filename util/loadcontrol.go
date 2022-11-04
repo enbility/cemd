@@ -78,20 +78,42 @@ func RequestLoadControlLimitList(service *service.EEBUSService, entity *spine.En
 	return msgCounter, nil
 }
 
-// returns if a provided category in the load control descriptions is available or not
+type loadControlLimitDescriptionMap map[model.LoadControlLimitIdType]model.LoadControlLimitDescriptionDataType
+
+// returns the load control descriptions
 // returns an error if no description data is available yet
-func GetLoadControlDescriptionCategorySupport(category model.LoadControlCategoryType, service *service.EEBUSService, entity *spine.EntityRemoteImpl) (bool, error) {
+func GetLoadControlLimitDescription(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (loadControlLimitDescriptionMap, error) {
 	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeLoadControl, entity)
 	if err != nil {
 		fmt.Println(err)
-		return false, err
+		return nil, err
 	}
 
 	data := featureRemote.Data(model.FunctionTypeLoadControlLimitDescriptionListData).(*model.LoadControlLimitDescriptionListDataType)
 	if data == nil {
-		return false, ErrDataNotAvailable
+		return nil, ErrMetadataNotAvailable
 	}
+
+	ref := make(loadControlLimitDescriptionMap)
 	for _, item := range data.LoadControlLimitDescriptionData {
+		if item.LimitId == nil {
+			continue
+		}
+		ref[*item.LimitId] = item
+	}
+
+	return ref, nil
+}
+
+// returns if a provided category in the load control limit descriptions is available or not
+// returns an error if no description data is available yet
+func GetLoadControlLimitDescriptionCategorySupport(category model.LoadControlCategoryType, service *service.EEBUSService, entity *spine.EntityRemoteImpl) (bool, error) {
+	data, err := GetLoadControlLimitDescription(service, entity)
+	if err != nil {
+		return false, err
+	}
+
+	for _, item := range data {
 		if item.LimitId == nil || item.LimitCategory == nil {
 			continue
 		}
@@ -101,6 +123,28 @@ func GetLoadControlDescriptionCategorySupport(category model.LoadControlCategory
 	}
 
 	return false, ErrDataNotAvailable
+}
+
+// write load control limits
+// returns an error if this failed
+func WriteLoadControlLimitValues(service *service.EEBUSService, entity *spine.EntityRemoteImpl, data []model.LoadControlLimitDataType) (*model.MsgCounterType, error) {
+	if len(data) == 0 {
+		return nil, ErrMissingData
+	}
+
+	featureLocal, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeLoadControl, entity)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	cmd := []model.CmdType{{
+		LoadControlLimitListData: &model.LoadControlLimitListDataType{
+			LoadControlLimitData: data,
+		},
+	}}
+
+	return featureRemote.Sender().Write(featureLocal.Address(), featureRemote.Address(), cmd)
 }
 
 func GetLoadControlLimitValues(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]LoadControlLimitType, error) {
@@ -169,24 +213,4 @@ func GetLoadControlLimitValues(service *service.EEBUSService, entity *spine.Enti
 	}
 
 	return resultSet, nil
-}
-
-// helper
-
-type loadControlLimitDescriptionMap map[model.LoadControlLimitIdType]model.LoadControlLimitDescriptionDataType
-
-// return a map of LoadControlLimitDescriptionListDataType with keyId as key
-func loadControlLimitDescriptionListData(featureRemote *spine.FeatureRemoteImpl) (loadControlLimitDescriptionMap, error) {
-	data := featureRemote.Data(model.FunctionTypeLoadControlLimitDescriptionListData).(*model.LoadControlLimitDescriptionListDataType)
-	if data == nil {
-		return nil, ErrMetadataNotAvailable
-	}
-	ref := make(loadControlLimitDescriptionMap)
-	for _, item := range data.LoadControlLimitDescriptionData {
-		if item.LimitId == nil {
-			continue
-		}
-		ref[*item.LimitId] = item
-	}
-	return ref, nil
 }

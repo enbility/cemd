@@ -80,6 +80,35 @@ func RequestElectricalPermittedValueSet(service *service.EEBUSService, entity *s
 	return msgCounter, nil
 }
 
+type electricatlParamDescriptionMapMeasurementId map[model.MeasurementIdType]model.ElectricalConnectionParameterDescriptionDataType
+type electricatlParamDescriptionMaParamId map[model.ElectricalConnectionParameterIdType]model.ElectricalConnectionParameterDescriptionDataType
+
+// return a map of ElectricalConnectionParameterDescriptionListDataType with measurementId as key and
+// ElectricalConnectionParameterDescriptionListDataType with parameterId as key
+func GetElectricalParamDescriptionListData(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (electricatlParamDescriptionMapMeasurementId, electricatlParamDescriptionMaParamId, error) {
+	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
+	if err != nil {
+		fmt.Println(err)
+		return nil, nil, err
+	}
+
+	data := featureRemote.Data(model.FunctionTypeElectricalConnectionParameterDescriptionListData).(*model.ElectricalConnectionParameterDescriptionListDataType)
+	if data == nil {
+		return nil, nil, ErrDataNotAvailable
+	}
+	refMeasurement := make(electricatlParamDescriptionMapMeasurementId)
+	refElectrical := make(electricatlParamDescriptionMaParamId)
+	for _, item := range data.ElectricalConnectionParameterDescriptionData {
+		if item.MeasurementId == nil || item.ElectricalConnectionId == nil {
+			continue
+		}
+		refMeasurement[*item.MeasurementId] = item
+		refElectrical[*item.ParameterId] = item
+	}
+
+	return refMeasurement, refElectrical, nil
+}
+
 // return current values for Electrical Description
 func GetElectricalDescription(service *service.EEBUSService, entity *spine.EntityRemoteImpl) ([]ElectricalDescriptionType, error) {
 	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
@@ -116,6 +145,95 @@ func GetElectricalDescription(service *service.EEBUSService, entity *spine.Entit
 	}
 
 	return resultSet, nil
+}
+
+// return number of phases the device is connected with
+func GetElectricalConnectedPhases(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (uint, error) {
+	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
+	if err != nil {
+		fmt.Println(err)
+		return 0, err
+	}
+
+	data := featureRemote.Data(model.FunctionTypeElectricalConnectionDescriptionListData).(*model.ElectricalConnectionDescriptionListDataType)
+	if data == nil {
+		return 0, ErrDataNotAvailable
+	}
+
+	for _, item := range data.ElectricalConnectionDescriptionData {
+		if item.ElectricalConnectionId == nil {
+			continue
+		}
+
+		if item.AcConnectedPhases != nil {
+			return *item.AcConnectedPhases, nil
+		}
+	}
+
+	// default to 3 if the value is not available
+	return 3, nil
+}
+
+// return current current limit values
+//
+// returns a map with the phase ("a", "b", "c") as a key for
+// minimum, maximum, default/pause values
+func GetElectricalCurrentsLimits(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (map[string]float64, map[string]float64, map[string]float64, error) {
+	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
+	if err != nil {
+		fmt.Println(err)
+		return nil, nil, nil, err
+	}
+
+	_, paramRef, err := GetElectricalParamDescriptionListData(service, entity)
+	if err != nil {
+		return nil, nil, nil, ErrMetadataNotAvailable
+	}
+
+	data := featureRemote.Data(model.FunctionTypeElectricalConnectionPermittedValueSetListData).(*model.ElectricalConnectionPermittedValueSetListDataType)
+	if data == nil {
+		return nil, nil, nil, ErrDataNotAvailable
+	}
+
+	resultSetMin := make(map[string]float64)
+	resultSetMax := make(map[string]float64)
+	resultSetDefault := make(map[string]float64)
+	for _, item := range data.ElectricalConnectionPermittedValueSetData {
+		if item.ElectricalConnectionId == nil || item.PermittedValueSet == nil {
+			continue
+		}
+
+		param, exists := paramRef[*item.ParameterId]
+		if !exists {
+			continue
+		}
+
+		if param.AcMeasuredPhases == nil {
+			continue
+		}
+
+		for _, set := range item.PermittedValueSet {
+			if set.Value != nil && len(set.Value) > 0 {
+				resultSetDefault[string(*param.AcMeasuredPhases)] = set.Value[0].GetValue()
+			}
+			if set.Range != nil {
+				for _, rangeItem := range set.Range {
+					if rangeItem.Min != nil {
+						resultSetMin[string(*param.AcMeasuredPhases)] = rangeItem.Min.GetValue()
+					}
+					if rangeItem.Max != nil {
+						resultSetMax[string(*param.AcMeasuredPhases)] = rangeItem.Max.GetValue()
+					}
+				}
+			}
+		}
+	}
+
+	if len(resultSetMin) == 0 && len(resultSetMax) == 0 && len(resultSetMax) == 0 {
+		return nil, nil, nil, ErrDataNotAvailable
+	}
+
+	return resultSetMin, resultSetMax, resultSetDefault, nil
 }
 
 // return current values for Electrical Limits

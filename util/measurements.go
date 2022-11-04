@@ -85,12 +85,12 @@ func GetMeasurementCurrents(service *service.EEBUSService, entity *spine.EntityR
 		return nil, err
 	}
 
-	descRef, err := measurementDescriptionListData(featureRemote)
+	descRef, err := GetMeasurementDescription(service, entity)
 	if err != nil {
 		return nil, ErrMetadataNotAvailable
 	}
 
-	paramRef, _, err := electricalParamDescriptionListData(featureRemote)
+	paramRef, _, err := GetElectricalParamDescriptionListData(service, entity)
 	if err != nil {
 		return nil, ErrMetadataNotAvailable
 	}
@@ -131,118 +131,50 @@ func GetMeasurementCurrents(service *service.EEBUSService, entity *spine.EntityR
 	return resultSet, nil
 }
 
-// return number of phases the device is connected with
-func GetElectricalConnectedPhases(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (uint, error) {
-	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
-	if err != nil {
-		fmt.Println(err)
-		return 0, err
-	}
+type measurementDescriptionMap map[model.MeasurementIdType]model.MeasurementDescriptionDataType
 
-	data := featureRemote.Data(model.FunctionTypeElectricalConnectionDescriptionListData).(*model.ElectricalConnectionDescriptionListDataType)
-	if data == nil {
-		return 0, ErrDataNotAvailable
-	}
-
-	for _, item := range data.ElectricalConnectionDescriptionData {
-		if item.ElectricalConnectionId == nil {
-			continue
-		}
-
-		if item.AcConnectedPhases != nil {
-			return *item.AcConnectedPhases, nil
-		}
-	}
-
-	// default to 3 if the value is not available
-	return 3, nil
-}
-
-// return current current limit values
-//
-// returns a map with the phase ("a", "b", "c") as a key for
-// minimum, maximum, default/pause values
-func GetElectricalCurrentsLimits(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (map[string]float64, map[string]float64, map[string]float64, error) {
-	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeElectricalConnection, entity)
-	if err != nil {
-		fmt.Println(err)
-		return nil, nil, nil, err
-	}
-
-	_, paramRef, err := electricalParamDescriptionListData(featureRemote)
-	if err != nil {
-		return nil, nil, nil, ErrMetadataNotAvailable
-	}
-
-	data := featureRemote.Data(model.FunctionTypeElectricalConnectionPermittedValueSetListData).(*model.ElectricalConnectionPermittedValueSetListDataType)
-	if data == nil {
-		return nil, nil, nil, ErrDataNotAvailable
-	}
-
-	resultSetMin := make(map[string]float64)
-	resultSetMax := make(map[string]float64)
-	resultSetDefault := make(map[string]float64)
-	for _, item := range data.ElectricalConnectionPermittedValueSetData {
-		if item.ElectricalConnectionId == nil || item.PermittedValueSet == nil {
-			continue
-		}
-
-		param, exists := paramRef[*item.ElectricalConnectionId]
-		if !exists {
-			continue
-		}
-
-		if param.AcMeasuredPhases == nil {
-			continue
-		}
-
-		for _, set := range item.PermittedValueSet {
-			if set.Value != nil && len(set.Value) > 0 {
-				resultSetDefault[string(*param.AcMeasuredPhases)] = set.Value[0].GetValue()
-			}
-			if set.Range != nil {
-				for _, rangeItem := range set.Range {
-					if rangeItem.Min != nil {
-						resultSetMin[string(*param.AcMeasuredPhases)] = rangeItem.Min.GetValue()
-					}
-					if rangeItem.Max != nil {
-						resultSetMax[string(*param.AcMeasuredPhases)] = rangeItem.Max.GetValue()
-					}
-				}
-			}
-		}
-	}
-
-	if len(resultSetMin) == 0 && len(resultSetMax) == 0 && len(resultSetMax) == 0 {
-		return nil, nil, nil, ErrDataNotAvailable
-	}
-
-	return resultSetMin, resultSetMax, resultSetDefault, nil
-}
-
-// returns if a provided scopetype in the measurement descriptions is available or not
+// return a map of MeasurementDescriptionListDataType with measurementId as key
 // returns an error if no description data is available yet
-func GetMeasurementDescriptionScopeSupport(scope model.ScopeTypeType, service *service.EEBUSService, entity *spine.EntityRemoteImpl) (bool, error) {
+func GetMeasurementDescription(service *service.EEBUSService, entity *spine.EntityRemoteImpl) (measurementDescriptionMap, error) {
 	_, featureRemote, err := service.GetLocalClientAndRemoteServerFeatures(model.FeatureTypeTypeMeasurement, entity)
 	if err != nil {
 		fmt.Println(err)
-		return false, err
+		return nil, err
 	}
 
 	data := featureRemote.Data(model.FunctionTypeMeasurementDescriptionListData).(*model.MeasurementDescriptionListDataType)
 	if data == nil {
-		return false, ErrDataNotAvailable
+		return nil, ErrMetadataNotAvailable
 	}
+	ref := make(measurementDescriptionMap)
 	for _, item := range data.MeasurementDescriptionData {
+		if item.MeasurementId == nil {
+			continue
+		}
+		ref[*item.MeasurementId] = item
+	}
+	return ref, nil
+}
+
+// return a map of MeasurementDescriptionListDataType with measurementId as key for a given scope
+// returns an error if no description data is available yet
+func GetMeasurementDescriptionForScope(scope model.ScopeTypeType, service *service.EEBUSService, entity *spine.EntityRemoteImpl) (measurementDescriptionMap, error) {
+	data, err := GetMeasurementDescription(service, entity)
+	if err != nil {
+		return nil, err
+	}
+
+	ref := make(measurementDescriptionMap)
+	for _, item := range data {
 		if item.MeasurementId == nil || item.ScopeType == nil {
 			continue
 		}
 		if *item.ScopeType == scope {
-			return true, nil
+			ref[*item.MeasurementId] = item
 		}
 	}
 
-	return false, ErrDataNotAvailable
+	return ref, ErrDataNotAvailable
 }
 
 // return current SoC for measurements
@@ -253,7 +185,7 @@ func GetMeasurementSoC(service *service.EEBUSService, entity *spine.EntityRemote
 		return 0.0, err
 	}
 
-	descRef, err := measurementDescriptionListData(featureRemote)
+	descRef, err := GetMeasurementDescription(service, entity)
 	if err != nil {
 		return 0.0, ErrMetadataNotAvailable
 	}
@@ -285,47 +217,6 @@ func GetMeasurementSoC(service *service.EEBUSService, entity *spine.EntityRemote
 	return 0.0, ErrDataNotAvailable
 }
 
-type electricatlParamDescriptionMapMeasurementId map[model.MeasurementIdType]model.ElectricalConnectionParameterDescriptionDataType
-type electricatlParamDescriptionMapElectricalId map[model.ElectricalConnectionIdType]model.ElectricalConnectionParameterDescriptionDataType
-
-// return a map of ElectricalConnectionParameterDescriptionListDataType with measurementId as key and
-// ElectricalConnectionParameterDescriptionListDataType with electricalConnectionId as key
-func electricalParamDescriptionListData(featureRemote *spine.FeatureRemoteImpl) (electricatlParamDescriptionMapMeasurementId, electricatlParamDescriptionMapElectricalId, error) {
-	data := featureRemote.Data(model.FunctionTypeElectricalConnectionParameterDescriptionListData).(*model.ElectricalConnectionParameterDescriptionListDataType)
-	if data == nil {
-		return nil, nil, ErrDataNotAvailable
-	}
-	refMeasurement := make(electricatlParamDescriptionMapMeasurementId)
-	refElectrical := make(electricatlParamDescriptionMapElectricalId)
-	for _, item := range data.ElectricalConnectionParameterDescriptionData {
-		if item.MeasurementId == nil || item.ElectricalConnectionId == nil {
-			continue
-		}
-		refMeasurement[*item.MeasurementId] = item
-		refElectrical[*item.ElectricalConnectionId] = item
-	}
-
-	return refMeasurement, refElectrical, nil
-}
-
-type measurementDescriptionMap map[model.MeasurementIdType]model.MeasurementDescriptionDataType
-
-// return a map of MeasurementDescriptionListDataType with measurementId as key
-func measurementDescriptionListData(featureRemote *spine.FeatureRemoteImpl) (measurementDescriptionMap, error) {
-	data := featureRemote.Data(model.FunctionTypeMeasurementDescriptionListData).(*model.MeasurementDescriptionListDataType)
-	if data == nil {
-		return nil, ErrMetadataNotAvailable
-	}
-	ref := make(measurementDescriptionMap)
-	for _, item := range data.MeasurementDescriptionData {
-		if item.MeasurementId == nil {
-			continue
-		}
-		ref[*item.MeasurementId] = item
-	}
-	return ref, nil
-}
-
 type measurementConstraintMap map[model.MeasurementIdType]model.MeasurementConstraintsDataType
 
 // return a map of MeasurementDescriptionListDataType with measurementId as key
@@ -355,7 +246,7 @@ func GetMeasurementValues(service *service.EEBUSService, entity *spine.EntityRem
 	// constraints can be optional
 	constraintsRef, _ := measurementConstraintsListData(featureRemote)
 
-	descRef, err := measurementDescriptionListData(featureRemote)
+	descRef, err := GetMeasurementDescription(service, entity)
 	if err != nil {
 		return nil, ErrMetadataNotAvailable
 	}

@@ -5,6 +5,8 @@ import (
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
+var phaseMapping = []string{"a", "b", "c"}
+
 // return the current charge sate of the EV
 func (e *EMobilityImpl) EVCurrentChargeState() (EVChargeStateType, error) {
 	evEntity, err := util.EntityOfTypeForSki(e.service, model.EntityTypeTypeEV, e.ski)
@@ -63,10 +65,9 @@ func (e *EMobilityImpl) EVCurrents() ([]float64, error) {
 		return nil, err
 	}
 
-	phases := []string{"a", "b", "c"}
 	var result []float64
 
-	for _, phase := range phases {
+	for _, phase := range phaseMapping {
 		value := 0.0
 		if theValue, exists := data[phase]; exists {
 			value = theValue
@@ -93,10 +94,9 @@ func (e *EMobilityImpl) EVCurrentLimits() ([]float64, []float64, []float64, erro
 		return nil, nil, nil, err
 	}
 
-	phases := []string{"a", "b", "c"}
 	var resultMin, resultMax, resultDefault []float64
 
-	for _, phase := range phases {
+	for _, phase := range phaseMapping {
 		value := 0.0
 		if theValue, exists := dataMin[phase]; exists {
 			value = theValue
@@ -147,8 +147,111 @@ func (e *EMobilityImpl) EVCurrentLimits() ([]float64, []float64, []float64, erro
 // and needs to have specific EVSE support for the specific EV brand.
 // In ISO15118-20 this is a standard feature which does not need special support on the EVSE.
 func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []float64) error {
+	evEntity, err := util.EntityOfTypeForSki(e.service, model.EntityTypeTypeEV, e.ski)
+	if err != nil {
+		return err
+	}
 
-	return nil
+	electricalDesc, _, err := util.GetElectricalParamDescriptionListData(e.service, evEntity)
+	if err != nil {
+		return util.ErrMetadataNotAvailable
+	}
+
+	elLimits, err := util.GetElectricalLimitValues(e.service, evEntity)
+	if err != nil {
+		return util.ErrMetadataNotAvailable
+	}
+
+	limitDesc, err := util.GetLoadControlLimitDescription(e.service, evEntity)
+	if err != nil {
+		return err
+	}
+
+	currentLimits, err := util.GetLoadControlLimitValues(e.service, evEntity)
+
+	var limitData []model.LoadControlLimitDataType
+
+	for scopeTypes := 0; scopeTypes < 2; scopeTypes++ {
+		currentsPerPhase := obligations
+		if scopeTypes == 1 {
+			currentsPerPhase = recommendations
+		}
+
+		for index, limit := range currentsPerPhase {
+			phase := phaseMapping[index]
+
+			var limitId *model.LoadControlLimitIdType
+			var elConnectionid *model.ElectricalConnectionIdType
+
+			for _, lDesc := range limitDesc {
+				if lDesc.LimitCategory == nil || lDesc.MeasurementId == nil {
+					continue
+				}
+
+				if *lDesc.LimitCategory != model.LoadControlCategoryTypeObligation {
+					continue
+				}
+
+				elDesc, exists := electricalDesc[*lDesc.MeasurementId]
+				if !exists {
+					continue
+				}
+				if elDesc.ElectricalConnectionId == nil || elDesc.AcMeasuredPhases == nil || string(*elDesc.AcMeasuredPhases) != phase {
+					continue
+				}
+
+				limitId = lDesc.LimitId
+				elConnectionid = elDesc.ElectricalConnectionId
+				break
+			}
+
+			if limitId == nil || elConnectionid == nil {
+				continue
+			}
+
+			var currentLimitsForID util.LoadControlLimitType
+			var found bool
+			for _, item := range currentLimits {
+				if uint(*limitId) != item.LimitId {
+					continue
+				}
+				currentLimitsForID = item
+				found = true
+				break
+			}
+			if !found || !currentLimitsForID.IsChangeable {
+				continue
+			}
+
+			limitValue := model.NewScaledNumberType(limit)
+			for _, elLimit := range elLimits {
+				if elLimit.ConnectionID != uint(*elConnectionid) {
+					continue
+				}
+				if elLimit.Scope != model.ScopeTypeTypeACCurrent {
+					continue
+				}
+				if limit < elLimit.Min {
+					limitValue = model.NewScaledNumberType(elLimit.Min)
+				}
+				if limit > elLimit.Max {
+					limitValue = model.NewScaledNumberType(elLimit.Max)
+				}
+			}
+
+			active := true
+			newLimit := model.LoadControlLimitDataType{
+				LimitId:       limitId,
+				IsLimitActive: &active,
+				Value:         limitValue,
+			}
+			limitData = append(limitData, newLimit)
+		}
+	}
+
+	_, err = util.WriteLoadControlLimitValues(e.service, evEntity, limitData)
+
+	return err
 }
 
 // return the current communication standard type used to communicate between EVSE and EV
@@ -206,7 +309,7 @@ func (e *EMobilityImpl) EVOptimizationOfSelfConsumptionSupported() (bool, error)
 	}
 
 	// check if loadcontrol limit descriptions contains a recommendation category
-	support, err := util.GetLoadControlDescriptionCategorySupport(model.LoadControlCategoryTypeRecommendation, e.service, evEntity)
+	support, err := util.GetLoadControlLimitDescriptionCategorySupport(model.LoadControlCategoryTypeRecommendation, e.service, evEntity)
 	if err != nil {
 		return false, err
 	}
@@ -234,12 +337,15 @@ func (e *EMobilityImpl) EVSoCSupported() (bool, error) {
 	}
 
 	// check if measurement descriptions has an SoC scope type
-	support, err := util.GetMeasurementDescriptionScopeSupport(model.ScopeTypeTypeStateOfCharge, e.service, evEntity)
+	desc, err := util.GetMeasurementDescriptionForScope(model.ScopeTypeTypeStateOfCharge, e.service, evEntity)
 	if err != nil {
 		return false, err
 	}
+	if len(desc) == 0 {
+		return false, util.ErrDataNotAvailable
+	}
 
-	return support, nil
+	return true, nil
 }
 
 // return the last known SoC of the connected EV
