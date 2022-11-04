@@ -1,6 +1,7 @@
 package emobility
 
 import (
+	"github.com/DerAndereAndi/eebus-go/features"
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/service/util"
 	"github.com/DerAndereAndi/eebus-go/spine"
@@ -12,6 +13,18 @@ type EMobilityImpl struct {
 
 	service *service.EEBUSService
 
+	evseEntity *spine.EntityRemoteImpl
+	evEntity   *spine.EntityRemoteImpl
+
+	deviceClassification map[*spine.EntityRemoteImpl]*features.DeviceClassification
+	deviceDiagnosis      map[*spine.EntityRemoteImpl]*features.DeviceDiagnosis
+
+	evDeviceConfiguration  *features.DeviceConfiguration
+	evElectricalConnection *features.ElectricalConnection
+	evMeasurement          *features.Measurement
+	evIdentification       *features.Identification
+	evLoadControl          *features.LoadControl
+
 	ski string
 }
 
@@ -20,9 +33,11 @@ func NewEMobility(service *service.EEBUSService, ski string) *EMobilityImpl {
 	ski = util.NormalizeSKI(ski)
 
 	emobility := &EMobilityImpl{
-		service: service,
-		entity:  service.LocalEntity(),
-		ski:     ski,
+		service:              service,
+		entity:               service.LocalEntity(),
+		ski:                  ski,
+		deviceClassification: make(map[*spine.EntityRemoteImpl]*features.DeviceClassification),
+		deviceDiagnosis:      make(map[*spine.EntityRemoteImpl]*features.DeviceDiagnosis),
 	}
 	spine.Events.Subscribe(emobility)
 

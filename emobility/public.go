@@ -2,6 +2,7 @@ package emobility
 
 import (
 	"github.com/DerAndereAndi/eebus-go-cem/util"
+	"github.com/DerAndereAndi/eebus-go/features"
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
@@ -9,13 +10,7 @@ var phaseMapping = []string{"a", "b", "c"}
 
 // return the current charge sate of the EV
 func (e *EMobilityImpl) EVCurrentChargeState() (EVChargeStateType, error) {
-	evEntity, err := util.EntityOfTypeForSki(e.service, model.EntityTypeTypeEV, e.ski)
-	if err != nil {
-		// no ev entity found means that it is unplugged
-		return EVChargeStateTypeUnplugged, nil
-	}
-
-	diagnosisState, err := util.GetDeviceDiagnosisState(e.service, evEntity)
+	diagnosisState, err := e.deviceDiagnosis[e.evEntity].GetState()
 	if err != nil {
 		return EVChargeStateTypeUnkown, err
 	}
@@ -36,12 +31,7 @@ func (e *EMobilityImpl) EVCurrentChargeState() (EVChargeStateType, error) {
 
 // return the number of ac connected phases of the EV or 0 if it is unknown
 func (e *EMobilityImpl) EVConnectedPhases() (uint, error) {
-	evEntity, err := util.EntityOfTypeForSki(e.service, model.EntityTypeTypeEV, e.ski)
-	if err != nil {
-		return 0, err
-	}
-
-	phases, err := util.GetElectricalConnectedPhases(e.service, evEntity)
+	phases, err := e.evElectricalConnection.GetConnectedPhases()
 	if err != nil {
 		return 0, err
 	}
@@ -55,12 +45,7 @@ func (e *EMobilityImpl) EVConnectedPhases() (uint, error) {
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *EMobilityImpl) EVCurrents() ([]float64, error) {
-	evEntity, err := util.EntityOfTypeForSki(e.service, model.EntityTypeTypeEV, e.ski)
-	if err != nil {
-		return nil, err
-	}
-
-	data, err := util.GetMeasurementCurrents(e.service, evEntity)
+	data, err := e.evMeasurement.GetCurrents(e.evElectricalConnection)
 	if err != nil {
 		return nil, err
 	}
@@ -84,12 +69,7 @@ func (e *EMobilityImpl) EVCurrents() ([]float64, error) {
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *EMobilityImpl) EVCurrentLimits() ([]float64, []float64, []float64, error) {
-	evEntity, err := util.EntityOfTypeForSki(e.service, model.EntityTypeTypeEV, e.ski)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	dataMin, dataMax, dataDefault, err := util.GetElectricalCurrentsLimits(e.service, evEntity)
+	dataMin, dataMax, dataDefault, err := e.evElectricalConnection.GetCurrentsLimits()
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -147,27 +127,25 @@ func (e *EMobilityImpl) EVCurrentLimits() ([]float64, []float64, []float64, erro
 // and needs to have specific EVSE support for the specific EV brand.
 // In ISO15118-20 this is a standard feature which does not need special support on the EVSE.
 func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []float64) error {
-	evEntity, err := util.EntityOfTypeForSki(e.service, model.EntityTypeTypeEV, e.ski)
+	electricalDesc, _, err := e.evElectricalConnection.GetParamDescriptionListData()
+	if err != nil {
+		return features.ErrMetadataNotAvailable
+	}
+
+	elLimits, err := e.evElectricalConnection.GetEVLimitValues()
+	if err != nil {
+		return features.ErrMetadataNotAvailable
+	}
+
+	limitDesc, err := e.evLoadControl.GetLimitDescription()
 	if err != nil {
 		return err
 	}
 
-	electricalDesc, _, err := util.GetElectricalParamDescriptionListData(e.service, evEntity)
-	if err != nil {
-		return util.ErrMetadataNotAvailable
-	}
-
-	elLimits, err := util.GetElectricalLimitValues(e.service, evEntity)
-	if err != nil {
-		return util.ErrMetadataNotAvailable
-	}
-
-	limitDesc, err := util.GetLoadControlLimitDescription(e.service, evEntity)
+	currentLimits, err := e.evLoadControl.GetLimitValues()
 	if err != nil {
 		return err
 	}
-
-	currentLimits, err := util.GetLoadControlLimitValues(e.service, evEntity)
 
 	var limitData []model.LoadControlLimitDataType
 
@@ -209,7 +187,7 @@ func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []
 				continue
 			}
 
-			var currentLimitsForID util.LoadControlLimitType
+			var currentLimitsForID features.LoadControlLimitType
 			var found bool
 			for _, item := range currentLimits {
 				if uint(*limitId) != item.LimitId {
@@ -249,7 +227,7 @@ func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []
 		}
 	}
 
-	_, err = util.WriteLoadControlLimitValues(e.service, evEntity, limitData)
+	_, err = e.evLoadControl.WriteLimitValues(limitData)
 
 	return err
 }
@@ -270,21 +248,16 @@ func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []
 //   - ErrNotSupported if getting the communication standard is not supported
 //   - and others
 func (e *EMobilityImpl) EVCommunicationStandard() (EVCommunicationStandardType, error) {
-	evEntity, err := util.EntityOfTypeForSki(e.service, model.EntityTypeTypeEV, e.ski)
-	if err != nil {
-		return EVCommunicationStandardTypeUnknown, err
-	}
-
 	// check if device configuration descriptions has an communication standard key name
-	support, err := util.GetDeviceConfigurationDescriptionKeyNameSupport(model.DeviceConfigurationKeyNameTypeCommunicationsStandard, e.service, evEntity)
+	support, err := e.evDeviceConfiguration.GetDescriptionKeyNameSupport(model.DeviceConfigurationKeyNameTypeCommunicationsStandard)
 	if err != nil {
 		return EVCommunicationStandardTypeUnknown, err
 	}
 	if !support {
-		return EVCommunicationStandardTypeUnknown, util.ErrNotSupported
+		return EVCommunicationStandardTypeUnknown, features.ErrNotSupported
 	}
 
-	data, err := util.GetEVCommunicationStandard(e.service, evEntity)
+	data, err := e.evDeviceConfiguration.GetEVCommunicationStandard()
 	if err != nil {
 		return EVCommunicationStandardTypeUnknown, err
 	}
@@ -309,7 +282,7 @@ func (e *EMobilityImpl) EVOptimizationOfSelfConsumptionSupported() (bool, error)
 	}
 
 	// check if loadcontrol limit descriptions contains a recommendation category
-	support, err := util.GetLoadControlLimitDescriptionCategorySupport(model.LoadControlCategoryTypeRecommendation, e.service, evEntity)
+	support, err := e.evLoadControl.GetLimitDescriptionCategorySupport(model.LoadControlCategoryTypeRecommendation)
 	if err != nil {
 		return false, err
 	}
@@ -337,12 +310,12 @@ func (e *EMobilityImpl) EVSoCSupported() (bool, error) {
 	}
 
 	// check if measurement descriptions has an SoC scope type
-	desc, err := util.GetMeasurementDescriptionForScope(model.ScopeTypeTypeStateOfCharge, e.service, evEntity)
+	desc, err := e.evMeasurement.GetDescriptionForScope(model.ScopeTypeTypeStateOfCharge)
 	if err != nil {
 		return false, err
 	}
 	if len(desc) == 0 {
-		return false, util.ErrDataNotAvailable
+		return false, features.ErrDataNotAvailable
 	}
 
 	return true, nil
@@ -359,21 +332,16 @@ func (e *EMobilityImpl) EVSoCSupported() (bool, error) {
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *EMobilityImpl) EVSoC() (float64, error) {
-	evEntity, err := util.EntityOfTypeForSki(e.service, model.EntityTypeTypeEV, e.ski)
-	if err != nil {
-		return 0.0, err
-	}
-
 	// check if the SoC is supported
 	support, err := e.EVSoCSupported()
 	if err != nil {
 		return 0.0, err
 	}
 	if !support {
-		return 0.0, util.ErrNotSupported
+		return 0.0, features.ErrNotSupported
 	}
 
-	return util.GetMeasurementSoC(e.service, evEntity)
+	return e.evMeasurement.GetSoC()
 }
 
 // returns if the EVSE and EV combination support coordinated charging

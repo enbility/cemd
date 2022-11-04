@@ -3,7 +3,7 @@ package emobility
 import (
 	"fmt"
 
-	"github.com/DerAndereAndi/eebus-go-cem/util"
+	"github.com/DerAndereAndi/eebus-go/features"
 	"github.com/DerAndereAndi/eebus-go/spine"
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
@@ -30,12 +30,14 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 		case spine.ElementChangeAdd:
 			switch entityType {
 			case model.EntityTypeTypeEVSE:
-				e.evseConnected(payload.Ski)
+				e.evseConnected(payload.Ski, payload.Entity)
 			case model.EntityTypeTypeEV:
 				e.evConnected(payload.Entity)
 			}
 		case spine.ElementChangeRemove:
 			switch entityType {
+			case model.EntityTypeTypeEVSE:
+				e.evseDisconnected(payload.Entity)
 			case model.EntityTypeTypeEV:
 				e.evDisconnected(payload.Entity)
 			}
@@ -45,7 +47,11 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 		if payload.ChangeType == spine.ElementChangeUpdate {
 			switch payload.Data.(type) {
 			case *model.DeviceClassificationManufacturerDataType:
-				_, err := util.GetManufacturerDetails(e.service, payload.Entity)
+				entity, exists := e.deviceClassification[payload.Entity]
+				if !exists {
+					return
+				}
+				_, err := entity.GetManufacturerDetails()
 				if err != nil {
 					fmt.Println("Error getting manufacturer data:", err)
 					return
@@ -54,13 +60,13 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 				// TODO: provide the current data to the CEM
 			case *model.DeviceConfigurationKeyValueDescriptionListDataType:
 				// key value descriptions received, now get the data
-				_, err := util.RequestDeviceConfigurationKeyValueList(e.service, payload.Entity)
+				_, err := e.evDeviceConfiguration.RequestKeyValueList()
 				if err != nil {
 					fmt.Println("Error getting configuration key values:", err)
 				}
 
 			case *model.DeviceConfigurationKeyValueListDataType:
-				data, err := util.GetDeviceConfigurationValues(e.service, payload.Entity)
+				data, err := e.evDeviceConfiguration.GetValues()
 				if err != nil {
 					fmt.Println("Error getting device configuration values:", err)
 					return
@@ -70,13 +76,17 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 				fmt.Printf("Device Configuration Values: %#v\n", data)
 
 			case *model.DeviceDiagnosisStateDataType:
-				_, err := util.GetDeviceDiagnosisState(e.service, payload.Entity)
+				entity, exists := e.deviceDiagnosis[payload.Entity]
+				if !exists {
+					return
+				}
+				_, err := entity.GetState()
 				if err != nil {
 					fmt.Println("Error getting device diagnosis state:", err)
 				}
 
 			case *model.ElectricalConnectionDescriptionListDataType:
-				data, err := util.GetElectricalDescription(e.service, payload.Entity)
+				data, err := e.evElectricalConnection.GetDescription()
 				if err != nil {
 					fmt.Println("Error getting electrical description:", err)
 					return
@@ -85,13 +95,13 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 				// TODO: provide the electrical description data
 				fmt.Printf("Electrical Description: %#v\n", data)
 			case *model.ElectricalConnectionParameterDescriptionListDataType:
-				_, err := util.RequestElectricalPermittedValueSet(e.service, payload.Entity)
+				_, err := e.evElectricalConnection.RequestPermittedValueSet()
 				if err != nil {
 					fmt.Println("Error getting electrical permitted values:", err)
 				}
 
 			case *model.ElectricalConnectionPermittedValueSetListDataType:
-				data, err := util.GetElectricalLimitValues(e.service, payload.Entity)
+				data, err := e.evElectricalConnection.GetEVLimitValues()
 				if err != nil {
 					fmt.Println("Error getting electrical limit values:", err)
 					return
@@ -101,13 +111,13 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 				fmt.Printf("Electrical Permitted Values: %#v\n", data)
 
 			case *model.LoadControlLimitDescriptionListDataType:
-				_, err := util.RequestLoadControlLimitList(e.service, payload.Entity)
+				_, err := e.evLoadControl.RequestLimits()
 				if err != nil {
 					fmt.Println("Error getting loadcontrol limit values:", err)
 				}
 
 			case *model.LoadControlLimitListDataType:
-				data, err := util.GetLoadControlLimitValues(e.service, payload.Entity)
+				data, err := e.evLoadControl.GetLimitValues()
 				if err != nil {
 					fmt.Println("Error getting loadcontrol limit values:", err)
 					return
@@ -117,13 +127,13 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 				fmt.Printf("Loadcontrol Limits: %#v\n", data)
 
 			case *model.MeasurementDescriptionListDataType:
-				_, err := util.RequestMeasurementList(e.service, payload.Entity)
+				_, err := e.evMeasurement.Request()
 				if err != nil {
 					fmt.Println("Error getting measurement list values:", err)
 				}
 
 			case *model.MeasurementListDataType:
-				data, err := util.GetMeasurementValues(e.service, payload.Entity)
+				data, err := e.evMeasurement.GetValues()
 				if err != nil {
 					fmt.Println("Error getting measurement values:", err)
 					return
@@ -133,7 +143,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 				fmt.Printf("Measurements: %#v\n", data)
 
 			case *model.IdentificationListDataType:
-				data, err := util.GetIdentificationValues(e.service, payload.Entity)
+				data, err := e.evIdentification.GetValues()
 				if err != nil {
 					fmt.Println("Error getting identification values:", err)
 					return
@@ -147,15 +157,45 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 }
 
 // process required steps when an evse is connected
-func (e *EMobilityImpl) evseConnected(ski string) {
-	remoteDevice := e.service.RemoteDeviceForSki(ski)
+func (e *EMobilityImpl) evseConnected(ski string, entity *spine.EntityRemoteImpl) {
+	e.evseEntity = entity
 
-	_, _ = util.RequestManufacturerDetailsForDevice(e.service, remoteDevice)
-	_, _ = util.RequestDiagnosisStateForDevice(e.service, remoteDevice)
+	f1, err := features.NewDeviceClassification(e.service, entity)
+	if err != nil {
+		return
+	}
+	e.deviceClassification[entity] = f1
+
+	f2, err := features.NewDeviceDiagnosis(e.service, entity)
+	if err != nil {
+		return
+	}
+	e.deviceDiagnosis[entity] = f2
+
+	_, _ = e.deviceClassification[entity].RequestManufacturerDetailsForEntity()
+	_, _ = e.deviceDiagnosis[entity].RequestStateForEntity()
+}
+
+// an EV was disconnected
+func (e *EMobilityImpl) evseDisconnected(entity *spine.EntityRemoteImpl) {
+	e.evseEntity = nil
+
+	delete(e.deviceClassification, entity)
+	delete(e.deviceDiagnosis, entity)
 }
 
 // an EV was disconnected, trigger required cleanup
 func (e *EMobilityImpl) evDisconnected(entity *spine.EntityRemoteImpl) {
+	e.evEntity = nil
+
+	delete(e.deviceClassification, entity)
+	delete(e.deviceDiagnosis, entity)
+	e.evDeviceConfiguration = nil
+	e.evElectricalConnection = nil
+	e.evMeasurement = nil
+	e.evIdentification = nil
+	e.evLoadControl = nil
+
 	fmt.Println("EV DISCONNECTED")
 
 	// TODO: add error handling
@@ -164,36 +204,47 @@ func (e *EMobilityImpl) evDisconnected(entity *spine.EntityRemoteImpl) {
 
 // an EV was connected, trigger required communication
 func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
+	e.evEntity = entity
+
 	fmt.Println("EV CONNECTED")
 
 	// TODO: add error handling
 
+	// setup features
+	e.deviceClassification[entity], _ = features.NewDeviceClassification(e.service, entity)
+	e.deviceDiagnosis[entity], _ = features.NewDeviceDiagnosis(e.service, entity)
+	e.evDeviceConfiguration, _ = features.NewDeviceConfiguration(e.service, entity)
+	e.evElectricalConnection, _ = features.NewElectricalConnection(e.service, entity)
+	e.evMeasurement, _ = features.NewMeasurement(e.service, entity)
+	e.evIdentification, _ = features.NewIdentification(e.service, entity)
+	e.evLoadControl, _ = features.NewLoadControl(e.service, entity)
+
 	// subscribe
-	if err := util.SubscribeDeviceClassificationForEntity(e.service, entity); err != nil {
+	if err := e.deviceClassification[entity].SubscribeForEntity(); err != nil {
 		fmt.Println(err)
 		return
 	}
-	if err := util.SubscribeDeviceDiagnosisForEntity(e.service, entity); err != nil {
+	if err := e.evDeviceConfiguration.SubscribeForEntity(); err != nil {
 		fmt.Println(err)
 		return
 	}
-	if err := util.SubscribeDeviceConfigurationForEntity(e.service, entity); err != nil {
+	if err := e.deviceDiagnosis[entity].SubscribeForEntity(); err != nil {
 		fmt.Println(err)
 		return
 	}
-	if err := util.SubscribeMeasurementsForEntity(e.service, entity); err != nil {
+	if err := e.evElectricalConnection.SubscribeForEntity(); err != nil {
 		fmt.Println(err)
 		return
 	}
-	if err := util.SubscribeElectricalConnectionForEntity(e.service, entity); err != nil {
+	if err := e.evMeasurement.SubscribeForEntity(); err != nil {
 		fmt.Println(err)
 		return
 	}
-	if err := util.SubscribeIdentificationForEntity(e.service, entity); err != nil {
+	if err := e.evIdentification.SubscribeForEntity(); err != nil {
 		fmt.Println(err)
 		return
 	}
-	if err := util.SubscribeLoadControlForEntity(e.service, entity); err != nil {
+	if err := e.evLoadControl.SubscribeForEntity(); err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -207,54 +258,54 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 	// }
 
 	// bindings
-	if err := util.BindLoadControlLimit(e.service, entity); err != nil {
+	if err := e.evLoadControl.Bind(); err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	// get ev configuration data
-	if err := util.RequestDeviceConfiguration(e.service, entity); err != nil {
+	if err := e.evDeviceConfiguration.Request(); err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	// get manufacturer details
-	if _, err := util.RequestManufacturerDetailsForEntity(e.service, entity); err != nil {
+	if _, err := e.deviceClassification[entity].RequestManufacturerDetailsForEntity(); err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	// get device diagnosis state
-	if _, err := util.RequestDiagnosisStateForEntity(e.service, entity); err != nil {
+	if _, err := e.deviceDiagnosis[entity].RequestStateForEntity(); err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	// get electrical connection parameter
-	if err := util.RequestElectricalConnectionDescription(e.service, entity); err != nil {
+	if err := e.evElectricalConnection.RequestDescription(); err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	if err := util.RequestElectricalConnectionParameterDescription(e.service, entity); err != nil {
+	if err := e.evElectricalConnection.RequestParameterDescription(); err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	// get measurement parameters
-	if err := util.RequestMeasurementDescription(e.service, entity); err != nil {
+	if err := e.evMeasurement.RequestDescription(); err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	// get identification
-	if _, err := util.RequestIdentification(e.service, entity); err != nil {
+	if _, err := e.evIdentification.Request(); err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	// get loadlimit parameter
-	if err := util.RequestLoadControlLimitDescription(e.service, entity); err != nil {
+	if err := e.evLoadControl.RequestLimitDescription(); err != nil {
 		fmt.Println(err)
 		return
 	}
