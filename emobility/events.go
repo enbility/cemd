@@ -159,14 +159,15 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 // process required steps when an evse is connected
 func (e *EMobilityImpl) evseConnected(ski string, entity *spine.EntityRemoteImpl) {
 	e.evseEntity = entity
+	localDevice := e.service.LocalDevice()
 
-	f1, err := features.NewDeviceClassification(e.service, entity)
+	f1, err := features.NewDeviceClassification(localDevice, entity)
 	if err != nil {
 		return
 	}
 	e.deviceClassification[entity] = f1
 
-	f2, err := features.NewDeviceDiagnosis(e.service, entity)
+	f2, err := features.NewDeviceDiagnosis(localDevice, entity)
 	if err != nil {
 		return
 	}
@@ -205,19 +206,20 @@ func (e *EMobilityImpl) evDisconnected(entity *spine.EntityRemoteImpl) {
 // an EV was connected, trigger required communication
 func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 	e.evEntity = entity
+	localDevice := e.service.LocalDevice()
 
 	fmt.Println("EV CONNECTED")
 
 	// TODO: add error handling
 
 	// setup features
-	e.deviceClassification[entity], _ = features.NewDeviceClassification(e.service, entity)
-	e.deviceDiagnosis[entity], _ = features.NewDeviceDiagnosis(e.service, entity)
-	e.evDeviceConfiguration, _ = features.NewDeviceConfiguration(e.service, entity)
-	e.evElectricalConnection, _ = features.NewElectricalConnection(e.service, entity)
-	e.evMeasurement, _ = features.NewMeasurement(e.service, entity)
-	e.evIdentification, _ = features.NewIdentification(e.service, entity)
-	e.evLoadControl, _ = features.NewLoadControl(e.service, entity)
+	e.deviceClassification[entity], _ = features.NewDeviceClassification(localDevice, entity)
+	e.deviceDiagnosis[entity], _ = features.NewDeviceDiagnosis(localDevice, entity)
+	e.evDeviceConfiguration, _ = features.NewDeviceConfiguration(localDevice, entity)
+	e.evElectricalConnection, _ = features.NewElectricalConnection(localDevice, entity)
+	e.evMeasurement, _ = features.NewMeasurement(localDevice, entity)
+	e.evIdentification, _ = features.NewIdentification(localDevice, entity)
+	e.evLoadControl, _ = features.NewLoadControl(localDevice, entity)
 
 	// subscribe
 	if err := e.deviceClassification[entity].SubscribeForEntity(); err != nil {
