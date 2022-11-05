@@ -161,13 +161,13 @@ func (e *EMobilityImpl) evseConnected(ski string, entity *spine.EntityRemoteImpl
 	e.evseEntity = entity
 	localDevice := e.service.LocalDevice()
 
-	f1, err := features.NewDeviceClassification(localDevice, entity)
+	f1, err := features.NewDeviceClassification(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 	if err != nil {
 		return
 	}
 	e.deviceClassification[entity] = f1
 
-	f2, err := features.NewDeviceDiagnosis(localDevice, entity)
+	f2, err := features.NewDeviceDiagnosis(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 	if err != nil {
 		return
 	}
@@ -213,13 +213,13 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 	// TODO: add error handling
 
 	// setup features
-	e.deviceClassification[entity], _ = features.NewDeviceClassification(localDevice, entity)
-	e.deviceDiagnosis[entity], _ = features.NewDeviceDiagnosis(localDevice, entity)
-	e.evDeviceConfiguration, _ = features.NewDeviceConfiguration(localDevice, entity)
-	e.evElectricalConnection, _ = features.NewElectricalConnection(localDevice, entity)
-	e.evMeasurement, _ = features.NewMeasurement(localDevice, entity)
-	e.evIdentification, _ = features.NewIdentification(localDevice, entity)
-	e.evLoadControl, _ = features.NewLoadControl(localDevice, entity)
+	e.deviceClassification[entity], _ = features.NewDeviceClassification(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	e.deviceDiagnosis[entity], _ = features.NewDeviceDiagnosis(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	e.evDeviceConfiguration, _ = features.NewDeviceConfiguration(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	e.evElectricalConnection, _ = features.NewElectricalConnection(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	e.evMeasurement, _ = features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	e.evIdentification, _ = features.NewIdentification(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	e.evLoadControl, _ = features.NewLoadControl(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 
 	// subscribe
 	if err := e.deviceClassification[entity].SubscribeForEntity(); err != nil {
