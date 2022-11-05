@@ -31,12 +31,40 @@ func (e *EMobilityImpl) EVCurrentChargeState() (EVChargeStateType, error) {
 
 // return the number of ac connected phases of the EV or 0 if it is unknown
 func (e *EMobilityImpl) EVConnectedPhases() (uint, error) {
-	phases, err := e.evElectricalConnection.GetConnectedPhases()
+	return e.evElectricalConnection.GetConnectedPhases()
+}
+
+// return the charged energy measurement in Wh of the connected EV
+//
+// possible errors:
+//   - ErrDataNotAvailable if no such measurement is (yet) available
+//   - and others
+func (e *EMobilityImpl) EVChargedEnergy() (float64, error) {
+	return e.evMeasurement.GetValueForScope(model.ScopeTypeTypeCharge, e.evElectricalConnection)
+}
+
+// return the last power measurement for each phase of the connected EV
+//
+// possible errors:
+//   - ErrDataNotAvailable if no such measurement is (yet) available
+//   - and others
+func (e *EMobilityImpl) EVPowerPerPhase() ([]float64, error) {
+	data, err := e.evMeasurement.GetValuesPerPhaseForScope(model.ScopeTypeTypeACPower, e.evElectricalConnection)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return phases, nil
+	var result []float64
+
+	for _, phase := range phaseMapping {
+		value := 0.0
+		if theValue, exists := data[phase]; exists {
+			value = theValue
+		}
+		result = append(result, value)
+	}
+
+	return result, nil
 }
 
 // return the last current measurement for each phase of the connected EV
@@ -44,8 +72,8 @@ func (e *EMobilityImpl) EVConnectedPhases() (uint, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *EMobilityImpl) EVCurrents() ([]float64, error) {
-	data, err := e.evMeasurement.GetCurrents(e.evElectricalConnection)
+func (e *EMobilityImpl) EVCurrentsPerPhase() ([]float64, error) {
+	data, err := e.evMeasurement.GetValuesPerPhaseForScope(model.ScopeTypeTypeACCurrent, e.evElectricalConnection)
 	if err != nil {
 		return nil, err
 	}
@@ -263,6 +291,25 @@ func (e *EMobilityImpl) EVCommunicationStandard() (EVCommunicationStandardType, 
 	}
 
 	return EVCommunicationStandardType(*data), err
+}
+
+// returns the identification of the currently connected EV or nil if not available
+//
+// possible errors:
+//   - ErrDataNotAvailable if that information is not (yet) available
+//   - and others
+func (e *EMobilityImpl) EVIdentification() (string, error) {
+	identifications, err := e.evIdentification.GetValues()
+	if err != nil {
+		return "", err
+	}
+
+	for _, identification := range identifications {
+		if identification.Identifier != "" {
+			return identification.Identifier, nil
+		}
+	}
+	return "", nil
 }
 
 // returns if the EVSE and EV combination support optimzation of self consumption
