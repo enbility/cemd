@@ -1,6 +1,7 @@
 package emobility
 
 import (
+	"github.com/DerAndereAndi/eebus-go-cem/scenarios"
 	"github.com/DerAndereAndi/eebus-go/features"
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/service/util"
@@ -172,9 +173,21 @@ func NewEMobility(service *service.EEBUSService, ski string) *EMobilityImpl {
 	return emobility
 }
 
+type EmobilityScenarioImpl struct {
+	service *service.EEBUSService
+}
+
+var _ scenarios.ScenariosI = (*EmobilityScenarioImpl)(nil)
+
+func NewEMobilityScenario(service *service.EEBUSService) *EmobilityScenarioImpl {
+	return &EmobilityScenarioImpl{
+		service: service,
+	}
+}
+
 // adds all the supported features to the local entity
-func AddEmobilityFeatures(service *service.EEBUSService) {
-	localEntity := service.LocalEntity()
+func (e *EmobilityScenarioImpl) AddFeatures() {
+	localEntity := e.service.LocalEntity()
 
 	{
 		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeClient, "Device Configuration Client")
@@ -213,8 +226,8 @@ func AddEmobilityFeatures(service *service.EEBUSService) {
 }
 
 // add supported e-mobility usecases
-func AddEmobilityUseCases(service *service.EEBUSService) {
-	localEntity := service.LocalEntity()
+func (e *EmobilityScenarioImpl) AddUseCases() {
+	localEntity := e.service.LocalEntity()
 
 	_ = spine.NewUseCase(
 		localEntity,

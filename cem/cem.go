@@ -65,8 +65,10 @@ func (h *CemImpl) Setup(port, remoteSKI, certFile, keyFile string, ifaces []stri
 	spine.Events.Subscribe(h)
 
 	// Setup the supported usecases and features
-	emobility.AddEmobilityFeatures(h.myService)
-	emobility.AddEmobilityUseCases(h.myService)
+	emobilityScenario := emobility.NewEMobilityScenario(h.myService)
+	emobilityScenario.AddFeatures()
+	emobilityScenario.AddUseCases()
+
 	// TODO: emobility should be stored per remote SKI and
 	// only be set for the SKI if the device supports it
 	h.emobility = emobility.NewEMobility(h.myService, remoteSKI)
