@@ -45,20 +45,22 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 	case spine.EventTypeDataChange:
 		if payload.ChangeType == spine.ElementChangeUpdate {
 			switch payload.Data.(type) {
-			case *model.DeviceClassificationManufacturerDataType:
-				var feature *features.DeviceClassification
-				if entityType == model.EntityTypeTypeEVSE {
-					feature = e.evseDeviceClassification
-				} else {
-					feature = e.evDeviceClassification
-				}
-				_, err := feature.GetManufacturerDetails()
-				if err != nil {
-					logging.Log.Error("Error getting manufacturer data:", err)
-					return
-				}
+			/*
+				case *model.DeviceClassificationManufacturerDataType:
+					var feature *features.DeviceClassification
+					if entityType == model.EntityTypeTypeEVSE {
+						feature = e.evseDeviceClassification
+					} else {
+						feature = e.evDeviceClassification
+					}
+					_, err := feature.GetManufacturerDetails()
+					if err != nil {
+						logging.Log.Error("Error getting manufacturer data:", err)
+						return
+					}
 
-				// TODO: provide the current data to the CEM
+					// TODO: provide the current data to the CEM
+			*/
 			case *model.DeviceConfigurationKeyValueDescriptionListDataType:
 				// key value descriptions received, now get the data
 				_, err := e.evDeviceConfiguration.RequestKeyValueList()
@@ -66,52 +68,61 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 					logging.Log.Error("Error getting configuration key values:", err)
 				}
 
-			case *model.DeviceConfigurationKeyValueListDataType:
-				data, err := e.evDeviceConfiguration.GetValues()
-				if err != nil {
-					logging.Log.Error("Error getting device configuration values:", err)
-					return
-				}
+				/*
+					case *model.DeviceConfigurationKeyValueListDataType:
+						data, err := e.evDeviceConfiguration.GetValues()
+						if err != nil {
+							logging.Log.Error("Error getting device configuration values:", err)
+							return
+						}
 
-				// TODO: provide the device configuration data
-				logging.Log.Debugf("Device Configuration Values: %#v\n", data)
+						// TODO: provide the device configuration data
+						logging.Log.Debugf("Device Configuration Values: %#v\n", data)
+				*/
 
-			case *model.DeviceDiagnosisStateDataType:
-				var feature *features.DeviceDiagnosis
-				if entityType == model.EntityTypeTypeEVSE {
-					feature = e.evseDeviceDiagnosis
-				} else {
-					feature = e.evDeviceDiagnosis
-				}
-				_, err := feature.GetState()
-				if err != nil {
-					logging.Log.Error("Error getting device diagnosis state:", err)
-				}
+				/*
+					case *model.DeviceDiagnosisStateDataType:
+						var feature *features.DeviceDiagnosis
+						if entityType == model.EntityTypeTypeEVSE {
+							feature = e.evseDeviceDiagnosis
+						} else {
+							feature = e.evDeviceDiagnosis
+						}
+						_, err := feature.GetState()
+						if err != nil {
+							logging.Log.Error("Error getting device diagnosis state:", err)
+						}
+				*/
 
-			case *model.ElectricalConnectionDescriptionListDataType:
-				data, err := e.evElectricalConnection.GetDescription()
-				if err != nil {
-					logging.Log.Error("Error getting electrical description:", err)
-					return
-				}
+				/*
+					case *model.ElectricalConnectionDescriptionListDataType:
+						data, err := e.evElectricalConnection.GetDescription()
+						if err != nil {
+							logging.Log.Error("Error getting electrical description:", err)
+							return
+						}
 
-				// TODO: provide the electrical description data
-				logging.Log.Debugf("Electrical Description: %#v\n", data)
+						// TODO: provide the electrical description data
+						logging.Log.Debugf("Electrical Description: %#v\n", data)
+				*/
+
 			case *model.ElectricalConnectionParameterDescriptionListDataType:
 				_, err := e.evElectricalConnection.RequestPermittedValueSet()
 				if err != nil {
 					logging.Log.Error("Error getting electrical permitted values:", err)
 				}
 
-			case *model.ElectricalConnectionPermittedValueSetListDataType:
-				data, err := e.evElectricalConnection.GetEVLimitValues()
-				if err != nil {
-					logging.Log.Error("Error getting electrical limit values:", err)
-					return
-				}
+				/*
+					case *model.ElectricalConnectionPermittedValueSetListDataType:
+						data, err := e.evElectricalConnection.GetEVLimitValues()
+						if err != nil {
+							logging.Log.Error("Error getting electrical limit values:", err)
+							return
+						}
 
-				// TODO: provide the electrical limit data
-				logging.Log.Debugf("Electrical Permitted Values: %#v\n", data)
+						// TODO: provide the electrical limit data
+						logging.Log.Debugf("Electrical Permitted Values: %#v\n", data)
+				*/
 
 			case *model.LoadControlLimitDescriptionListDataType:
 				_, err := e.evLoadControl.RequestLimits()
@@ -119,15 +130,17 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 					logging.Log.Error("Error getting loadcontrol limit values:", err)
 				}
 
-			case *model.LoadControlLimitListDataType:
-				data, err := e.evLoadControl.GetLimitValues()
-				if err != nil {
-					logging.Log.Error("Error getting loadcontrol limit values:", err)
-					return
-				}
+				/*
+					case *model.LoadControlLimitListDataType:
+						data, err := e.evLoadControl.GetLimitValues()
+						if err != nil {
+							logging.Log.Error("Error getting loadcontrol limit values:", err)
+							return
+						}
 
-				// TODO: provide the loadcontrol limit data
-				logging.Log.Debugf("Loadcontrol Limits: %#v\n", data)
+						// TODO: provide the loadcontrol limit data
+						logging.Log.Debugf("Loadcontrol Limits: %#v\n", data)
+				*/
 
 			case *model.MeasurementDescriptionListDataType:
 				_, err := e.evMeasurement.Request()
@@ -135,25 +148,29 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 					logging.Log.Error("Error getting measurement list values:", err)
 				}
 
-			case *model.MeasurementListDataType:
-				data, err := e.evMeasurement.GetValues()
-				if err != nil {
-					logging.Log.Error("Error getting measurement values:", err)
-					return
-				}
+				/*
+					case *model.MeasurementListDataType:
+						data, err := e.evMeasurement.GetValues()
+						if err != nil {
+							logging.Log.Error("Error getting measurement values:", err)
+							return
+						}
 
-				// TODO: provide the measurement data
-				logging.Log.Debugf("Measurements: %#v\n", data)
+						// TODO: provide the measurement data
+						logging.Log.Debugf("Measurements: %#v\n", data)
+				*/
 
-			case *model.IdentificationListDataType:
-				data, err := e.evIdentification.GetValues()
-				if err != nil {
-					logging.Log.Error("Error getting identification values:", err)
-					return
-				}
+				/*
+					case *model.IdentificationListDataType:
+						data, err := e.evIdentification.GetValues()
+						if err != nil {
+							logging.Log.Error("Error getting identification values:", err)
+							return
+						}
 
-				// TODO: provide the device configuration data
-				logging.Log.Debugf("Identification Values: %#v\n", data)
+						// TODO: provide the device configuration data
+						logging.Log.Debugf("Identification Values: %#v\n", data)
+				*/
 			}
 		}
 	}
