@@ -1,8 +1,7 @@
 package cem
 
 import (
-	"fmt"
-
+	"github.com/DerAndereAndi/eebus-go/logging"
 	"github.com/DerAndereAndi/eebus-go/spine"
 	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
@@ -26,14 +25,14 @@ func (h *CemImpl) subscriptionRequestHandling(payload spine.EventPayload) {
 	if *data.ServerFeatureType == model.FeatureTypeTypeDeviceDiagnosis {
 		remoteDevice := h.myService.RemoteDeviceForSki(payload.Ski)
 		if remoteDevice == nil {
-			fmt.Println("No remote device found for SKI:", payload.Ski)
+			logging.Log.Info("No remote device found for SKI:", payload.Ski)
 			return
 		}
 
 		senderAddr := h.myService.LocalDevice().FeatureByTypeAndRole(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer).Address()
 		destinationAddr := payload.Feature.Address()
 		if senderAddr == nil || destinationAddr == nil {
-			fmt.Println("No sender or destination address found for SKI:", payload.Ski)
+			logging.Log.Info("No sender or destination address found for SKI:", payload.Ski)
 			return
 		}
 

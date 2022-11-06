@@ -2,7 +2,7 @@ module github.com/DerAndereAndi/eebus-go-cem
 
 go 1.18
 
-require github.com/DerAndereAndi/eebus-go v0.0.0-20221105195130-a574b082bdc4
+require github.com/DerAndereAndi/eebus-go v0.0.0-20221106094541-5a90259d3241
 
 require github.com/miekg/dns v1.1.50 // indirect
 

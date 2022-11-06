@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/DerAndereAndi/eebus-go-cem/emobility"
+	"github.com/DerAndereAndi/eebus-go/logging"
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/spine"
 	"github.com/DerAndereAndi/eebus-go/spine/model"
@@ -96,7 +97,7 @@ func (h *CemImpl) RemoteServiceTrustRequested(ski string) {
 func (h *CemImpl) RemoteServiceShipIDReported(ski string, shipID string) {
 	// we should associated the Ship ID with the SKI and store it
 	// so the next connection can start trusted
-	fmt.Println("SKI", ski, "has Ship ID:", shipID)
+	logging.Log.Info("SKI", ski, "has Ship ID:", shipID)
 }
 
 // Logging interface
