@@ -10,7 +10,7 @@ var phaseMapping = []string{"a", "b", "c"}
 
 // return the current charge sate of the EV
 func (e *EMobilityImpl) EVCurrentChargeState() (EVChargeStateType, error) {
-	diagnosisState, err := e.deviceDiagnosis[e.evEntity].GetState()
+	diagnosisState, err := e.evDeviceDiagnosis.GetState()
 	if err != nil {
 		return EVChargeStateTypeUnkown, err
 	}

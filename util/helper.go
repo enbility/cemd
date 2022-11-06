@@ -15,7 +15,7 @@ func IsUsecaseSupported(usecase model.UseCaseNameType, actor model.UseCaseActorT
 			continue
 		}
 		for _, uc := range element.UseCaseSupport {
-			if *uc.UseCaseName == usecase {
+			if uc.UseCaseName != nil && *uc.UseCaseName == usecase {
 				return true
 			}
 		}

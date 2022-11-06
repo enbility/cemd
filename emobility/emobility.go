@@ -143,9 +143,11 @@ type EMobilityImpl struct {
 	evseEntity *spine.EntityRemoteImpl
 	evEntity   *spine.EntityRemoteImpl
 
-	deviceClassification map[*spine.EntityRemoteImpl]*features.DeviceClassification
-	deviceDiagnosis      map[*spine.EntityRemoteImpl]*features.DeviceDiagnosis
+	evseDeviceClassification *features.DeviceClassification
+	evseDeviceDiagnosis      *features.DeviceDiagnosis
 
+	evDeviceClassification *features.DeviceClassification
+	evDeviceDiagnosis      *features.DeviceDiagnosis
 	evDeviceConfiguration  *features.DeviceConfiguration
 	evElectricalConnection *features.ElectricalConnection
 	evMeasurement          *features.Measurement
@@ -162,11 +164,9 @@ func NewEMobility(service *service.EEBUSService, ski string) *EMobilityImpl {
 	ski = util.NormalizeSKI(ski)
 
 	emobility := &EMobilityImpl{
-		service:              service,
-		entity:               service.LocalEntity(),
-		ski:                  ski,
-		deviceClassification: make(map[*spine.EntityRemoteImpl]*features.DeviceClassification),
-		deviceDiagnosis:      make(map[*spine.EntityRemoteImpl]*features.DeviceDiagnosis),
+		service: service,
+		entity:  service.LocalEntity(),
+		ski:     ski,
 	}
 	spine.Events.Subscribe(emobility)
 

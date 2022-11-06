@@ -46,11 +46,13 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 		if payload.ChangeType == spine.ElementChangeUpdate {
 			switch payload.Data.(type) {
 			case *model.DeviceClassificationManufacturerDataType:
-				entity, exists := e.deviceClassification[payload.Entity]
-				if !exists {
-					return
+				var feature *features.DeviceClassification
+				if entityType == model.EntityTypeTypeEVSE {
+					feature = e.evseDeviceClassification
+				} else {
+					feature = e.evDeviceClassification
 				}
-				_, err := entity.GetManufacturerDetails()
+				_, err := feature.GetManufacturerDetails()
 				if err != nil {
 					logging.Log.Error("Error getting manufacturer data:", err)
 					return
@@ -75,11 +77,13 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 				logging.Log.Debugf("Device Configuration Values: %#v\n", data)
 
 			case *model.DeviceDiagnosisStateDataType:
-				entity, exists := e.deviceDiagnosis[payload.Entity]
-				if !exists {
-					return
+				var feature *features.DeviceDiagnosis
+				if entityType == model.EntityTypeTypeEVSE {
+					feature = e.evseDeviceDiagnosis
+				} else {
+					feature = e.evDeviceDiagnosis
 				}
-				_, err := entity.GetState()
+				_, err := feature.GetState()
 				if err != nil {
 					logging.Log.Error("Error getting device diagnosis state:", err)
 				}
@@ -164,32 +168,32 @@ func (e *EMobilityImpl) evseConnected(ski string, entity *spine.EntityRemoteImpl
 	if err != nil {
 		return
 	}
-	e.deviceClassification[entity] = f1
+	e.evseDeviceClassification = f1
 
 	f2, err := features.NewDeviceDiagnosis(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 	if err != nil {
 		return
 	}
-	e.deviceDiagnosis[entity] = f2
+	e.evseDeviceDiagnosis = f2
 
-	_, _ = e.deviceClassification[entity].RequestManufacturerDetailsForEntity()
-	_, _ = e.deviceDiagnosis[entity].RequestStateForEntity()
+	_, _ = e.evseDeviceClassification.RequestManufacturerDetailsForEntity()
+	_, _ = e.evseDeviceDiagnosis.RequestStateForEntity()
 }
 
 // an EV was disconnected
 func (e *EMobilityImpl) evseDisconnected(entity *spine.EntityRemoteImpl) {
 	e.evseEntity = nil
 
-	delete(e.deviceClassification, entity)
-	delete(e.deviceDiagnosis, entity)
+	e.evseDeviceClassification = nil
+	e.evseDeviceDiagnosis = nil
 }
 
 // an EV was disconnected, trigger required cleanup
 func (e *EMobilityImpl) evDisconnected(entity *spine.EntityRemoteImpl) {
 	e.evEntity = nil
 
-	delete(e.deviceClassification, entity)
-	delete(e.deviceDiagnosis, entity)
+	e.evDeviceClassification = nil
+	e.evDeviceDiagnosis = nil
 	e.evDeviceConfiguration = nil
 	e.evElectricalConnection = nil
 	e.evMeasurement = nil
@@ -212,8 +216,8 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 	// TODO: add error handling
 
 	// setup features
-	e.deviceClassification[entity], _ = features.NewDeviceClassification(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
-	e.deviceDiagnosis[entity], _ = features.NewDeviceDiagnosis(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	e.evDeviceClassification, _ = features.NewDeviceClassification(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	e.evDeviceDiagnosis, _ = features.NewDeviceDiagnosis(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 	e.evDeviceConfiguration, _ = features.NewDeviceConfiguration(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 	e.evElectricalConnection, _ = features.NewElectricalConnection(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 	e.evMeasurement, _ = features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
@@ -221,7 +225,7 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 	e.evLoadControl, _ = features.NewLoadControl(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 
 	// subscribe
-	if err := e.deviceClassification[entity].SubscribeForEntity(); err != nil {
+	if err := e.evDeviceClassification.SubscribeForEntity(); err != nil {
 		logging.Log.Error(err)
 		return
 	}
@@ -229,7 +233,7 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 		logging.Log.Error(err)
 		return
 	}
-	if err := e.deviceDiagnosis[entity].SubscribeForEntity(); err != nil {
+	if err := e.evDeviceDiagnosis.SubscribeForEntity(); err != nil {
 		logging.Log.Error(err)
 		return
 	}
@@ -271,13 +275,13 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 	}
 
 	// get manufacturer details
-	if _, err := e.deviceClassification[entity].RequestManufacturerDetailsForEntity(); err != nil {
+	if _, err := e.evDeviceClassification.RequestManufacturerDetailsForEntity(); err != nil {
 		logging.Log.Error(err)
 		return
 	}
 
 	// get device diagnosis state
-	if _, err := e.deviceDiagnosis[entity].RequestStateForEntity(); err != nil {
+	if _, err := e.evDeviceDiagnosis.RequestStateForEntity(); err != nil {
 		logging.Log.Error(err)
 		return
 	}

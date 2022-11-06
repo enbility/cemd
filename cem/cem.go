@@ -100,6 +100,10 @@ func (h *CemImpl) RemoteServiceShipIDReported(ski string, shipID string) {
 	logging.Log.Info("SKI", ski, "has Ship ID:", shipID)
 }
 
+func (h *CemImpl) RemoteSKIConnected(ski string) {}
+
+func (h *CemImpl) RemoteSKIDisconnected(ski string) {}
+
 // Logging interface
 
 func (h *CemImpl) log(level string, args ...interface{}) {
