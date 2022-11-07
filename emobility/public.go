@@ -206,8 +206,10 @@ func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []
 	var limitData []model.LoadControlLimitDataType
 
 	for scopeTypes := 0; scopeTypes < 2; scopeTypes++ {
+		category := model.LoadControlCategoryTypeObligation
 		currentsPerPhase := obligations
 		if scopeTypes == 1 {
+			category = model.LoadControlCategoryTypeRecommendation
 			currentsPerPhase = recommendations
 		}
 
@@ -222,7 +224,7 @@ func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []
 					continue
 				}
 
-				if *lDesc.LimitCategory != model.LoadControlCategoryTypeObligation {
+				if *lDesc.LimitCategory != category {
 					continue
 				}
 
