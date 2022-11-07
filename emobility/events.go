@@ -36,9 +36,9 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 		case spine.ElementChangeRemove:
 			switch entityType {
 			case model.EntityTypeTypeEVSE:
-				e.evseDisconnected(payload.Entity)
+				e.evseDisconnected()
 			case model.EntityTypeTypeEV:
-				e.evDisconnected(payload.Entity)
+				e.evDisconnected()
 			}
 		}
 
@@ -198,15 +198,17 @@ func (e *EMobilityImpl) evseConnected(ski string, entity *spine.EntityRemoteImpl
 }
 
 // an EV was disconnected
-func (e *EMobilityImpl) evseDisconnected(entity *spine.EntityRemoteImpl) {
+func (e *EMobilityImpl) evseDisconnected() {
 	e.evseEntity = nil
 
 	e.evseDeviceClassification = nil
 	e.evseDeviceDiagnosis = nil
+
+	e.evDisconnected()
 }
 
 // an EV was disconnected, trigger required cleanup
-func (e *EMobilityImpl) evDisconnected(entity *spine.EntityRemoteImpl) {
+func (e *EMobilityImpl) evDisconnected() {
 	e.evEntity = nil
 
 	e.evDeviceClassification = nil
