@@ -1,5 +1,7 @@
 package emobility
 
+import "errors"
+
 type EVCommunicationStandardType string
 
 const (
@@ -12,7 +14,7 @@ const (
 type EVChargeStateType string
 
 const (
-	EVChargeStateTypeUnkown    EVChargeStateType = "Unknown"
+	EVChargeStateTypeUnknown   EVChargeStateType = "Unknown"
 	EVChargeStateTypeUnplugged EVChargeStateType = "unplugged"
 	EVChargeStateTypeError     EVChargeStateType = "error"
 	EVChargeStateTypePaused    EVChargeStateType = "paused"
@@ -28,3 +30,5 @@ const (
 	EVChargeStrategyTypeDirectCharging EVChargeStrategyType = "directcharging"
 	EVChargeStrategyTypeTimedCharging  EVChargeStrategyType = "timedcharging"
 )
+
+var ErrEVDisconnected = errors.New("ev is disconnected")
