@@ -148,6 +148,16 @@ func (e *EMobilityImpl) EVCurrentLimits() ([]float64, []float64, []float64, erro
 		resultDefault = append(resultDefault, value)
 	}
 
+	// Min current data should be derived from min power data
+	// but as this value is only properly provided via VAS the
+	// currrent min values can not be trusted.
+	// Min current for 3-phase should be at least 2.2A (ISO)
+	for index, item := range resultMin {
+		if item < 2.2 {
+			resultMin[index] = 2.2
+		}
+	}
+
 	return resultMin, resultMax, resultDefault, nil
 }
 
@@ -268,7 +278,7 @@ func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []
 					continue
 				}
 				if limit < elLimit.Min {
-					limitValue = model.NewScaledNumberType(elLimit.Min)
+					limitValue = model.NewScaledNumberType(elLimit.Default)
 				}
 				if limit > elLimit.Max {
 					limitValue = model.NewScaledNumberType(elLimit.Max)
