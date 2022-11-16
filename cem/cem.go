@@ -14,40 +14,27 @@ import (
 )
 
 type CemImpl struct {
+	vendorCode   string
 	brand        string
 	model        string
 	serialNumber string
-	identifier   string
 	myService    *service.EEBUSService
 	emobility    *emobility.EMobilityImpl
 }
 
-func NewCEM(brand, model, serialNumber, identifier string) *CemImpl {
+func NewCEM(vendorCode, brand, model, serialNumber string) *CemImpl {
 	return &CemImpl{
+		vendorCode:   vendorCode,
 		brand:        brand,
 		model:        model,
 		serialNumber: serialNumber,
-		identifier:   identifier,
 	}
 }
 
 func (h *CemImpl) Setup(port, remoteSKI, certFile, keyFile string, ifaces []string) error {
-	serviceDescription := &service.ServiceDescription{
-		Brand:        h.brand,
-		Model:        h.model,
-		SerialNumber: h.serialNumber,
-		Identifier:   h.identifier,
-		DeviceType:   model.DeviceTypeTypeEnergyManagementSystem,
-		Interfaces:   ifaces,
-	}
-
-	h.myService = service.NewEEBUSService(serviceDescription, h)
-	h.myService.SetLogging(h)
-
-	var err error
 	var certificate tls.Certificate
 
-	serviceDescription.Port, err = strconv.Atoi(port)
+	portValue, err := strconv.Atoi(port)
 	if err != nil {
 		return err
 	}
@@ -57,7 +44,21 @@ func (h *CemImpl) Setup(port, remoteSKI, certFile, keyFile string, ifaces []stri
 		return err
 	}
 
-	serviceDescription.Certificate = certificate
+	serviceDescription, err := service.NewServiceDescription(
+		h.vendorCode,
+		h.brand,
+		h.model,
+		h.serialNumber,
+		model.DeviceTypeTypeEnergyManagementSystem,
+		portValue,
+		certificate)
+	if err != nil {
+		return err
+	}
+	serviceDescription.Interfaces = ifaces
+
+	h.myService = service.NewEEBUSService(serviceDescription, h)
+	h.myService.SetLogging(h)
 
 	if err = h.myService.Setup(); err != nil {
 		return err
