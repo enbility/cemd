@@ -55,7 +55,7 @@ func (h *CemImpl) Setup(port, remoteSKI, certFile, keyFile string, ifaces []stri
 	if err != nil {
 		return err
 	}
-	serviceDescription.Interfaces = ifaces
+	serviceDescription.SetInterfaces(ifaces)
 
 	h.myService = service.NewEEBUSService(serviceDescription, h)
 	h.myService.SetLogging(h)
