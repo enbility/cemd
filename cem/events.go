@@ -21,28 +21,30 @@ func (h *CemImpl) HandleEvent(payload spine.EventPayload) {
 func (h *CemImpl) subscriptionRequestHandling(payload spine.EventPayload) {
 	data := payload.Data.(model.SubscriptionManagementRequestCallType)
 
-	// Heartbeat subscription requests
-	if *data.ServerFeatureType == model.FeatureTypeTypeDeviceDiagnosis {
-		remoteDevice := h.myService.RemoteDeviceForSki(payload.Ski)
-		if remoteDevice == nil {
-			logging.Log.Info("No remote device found for SKI:", payload.Ski)
-			return
-		}
+	// Heartbeat subscription requests?
+	if *data.ServerFeatureType != model.FeatureTypeTypeDeviceDiagnosis {
+		return
+	}
 
-		senderAddr := h.myService.LocalDevice().FeatureByTypeAndRole(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer).Address()
-		destinationAddr := payload.Feature.Address()
-		if senderAddr == nil || destinationAddr == nil {
-			logging.Log.Info("No sender or destination address found for SKI:", payload.Ski)
-			return
-		}
+	remoteDevice := h.service.RemoteDeviceForSki(payload.Ski)
+	if remoteDevice == nil {
+		logging.Log.Info("No remote device found for SKI:", payload.Ski)
+		return
+	}
 
-		switch payload.ChangeType {
-		case spine.ElementChangeAdd:
-			// start sending heartbeats
-			remoteDevice.StartHeartbeatSend(senderAddr, destinationAddr)
-		case spine.ElementChangeRemove:
-			// stop sending heartbeats
-			remoteDevice.Stopheartbeat()
-		}
+	senderAddr := h.service.LocalDevice().FeatureByTypeAndRole(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer).Address()
+	destinationAddr := payload.Feature.Address()
+	if senderAddr == nil || destinationAddr == nil {
+		logging.Log.Info("No sender or destination address found for SKI:", payload.Ski)
+		return
+	}
+
+	switch payload.ChangeType {
+	case spine.ElementChangeAdd:
+		// start sending heartbeats
+		remoteDevice.StartHeartbeatSend(senderAddr, destinationAddr)
+	case spine.ElementChangeRemove:
+		// stop sending heartbeats
+		remoteDevice.Stopheartbeat()
 	}
 }

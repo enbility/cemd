@@ -1,150 +1,62 @@
 package cem
 
 import (
-	"crypto/tls"
-	"fmt"
-	"strconv"
-	"time"
-
 	"github.com/DerAndereAndi/eebus-go-cem/emobility"
 	"github.com/DerAndereAndi/eebus-go/logging"
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/spine"
-	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
+// Generic CEM implementation
 type CemImpl struct {
-	vendorCode   string
-	brand        string
-	model        string
-	serialNumber string
-	myService    *service.EEBUSService
-	emobility    *emobility.EMobilityImpl
+	service *service.EEBUSService
 }
 
-func NewCEM(vendorCode, brand, model, serialNumber string) *CemImpl {
-	return &CemImpl{
-		vendorCode:   vendorCode,
-		brand:        brand,
-		model:        model,
-		serialNumber: serialNumber,
-	}
+func NewCEM(serviceDescription *service.ServiceDescription, serviceDelegate service.EEBUSServiceDelegate, log logging.Logging) *CemImpl {
+	cem := &CemImpl{}
+
+	cem.service = service.NewEEBUSService(serviceDescription, serviceDelegate)
+	cem.service.SetLogging(log)
+
+	return cem
 }
 
-func (h *CemImpl) Setup(port, remoteSKI, certFile, keyFile string, ifaces []string) error {
-	var certificate tls.Certificate
-
-	portValue, err := strconv.Atoi(port)
-	if err != nil {
-		return err
-	}
-
-	certificate, err = tls.LoadX509KeyPair(certFile, keyFile)
-	if err != nil {
-		return err
-	}
-
-	serviceDescription, err := service.NewServiceDescription(
-		h.vendorCode,
-		h.brand,
-		h.model,
-		h.serialNumber,
-		model.DeviceTypeTypeEnergyManagementSystem,
-		portValue,
-		certificate)
-	if err != nil {
-		return err
-	}
-	serviceDescription.SetInterfaces(ifaces)
-
-	h.myService = service.NewEEBUSService(serviceDescription, h)
-	h.myService.SetLogging(h)
-
-	if err = h.myService.Setup(); err != nil {
+// Set up the supported usecases and features
+func (h *CemImpl) Setup(enableEmobility bool) error {
+	if err := h.service.Setup(); err != nil {
 		return err
 	}
 
 	spine.Events.Subscribe(h)
 
 	// Setup the supported usecases and features
-	emobilityScenario := emobility.NewEMobilityScenario(h.myService)
-	emobilityScenario.AddFeatures()
-	emobilityScenario.AddUseCases()
-
-	// TODO: emobility should be stored per remote SKI and
-	// only be set for the SKI if the device supports it
-	h.emobility = emobility.NewEMobility(h.myService, remoteSKI)
-
-	h.myService.Start()
-	// defer h.myService.Shutdown()
-
-	remoteService := service.ServiceDetails{
-		SKI: remoteSKI,
+	if enableEmobility {
+		emobilityScenario := emobility.NewEMobilityScenario(h.service)
+		emobilityScenario.AddFeatures()
+		emobilityScenario.AddUseCases()
 	}
-	h.myService.RegisterRemoteService(remoteService)
+
+	h.service.Start()
+	// defer h.myService.Shutdown()
 
 	return nil
 }
 
-// EEBUSServiceDelegate
-
-// handle a request to trust a remote service
-func (h *CemImpl) RemoteServiceTrustRequested(ski string) {
-	// we directly trust it in this example
-	h.myService.UpdateRemoteServiceTrust(ski, true)
+func (h *CemImpl) Start() {
+	h.service.Start()
 }
 
-// report the Ship ID of a newly trusted connection
-func (h *CemImpl) RemoteServiceShipIDReported(ski string, shipID string) {
-	// we should associated the Ship ID with the SKI and store it
-	// so the next connection can start trusted
-	logging.Log.Info("SKI", ski, "has Ship ID:", shipID)
+func (h *CemImpl) Shutdown() {
+	h.service.Shutdown()
 }
 
-func (h *CemImpl) RemoteSKIConnected(ski string) {}
+func (h *CemImpl) RegisterEmobilityRemoteDevice(details service.ServiceDetails) *emobility.EMobilityImpl {
+	// TODO: emobility should be stored per remote SKI and
+	// only be set for the SKI if the device supports it
 
-func (h *CemImpl) RemoteSKIDisconnected(ski string) {}
-
-// Logging interface
-
-func (h *CemImpl) log(level string, args ...interface{}) {
-	t := time.Now()
-	fmt.Printf("%s: %s %s", t.Format(time.RFC3339), level, fmt.Sprintln(args...))
+	return emobility.NewEMobility(h.service, details)
 }
 
-func (h *CemImpl) logf(level, format string, args ...interface{}) {
-	t := time.Now()
-	fmt.Printf("%s: %s %s\n", t.Format(time.RFC3339), level, fmt.Sprintf(format, args...))
-}
-
-func (h *CemImpl) Trace(args ...interface{}) {
-	h.log("TRACE", args...)
-}
-
-func (h *CemImpl) Tracef(format string, args ...interface{}) {
-	h.logf("TRACE", format, args...)
-}
-
-func (h *CemImpl) Debug(args ...interface{}) {
-	h.log("DEBUG", args...)
-}
-
-func (h *CemImpl) Debugf(format string, args ...interface{}) {
-	h.logf("DEBUG", format, args...)
-}
-
-func (h *CemImpl) Info(args ...interface{}) {
-	h.log("INFO", args...)
-}
-
-func (h *CemImpl) Infof(format string, args ...interface{}) {
-	h.logf("INFO", format, args...)
-}
-
-func (h *CemImpl) Error(args ...interface{}) {
-	h.log("ERROR", args...)
-}
-
-func (h *CemImpl) Errorf(format string, args ...interface{}) {
-	h.logf("ERROR", format, args...)
+func (h *CemImpl) UnRegisterEmobilityRemoteDevice(remoteDeviceSki string) error {
+	return h.service.UnregisterRemoteService(remoteDeviceSki)
 }
