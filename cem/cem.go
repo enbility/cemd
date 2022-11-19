@@ -9,7 +9,8 @@ import (
 
 // Generic CEM implementation
 type CemImpl struct {
-	service *service.EEBUSService
+	service           *service.EEBUSService
+	emobilityScenario *emobility.EmobilityScenarioImpl
 }
 
 func NewCEM(serviceDescription *service.ServiceDescription, serviceDelegate service.EEBUSServiceDelegate, log logging.Logging) *CemImpl {
@@ -31,19 +32,17 @@ func (h *CemImpl) Setup(enableEmobility bool) error {
 
 	// Setup the supported usecases and features
 	if enableEmobility {
-		emobilityScenario := emobility.NewEMobilityScenario(h.service)
-		emobilityScenario.AddFeatures()
-		emobilityScenario.AddUseCases()
+		h.emobilityScenario = emobility.NewEMobilityScenario(h.service)
+		h.emobilityScenario.AddFeatures()
+		h.emobilityScenario.AddUseCases()
 	}
-
-	h.service.Start()
-	// defer h.myService.Shutdown()
 
 	return nil
 }
 
 func (h *CemImpl) Start() {
 	h.service.Start()
+	// defer h.myService.Shutdown()
 }
 
 func (h *CemImpl) Shutdown() {
@@ -51,12 +50,9 @@ func (h *CemImpl) Shutdown() {
 }
 
 func (h *CemImpl) RegisterEmobilityRemoteDevice(details service.ServiceDetails) *emobility.EMobilityImpl {
-	// TODO: emobility should be stored per remote SKI and
-	// only be set for the SKI if the device supports it
-
-	return emobility.NewEMobility(h.service, details)
+	return h.emobilityScenario.RegisterEmobilityRemoteDevice(details)
 }
 
 func (h *CemImpl) UnRegisterEmobilityRemoteDevice(remoteDeviceSki string) error {
-	return h.service.UnregisterRemoteService(remoteDeviceSki)
+	return h.emobilityScenario.UnRegisterEmobilityRemoteDevice(remoteDeviceSki)
 }

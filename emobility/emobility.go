@@ -1,12 +1,10 @@
 package emobility
 
 import (
-	"github.com/DerAndereAndi/eebus-go-cem/scenarios"
 	"github.com/DerAndereAndi/eebus-go/features"
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/service/util"
 	"github.com/DerAndereAndi/eebus-go/spine"
-	"github.com/DerAndereAndi/eebus-go/spine/model"
 )
 
 type EmobilityI interface {
@@ -173,103 +171,4 @@ func NewEMobility(service *service.EEBUSService, details service.ServiceDetails)
 	service.RegisterRemoteService(details)
 
 	return emobility
-}
-
-type EmobilityScenarioImpl struct {
-	service *service.EEBUSService
-}
-
-var _ scenarios.ScenariosI = (*EmobilityScenarioImpl)(nil)
-
-func NewEMobilityScenario(service *service.EEBUSService) *EmobilityScenarioImpl {
-	return &EmobilityScenarioImpl{
-		service: service,
-	}
-}
-
-// adds all the supported features to the local entity
-func (e *EmobilityScenarioImpl) AddFeatures() {
-	localEntity := e.service.LocalEntity()
-
-	{
-		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeClient, "Device Configuration Client")
-	}
-	{
-		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceClassification, model.RoleTypeClient, "Device Classification Client")
-	}
-	{
-		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient, "Device Diagnosis Client")
-	}
-	{
-		f := localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer, "Device Diagnosis Server")
-		f.AddFunctionType(model.FunctionTypeDeviceDiagnosisStateData, true, false)
-
-		// Set the initial state
-		state := model.DeviceDiagnosisOperatingStateTypeNormalOperation
-		deviceDiagnosisStateDate := &model.DeviceDiagnosisStateDataType{
-			OperatingState: &state,
-		}
-		f.SetData(model.FunctionTypeDeviceDiagnosisStateData, deviceDiagnosisStateDate)
-
-		f.AddFunctionType(model.FunctionTypeDeviceDiagnosisHeartbeatData, true, false)
-	}
-	{
-		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient, "Electrical Connection Client")
-	}
-	{
-		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeMeasurement, model.RoleTypeClient, "Measurement Client")
-	}
-	{
-		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeIdentification, model.RoleTypeClient, "Identification Client")
-	}
-	{
-		_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeLoadControl, model.RoleTypeClient, "LoadControl Client")
-	}
-}
-
-// add supported e-mobility usecases
-func (e *EmobilityScenarioImpl) AddUseCases() {
-	localEntity := e.service.LocalEntity()
-
-	_ = spine.NewUseCase(
-		localEntity,
-		model.UseCaseNameTypeEVSECommissioningAndConfiguration,
-		model.SpecificationVersionType("1.0.1"),
-		[]model.UseCaseScenarioSupportType{1, 2})
-
-	_ = spine.NewUseCase(
-		localEntity,
-		model.UseCaseNameTypeEVCommissioningAndConfiguration,
-		model.SpecificationVersionType("1.0.1"),
-		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
-
-	_ = spine.NewUseCase(
-		localEntity,
-		model.UseCaseNameTypeMeasurementOfElectricityDuringEVCharging,
-		model.SpecificationVersionType("1.0.1"),
-		[]model.UseCaseScenarioSupportType{1, 2, 3})
-
-	_ = spine.NewUseCase(
-		localEntity,
-		model.UseCaseNameTypeOverloadProtectionByEVChargingCurrentCurtailment,
-		model.SpecificationVersionType("1.0.1b"),
-		[]model.UseCaseScenarioSupportType{1, 2, 3})
-
-	_ = spine.NewUseCase(
-		localEntity,
-		model.UseCaseNameTypeEVStateOfCharge,
-		model.SpecificationVersionType("1.0.0"),
-		[]model.UseCaseScenarioSupportType{1, 2, 3, 4})
-
-	_ = spine.NewUseCase(
-		localEntity,
-		model.UseCaseNameTypeOptimizationOfSelfConsumptionDuringEVCharging,
-		model.SpecificationVersionType("1.0.1b"),
-		[]model.UseCaseScenarioSupportType{1, 2, 3})
-
-	_ = spine.NewUseCase(
-		localEntity,
-		model.UseCaseNameTypeCoordinatedEVCharging,
-		model.SpecificationVersionType("1.0.1"),
-		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
 }
