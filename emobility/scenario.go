@@ -142,7 +142,7 @@ func (e *EmobilityScenarioImpl) UnRegisterEmobilityRemoteDevice(remoteDeviceSki 
 
 	delete(e.remoteDevices, remoteDeviceSki)
 
-	return e.service.UnregisterRemoteService(remoteDeviceSki)
+	return e.service.UnpairRemoteService(remoteDeviceSki)
 }
 
 func (e *EmobilityScenarioImpl) HandleResult(errorMsg spine.ResultMessage) {

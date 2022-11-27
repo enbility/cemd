@@ -34,6 +34,6 @@ func (e *EMobilityImpl) handleResultDeviceDiagnosis(resultMsg spine.ResultMessag
 		resultMsg.DeviceRemote.Stopheartbeat()
 
 		// something is horribly wrong, disconnect and hope a new connection will fix it
-		e.service.DisconnectSKI(resultMsg.DeviceRemote.Ski())
+		e.service.DisconnectSKI(resultMsg.DeviceRemote.Ski(), string(*resultMsg.Result.Description))
 	}
 }

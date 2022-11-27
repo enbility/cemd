@@ -3,8 +3,8 @@ package emobility
 import (
 	"github.com/DerAndereAndi/eebus-go/features"
 	"github.com/DerAndereAndi/eebus-go/service"
-	"github.com/DerAndereAndi/eebus-go/service/util"
 	"github.com/DerAndereAndi/eebus-go/spine"
+	"github.com/DerAndereAndi/eebus-go/util"
 )
 
 type EmobilityI interface {
@@ -168,7 +168,7 @@ func NewEMobility(service *service.EEBUSService, details service.ServiceDetails)
 	}
 	spine.Events.Subscribe(emobility)
 
-	service.RegisterRemoteService(details)
+	service.PairRemoteService(details)
 
 	return emobility
 }

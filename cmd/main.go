@@ -31,14 +31,6 @@ func (d *DemoCem) Setup() error {
 	return d.cem.Setup(true)
 }
 
-// EEBUSServiceDelegate
-
-// handle a request to trust a remote service
-func (d *DemoCem) RemoteServiceTrustRequested(service *service.EEBUSService, ski string) {
-	// we directly trust it in this example
-	service.UpdateRemoteServiceTrust(ski, true)
-}
-
 // report the Ship ID of a newly trusted connection
 func (d *DemoCem) RemoteServiceShipIDReported(service *service.EEBUSService, ski string, shipID string) {
 	// we should associated the Ship ID with the SKI and store it
