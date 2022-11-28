@@ -42,6 +42,8 @@ func (d *DemoCem) RemoteSKIConnected(service *service.EEBUSService, ski string) 
 
 func (d *DemoCem) RemoteSKIDisconnected(service *service.EEBUSService, ski string) {}
 
+func (h *DemoCem) ReportServiceShipID(ski string, shipdID string) {}
+
 // Logging interface
 
 func (d *DemoCem) log(level string, args ...interface{}) {

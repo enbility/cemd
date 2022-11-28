@@ -13,10 +13,10 @@ type CemImpl struct {
 	emobilityScenario *emobility.EmobilityScenarioImpl
 }
 
-func NewCEM(serviceDescription *service.ServiceDescription, serviceDelegate service.EEBUSServiceDelegate, log logging.Logging) *CemImpl {
+func NewCEM(serviceDescription *service.ServiceDescription, serviceHandler service.EEBUSServiceHandler, log logging.Logging) *CemImpl {
 	cem := &CemImpl{}
 
-	cem.service = service.NewEEBUSService(serviceDescription, serviceDelegate)
+	cem.service = service.NewEEBUSService(serviceDescription, serviceHandler)
 	cem.service.SetLogging(log)
 
 	return cem
