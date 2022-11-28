@@ -14,6 +14,10 @@ func (e *EMobilityImpl) EVCurrentChargeState() (EVChargeStateType, error) {
 		return EVChargeStateTypeUnplugged, nil
 	}
 
+	if e.evDeviceDiagnosis == nil {
+		return EVChargeStateTypeUnknown, features.ErrDataNotAvailable
+	}
+
 	diagnosisState, err := e.evDeviceDiagnosis.GetState()
 	if err != nil {
 		return EVChargeStateTypeUnknown, err
@@ -39,6 +43,10 @@ func (e *EMobilityImpl) EVConnectedPhases() (uint, error) {
 		return 0, ErrEVDisconnected
 	}
 
+	if e.evElectricalConnection == nil {
+		return 0, features.ErrDataNotAvailable
+	}
+
 	return e.evElectricalConnection.GetConnectedPhases()
 }
 
@@ -52,6 +60,10 @@ func (e *EMobilityImpl) EVChargedEnergy() (float64, error) {
 		return 0.0, ErrEVDisconnected
 	}
 
+	if e.evMeasurement == nil {
+		return 0.0, features.ErrDataNotAvailable
+	}
+
 	return e.evMeasurement.GetValueForScope(model.ScopeTypeTypeCharge, e.evElectricalConnection)
 }
 
@@ -63,6 +75,10 @@ func (e *EMobilityImpl) EVChargedEnergy() (float64, error) {
 func (e *EMobilityImpl) EVPowerPerPhase() ([]float64, error) {
 	if e.evEntity == nil {
 		return nil, ErrEVDisconnected
+	}
+
+	if e.evMeasurement == nil {
+		return nil, features.ErrDataNotAvailable
 	}
 
 	data, err := e.evMeasurement.GetValuesPerPhaseForScope(model.ScopeTypeTypeACPower, e.evElectricalConnection)
@@ -93,6 +109,10 @@ func (e *EMobilityImpl) EVCurrentsPerPhase() ([]float64, error) {
 		return nil, ErrEVDisconnected
 	}
 
+	if e.evMeasurement == nil {
+		return nil, features.ErrDataNotAvailable
+	}
+
 	data, err := e.evMeasurement.GetValuesPerPhaseForScope(model.ScopeTypeTypeACCurrent, e.evElectricalConnection)
 	if err != nil {
 		return nil, err
@@ -119,6 +139,10 @@ func (e *EMobilityImpl) EVCurrentsPerPhase() ([]float64, error) {
 func (e *EMobilityImpl) EVCurrentLimits() ([]float64, []float64, []float64, error) {
 	if e.evEntity == nil {
 		return nil, nil, nil, ErrEVDisconnected
+	}
+
+	if e.evElectricalConnection == nil {
+		return nil, nil, nil, features.ErrDataNotAvailable
 	}
 
 	dataMin, dataMax, dataDefault, err := e.evElectricalConnection.GetCurrentsLimits()
@@ -191,6 +215,10 @@ func (e *EMobilityImpl) EVCurrentLimits() ([]float64, []float64, []float64, erro
 func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []float64) error {
 	if e.evEntity == nil {
 		return ErrEVDisconnected
+	}
+
+	if e.evElectricalConnection == nil || e.evLoadControl == nil {
+		return features.ErrDataNotAvailable
 	}
 
 	electricalDesc, _, err := e.evElectricalConnection.GetParamDescriptionListData()
@@ -320,6 +348,10 @@ func (e *EMobilityImpl) EVCommunicationStandard() (EVCommunicationStandardType, 
 		return EVCommunicationStandardTypeUnknown, ErrEVDisconnected
 	}
 
+	if e.evDeviceConfiguration == nil {
+		return EVCommunicationStandardTypeUnknown, features.ErrDataNotAvailable
+	}
+
 	// check if device configuration descriptions has an communication standard key name
 	support, err := e.evDeviceConfiguration.GetDescriptionKeyNameSupport(model.DeviceConfigurationKeyNameTypeCommunicationsStandard)
 	if err != nil {
@@ -347,6 +379,10 @@ func (e *EMobilityImpl) EVIdentification() (string, error) {
 		return "", ErrEVDisconnected
 	}
 
+	if e.evIdentification == nil {
+		return "", features.ErrDataNotAvailable
+	}
+
 	identifications, err := e.evIdentification.GetValues()
 	if err != nil {
 		return "", err
@@ -366,8 +402,12 @@ func (e *EMobilityImpl) EVIdentification() (string, error) {
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
 func (e *EMobilityImpl) EVOptimizationOfSelfConsumptionSupported() (bool, error) {
-	if e.evEntity == nil {
+	if e.evEntity == nil || e.evLoadControl == nil {
 		return false, ErrEVDisconnected
+	}
+
+	if e.evLoadControl == nil {
+		return false, features.ErrDataNotAvailable
 	}
 
 	evEntity, err := util.EntityOfTypeForSki(e.service, model.EntityTypeTypeEV, e.ski)
@@ -400,6 +440,10 @@ func (e *EMobilityImpl) EVOptimizationOfSelfConsumptionSupported() (bool, error)
 func (e *EMobilityImpl) EVSoCSupported() (bool, error) {
 	if e.evEntity == nil {
 		return false, ErrEVDisconnected
+	}
+
+	if e.evMeasurement == nil {
+		return false, features.ErrDataNotAvailable
 	}
 
 	evEntity, err := util.EntityOfTypeForSki(e.service, model.EntityTypeTypeEV, e.ski)
@@ -437,6 +481,10 @@ func (e *EMobilityImpl) EVSoCSupported() (bool, error) {
 func (e *EMobilityImpl) EVSoC() (float64, error) {
 	if e.evEntity == nil {
 		return 0.0, ErrEVDisconnected
+	}
+
+	if e.evMeasurement == nil {
+		return 0.0, features.ErrDataNotAvailable
 	}
 
 	// check if the SoC is supported
