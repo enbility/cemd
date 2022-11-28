@@ -42,7 +42,6 @@ func (h *CemImpl) Setup(enableEmobility bool) error {
 
 func (h *CemImpl) Start() {
 	h.service.Start()
-	// defer h.myService.Shutdown()
 }
 
 func (h *CemImpl) Shutdown() {
