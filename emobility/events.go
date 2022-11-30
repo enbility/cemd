@@ -14,22 +14,15 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 		return
 	}
 
-	// we only care about events from an EVSE or EV entity or device changes for this remote device
-	if payload.Entity == nil && payload.EventType != spine.EventTypeDeviceChange {
+	// we care only about events for this remote device
+	if payload.Device != nil && payload.Device.Ski() != e.ski {
 		return
 	}
 
+	// we care only about events from an EVSE or EV entity or device changes for this remote device
 	if payload.Entity != nil {
 		entityType := payload.Entity.EntityType()
 		if entityType != model.EntityTypeTypeEVSE && entityType != model.EntityTypeTypeEV {
-			return
-		}
-	}
-	if payload.Device == nil {
-		return
-	}
-	if payload.Device.Ski() != e.ski {
-		if payload.EventType == spine.EventTypeDeviceChange {
 			return
 		}
 	}
@@ -41,6 +34,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 			e.evseDisconnected()
 			e.evDisconnected()
 		}
+
 	case spine.EventTypeEntityChange:
 		entityType := payload.Entity.EntityType()
 
@@ -228,6 +222,10 @@ func (e *EMobilityImpl) evseDisconnected() {
 
 // an EV was disconnected, trigger required cleanup
 func (e *EMobilityImpl) evDisconnected() {
+	if e.evEntity == nil {
+		return
+	}
+
 	e.evEntity = nil
 
 	e.evDeviceClassification = nil
