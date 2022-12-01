@@ -21,7 +21,8 @@ var _ scenarios.ScenariosI = (*EmobilityScenarioImpl)(nil)
 
 func NewEMobilityScenario(siteConfig *scenarios.SiteConfig, service *service.EEBUSService) *EmobilityScenarioImpl {
 	return &EmobilityScenarioImpl{
-		ScenarioImpl: scenarios.NewScenarioImpl(siteConfig, service),
+		ScenarioImpl:  scenarios.NewScenarioImpl(siteConfig, service),
+		remoteDevices: make(map[string]*EMobilityImpl),
 	}
 }
 
