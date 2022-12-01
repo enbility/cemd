@@ -86,6 +86,23 @@ func (e *EMobilityImpl) EVPowerPerPhase() ([]float64, error) {
 		return nil, err
 	}
 
+	// If power is not provided, fall back to power calculations via currents
+	if len(data) == 0 {
+		currents, err := e.evMeasurement.GetValuesPerPhaseForScope(model.ScopeTypeTypeACCurrent, e.evElectricalConnection)
+		if err != nil {
+			return nil, err
+		}
+
+		// calculate the power
+		for _, phase := range phaseMapping {
+			value := 0.0
+			if theValue, exists := currents[phase]; exists {
+				value = theValue
+			}
+			data[phase] = value * e.siteConfig.Voltage()
+		}
+	}
+
 	var result []float64
 
 	for _, phase := range phaseMapping {
