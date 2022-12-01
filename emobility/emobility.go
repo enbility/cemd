@@ -1,6 +1,7 @@
 package emobility
 
 import (
+	"github.com/DerAndereAndi/eebus-go-cem/scenarios"
 	"github.com/DerAndereAndi/eebus-go/features"
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/spine"
@@ -136,7 +137,8 @@ type EmobilityI interface {
 type EMobilityImpl struct {
 	entity *spine.EntityLocalImpl
 
-	service *service.EEBUSService
+	siteConfig *scenarios.SiteConfig
+	service    *service.EEBUSService
 
 	evseEntity *spine.EntityRemoteImpl
 	evEntity   *spine.EntityRemoteImpl
@@ -158,13 +160,14 @@ type EMobilityImpl struct {
 var _ EmobilityI = (*EMobilityImpl)(nil)
 
 // Add E-Mobility support
-func NewEMobility(service *service.EEBUSService, details service.ServiceDetails) *EMobilityImpl {
+func NewEMobility(siteConfig *scenarios.SiteConfig, service *service.EEBUSService, details service.ServiceDetails) *EMobilityImpl {
 	ski := util.NormalizeSKI(details.SKI)
 
 	emobility := &EMobilityImpl{
-		service: service,
-		entity:  service.LocalEntity(),
-		ski:     ski,
+		siteConfig: siteConfig,
+		service:    service,
+		entity:     service.LocalEntity(),
+		ski:        ski,
 	}
 	spine.Events.Subscribe(emobility)
 

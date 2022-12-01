@@ -10,7 +10,7 @@ import (
 )
 
 type EmobilityScenarioImpl struct {
-	service *service.EEBUSService
+	*scenarios.ScenarioImpl
 
 	remoteDevices map[string]*EMobilityImpl
 
@@ -19,16 +19,15 @@ type EmobilityScenarioImpl struct {
 
 var _ scenarios.ScenariosI = (*EmobilityScenarioImpl)(nil)
 
-func NewEMobilityScenario(service *service.EEBUSService) *EmobilityScenarioImpl {
+func NewEMobilityScenario(siteConfig *scenarios.SiteConfig, service *service.EEBUSService) *EmobilityScenarioImpl {
 	return &EmobilityScenarioImpl{
-		service:       service,
-		remoteDevices: make(map[string]*EMobilityImpl),
+		ScenarioImpl: scenarios.NewScenarioImpl(siteConfig, service),
 	}
 }
 
 // adds all the supported features to the local entity
 func (e *EmobilityScenarioImpl) AddFeatures() {
-	localEntity := e.service.LocalEntity()
+	localEntity := e.Service.LocalEntity()
 
 	{
 		f := localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeClient, "Device Configuration Client")
@@ -76,7 +75,7 @@ func (e *EmobilityScenarioImpl) AddFeatures() {
 
 // add supported e-mobility usecases
 func (e *EmobilityScenarioImpl) AddUseCases() {
-	localEntity := e.service.LocalEntity()
+	localEntity := e.Service.LocalEntity()
 
 	_ = spine.NewUseCase(
 		localEntity,
@@ -131,7 +130,7 @@ func (e *EmobilityScenarioImpl) RegisterEmobilityRemoteDevice(details service.Se
 		return em
 	}
 
-	emobility := NewEMobility(e.service, details)
+	emobility := NewEMobility(e.SiteConfig, e.Service, details)
 	e.remoteDevices[details.SKI] = emobility
 	return emobility
 }
@@ -142,7 +141,7 @@ func (e *EmobilityScenarioImpl) UnRegisterEmobilityRemoteDevice(remoteDeviceSki 
 
 	delete(e.remoteDevices, remoteDeviceSki)
 
-	return e.service.UnpairRemoteService(remoteDeviceSki)
+	return e.Service.UnpairRemoteService(remoteDeviceSki)
 }
 
 func (e *EmobilityScenarioImpl) HandleResult(errorMsg spine.ResultMessage) {

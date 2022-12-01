@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/DerAndereAndi/eebus-go-cem/cem"
+	"github.com/DerAndereAndi/eebus-go-cem/scenarios"
 	"github.com/DerAndereAndi/eebus-go/logging"
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/spine/model"
@@ -19,10 +20,10 @@ type DemoCem struct {
 	cem *cem.CemImpl
 }
 
-func NewDemoCem(serviceDescription *service.ServiceDescription) *DemoCem {
+func NewDemoCem(siteConfig *scenarios.SiteConfig, serviceDescription *service.ServiceDescription) *DemoCem {
 	demo := &DemoCem{}
 
-	demo.cem = cem.NewCEM(serviceDescription, demo, demo)
+	demo.cem = cem.NewCEM(siteConfig, serviceDescription, demo, demo)
 
 	return demo
 }
@@ -127,7 +128,8 @@ func main() {
 	}
 	serviceDescription.SetInterfaces(ifaces)
 
-	demo := NewDemoCem(serviceDescription)
+	siteConfig := scenarios.NewSiteConfig(230.0)
+	demo := NewDemoCem(siteConfig, serviceDescription)
 	if err := demo.Setup(); err != nil {
 		fmt.Println("Error setting up cem: ", err)
 		return
