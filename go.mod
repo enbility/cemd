@@ -2,11 +2,10 @@ module github.com/enbility/cemd
 
 go 1.18
 
-require github.com/enbility/eebus-go v0.0.0-20221205131802-d7cf1fd3edcc
-
-require github.com/miekg/dns v1.1.50 // indirect
+require github.com/enbility/eebus-go v0.1.0
 
 require (
+	github.com/miekg/dns v1.1.50 // indirect
 	github.com/ahmetb/go-linq/v3 v3.2.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
