@@ -1,9 +1,9 @@
 package cem
 
 import (
-	"github.com/DerAndereAndi/eebus-go/logging"
-	"github.com/DerAndereAndi/eebus-go/spine"
-	"github.com/DerAndereAndi/eebus-go/spine/model"
+	"github.com/enbility/eebus-go/logging"
+	"github.com/enbility/eebus-go/spine"
+	"github.com/enbility/eebus-go/spine/model"
 )
 
 // Handle events from eebus-go library

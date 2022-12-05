@@ -1,9 +1,9 @@
 package emobility
 
 import (
-	"github.com/DerAndereAndi/cemd/util"
-	"github.com/DerAndereAndi/eebus-go/features"
-	"github.com/DerAndereAndi/eebus-go/spine/model"
+	"github.com/enbility/cemd/util"
+	"github.com/enbility/eebus-go/features"
+	"github.com/enbility/eebus-go/spine/model"
 )
 
 var phaseMapping = []string{"a", "b", "c"}

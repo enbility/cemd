@@ -3,10 +3,10 @@ package emobility
 import (
 	"sync"
 
-	"github.com/DerAndereAndi/cemd/scenarios"
-	"github.com/DerAndereAndi/eebus-go/service"
-	"github.com/DerAndereAndi/eebus-go/spine"
-	"github.com/DerAndereAndi/eebus-go/spine/model"
+	"github.com/enbility/cemd/scenarios"
+	"github.com/enbility/eebus-go/service"
+	"github.com/enbility/eebus-go/spine"
+	"github.com/enbility/eebus-go/spine/model"
 )
 
 type EmobilityScenarioImpl struct {

@@ -1,8 +1,8 @@
 package emobility
 
 import (
-	"github.com/DerAndereAndi/eebus-go/spine"
-	"github.com/DerAndereAndi/eebus-go/spine/model"
+	"github.com/enbility/eebus-go/spine"
+	"github.com/enbility/eebus-go/spine/model"
 )
 
 func (e *EMobilityImpl) HandleResult(errorMsg spine.ResultMessage) {

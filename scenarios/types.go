@@ -1,6 +1,6 @@
 package scenarios
 
-import "github.com/DerAndereAndi/eebus-go/service"
+import "github.com/enbility/eebus-go/service"
 
 // Implemented by EmobilityScenarioImpl, used by CemImpl
 type ScenariosI interface {

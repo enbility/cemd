@@ -4,7 +4,7 @@ The goal is to provide an EEBUS CEM implementation
 
 ## Introduction
 
-This library provides a foundation to implement energy management solutions using the [eebus-go](https://github.com/DerAndereAndi/eebus-go) library. It is designed to be included either directly into go projects, or it will be able to run as a daemon for other systems interact with (to be implemented).
+This library provides a foundation to implement energy management solutions using the [eebus-go](https://github.com/enbility/eebus-go) library. It is designed to be included either directly into go projects, or it will be able to run as a daemon for other systems interact with (to be implemented).
 
 These EEBUS use cases are already supported:
 

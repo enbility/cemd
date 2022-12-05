@@ -1,11 +1,11 @@
 package emobility
 
 import (
-	"github.com/DerAndereAndi/cemd/scenarios"
-	"github.com/DerAndereAndi/eebus-go/features"
-	"github.com/DerAndereAndi/eebus-go/service"
-	"github.com/DerAndereAndi/eebus-go/spine"
-	"github.com/DerAndereAndi/eebus-go/util"
+	"github.com/enbility/cemd/scenarios"
+	"github.com/enbility/eebus-go/features"
+	"github.com/enbility/eebus-go/service"
+	"github.com/enbility/eebus-go/spine"
+	"github.com/enbility/eebus-go/util"
 )
 
 type EmobilityI interface {

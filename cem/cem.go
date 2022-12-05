@@ -1,11 +1,11 @@
 package cem
 
 import (
-	"github.com/DerAndereAndi/cemd/emobility"
-	"github.com/DerAndereAndi/cemd/scenarios"
-	"github.com/DerAndereAndi/eebus-go/logging"
-	"github.com/DerAndereAndi/eebus-go/service"
-	"github.com/DerAndereAndi/eebus-go/spine"
+	"github.com/enbility/cemd/emobility"
+	"github.com/enbility/cemd/scenarios"
+	"github.com/enbility/eebus-go/logging"
+	"github.com/enbility/eebus-go/service"
+	"github.com/enbility/eebus-go/spine"
 )
 
 // Generic CEM implementation

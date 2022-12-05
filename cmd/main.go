@@ -9,11 +9,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/DerAndereAndi/cemd/cem"
-	"github.com/DerAndereAndi/cemd/scenarios"
-	"github.com/DerAndereAndi/eebus-go/logging"
-	"github.com/DerAndereAndi/eebus-go/service"
-	"github.com/DerAndereAndi/eebus-go/spine/model"
+	"github.com/enbility/cemd/cem"
+	"github.com/enbility/cemd/scenarios"
+	"github.com/enbility/eebus-go/logging"
+	"github.com/enbility/eebus-go/service"
+	"github.com/enbility/eebus-go/spine/model"
 )
 
 type DemoCem struct {

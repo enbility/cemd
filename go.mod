@@ -1,8 +1,8 @@
-module github.com/DerAndereAndi/cemd
+module github.com/enbility/cemd
 
 go 1.18
 
-require github.com/DerAndereAndi/eebus-go v0.0.0-20221204182345-a6e383fb695b
+require github.com/enbility/eebus-go v0.0.0-20221205131802-d7cf1fd3edcc
 
 require github.com/miekg/dns v1.1.50 // indirect
 
