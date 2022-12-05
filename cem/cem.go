@@ -1,8 +1,8 @@
 package cem
 
 import (
-	"github.com/DerAndereAndi/eebus-go-cem/emobility"
-	"github.com/DerAndereAndi/eebus-go-cem/scenarios"
+	"github.com/DerAndereAndi/cemd/emobility"
+	"github.com/DerAndereAndi/cemd/scenarios"
 	"github.com/DerAndereAndi/eebus-go/logging"
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/spine"

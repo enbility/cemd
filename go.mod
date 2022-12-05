@@ -1,4 +1,4 @@
-module github.com/DerAndereAndi/eebus-go-cem
+module github.com/DerAndereAndi/cemd
 
 go 1.18
 

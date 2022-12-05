@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/DerAndereAndi/eebus-go-cem/cem"
-	"github.com/DerAndereAndi/eebus-go-cem/scenarios"
+	"github.com/DerAndereAndi/cemd/cem"
+	"github.com/DerAndereAndi/cemd/scenarios"
 	"github.com/DerAndereAndi/eebus-go/logging"
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/spine/model"

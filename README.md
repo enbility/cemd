@@ -1,14 +1,30 @@
-# eebus-go-cem
+# cemd
 
-The goal is to provide a basic EEBUS CEM implementation
+The goal is to provide an EEBUS CEM implementation
 
 ## Introduction
 
-This repository contains:
+This library provides a foundation to implement energy management solutions using the [eebus-go](https://github.com/DerAndereAndi/eebus-go) library. It is designed to be included either directly into go projects, or it will be able to run as a daemon for other systems interact with (to be implemented).
 
-- Uses the eebus-go EEBUS stack at <https://github.com/DerAndereAndi/eebus-go>
-- Initially working to support on EVSE and EV related use cases, meaning to work with an EVSE that supports EEBUS
-- ... work in progress
+These EEBUS use cases are already supported:
+
+- E-Mobility:
+
+  - EVSE Commissioning and Configuration V1.0.1
+  - EV Commissioning and Configuration V1.0.1
+  - EV Charging Electricity Measurement V1.0.1
+  - EV State Of Charge V1.0.0 RC1
+  - Optimization of Self Consumption During EV Charging V1.0.1b
+  - Overload Protection by EV Charging Current Curtailment V1.0.1b
+
+These use cases are currently planned to be supported in the future:
+
+- E-Mobility:
+
+  - Coordinated EV Charging V1.0.1
+  - EV Charging Summary V1.0.1
+
+More use cases and scenarios will hopefully follow in the future as well.
 
 ## Usage
 

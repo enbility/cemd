@@ -1,7 +1,7 @@
 package emobility
 
 import (
-	"github.com/DerAndereAndi/eebus-go-cem/scenarios"
+	"github.com/DerAndereAndi/cemd/scenarios"
 	"github.com/DerAndereAndi/eebus-go/features"
 	"github.com/DerAndereAndi/eebus-go/service"
 	"github.com/DerAndereAndi/eebus-go/spine"
