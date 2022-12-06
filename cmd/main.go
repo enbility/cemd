@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/enbility/cemd/cem"
-	"github.com/enbility/cemd/scenarios"
 	"github.com/enbility/eebus-go/logging"
 	"github.com/enbility/eebus-go/service"
 	"github.com/enbility/eebus-go/spine/model"
@@ -20,10 +19,10 @@ type DemoCem struct {
 	cem *cem.CemImpl
 }
 
-func NewDemoCem(siteConfig *scenarios.SiteConfig, serviceDescription *service.ServiceDescription) *DemoCem {
+func NewDemoCem(configuration *service.Configuration) *DemoCem {
 	demo := &DemoCem{}
 
-	demo.cem = cem.NewCEM(siteConfig, serviceDescription, demo, demo)
+	demo.cem = cem.NewCEM(configuration, demo, demo)
 
 	return demo
 }
@@ -114,22 +113,22 @@ func main() {
 
 	ifaces := []string{os.Args[5]}
 
-	serviceDescription, err := service.NewServiceDescription(
+	configuration, err := service.NewConfiguration(
 		"Demo",
 		"Demo",
 		"HEMS",
 		"123456789",
 		model.DeviceTypeTypeEnergyManagementSystem,
 		portValue,
-		certificate)
+		certificate,
+		230)
 	if err != nil {
 		fmt.Println("Service data is invalid:", err)
 		return
 	}
-	serviceDescription.SetInterfaces(ifaces)
+	configuration.SetInterfaces(ifaces)
 
-	siteConfig := scenarios.NewSiteConfig(230.0)
-	demo := NewDemoCem(siteConfig, serviceDescription)
+	demo := NewDemoCem(configuration)
 	if err := demo.Setup(); err != nil {
 		fmt.Println("Error setting up cem: ", err)
 		return
