@@ -99,7 +99,7 @@ func (e *EMobilityImpl) EVPowerPerPhase() ([]float64, error) {
 			if theValue, exists := currents[phase]; exists {
 				value = theValue
 			}
-			data[phase] = value * e.siteConfig.Voltage()
+			data[phase] = value * e.service.Configuration.Voltage()
 		}
 	}
 

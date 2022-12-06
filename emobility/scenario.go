@@ -19,9 +19,9 @@ type EmobilityScenarioImpl struct {
 
 var _ scenarios.ScenariosI = (*EmobilityScenarioImpl)(nil)
 
-func NewEMobilityScenario(siteConfig *scenarios.SiteConfig, service *service.EEBUSService) *EmobilityScenarioImpl {
+func NewEMobilityScenario(service *service.EEBUSService) *EmobilityScenarioImpl {
 	return &EmobilityScenarioImpl{
-		ScenarioImpl:  scenarios.NewScenarioImpl(siteConfig, service),
+		ScenarioImpl:  scenarios.NewScenarioImpl(service),
 		remoteDevices: make(map[string]*EMobilityImpl),
 	}
 }
@@ -131,7 +131,7 @@ func (e *EmobilityScenarioImpl) RegisterEmobilityRemoteDevice(details service.Se
 		return em
 	}
 
-	emobility := NewEMobility(e.SiteConfig, e.Service, details)
+	emobility := NewEMobility(e.Service, details)
 	e.remoteDevices[details.SKI] = emobility
 	return emobility
 }
