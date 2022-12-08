@@ -158,8 +158,8 @@ type EMobilityImpl struct {
 var _ EmobilityI = (*EMobilityImpl)(nil)
 
 // Add E-Mobility support
-func NewEMobility(service *service.EEBUSService, details service.ServiceDetails) *EMobilityImpl {
-	ski := util.NormalizeSKI(details.SKI)
+func NewEMobility(service *service.EEBUSService, details *service.ServiceDetails) *EMobilityImpl {
+	ski := util.NormalizeSKI(details.SKI())
 
 	emobility := &EMobilityImpl{
 		service: service,

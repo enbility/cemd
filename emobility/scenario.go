@@ -121,18 +121,18 @@ func (e *EmobilityScenarioImpl) AddUseCases() {
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
 }
 
-func (e *EmobilityScenarioImpl) RegisterEmobilityRemoteDevice(details service.ServiceDetails) *EMobilityImpl {
+func (e *EmobilityScenarioImpl) RegisterEmobilityRemoteDevice(details *service.ServiceDetails) *EMobilityImpl {
 	// TODO: emobility should be stored per remote SKI and
 	// only be set for the SKI if the device supports it
 	e.mux.Lock()
 	defer e.mux.Unlock()
 
-	if em, ok := e.remoteDevices[details.SKI]; ok {
+	if em, ok := e.remoteDevices[details.SKI()]; ok {
 		return em
 	}
 
 	emobility := NewEMobility(e.Service, details)
-	e.remoteDevices[details.SKI] = emobility
+	e.remoteDevices[details.SKI()] = emobility
 	return emobility
 }
 
