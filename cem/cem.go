@@ -49,7 +49,7 @@ func (h *CemImpl) Shutdown() {
 	h.service.Shutdown()
 }
 
-func (h *CemImpl) RegisterEmobilityRemoteDevice(details service.ServiceDetails) *emobility.EMobilityImpl {
+func (h *CemImpl) RegisterEmobilityRemoteDevice(details *service.ServiceDetails) *emobility.EMobilityImpl {
 	return h.emobilityScenario.RegisterEmobilityRemoteDevice(details)
 }
 

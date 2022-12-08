@@ -134,9 +134,7 @@ func main() {
 		return
 	}
 
-	remoteService := service.ServiceDetails{
-		SKI: os.Args[2],
-	}
+	remoteService := service.NewServiceDetails(os.Args[2])
 	demo.cem.RegisterEmobilityRemoteDevice(remoteService)
 
 	// Clean exit to make sure mdns shutdown is invoked
