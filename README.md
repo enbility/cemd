@@ -1,6 +1,6 @@
 # cemd
 
-[![Build Status](https://github.com/enbility/cemd/actions/workflows/default.yml/badge.svg?branch=main)](https://github.com/enbility/cemd/actions/workflows/default.yml/badge.svg?branch=main)
+[![Build Status](https://github.com/enbility/cemd/actions/workflows/default.yml/badge.svg?branch=dev)](https://github.com/enbility/cemd/actions/workflows/default.yml/badge.svg?branch=dev)
 [![GoDoc](https://img.shields.io/badge/godoc-reference-5272B4)](https://godoc.org/github.com/enbility/cemd)
 [![Go report](https://goreportcard.com/badge/github.com/enbility/cemd)](https://goreportcard.com/report/github.com/enbility/cemd)
 
