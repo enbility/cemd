@@ -305,7 +305,7 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 	}
 
 	// get ev configuration data
-	if err := e.evDeviceConfiguration.Request(); err != nil {
+	if err := e.evDeviceConfiguration.RequestDescription(); err != nil {
 		logging.Log.Error(err)
 		return
 	}

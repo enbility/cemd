@@ -6,8 +6,6 @@ import (
 	"github.com/enbility/eebus-go/spine/model"
 )
 
-var phaseMapping = []string{"a", "b", "c"}
-
 // return the current charge sate of the EV
 func (e *EMobilityImpl) EVCurrentChargeState() (EVChargeStateType, error) {
 	if e.evEntity == nil {
@@ -64,7 +62,11 @@ func (e *EMobilityImpl) EVChargedEnergy() (float64, error) {
 		return 0.0, features.ErrDataNotAvailable
 	}
 
-	return e.evMeasurement.GetValueForScope(model.ScopeTypeTypeCharge, e.evElectricalConnection)
+	measurement := model.MeasurementTypeTypeEnergy
+	commodity := model.CommodityTypeTypeElectricity
+	scope := model.ScopeTypeTypeCharge
+	value, _, err := e.evMeasurement.GetValueForTypeCommodityScope(measurement, commodity, scope)
+	return value, err
 }
 
 // return the last power measurement for each phase of the connected EV
@@ -81,20 +83,25 @@ func (e *EMobilityImpl) EVPowerPerPhase() ([]float64, error) {
 		return nil, features.ErrDataNotAvailable
 	}
 
-	data, err := e.evMeasurement.GetValuesPerPhaseForScope(model.ScopeTypeTypeACPower, e.evElectricalConnection)
+	measurement := model.MeasurementTypeTypePower
+	commodity := model.CommodityTypeTypeElectricity
+	scope := model.ScopeTypeTypeACPower
+	data, _, err := e.evMeasurement.GetValuesPerPhaseForTypeCommodityScope(measurement, commodity, scope, e.evElectricalConnection)
 	if err != nil {
 		return nil, err
 	}
 
 	// If power is not provided, fall back to power calculations via currents
 	if len(data) == 0 {
-		currents, err := e.evMeasurement.GetValuesPerPhaseForScope(model.ScopeTypeTypeACCurrent, e.evElectricalConnection)
+		measurement = model.MeasurementTypeTypeCurrent
+		scope = model.ScopeTypeTypeACCurrent
+		currents, _, err := e.evMeasurement.GetValuesPerPhaseForTypeCommodityScope(measurement, commodity, scope, e.evElectricalConnection)
 		if err != nil {
 			return nil, err
 		}
 
 		// calculate the power
-		for _, phase := range phaseMapping {
+		for _, phase := range util.PhaseMapping {
 			value := 0.0
 			if theValue, exists := currents[phase]; exists {
 				value = theValue
@@ -105,7 +112,7 @@ func (e *EMobilityImpl) EVPowerPerPhase() ([]float64, error) {
 
 	var result []float64
 
-	for _, phase := range phaseMapping {
+	for _, phase := range util.PhaseMapping {
 		value := 0.0
 		if theValue, exists := data[phase]; exists {
 			value = theValue
@@ -130,14 +137,17 @@ func (e *EMobilityImpl) EVCurrentsPerPhase() ([]float64, error) {
 		return nil, features.ErrDataNotAvailable
 	}
 
-	data, err := e.evMeasurement.GetValuesPerPhaseForScope(model.ScopeTypeTypeACCurrent, e.evElectricalConnection)
+	measurement := model.MeasurementTypeTypeCurrent
+	commodity := model.CommodityTypeTypeElectricity
+	scope := model.ScopeTypeTypeACCurrent
+	data, _, err := e.evMeasurement.GetValuesPerPhaseForTypeCommodityScope(measurement, commodity, scope, e.evElectricalConnection)
 	if err != nil {
 		return nil, err
 	}
 
 	var result []float64
 
-	for _, phase := range phaseMapping {
+	for _, phase := range util.PhaseMapping {
 		value := 0.0
 		if theValue, exists := data[phase]; exists {
 			value = theValue
@@ -169,7 +179,7 @@ func (e *EMobilityImpl) EVCurrentLimits() ([]float64, []float64, []float64, erro
 
 	var resultMin, resultMax, resultDefault []float64
 
-	for _, phase := range phaseMapping {
+	for _, phase := range util.PhaseMapping {
 		value := 0.0
 		if theValue, exists := dataMin[phase]; exists {
 			value = theValue
@@ -269,7 +279,7 @@ func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []
 		}
 
 		for index, limit := range currentsPerPhase {
-			phase := phaseMapping[index]
+			phase := util.PhaseMapping[index]
 
 			var limitId *model.LoadControlLimitIdType
 			var elConnectionid *model.ElectricalConnectionIdType
@@ -378,12 +388,17 @@ func (e *EMobilityImpl) EVCommunicationStandard() (EVCommunicationStandardType, 
 		return EVCommunicationStandardTypeUnknown, features.ErrNotSupported
 	}
 
-	data, err := e.evDeviceConfiguration.GetEVCommunicationStandard()
+	data, err := e.evDeviceConfiguration.GetValueForKeyName(model.DeviceConfigurationKeyNameTypeCommunicationsStandard, model.DeviceConfigurationKeyValueTypeTypeString)
 	if err != nil {
 		return EVCommunicationStandardTypeUnknown, err
 	}
 
-	return EVCommunicationStandardType(*data), err
+	if data == nil {
+		return EVCommunicationStandardTypeUnknown, features.ErrDataNotAvailable
+	}
+
+	value := data.(*string)
+	return EVCommunicationStandardType(*value), nil
 }
 
 // returns the identification of the currently connected EV or nil if not available
