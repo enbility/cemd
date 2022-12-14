@@ -55,7 +55,7 @@ func (e *GridScenarioImpl) AddUseCases() {
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7})
 }
 
-func (e *GridScenarioImpl) RegisterGridRemoteDevice(details *service.ServiceDetails) *GridImpl {
+func (e *GridScenarioImpl) RegisterRemoteDevice(details *service.ServiceDetails) any {
 	// TODO: grid should be stored per remote SKI and
 	// only be set for the SKI if the device supports it
 	e.mux.Lock()
@@ -70,7 +70,7 @@ func (e *GridScenarioImpl) RegisterGridRemoteDevice(details *service.ServiceDeta
 	return grid
 }
 
-func (e *GridScenarioImpl) UnRegisterEmobilityRemoteDevice(remoteDeviceSki string) error {
+func (e *GridScenarioImpl) UnRegisterRemoteDevice(remoteDeviceSki string) error {
 	e.mux.Lock()
 	defer e.mux.Unlock()
 
