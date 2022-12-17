@@ -28,7 +28,7 @@ func NewDemoCem(configuration *service.Configuration) *DemoCem {
 }
 
 func (d *DemoCem) Setup() error {
-	return d.cem.Setup(true)
+	return d.cem.Setup(true, true)
 }
 
 // report the Ship ID of a newly trusted connection
