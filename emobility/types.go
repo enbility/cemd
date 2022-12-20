@@ -1,8 +1,12 @@
 package emobility
 
-import "errors"
+import (
+	"errors"
 
-type EVCommunicationStandardType string
+	"github.com/enbility/eebus-go/spine/model"
+)
+
+type EVCommunicationStandardType model.DeviceConfigurationKeyValueStringType
 
 const (
 	EVCommunicationStandardTypeUnknown      EVCommunicationStandardType = "unknown"

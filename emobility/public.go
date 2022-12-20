@@ -55,11 +55,11 @@ func (e *EMobilityImpl) EVConnectedPhases() (uint, error) {
 //   - and others
 func (e *EMobilityImpl) EVChargedEnergy() (float64, error) {
 	if e.evEntity == nil {
-		return 0.0, ErrEVDisconnected
+		return 0, ErrEVDisconnected
 	}
 
 	if e.evMeasurement == nil {
-		return 0.0, features.ErrDataNotAvailable
+		return 0, features.ErrDataNotAvailable
 	}
 
 	measurement := model.MeasurementTypeTypeEnergy
@@ -397,7 +397,7 @@ func (e *EMobilityImpl) EVCommunicationStandard() (EVCommunicationStandardType, 
 		return EVCommunicationStandardTypeUnknown, features.ErrDataNotAvailable
 	}
 
-	value := data.(*string)
+	value := data.(*model.DeviceConfigurationKeyValueStringType)
 	return EVCommunicationStandardType(*value), nil
 }
 
