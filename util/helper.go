@@ -7,7 +7,7 @@ import (
 	"github.com/enbility/eebus-go/spine/model"
 )
 
-var PhaseMapping = []string{"a", "b", "c"}
+var PhaseNameMapping = []model.ElectricalConnectionPhaseNameType{model.ElectricalConnectionPhaseNameTypeA, model.ElectricalConnectionPhaseNameTypeB, model.ElectricalConnectionPhaseNameTypeC}
 
 // check if the given usecase, actor is supported by the remote device
 func IsUsecaseSupported(usecase model.UseCaseNameType, actor model.UseCaseActorType, remoteDevice *spine.DeviceRemoteImpl) bool {

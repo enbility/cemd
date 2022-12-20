@@ -75,6 +75,9 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 					// TODO: provide the current data to the CEM
 			*/
 			case *model.DeviceConfigurationKeyValueDescriptionListDataType:
+				if e.evDeviceConfiguration == nil {
+					break
+				}
 				// key value descriptions received, now get the data
 				_, err := e.evDeviceConfiguration.RequestKeyValueList()
 				if err != nil {
@@ -120,6 +123,9 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 				*/
 
 			case *model.ElectricalConnectionParameterDescriptionListDataType:
+				if e.evElectricalConnection == nil {
+					break
+				}
 				_, err := e.evElectricalConnection.RequestPermittedValueSet()
 				if err != nil {
 					logging.Log.Error("Error getting electrical permitted values:", err)
@@ -138,6 +144,9 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 				*/
 
 			case *model.LoadControlLimitDescriptionListDataType:
+				if e.evLoadControl == nil {
+					break
+				}
 				_, err := e.evLoadControl.RequestLimits()
 				if err != nil {
 					logging.Log.Error("Error getting loadcontrol limit values:", err)
@@ -156,6 +165,9 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 				*/
 
 			case *model.MeasurementDescriptionListDataType:
+				if e.evMeasurement == nil {
+					break
+				}
 				_, err := e.evMeasurement.Request()
 				if err != nil {
 					logging.Log.Error("Error getting measurement list values:", err)

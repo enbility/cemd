@@ -4,6 +4,7 @@ import (
 	"github.com/enbility/cemd/util"
 	"github.com/enbility/eebus-go/features"
 	"github.com/enbility/eebus-go/spine/model"
+	eebusUtil "github.com/enbility/eebus-go/util"
 )
 
 // return the current charge sate of the EV
@@ -21,7 +22,12 @@ func (e *EMobilityImpl) EVCurrentChargeState() (EVChargeStateType, error) {
 		return EVChargeStateTypeUnknown, err
 	}
 
-	switch diagnosisState.OperatingState {
+	operatingState := diagnosisState.OperatingState
+	if operatingState == nil {
+		return EVChargeStateTypeUnknown, features.ErrDataNotAvailable
+	}
+
+	switch *operatingState {
 	case model.DeviceDiagnosisOperatingStateTypeNormalOperation:
 		return EVChargeStateTypeActive, nil
 	case model.DeviceDiagnosisOperatingStateTypeStandby:
@@ -45,7 +51,23 @@ func (e *EMobilityImpl) EVConnectedPhases() (uint, error) {
 		return 0, features.ErrDataNotAvailable
 	}
 
-	return e.evElectricalConnection.GetConnectedPhases()
+	data, err := e.evElectricalConnection.GetDescriptions()
+	if err != nil {
+		return 0, features.ErrDataNotAvailable
+	}
+
+	for _, item := range data {
+		if item.ElectricalConnectionId == nil {
+			continue
+		}
+
+		if item.AcConnectedPhases != nil {
+			return *item.AcConnectedPhases, nil
+		}
+	}
+
+	// default to 3 if the value is not available
+	return 3, nil
 }
 
 // return the charged energy measurement in Wh of the connected EV
@@ -65,8 +87,18 @@ func (e *EMobilityImpl) EVChargedEnergy() (float64, error) {
 	measurement := model.MeasurementTypeTypeEnergy
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeCharge
-	value, _, err := e.evMeasurement.GetValueForTypeCommodityScope(measurement, commodity, scope)
-	return value, err
+	data, err := e.evMeasurement.GetDataForTypeCommodityScope(measurement, commodity, scope)
+	if err != nil {
+		return 0, err
+	}
+
+	// we assume there is only one result
+	value := data[0].Value
+	if value == nil {
+		return 0, features.ErrDataNotAvailable
+	}
+
+	return value.GetValue(), err
 }
 
 // return the last power measurement for each phase of the connected EV
@@ -83,41 +115,45 @@ func (e *EMobilityImpl) EVPowerPerPhase() ([]float64, error) {
 		return nil, features.ErrDataNotAvailable
 	}
 
+	var data []model.MeasurementDataType
+
+	powerAvailable := true
 	measurement := model.MeasurementTypeTypePower
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACPower
-	data, _, err := e.evMeasurement.GetValuesPerPhaseForTypeCommodityScope(measurement, commodity, scope, e.evElectricalConnection)
-	if err != nil {
-		return nil, err
-	}
+	data, err := e.evMeasurement.GetDataForTypeCommodityScope(measurement, commodity, scope)
+	if err != nil || len(data) == 0 {
+		powerAvailable = false
 
-	// If power is not provided, fall back to power calculations via currents
-	if len(data) == 0 {
+		// If power is not provided, fall back to power calculations via currents
 		measurement = model.MeasurementTypeTypeCurrent
 		scope = model.ScopeTypeTypeACCurrent
-		currents, _, err := e.evMeasurement.GetValuesPerPhaseForTypeCommodityScope(measurement, commodity, scope, e.evElectricalConnection)
+		data, err = e.evMeasurement.GetDataForTypeCommodityScope(measurement, commodity, scope)
 		if err != nil {
 			return nil, err
-		}
-
-		// calculate the power
-		for _, phase := range util.PhaseMapping {
-			value := 0.0
-			if theValue, exists := currents[phase]; exists {
-				value = theValue
-			}
-			data[phase] = value * e.service.Configuration.Voltage()
 		}
 	}
 
 	var result []float64
 
-	for _, phase := range util.PhaseMapping {
-		value := 0.0
-		if theValue, exists := data[phase]; exists {
-			value = theValue
+	for _, phase := range util.PhaseNameMapping {
+		for _, item := range data {
+			if item.Value == nil {
+				continue
+			}
+
+			elParam, err := e.evElectricalConnection.GetParameterDescriptionForMeasurementId(*item.MeasurementId)
+			if err != nil || elParam.AcMeasuredPhases == nil || *elParam.AcMeasuredPhases != phase {
+				continue
+			}
+
+			phaseValue := item.Value.GetValue()
+			if !powerAvailable {
+				phaseValue *= e.service.Configuration.Voltage()
+			}
+
+			result = append(result, phaseValue)
 		}
-		result = append(result, value)
 	}
 
 	return result, nil
@@ -140,19 +176,27 @@ func (e *EMobilityImpl) EVCurrentsPerPhase() ([]float64, error) {
 	measurement := model.MeasurementTypeTypeCurrent
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACCurrent
-	data, _, err := e.evMeasurement.GetValuesPerPhaseForTypeCommodityScope(measurement, commodity, scope, e.evElectricalConnection)
+	data, err := e.evMeasurement.GetDataForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return nil, err
 	}
 
 	var result []float64
 
-	for _, phase := range util.PhaseMapping {
-		value := 0.0
-		if theValue, exists := data[phase]; exists {
-			value = theValue
+	for _, phase := range util.PhaseNameMapping {
+		for _, item := range data {
+			if item.Value == nil {
+				continue
+			}
+
+			elParam, err := e.evElectricalConnection.GetParameterDescriptionForMeasurementId(*item.MeasurementId)
+			if err != nil || elParam.AcMeasuredPhases == nil || *elParam.AcMeasuredPhases != phase {
+				continue
+			}
+
+			phaseValue := item.Value.GetValue()
+			result = append(result, phaseValue)
 		}
-		result = append(result, value)
 	}
 
 	return result, nil
@@ -172,43 +216,36 @@ func (e *EMobilityImpl) EVCurrentLimits() ([]float64, []float64, []float64, erro
 		return nil, nil, nil, features.ErrDataNotAvailable
 	}
 
-	dataMin, dataMax, dataDefault, err := e.evElectricalConnection.GetCurrentsLimits()
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
 	var resultMin, resultMax, resultDefault []float64
 
-	for _, phase := range util.PhaseMapping {
-		value := 0.0
-		if theValue, exists := dataMin[phase]; exists {
-			value = theValue
+	for _, phaseName := range util.PhaseNameMapping {
+		// electricalParameterDescription contains the measured phase for each measurementId
+		elParamDesc, err := e.evElectricalConnection.GetParameterDescriptionForMeasuredPhase(phaseName)
+		if err != nil || elParamDesc.ParameterId == nil {
+			continue
 		}
-		resultMin = append(resultMin, value)
 
-		value = 0.0
-		if theValue, exists := dataMax[phase]; exists {
-			value = theValue
+		dataMin, dataMax, dataDefault, err := e.evElectricalConnection.GetLimitsForParameterId(*elParamDesc.ParameterId)
+		if err != nil {
+			continue
 		}
-		resultMax = append(resultMax, value)
 
-		value = 0.0
-		if theValue, exists := dataDefault[phase]; exists {
-			value = theValue
+		// Min current data should be derived from min power data
+		// but as this value is only properly provided via VAS the
+		// currrent min values can not be trusted.
+		// Min current for 3-phase should be at least 2.2A (ISO)
+		if dataMin < 2.2 {
+			dataMin = 2.2
 		}
-		resultDefault = append(resultDefault, value)
+
+		resultMin = append(resultMin, dataMin)
+		resultMax = append(resultMax, dataMax)
+		resultDefault = append(resultDefault, dataDefault)
 	}
 
-	// Min current data should be derived from min power data
-	// but as this value is only properly provided via VAS the
-	// currrent min values can not be trusted.
-	// Min current for 3-phase should be at least 2.2A (ISO)
-	for index, item := range resultMin {
-		if item < 2.2 {
-			resultMin[index] = 2.2
-		}
+	if len(resultMin) == 0 {
+		return nil, nil, nil, features.ErrDataNotAvailable
 	}
-
 	return resultMin, resultMax, resultDefault, nil
 }
 
@@ -232,13 +269,12 @@ func (e *EMobilityImpl) EVCurrentLimits() ([]float64, []float64, []float64, erro
 // the EVSE needs to be able map the recommendations into oligation limits which then
 // works for all EVs communication either via IEC61851 or ISO15118.
 //
-// note:
-// For obligations to work for optimizing solar excess power, the EV needs to
-// have an energy demand. Recommendations work even if the EV does not have an active
-// energy demand, given it communicated with the EVSE via ISO15118 and supports the usecase.
-// In ISO15118-2 the usecase is only supported via VAS extensions which are vendor specific
-// and needs to have specific EVSE support for the specific EV brand.
-// In ISO15118-20 this is a standard feature which does not need special support on the EVSE.
+// notes:
+//   - For obligations to work for optimizing solar excess power, the EV needs to have an energy demand.
+//   - Recommendations work even if the EV does not have an active energy demand, given it communicated with the EVSE via ISO15118 and supports the usecase.
+//   - In ISO15118-2 the usecase is only supported via VAS extensions which are vendor specific and needs to have specific EVSE support for the specific EV brand.
+//   - In ISO15118-20 this is a standard feature which does not need special support on the EVSE.
+//   - Min power data is only provided via IEC61851 or using VAS in ISO15118-2.
 func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []float64) error {
 	if e.evEntity == nil {
 		return ErrEVDisconnected
@@ -246,26 +282,6 @@ func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []
 
 	if e.evElectricalConnection == nil || e.evLoadControl == nil {
 		return features.ErrDataNotAvailable
-	}
-
-	electricalDesc, _, err := e.evElectricalConnection.GetParamDescriptionListData()
-	if err != nil {
-		return features.ErrMetadataNotAvailable
-	}
-
-	elLimits, err := e.evElectricalConnection.GetEVLimitValues()
-	if err != nil {
-		return features.ErrMetadataNotAvailable
-	}
-
-	limitDesc, err := e.evLoadControl.GetLimitDescription()
-	if err != nil {
-		return err
-	}
-
-	currentLimits, err := e.evLoadControl.GetLimitValues()
-	if err != nil {
-		return err
 	}
 
 	var limitData []model.LoadControlLimitDataType
@@ -278,79 +294,58 @@ func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []
 			currentsPerPhase = recommendations
 		}
 
-		for index, limit := range currentsPerPhase {
-			phase := util.PhaseMapping[index]
+		for index, phaseLimit := range currentsPerPhase {
+			phaseName := util.PhaseNameMapping[index]
 
-			var limitId *model.LoadControlLimitIdType
-			var elConnectionid *model.ElectricalConnectionIdType
-
-			for _, lDesc := range limitDesc {
-				if lDesc.LimitCategory == nil || lDesc.MeasurementId == nil {
-					continue
-				}
-
-				if *lDesc.LimitCategory != category {
-					continue
-				}
-
-				elDesc, exists := electricalDesc[*lDesc.MeasurementId]
-				if !exists {
-					continue
-				}
-				if elDesc.ElectricalConnectionId == nil || elDesc.AcMeasuredPhases == nil || string(*elDesc.AcMeasuredPhases) != phase {
-					continue
-				}
-
-				limitId = lDesc.LimitId
-				elConnectionid = elDesc.ElectricalConnectionId
-				break
-			}
-
-			if limitId == nil || elConnectionid == nil {
+			// find out the appropriate limitId for each phase value
+			// limitDescription contains the measurementId for each limitId
+			limitDescriptions, err := e.evLoadControl.GetLimitDescriptionsForCategory(category)
+			if err != nil {
 				continue
 			}
 
-			var currentLimitsForID features.LoadControlLimitType
-			var found bool
-			for _, item := range currentLimits {
-				if uint(*limitId) != item.LimitId {
-					continue
-				}
-				currentLimitsForID = item
-				found = true
-				break
-			}
-			if !found || !currentLimitsForID.IsChangeable {
+			// electricalParameterDescription contains the measured phase for each measurementId
+			elParamDesc, err := e.evElectricalConnection.GetParameterDescriptionForMeasuredPhase(phaseName)
+			if err != nil || elParamDesc.MeasurementId == nil {
 				continue
 			}
 
-			limitValue := model.NewScaledNumberType(limit)
-			for _, elLimit := range elLimits {
-				if elLimit.ConnectionID != uint(*elConnectionid) {
-					continue
-				}
-				if elLimit.Scope != model.ScopeTypeTypeACCurrent {
-					continue
-				}
-				if limit < elLimit.Min {
-					limitValue = model.NewScaledNumberType(elLimit.Default)
-				}
-				if limit > elLimit.Max {
-					limitValue = model.NewScaledNumberType(elLimit.Max)
+			var limitDesc *model.LoadControlLimitDescriptionDataType
+			for _, desc := range limitDescriptions {
+				if desc.MeasurementId != nil && *desc.MeasurementId == *elParamDesc.MeasurementId {
+					limitDesc = &desc
+					break
 				}
 			}
 
-			active := true
+			if limitDesc == nil || limitDesc.LimitId == nil {
+				continue
+			}
+
+			limitIdData, err := e.evLoadControl.GetLimitDataForLimitId(*limitDesc.LimitId)
+			if err != nil {
+				continue
+			}
+
+			// EEBus_UC_TS_OverloadProtectionByEvChargingCurrentCurtailment V1.01b 3.2.1.2.2.2
+			// If omitted or set to "true", the timePeriod, value and isLimitActive element SHALL be writeable by a client.
+			if limitIdData.IsLimitChangeable != nil && !*limitIdData.IsLimitChangeable {
+				continue
+			}
+
+			// electricalPermittedValueSet contains the allowed min, max and the default values per phase
+			phaseLimit = e.evElectricalConnection.AdjustValueToBeWithinPermittedValuesForParameter(phaseLimit, *elParamDesc.ParameterId)
+
 			newLimit := model.LoadControlLimitDataType{
-				LimitId:       limitId,
-				IsLimitActive: &active,
-				Value:         limitValue,
+				LimitId:       limitDesc.LimitId,
+				IsLimitActive: eebusUtil.Ptr(true),
+				Value:         model.NewScaledNumberType(phaseLimit),
 			}
 			limitData = append(limitData, newLimit)
 		}
 	}
 
-	_, err = e.evLoadControl.WriteLimitValues(limitData)
+	_, err := e.evLoadControl.WriteLimitValues(limitData)
 
 	return err
 }
@@ -380,12 +375,9 @@ func (e *EMobilityImpl) EVCommunicationStandard() (EVCommunicationStandardType, 
 	}
 
 	// check if device configuration descriptions has an communication standard key name
-	support, err := e.evDeviceConfiguration.GetDescriptionKeyNameSupport(model.DeviceConfigurationKeyNameTypeCommunicationsStandard)
+	_, err := e.evDeviceConfiguration.GetDescriptionForKeyName(model.DeviceConfigurationKeyNameTypeCommunicationsStandard)
 	if err != nil {
 		return EVCommunicationStandardTypeUnknown, err
-	}
-	if !support {
-		return EVCommunicationStandardTypeUnknown, features.ErrNotSupported
 	}
 
 	data, err := e.evDeviceConfiguration.GetValueForKeyName(model.DeviceConfigurationKeyNameTypeCommunicationsStandard, model.DeviceConfigurationKeyValueTypeTypeString)
@@ -421,9 +413,12 @@ func (e *EMobilityImpl) EVIdentification() (string, error) {
 	}
 
 	for _, identification := range identifications {
-		if identification.Identifier != "" {
-			return identification.Identifier, nil
+		value := identification.IdentificationValue
+		if value == nil {
+			continue
 		}
+
+		return string(*value), nil
 	}
 	return "", nil
 }
@@ -434,7 +429,7 @@ func (e *EMobilityImpl) EVIdentification() (string, error) {
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
 func (e *EMobilityImpl) EVOptimizationOfSelfConsumptionSupported() (bool, error) {
-	if e.evEntity == nil || e.evLoadControl == nil {
+	if e.evEntity == nil {
 		return false, ErrEVDisconnected
 	}
 
@@ -453,11 +448,11 @@ func (e *EMobilityImpl) EVOptimizationOfSelfConsumptionSupported() (bool, error)
 	}
 
 	// check if loadcontrol limit descriptions contains a recommendation category
-	support, err := e.evLoadControl.GetLimitDescriptionCategorySupport(model.LoadControlCategoryTypeRecommendation)
-	if err != nil {
+	if _, err = e.evLoadControl.GetLimitDescriptionsForCategory(model.LoadControlCategoryTypeRecommendation); err != nil {
 		return false, err
 	}
-	return support, nil
+
+	return true, nil
 }
 
 // return if the EVSE and EV combination support providing an SoC
@@ -489,7 +484,7 @@ func (e *EMobilityImpl) EVSoCSupported() (bool, error) {
 	}
 
 	// check if measurement descriptions has an SoC scope type
-	desc, err := e.evMeasurement.GetDescriptionForScope(model.ScopeTypeTypeStateOfCharge)
+	desc, err := e.evMeasurement.GetDescriptionsForScope(model.ScopeTypeTypeStateOfCharge)
 	if err != nil {
 		return false, err
 	}
@@ -512,23 +507,31 @@ func (e *EMobilityImpl) EVSoCSupported() (bool, error) {
 //   - and others
 func (e *EMobilityImpl) EVSoC() (float64, error) {
 	if e.evEntity == nil {
-		return 0.0, ErrEVDisconnected
+		return 0, ErrEVDisconnected
 	}
 
 	if e.evMeasurement == nil {
-		return 0.0, features.ErrDataNotAvailable
+		return 0, features.ErrDataNotAvailable
 	}
 
 	// check if the SoC is supported
 	support, err := e.EVSoCSupported()
 	if err != nil {
-		return 0.0, err
+		return 0, err
 	}
 	if !support {
-		return 0.0, features.ErrNotSupported
+		return 0, features.ErrNotSupported
 	}
 
-	return e.evMeasurement.GetSoC()
+	data, err := e.evMeasurement.GetDataForTypeCommodityScope(model.MeasurementTypeTypePercentage, model.CommodityTypeTypeElectricity, model.ScopeTypeTypeStateOfCharge)
+	if err != nil {
+		return 0, err
+	}
+
+	// we assume there is only one value, nil is already checked
+	value := data[0].Value
+
+	return value.GetValue(), nil
 }
 
 // returns if the EVSE and EV combination support coordinated charging
