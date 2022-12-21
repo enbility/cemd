@@ -28,7 +28,7 @@ func (g *GridImpl) PowerLimitationFactor() (float64, error) {
 		return 0, err
 	}
 
-	data, err := g.gridDeviceConfiguration.GetValueForKeyName(keyname, model.DeviceConfigurationKeyValueTypeTypeScaledNumber)
+	data, err := g.gridDeviceConfiguration.GetKeyValueForKeyName(keyname, model.DeviceConfigurationKeyValueTypeTypeScaledNumber)
 	if err != nil {
 		return 0, err
 	}
@@ -50,7 +50,7 @@ func (g *GridImpl) MomentaryPowerConsumptionOrProduction() (float64, error) {
 	measurement := model.MeasurementTypeTypePower
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACPowerTotal
-	data, err := g.getDataForTypeCommodityScope(measurement, commodity, scope)
+	data, err := g.getValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return 0, err
 	}
@@ -87,7 +87,7 @@ func (g *GridImpl) TotalFeedInEnergy() (float64, error) {
 	measurement := model.MeasurementTypeTypeEnergy
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeGridFeedIn
-	data, err := g.getDataForTypeCommodityScope(measurement, commodity, scope)
+	data, err := g.getValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return 0, err
 	}
@@ -110,7 +110,7 @@ func (g *GridImpl) TotalConsumedEnergy() (float64, error) {
 	measurement := model.MeasurementTypeTypeEnergy
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeGridConsumption
-	data, err := g.getDataForTypeCommodityScope(measurement, commodity, scope)
+	data, err := g.getValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return 0, err
 	}
@@ -133,7 +133,7 @@ func (g *GridImpl) MomentaryCurrentConsumptionOrProduction() ([]float64, error) 
 	measurement := model.MeasurementTypeTypeCurrent
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACCurrent
-	values, err := g.getDataForTypeCommodityScope(measurement, commodity, scope)
+	values, err := g.getValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +184,7 @@ func (g *GridImpl) Voltage() ([]float64, error) {
 	measurement := model.MeasurementTypeTypeVoltage
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACVoltage
-	data, err := g.getDataForTypeCommodityScope(measurement, commodity, scope)
+	data, err := g.getValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +225,7 @@ func (g *GridImpl) Frequency() (float64, error) {
 	measurement := model.MeasurementTypeTypeFrequency
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACFrequency
-	item, err := g.getDataForTypeCommodityScope(measurement, commodity, scope)
+	item, err := g.getValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return 0, err
 	}
@@ -241,7 +241,7 @@ func (g *GridImpl) Frequency() (float64, error) {
 
 // helper
 
-func (g *GridImpl) getDataForTypeCommodityScope(measurement model.MeasurementTypeType, commodity model.CommodityTypeType, scope model.ScopeTypeType) ([]model.MeasurementDataType, error) {
+func (g *GridImpl) getValuesForTypeCommodityScope(measurement model.MeasurementTypeType, commodity model.CommodityTypeType, scope model.ScopeTypeType) ([]model.MeasurementDataType, error) {
 	if g.gridEntity == nil {
 		return nil, ErrDeviceDisconnected
 	}
@@ -250,5 +250,5 @@ func (g *GridImpl) getDataForTypeCommodityScope(measurement model.MeasurementTyp
 		return nil, features.ErrDataNotAvailable
 	}
 
-	return g.gridMeasurement.GetDataForTypeCommodityScope(measurement, commodity, scope)
+	return g.gridMeasurement.GetValuesForTypeCommodityScope(measurement, commodity, scope)
 }

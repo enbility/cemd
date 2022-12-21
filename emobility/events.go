@@ -79,7 +79,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 					break
 				}
 				// key value descriptions received, now get the data
-				_, err := e.evDeviceConfiguration.RequestKeyValueList()
+				_, err := e.evDeviceConfiguration.RequestKeyValues()
 				if err != nil {
 					logging.Log.Error("Error getting configuration key values:", err)
 				}
@@ -126,7 +126,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 				if e.evElectricalConnection == nil {
 					break
 				}
-				_, err := e.evElectricalConnection.RequestPermittedValueSet()
+				_, err := e.evElectricalConnection.RequestPermittedValueSets()
 				if err != nil {
 					logging.Log.Error("Error getting electrical permitted values:", err)
 				}
@@ -147,7 +147,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 				if e.evLoadControl == nil {
 					break
 				}
-				_, err := e.evLoadControl.RequestLimits()
+				_, err := e.evLoadControl.RequestLimitValues()
 				if err != nil {
 					logging.Log.Error("Error getting loadcontrol limit values:", err)
 				}
@@ -168,7 +168,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 				if e.evMeasurement == nil {
 					break
 				}
-				_, err := e.evMeasurement.Request()
+				_, err := e.evMeasurement.RequestValues()
 				if err != nil {
 					logging.Log.Error("Error getting measurement list values:", err)
 				}
@@ -218,8 +218,8 @@ func (e *EMobilityImpl) evseConnected(ski string, entity *spine.EntityRemoteImpl
 	}
 	e.evseDeviceDiagnosis = f2
 
-	_, _ = e.evseDeviceClassification.RequestManufacturerDetailsForEntity()
-	_, _ = e.evseDeviceDiagnosis.RequestStateForEntity()
+	_, _ = e.evseDeviceClassification.RequestManufacturerDetails()
+	_, _ = e.evseDeviceDiagnosis.RequestState()
 }
 
 // an EV was disconnected
@@ -317,48 +317,48 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 	}
 
 	// get ev configuration data
-	if err := e.evDeviceConfiguration.RequestDescription(); err != nil {
+	if err := e.evDeviceConfiguration.RequestDescriptions(); err != nil {
 		logging.Log.Error(err)
 		return
 	}
 
 	// get manufacturer details
-	if _, err := e.evDeviceClassification.RequestManufacturerDetailsForEntity(); err != nil {
+	if _, err := e.evDeviceClassification.RequestManufacturerDetails(); err != nil {
 		logging.Log.Error(err)
 		return
 	}
 
 	// get device diagnosis state
-	if _, err := e.evDeviceDiagnosis.RequestStateForEntity(); err != nil {
+	if _, err := e.evDeviceDiagnosis.RequestState(); err != nil {
 		logging.Log.Error(err)
 		return
 	}
 
 	// get electrical connection parameter
-	if err := e.evElectricalConnection.RequestDescription(); err != nil {
+	if err := e.evElectricalConnection.RequestDescriptions(); err != nil {
 		logging.Log.Error(err)
 		return
 	}
 
-	if err := e.evElectricalConnection.RequestParameterDescription(); err != nil {
+	if err := e.evElectricalConnection.RequestParameterDescriptions(); err != nil {
 		logging.Log.Error(err)
 		return
 	}
 
 	// get measurement parameters
-	if err := e.evMeasurement.RequestDescription(); err != nil {
+	if err := e.evMeasurement.RequestDescriptions(); err != nil {
 		logging.Log.Error(err)
 		return
 	}
 
 	// get identification
-	if _, err := e.evIdentification.Request(); err != nil {
+	if _, err := e.evIdentification.RequestValues(); err != nil {
 		logging.Log.Error(err)
 		return
 	}
 
 	// get loadlimit parameter
-	if err := e.evLoadControl.RequestLimitDescription(); err != nil {
+	if err := e.evLoadControl.RequestLimitDescriptions(); err != nil {
 		logging.Log.Error(err)
 		return
 	}

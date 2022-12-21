@@ -87,7 +87,7 @@ func (e *EMobilityImpl) EVChargedEnergy() (float64, error) {
 	measurement := model.MeasurementTypeTypeEnergy
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeCharge
-	data, err := e.evMeasurement.GetDataForTypeCommodityScope(measurement, commodity, scope)
+	data, err := e.evMeasurement.GetValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return 0, err
 	}
@@ -121,14 +121,14 @@ func (e *EMobilityImpl) EVPowerPerPhase() ([]float64, error) {
 	measurement := model.MeasurementTypeTypePower
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACPower
-	data, err := e.evMeasurement.GetDataForTypeCommodityScope(measurement, commodity, scope)
+	data, err := e.evMeasurement.GetValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil || len(data) == 0 {
 		powerAvailable = false
 
 		// If power is not provided, fall back to power calculations via currents
 		measurement = model.MeasurementTypeTypeCurrent
 		scope = model.ScopeTypeTypeACCurrent
-		data, err = e.evMeasurement.GetDataForTypeCommodityScope(measurement, commodity, scope)
+		data, err = e.evMeasurement.GetValuesForTypeCommodityScope(measurement, commodity, scope)
 		if err != nil {
 			return nil, err
 		}
@@ -176,7 +176,7 @@ func (e *EMobilityImpl) EVCurrentsPerPhase() ([]float64, error) {
 	measurement := model.MeasurementTypeTypeCurrent
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACCurrent
-	data, err := e.evMeasurement.GetDataForTypeCommodityScope(measurement, commodity, scope)
+	data, err := e.evMeasurement.GetValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return nil, err
 	}
@@ -322,7 +322,7 @@ func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []
 				continue
 			}
 
-			limitIdData, err := e.evLoadControl.GetLimitDataForLimitId(*limitDesc.LimitId)
+			limitIdData, err := e.evLoadControl.GetLimitValueForLimitId(*limitDesc.LimitId)
 			if err != nil {
 				continue
 			}
@@ -380,7 +380,7 @@ func (e *EMobilityImpl) EVCommunicationStandard() (EVCommunicationStandardType, 
 		return EVCommunicationStandardTypeUnknown, err
 	}
 
-	data, err := e.evDeviceConfiguration.GetValueForKeyName(model.DeviceConfigurationKeyNameTypeCommunicationsStandard, model.DeviceConfigurationKeyValueTypeTypeString)
+	data, err := e.evDeviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypeCommunicationsStandard, model.DeviceConfigurationKeyValueTypeTypeString)
 	if err != nil {
 		return EVCommunicationStandardTypeUnknown, err
 	}
@@ -523,7 +523,7 @@ func (e *EMobilityImpl) EVSoC() (float64, error) {
 		return 0, features.ErrNotSupported
 	}
 
-	data, err := e.evMeasurement.GetDataForTypeCommodityScope(model.MeasurementTypeTypePercentage, model.CommodityTypeTypeElectricity, model.ScopeTypeTypeStateOfCharge)
+	data, err := e.evMeasurement.GetValuesForTypeCommodityScope(model.MeasurementTypeTypePercentage, model.CommodityTypeTypeElectricity, model.ScopeTypeTypeStateOfCharge)
 	if err != nil {
 		return 0, err
 	}
