@@ -1,6 +1,9 @@
 package emobility
 
 import (
+	"errors"
+	"time"
+
 	"github.com/enbility/cemd/util"
 	"github.com/enbility/eebus-go/features"
 	"github.com/enbility/eebus-go/spine/model"
@@ -555,4 +558,286 @@ func (e *EMobilityImpl) EVCoordinatedChargingSupported() (bool, error) {
 	}
 
 	return true, nil
+}
+
+// returns the current charging strategy
+func (e *EMobilityImpl) EVChargeStrategy() EVChargeStrategyType {
+	if e.evEntity == nil {
+		return EVChargeStrategyTypeUnknown
+	}
+
+	// only ISO communication can provide a charging strategy information
+	com, err := e.EVCommunicationStandard()
+	if err != nil || com == EVCommunicationStandardTypeUnknown || com == EVCommunicationStandardTypeIEC61851 {
+		return EVChargeStrategyTypeUnknown
+	}
+
+	if e.evTimeSeries == nil {
+		return EVChargeStrategyTypeUnknown
+	}
+
+	// only the time series data for singledemand is relevant for detecting the charging strategy
+	data, err := e.evTimeSeries.GetValueForType(model.TimeSeriesTypeTypeSingleDemand)
+	if err != nil {
+		return EVChargeStrategyTypeUnknown
+	}
+
+	// without time series slots, there is no known strategy
+	if data.TimeSeriesSlot == nil || len(data.TimeSeriesSlot) == 0 {
+		return EVChargeStrategyTypeUnknown
+	}
+
+	// get the value for the first slot
+	firstSlot := data.TimeSeriesSlot[0]
+	value := firstSlot.Value
+	if value == nil {
+		return EVChargeStrategyTypeUnknown
+	}
+	demand := value.GetValue() // demand in Wh
+
+	// the EV has no demand
+	if demand == 0 {
+		return EVChargeStrategyTypeNoDemand
+	}
+
+	// if demand is > 0 and duration does not exist, the EV is not charging via a timer
+	// but either via direct charging enabled or charging to minimum SoC using a profile
+	if firstSlot.Duration == nil {
+		return EVChargeStrategyTypeDirectCharging
+	}
+
+	if _, err := firstSlot.Duration.GetTimeDuration(); err != nil {
+		// we got an invalid duration
+		return EVChargeStrategyTypeUnknown
+	}
+
+	// there is demand and a duration
+	return EVChargeStrategyTypeTimedCharging
+}
+
+// returns the current energy demand in Wh and the duration
+func (e *EMobilityImpl) EVEnergyDemand() (float64, time.Duration, error) {
+	if e.evEntity == nil {
+		return 0, 0, ErrEVDisconnected
+	}
+
+	if e.evTimeSeries == nil {
+		return 0, 0, features.ErrDataNotAvailable
+	}
+
+	data, err := e.evTimeSeries.GetValueForType(model.TimeSeriesTypeTypeSingleDemand)
+	if err != nil {
+		return 0, 0, features.ErrDataNotAvailable
+	}
+
+	// exactly one time series slot is required
+	if data.TimeSeriesSlot == nil || len(data.TimeSeriesSlot) != 1 {
+		return 0, 0, features.ErrDataNotAvailable
+	}
+
+	// get the value for the first slot
+	firstSlot := data.TimeSeriesSlot[0]
+	value := firstSlot.Value
+	if value == nil {
+		return 0, 0, features.ErrDataNotAvailable
+	}
+
+	if firstSlot.Duration == nil {
+		return value.GetValue(), 0, nil
+	}
+
+	duration, err := firstSlot.Duration.GetTimeDuration()
+	if err != nil {
+		// we got an invalid duration
+		return 0, 0, features.ErrDataNotAvailable
+	}
+
+	return value.GetValue(), duration, nil
+}
+
+// returns the constraints for the power slots
+func (e *EMobilityImpl) EVGetPowerConstraints() (uint, uint, time.Duration, time.Duration, time.Duration) {
+	if e.evTimeSeries == nil {
+		return 0, 0, 0, 0, 0
+	}
+
+	constraints, err := e.evTimeSeries.GetConstraints()
+	if err != nil {
+		return 0, 0, 0, 0, 0
+	}
+
+	// only use the first constraint
+	constraint := constraints[0]
+
+	var minCount, maxCount uint
+	var minDuration, maxDuration, stepSize time.Duration
+
+	if constraint.SlotCountMin != nil {
+		minCount = uint(*constraint.SlotCountMin)
+	}
+	if constraint.SlotCountMax != nil {
+		maxCount = uint(*constraint.SlotCountMax)
+	}
+	if constraint.SlotDurationMin != nil {
+		if duration, err := constraint.SlotDurationMin.GetTimeDuration(); err != nil {
+			minDuration = duration
+		}
+	}
+	if constraint.SlotDurationMax != nil {
+		if duration, err := constraint.SlotDurationMax.GetTimeDuration(); err != nil {
+			maxDuration = duration
+		}
+	}
+	if constraint.SlotDurationStepSize != nil {
+		if duration, err := constraint.SlotDurationStepSize.GetTimeDuration(); err != nil {
+			stepSize = duration
+		}
+	}
+
+	return minCount, maxCount, minDuration, maxDuration, stepSize
+}
+
+// send power limits to the EV
+func (e *EMobilityImpl) EVWritePowerLimits(data []EVDurationSlotValue) error {
+	if e.evTimeSeries == nil {
+		return ErrNotSupported
+	}
+
+	timeSeriesSlots := []model.TimeSeriesSlotType{}
+	var totalDuration time.Duration
+	for index, slot := range data {
+		relativeStart := totalDuration
+
+		timeSeriesSlot := model.TimeSeriesSlotType{
+			TimeSeriesSlotId: eebusUtil.Ptr(model.TimeSeriesSlotIdType(index)),
+			TimePeriod: &model.TimePeriodType{
+				StartTime: model.NewAbsoluteOrRelativeTimeTypeFromDuration(relativeStart),
+			},
+			MaxValue: model.NewScaledNumberType(slot.Value),
+		}
+
+		// the last slot also needs an End Time
+		if index == len(data)-1 {
+			relativeEndTime := relativeStart + slot.Duration
+			timeSeriesSlot.TimePeriod.EndTime = model.NewAbsoluteOrRelativeTimeTypeFromDuration(relativeEndTime)
+		}
+		timeSeriesSlots = append(timeSeriesSlots, timeSeriesSlot)
+
+		totalDuration += slot.Duration
+	}
+
+	desc, err := e.evTimeSeries.GetDescriptionForType(model.TimeSeriesTypeTypeConstraints)
+	if err != nil {
+		return ErrNotSupported
+	}
+
+	timeSeriesData := model.TimeSeriesDataType{
+		TimeSeriesId: desc.TimeSeriesId,
+		TimePeriod: &model.TimePeriodType{
+			StartTime: model.NewAbsoluteOrRelativeTimeType("PT0S"),
+			EndTime:   model.NewAbsoluteOrRelativeTimeTypeFromDuration(totalDuration),
+		},
+		TimeSeriesSlot: timeSeriesSlots,
+	}
+
+	_, err = e.evTimeSeries.WriteValues([]model.TimeSeriesDataType{timeSeriesData})
+
+	return err
+}
+
+// returns the minimum and maximum number of incentive slots allowed
+func (e *EMobilityImpl) EVGetIncentiveConstraints() (uint, uint) {
+	if e.evIncentiveTable == nil {
+		return 0, 0
+	}
+
+	constraints, err := e.evIncentiveTable.GetConstraints()
+	if err != nil {
+		return 0, 0
+	}
+
+	// only use the first constraint
+	constraint := constraints[0]
+
+	if constraint.IncentiveSlotConstraints == nil || constraint.IncentiveSlotConstraints.SlotCountMax == nil {
+		return 0, 0
+	}
+	max := uint(*constraint.IncentiveSlotConstraints.SlotCountMax)
+
+	var min uint = 1
+	if constraint.IncentiveSlotConstraints.SlotCountMin != nil {
+		min = uint(*constraint.IncentiveSlotConstraints.SlotCountMin)
+	}
+
+	return min, max
+}
+
+// send incentives to the EV
+func (e *EMobilityImpl) EVWriteIncentives(data []EVDurationSlotValue) error {
+	min, max := e.EVGetIncentiveConstraints()
+
+	if min != 0 && min > uint(len(data)) {
+		return errors.New("too few charge slots provided")
+	}
+
+	if max != 0 && max < uint(len(data)) {
+		return errors.New("too many charge slots provided")
+	}
+
+	incentiveSlots := []model.IncentiveTableIncentiveSlotType{}
+	var totalDuration time.Duration
+	for index, slot := range data {
+		relativeStart := totalDuration
+
+		timeInterval := &model.TimeTableDataType{
+			StartTime: &model.AbsoluteOrRecurringTimeType{
+				Relative: model.NewDurationType(relativeStart),
+			},
+		}
+
+		// the last slot also needs an End Time
+		if index == len(data)-1 {
+			relativeEndTime := relativeStart + slot.Duration
+			timeInterval.EndTime = &model.AbsoluteOrRecurringTimeType{
+				Relative: model.NewDurationType(relativeEndTime),
+			}
+		}
+
+		incentiveSlot := model.IncentiveTableIncentiveSlotType{
+			TimeInterval: timeInterval,
+			Tier: []model.IncentiveTableTierType{
+				{
+					Tier: &model.TierDataType{
+						TierId: eebusUtil.Ptr(model.TierIdType(1)),
+					},
+					Boundary: []model.TierBoundaryDataType{
+						{
+							BoundaryId:         eebusUtil.Ptr(model.TierBoundaryIdType(1)), // only 1 boundary exists
+							LowerBoundaryValue: model.NewScaledNumberType(0),
+						},
+					},
+					Incentive: []model.IncentiveDataType{
+						{
+							IncentiveId: eebusUtil.Ptr(model.IncentiveIdType(1)), // always use price
+							Value:       model.NewScaledNumberType(slot.Value),
+						},
+					},
+				},
+			},
+		}
+		incentiveSlots = append(incentiveSlots, incentiveSlot)
+
+		totalDuration += slot.Duration
+	}
+
+	incentiveData := model.IncentiveTableType{
+		Tariff: &model.TariffDataType{
+			TariffId: eebusUtil.Ptr(model.TariffIdType(0)),
+		},
+		IncentiveSlot: incentiveSlots,
+	}
+
+	_, err := e.evIncentiveTable.WriteValues([]model.IncentiveTableType{incentiveData})
+
+	return err
 }

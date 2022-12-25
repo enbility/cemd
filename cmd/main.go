@@ -28,7 +28,10 @@ func NewDemoCem(configuration *service.Configuration) *DemoCem {
 }
 
 func (d *DemoCem) Setup() error {
-	return d.cem.Setup(true, true)
+	return d.cem.Setup(cem.CemConfiguration{
+		EmobilityScenarioEnabled: true,
+		GridScenarioEnabled:      true,
+	})
 }
 
 // report the Ship ID of a newly trusted connection
@@ -135,7 +138,7 @@ func main() {
 	}
 
 	remoteService := service.NewServiceDetails(os.Args[2])
-	demo.cem.RegisterEmobilityRemoteDevice(remoteService)
+	demo.cem.RegisterEmobilityRemoteDevice(remoteService, nil)
 
 	// Clean exit to make sure mdns shutdown is invoked
 	sig := make(chan os.Signal, 1)

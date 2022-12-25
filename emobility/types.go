@@ -2,6 +2,7 @@ package emobility
 
 import (
 	"errors"
+	"time"
 
 	"github.com/enbility/eebus-go/spine/model"
 )
@@ -35,4 +36,11 @@ const (
 	EVChargeStrategyTypeTimedCharging  EVChargeStrategyType = "timedcharging"
 )
 
+// Contains details about power limits or incentives for a defined timeframe
+type EVDurationSlotValue struct {
+	Duration time.Duration // Duration of this slot
+	Value    float64       // Energy Cost or Power Limit
+}
+
 var ErrEVDisconnected = errors.New("ev is disconnected")
+var ErrNotSupported = errors.New("function is not supported")

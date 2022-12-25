@@ -5,21 +5,22 @@ import (
 	"github.com/enbility/eebus-go/logging"
 	"github.com/enbility/eebus-go/spine"
 	"github.com/enbility/eebus-go/spine/model"
+	"github.com/enbility/eebus-go/util"
 )
 
 // Internal EventHandler Interface for the CEM
 func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
-	// we only care about the registered SKI
+	// only care about the registered SKI
 	if payload.Ski != e.ski {
 		return
 	}
 
-	// we care only about events for this remote device
+	// only care about events for this remote device
 	if payload.Device != nil && payload.Device.Ski() != e.ski {
 		return
 	}
 
-	// we care only about events from an EVSE or EV entity or device changes for this remote device
+	// only care about events from an EVSE or EV entity or device changes for this remote device
 	if payload.Entity != nil {
 		entityType := payload.Entity.EntityType()
 		if entityType != model.EntityTypeTypeEVSE && entityType != model.EntityTypeTypeEV {
@@ -58,147 +59,203 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 	case spine.EventTypeDataChange:
 		if payload.ChangeType == spine.ElementChangeUpdate {
 			switch payload.Data.(type) {
-			/*
-				case *model.DeviceClassificationManufacturerDataType:
-					var feature *features.DeviceClassification
-					if entityType == model.EntityTypeTypeEVSE {
-						feature = e.evseDeviceClassification
-					} else {
-						feature = e.evDeviceClassification
-					}
-					_, err := feature.GetManufacturerDetails()
-					if err != nil {
-						logging.Log.Error("Error getting manufacturer data:", err)
-						return
-					}
-
-					// TODO: provide the current data to the CEM
-			*/
 			case *model.DeviceConfigurationKeyValueDescriptionListDataType:
 				if e.evDeviceConfiguration == nil {
 					break
 				}
+
 				// key value descriptions received, now get the data
-				_, err := e.evDeviceConfiguration.RequestKeyValues()
-				if err != nil {
+				if _, err := e.evDeviceConfiguration.RequestKeyValues(); err != nil {
 					logging.Log.Error("Error getting configuration key values:", err)
 				}
-
-				/*
-					case *model.DeviceConfigurationKeyValueListDataType:
-						data, err := e.evDeviceConfiguration.GetValues()
-						if err != nil {
-							logging.Log.Error("Error getting device configuration values:", err)
-							return
-						}
-
-						// TODO: provide the device configuration data
-						logging.Log.Debugf("Device Configuration Values: %#v\n", data)
-				*/
-
-				/*
-					case *model.DeviceDiagnosisStateDataType:
-						var feature *features.DeviceDiagnosis
-						if entityType == model.EntityTypeTypeEVSE {
-							feature = e.evseDeviceDiagnosis
-						} else {
-							feature = e.evDeviceDiagnosis
-						}
-						_, err := feature.GetState()
-						if err != nil {
-							logging.Log.Error("Error getting device diagnosis state:", err)
-						}
-				*/
-
-				/*
-					case *model.ElectricalConnectionDescriptionListDataType:
-						data, err := e.evElectricalConnection.GetDescription()
-						if err != nil {
-							logging.Log.Error("Error getting electrical description:", err)
-							return
-						}
-
-						// TODO: provide the electrical description data
-						logging.Log.Debugf("Electrical Description: %#v\n", data)
-				*/
 
 			case *model.ElectricalConnectionParameterDescriptionListDataType:
 				if e.evElectricalConnection == nil {
 					break
 				}
-				_, err := e.evElectricalConnection.RequestPermittedValueSets()
-				if err != nil {
+				if _, err := e.evElectricalConnection.RequestPermittedValueSets(); err != nil {
 					logging.Log.Error("Error getting electrical permitted values:", err)
 				}
-
-				/*
-					case *model.ElectricalConnectionPermittedValueSetListDataType:
-						data, err := e.evElectricalConnection.GetEVLimitValues()
-						if err != nil {
-							logging.Log.Error("Error getting electrical limit values:", err)
-							return
-						}
-
-						// TODO: provide the electrical limit data
-						logging.Log.Debugf("Electrical Permitted Values: %#v\n", data)
-				*/
 
 			case *model.LoadControlLimitDescriptionListDataType:
 				if e.evLoadControl == nil {
 					break
 				}
-				_, err := e.evLoadControl.RequestLimitValues()
-				if err != nil {
+				if _, err := e.evLoadControl.RequestLimitValues(); err != nil {
 					logging.Log.Error("Error getting loadcontrol limit values:", err)
 				}
-
-				/*
-					case *model.LoadControlLimitListDataType:
-						data, err := e.evLoadControl.GetLimitValues()
-						if err != nil {
-							logging.Log.Error("Error getting loadcontrol limit values:", err)
-							return
-						}
-
-						// TODO: provide the loadcontrol limit data
-						logging.Log.Debugf("Loadcontrol Limits: %#v\n", data)
-				*/
 
 			case *model.MeasurementDescriptionListDataType:
 				if e.evMeasurement == nil {
 					break
 				}
-				_, err := e.evMeasurement.RequestValues()
-				if err != nil {
+				if _, err := e.evMeasurement.RequestValues(); err != nil {
 					logging.Log.Error("Error getting measurement list values:", err)
 				}
 
-				/*
-					case *model.MeasurementListDataType:
-						data, err := e.evMeasurement.GetValues()
-						if err != nil {
-							logging.Log.Error("Error getting measurement values:", err)
-							return
+			case *model.TimeSeriesDescriptionListDataType:
+				if e.evTimeSeries == nil || payload.CmdClassifier == nil {
+					break
+				}
+
+				switch *payload.CmdClassifier {
+				case model.CmdClassifierTypeReply:
+					if err := e.evTimeSeries.RequestConstraints(); err == nil {
+						break
+					}
+
+					// if constraints do not exist, directly request values
+					e.evRequestTimeSeriesValues()
+
+				case model.CmdClassifierTypeNotify:
+					// check if we are required to update the plan
+					if !e.evCheckTimeSeriesDescriptionConstraintsUpdateRequired() {
+						break
+					}
+
+					energy, duration, err := e.EVEnergyDemand()
+					if err != nil {
+						logging.Log.Error("Error getting energy demand:", err)
+						break
+					}
+
+					// request CEM for power limits
+					minSlots, maxSlots, minDuration, maxDuration, durationStepSize := e.EVGetPowerConstraints()
+					if err != nil {
+						logging.Log.Error("Error getting timeseries constraints:", err)
+					} else {
+						if e.dataProvider == nil {
+							break
 						}
+						e.dataProvider.EVRequestPowerLimits(energy, duration, minSlots, maxSlots, minDuration, maxDuration, durationStepSize)
+					}
+				}
 
-						// TODO: provide the measurement data
-						logging.Log.Debugf("Measurements: %#v\n", data)
-				*/
+			case *model.TimeSeriesConstraintsListDataType:
+				if e.evTimeSeries == nil || payload.CmdClassifier == nil {
+					break
+				}
 
-				/*
-					case *model.IdentificationListDataType:
-						data, err := e.evIdentification.GetValues()
-						if err != nil {
-							logging.Log.Error("Error getting identification values:", err)
-							return
-						}
+				if *payload.CmdClassifier != model.CmdClassifierTypeReply {
+					break
+				}
 
-						// TODO: provide the device configuration data
-						logging.Log.Debugf("Identification Values: %#v\n", data)
-				*/
+				if err := e.evTimeSeries.RequestConstraints(); err == nil {
+					break
+				}
+
+				e.evRequestTimeSeriesValues()
+
+			case *model.TimeSeriesListDataType:
+				if e.evTimeSeries == nil || payload.CmdClassifier == nil {
+					break
+				}
+
+				if *payload.CmdClassifier != model.CmdClassifierTypeNotify {
+					break
+				}
+
+				// check if we received a plan
+				e.evForwardChargePlanIfProvided()
+
+			case *model.IncentiveDescriptionDataType:
+				if e.evIncentiveTable == nil || payload.CmdClassifier == nil {
+					break
+				}
+
+				switch *payload.CmdClassifier {
+				case model.CmdClassifierTypeReply:
+					if err := e.evIncentiveTable.RequestConstraints(); err != nil {
+						break
+					}
+
+					// if constraints do not exist, directly request values
+					e.evRequestIncentiveValues()
+
+				case model.CmdClassifierTypeNotify:
+					// check if we are required to update the plan
+					if e.dataProvider == nil || !e.evCheckIncentiveTableDescriptionUpdateRequired() {
+						break
+					}
+
+					_, duration, err := e.EVEnergyDemand()
+					if err != nil {
+						logging.Log.Error("Error getting energy demand:", err)
+						break
+					}
+
+					min, max := e.EVGetIncentiveConstraints()
+
+					// request CEM for incentives
+					e.dataProvider.EVRequestIncentives(duration, min, max)
+				}
+
+			case *model.IncentiveTableConstraintsDataType:
+				if *payload.CmdClassifier == model.CmdClassifierTypeReply {
+					e.evRequestIncentiveValues()
+				}
 			}
 		}
 	}
+}
+
+// request time series values
+func (e *EMobilityImpl) evRequestTimeSeriesValues() {
+	if e.evTimeSeries == nil {
+		return
+	}
+
+	if _, err := e.evTimeSeries.RequestValues(); err != nil {
+		logging.Log.Error("Error getting time series list values:", err)
+	}
+}
+
+// send the ev provided charge plan to the CEM
+func (e *EMobilityImpl) evForwardChargePlanIfProvided() {
+	if e.evTimeSeries == nil || e.dataProvider == nil {
+		return
+	}
+
+	timeSeries, err := e.evTimeSeries.GetValueForType(model.TimeSeriesTypeTypePlan)
+	if err != nil {
+		return
+	}
+
+	if len(timeSeries.TimeSeriesSlot) == 0 {
+		return
+	}
+
+	var data []EVDurationSlotValue
+
+	for _, slot := range timeSeries.TimeSeriesSlot {
+		duration, err := slot.Duration.GetTimeDuration()
+		if err != nil {
+			logging.Log.Error("ev charge plan contains invalid duration:", err)
+			return
+		}
+
+		item := EVDurationSlotValue{
+			Duration: duration,
+			Value:    slot.Value.GetValue(),
+		}
+
+		data = append(data, item)
+	}
+
+	e.dataProvider.EVProvideChargePlan(data)
+}
+
+// request incentive table values
+func (e *EMobilityImpl) evRequestIncentiveValues() {
+	if e.evIncentiveTable == nil {
+		return
+	}
+
+	if _, err := e.evIncentiveTable.RequestValues(); err != nil {
+		logging.Log.Error("Error getting time series list values:", err)
+	}
+
+	e.evWriteIncentiveTableDescriptions()
 }
 
 // process required steps when an evse is connected
@@ -247,11 +304,10 @@ func (e *EMobilityImpl) evDisconnected() {
 	e.evMeasurement = nil
 	e.evIdentification = nil
 	e.evLoadControl = nil
+	e.evTimeSeries = nil
+	e.evIncentiveTable = nil
 
 	logging.Log.Info("ev disconnected")
-
-	// TODO: add error handling
-
 }
 
 // an EV was connected, trigger required communication
@@ -261,8 +317,6 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 
 	logging.Log.Info("ev connected")
 
-	// TODO: add error handling
-
 	// setup features
 	e.evDeviceClassification, _ = features.NewDeviceClassification(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 	e.evDeviceDiagnosis, _ = features.NewDeviceDiagnosis(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
@@ -271,96 +325,206 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 	e.evMeasurement, _ = features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 	e.evIdentification, _ = features.NewIdentification(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 	e.evLoadControl, _ = features.NewLoadControl(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	e.evTimeSeries, _ = features.NewTimeSeries(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	e.evIncentiveTable, _ = features.NewIncentiveTable(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+
+	// optional requests are only logged as debug
 
 	// subscribe
 	if err := e.evDeviceClassification.SubscribeForEntity(); err != nil {
 		logging.Log.Error(err)
-		return
 	}
 	if err := e.evDeviceConfiguration.SubscribeForEntity(); err != nil {
 		logging.Log.Error(err)
-		return
 	}
 	if err := e.evDeviceDiagnosis.SubscribeForEntity(); err != nil {
 		logging.Log.Error(err)
-		return
 	}
 	if err := e.evElectricalConnection.SubscribeForEntity(); err != nil {
 		logging.Log.Error(err)
-		return
 	}
 	if err := e.evMeasurement.SubscribeForEntity(); err != nil {
 		logging.Log.Error(err)
-		return
-	}
-	if err := e.evIdentification.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
-		return
 	}
 	if err := e.evLoadControl.SubscribeForEntity(); err != nil {
 		logging.Log.Error(err)
-		return
 	}
-	// if err := util.SubscribeTimeSeriesForEntity(e.service, entity); err != nil {
-	// 	logging.Log.Error(err)
-	// 	return
-	// }
-	// if err := util.SubscribeIncentiveTableForEntity(e.service, entity); err != nil {
-	// 	logging.Log.Error(err)
-	// 	return
-	// }
+	if err := e.evIdentification.SubscribeForEntity(); err != nil {
+		logging.Log.Debug(err)
+	}
+	if err := e.evTimeSeries.SubscribeForEntity(); err != nil {
+		logging.Log.Debug(err)
+	}
+	// this is optional
+	if err := e.evIncentiveTable.SubscribeForEntity(); err != nil {
+		logging.Log.Debug(err)
+	}
 
 	// bindings
 	if err := e.evLoadControl.Bind(); err != nil {
 		logging.Log.Error(err)
-		return
+	}
+
+	// this is optional
+	if err := e.evTimeSeries.Bind(); err != nil {
+		logging.Log.Debug(err)
+	}
+
+	// this is optional
+	if err := e.evIncentiveTable.Bind(); err != nil {
+		logging.Log.Debug(err)
 	}
 
 	// get ev configuration data
 	if err := e.evDeviceConfiguration.RequestDescriptions(); err != nil {
 		logging.Log.Error(err)
-		return
 	}
 
 	// get manufacturer details
 	if _, err := e.evDeviceClassification.RequestManufacturerDetails(); err != nil {
-		logging.Log.Error(err)
-		return
+		logging.Log.Debug(err)
 	}
 
 	// get device diagnosis state
 	if _, err := e.evDeviceDiagnosis.RequestState(); err != nil {
 		logging.Log.Error(err)
-		return
 	}
 
 	// get electrical connection parameter
 	if err := e.evElectricalConnection.RequestDescriptions(); err != nil {
 		logging.Log.Error(err)
-		return
 	}
 
 	if err := e.evElectricalConnection.RequestParameterDescriptions(); err != nil {
 		logging.Log.Error(err)
-		return
 	}
 
 	// get measurement parameters
 	if err := e.evMeasurement.RequestDescriptions(); err != nil {
 		logging.Log.Error(err)
-		return
-	}
-
-	// get identification
-	if _, err := e.evIdentification.RequestValues(); err != nil {
-		logging.Log.Error(err)
-		return
 	}
 
 	// get loadlimit parameter
 	if err := e.evLoadControl.RequestLimitDescriptions(); err != nil {
 		logging.Log.Error(err)
+	}
+
+	// get identification
+	if _, err := e.evIdentification.RequestValues(); err != nil {
+		logging.Log.Debug(err)
+	}
+
+	// get time series parameter
+	if err := e.evTimeSeries.RequestDescriptions(); err != nil {
+		logging.Log.Debug(err)
+	}
+
+	// get incentive table parameter
+	if err := e.evIncentiveTable.RequestDescriptions(); err != nil {
+		logging.Log.Debug(err)
+	}
+}
+
+// inform the EVSE about used currency and boundary units
+//
+// # SPINE UC CoordinatedEVCharging 2.4.3
+func (e *EMobilityImpl) evWriteIncentiveTableDescriptions() {
+	if e.evIncentiveTable == nil {
 		return
 	}
 
+	descriptions, err := e.evIncentiveTable.GetDescriptionsForScope(model.ScopeTypeTypeSimpleIncentiveTable)
+	if err != nil {
+		logging.Log.Error(err)
+		return
+	}
+
+	// - tariff, min 1
+	//   each tariff has
+	//   - tiers: min 1, max 3
+	//     each tier has:
+	//     - boundaries: min 1, used for different power limits, e.g. 0-1kW x€, 1-3kW y€, ...
+	//     - incentives: min 1, max 3
+	//       - price/costs (absolute or relative)
+	//       - renewable energy percentage
+	//       - CO2 emissions
+	//
+	// limit this to
+	// - 1 tariff
+	//   - 1 tier
+	//     - 1 boundary
+	//     - 1 incentive (price)
+	//       incentive type has to be the same for all sent power limits!
+	data := []model.IncentiveTableDescriptionType{
+		{
+			TariffDescription: descriptions[0].TariffDescription,
+			Tier: []model.IncentiveTableDescriptionTierType{
+				{
+					TierDescription: &model.TierDescriptionDataType{
+						TierId:   util.Ptr(model.TierIdType(1)),
+						TierType: util.Ptr(model.TierTypeTypeDynamicCost),
+					},
+					BoundaryDescription: []model.TierBoundaryDescriptionDataType{
+						{
+							BoundaryId:   util.Ptr(model.TierBoundaryIdType(1)),
+							BoundaryType: util.Ptr(model.TierBoundaryTypeTypePowerBoundary),
+							BoundaryUnit: util.Ptr(model.UnitOfMeasurementTypeW),
+						},
+					},
+					IncentiveDescription: []model.IncentiveDescriptionDataType{
+						{
+							IncentiveId:   util.Ptr(model.IncentiveIdType(1)),
+							IncentiveType: util.Ptr(model.IncentiveTypeTypeAbsoluteCost),
+							Currency:      util.Ptr(e.currency),
+						},
+					},
+				},
+			},
+		},
+	}
+
+	_, err = e.evIncentiveTable.WriteDescriptions(data)
+	if err != nil {
+		logging.Log.Error(err)
+	}
+}
+
+// check timeSeries descriptions if constraints element has updateRequired set to true
+// as this triggers the CEM to send power tables within 20s
+func (e *EMobilityImpl) evCheckTimeSeriesDescriptionConstraintsUpdateRequired() bool {
+	if e.evTimeSeries == nil {
+		return false
+	}
+
+	data, err := e.evTimeSeries.GetDescriptionForType(model.TimeSeriesTypeTypeConstraints)
+	if err != nil {
+		return false
+	}
+
+	if data.UpdateRequired != nil {
+		return *data.UpdateRequired
+	}
+
+	return false
+}
+
+// check incentibeTable descriptions if the tariff description has updateRequired set to true
+// as this triggers the CEM to send incentive tables within 20s
+func (e *EMobilityImpl) evCheckIncentiveTableDescriptionUpdateRequired() bool {
+	if e.evIncentiveTable == nil {
+		return false
+	}
+
+	data, err := e.evIncentiveTable.GetDescriptionsForScope(model.ScopeTypeTypeSimpleIncentiveTable)
+	if err != nil {
+		return false
+	}
+
+	// only use the first description and therein the first tariff
+	item := data[0].TariffDescription
+	if item.UpdateRequired != nil {
+		return *item.UpdateRequired
+	}
+
+	return false
 }

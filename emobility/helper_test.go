@@ -134,11 +134,93 @@ func setupDevices(eebusService *service.EEBUSService) (*spine.DeviceLocalImpl, *
 	localEntity.AddFeature(f)
 	f = spine.NewFeatureLocalImpl(6, localEntity, model.FeatureTypeTypeLoadControl, model.RoleTypeClient)
 	localEntity.AddFeature(f)
+	f = spine.NewFeatureLocalImpl(6, localEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeClient)
+	localEntity.AddFeature(f)
 
 	writeHandler := &WriteMessageHandler{}
 	remoteDevice := spine.NewDeviceRemoteImpl(localDevice, remoteSki, writeHandler)
 
+	var clientRemoteFeatures = []struct {
+		featureType   model.FeatureTypeType
+		supportedFcts []model.FunctionType
+	}{
+		{
+			model.FeatureTypeTypeDeviceDiagnosis,
+			[]model.FunctionType{},
+		},
+		{
+			model.FeatureTypeTypeDeviceConfiguration,
+			[]model.FunctionType{
+				model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData,
+				model.FunctionTypeDeviceConfigurationKeyValueListData,
+			},
+		},
+		{model.FeatureTypeTypeElectricalConnection,
+			[]model.FunctionType{
+				model.FunctionTypeElectricalConnectionDescriptionListData,
+				model.FunctionTypeElectricalConnectionParameterDescriptionListData,
+				model.FunctionTypeElectricalConnectionPermittedValueSetListData,
+			},
+		},
+		{
+			model.FeatureTypeTypeMeasurement,
+			[]model.FunctionType{
+				model.FunctionTypeMeasurementDescriptionListData,
+				model.FunctionTypeMeasurementListData,
+			},
+		},
+		{
+			model.FeatureTypeTypeLoadControl,
+			[]model.FunctionType{
+				model.FunctionTypeLoadControlLimitDescriptionListData,
+				model.FunctionTypeLoadControlLimitListData,
+			},
+		},
+		{
+			model.FeatureTypeTypeIdentification,
+			[]model.FunctionType{
+				model.FunctionTypeIdentificationListData,
+			},
+		},
+		{model.FeatureTypeTypeTimeSeries,
+			[]model.FunctionType{
+				model.FunctionTypeTimeSeriesDescriptionListData,
+				model.FunctionTypeTimeSeriesListData,
+				model.FunctionTypeTimeSeriesConstraintsListData,
+			},
+		},
+	}
+
 	remoteDeviceName := "remote"
+
+	var featureInformations []model.NodeManagementDetailedDiscoveryFeatureInformationType
+	for index, feature := range clientRemoteFeatures {
+		supportedFcts := []model.FunctionPropertyType{}
+		for _, fct := range feature.supportedFcts {
+			supportedFct := model.FunctionPropertyType{
+				Function: util.Ptr(fct),
+				PossibleOperations: &model.PossibleOperationsType{
+					Read: &model.PossibleOperationsReadType{},
+				},
+			}
+			supportedFcts = append(supportedFcts, supportedFct)
+		}
+
+		featureInformation := model.NodeManagementDetailedDiscoveryFeatureInformationType{
+			Description: &model.NetworkManagementFeatureDescriptionDataType{
+				FeatureAddress: &model.FeatureAddressType{
+					Device:  util.Ptr(model.AddressDeviceType(remoteDeviceName)),
+					Entity:  []model.AddressEntityType{1, 1},
+					Feature: util.Ptr(model.AddressFeatureType(index)),
+				},
+				FeatureType:       util.Ptr(feature.featureType),
+				Role:              util.Ptr(model.RoleTypeServer),
+				SupportedFunction: supportedFcts,
+			},
+		}
+		featureInformations = append(featureInformations, featureInformation)
+	}
+
 	detailedData := &model.NodeManagementDetailedDiscoveryDataType{
 		DeviceInformation: &model.NodeManagementDetailedDiscoveryDeviceInformationType{
 			Description: &model.NetworkManagementDeviceDescriptionDataType{
@@ -167,144 +249,7 @@ func setupDevices(eebusService *service.EEBUSService) (*spine.DeviceLocalImpl, *
 				},
 			},
 		},
-		FeatureInformation: []model.NodeManagementDetailedDiscoveryFeatureInformationType{
-			{
-				Description: &model.NetworkManagementFeatureDescriptionDataType{
-					FeatureAddress: &model.FeatureAddressType{
-						Device:  util.Ptr(model.AddressDeviceType(remoteDeviceName)),
-						Entity:  []model.AddressEntityType{1, 1},
-						Feature: util.Ptr(model.AddressFeatureType(1)),
-					},
-					FeatureType: util.Ptr(model.FeatureTypeTypeDeviceDiagnosis),
-					Role:        util.Ptr(model.RoleTypeServer),
-				},
-			},
-			{
-				Description: &model.NetworkManagementFeatureDescriptionDataType{
-					FeatureAddress: &model.FeatureAddressType{
-						Device:  util.Ptr(model.AddressDeviceType(remoteDeviceName)),
-						Entity:  []model.AddressEntityType{1, 1},
-						Feature: util.Ptr(model.AddressFeatureType(2)),
-					},
-					FeatureType: util.Ptr(model.FeatureTypeTypeElectricalConnection),
-					Role:        util.Ptr(model.RoleTypeServer),
-					SupportedFunction: []model.FunctionPropertyType{
-						{
-							Function: util.Ptr(model.FunctionTypeElectricalConnectionDescriptionListData),
-							PossibleOperations: &model.PossibleOperationsType{
-								Read: &model.PossibleOperationsReadType{},
-							},
-						},
-						{
-							Function: util.Ptr(model.FunctionTypeElectricalConnectionParameterDescriptionListData),
-							PossibleOperations: &model.PossibleOperationsType{
-								Read: &model.PossibleOperationsReadType{},
-							},
-						},
-						{
-							Function: util.Ptr(model.FunctionTypeElectricalConnectionPermittedValueSetListData),
-							PossibleOperations: &model.PossibleOperationsType{
-								Read: &model.PossibleOperationsReadType{},
-							},
-						},
-					},
-				},
-			},
-			{
-				Description: &model.NetworkManagementFeatureDescriptionDataType{
-					FeatureAddress: &model.FeatureAddressType{
-						Device:  util.Ptr(model.AddressDeviceType(remoteDeviceName)),
-						Entity:  []model.AddressEntityType{1, 1},
-						Feature: util.Ptr(model.AddressFeatureType(3)),
-					},
-					FeatureType: util.Ptr(model.FeatureTypeTypeMeasurement),
-					Role:        util.Ptr(model.RoleTypeServer),
-					SupportedFunction: []model.FunctionPropertyType{
-						{
-							Function: util.Ptr(model.FunctionTypeMeasurementDescriptionListData),
-							PossibleOperations: &model.PossibleOperationsType{
-								Read: &model.PossibleOperationsReadType{},
-							},
-						},
-						{
-							Function: util.Ptr(model.FunctionTypeMeasurementListData),
-							PossibleOperations: &model.PossibleOperationsType{
-								Read: &model.PossibleOperationsReadType{},
-							},
-						},
-					},
-				},
-			},
-			{
-				Description: &model.NetworkManagementFeatureDescriptionDataType{
-					FeatureAddress: &model.FeatureAddressType{
-						Device:  util.Ptr(model.AddressDeviceType(remoteDeviceName)),
-						Entity:  []model.AddressEntityType{1, 1},
-						Feature: util.Ptr(model.AddressFeatureType(4)),
-					},
-					FeatureType: util.Ptr(model.FeatureTypeTypeDeviceConfiguration),
-					Role:        util.Ptr(model.RoleTypeServer),
-					SupportedFunction: []model.FunctionPropertyType{
-						{
-							Function: util.Ptr(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData),
-							PossibleOperations: &model.PossibleOperationsType{
-								Read: &model.PossibleOperationsReadType{},
-							},
-						},
-						{
-							Function: util.Ptr(model.FunctionTypeDeviceConfigurationKeyValueListData),
-							PossibleOperations: &model.PossibleOperationsType{
-								Read: &model.PossibleOperationsReadType{},
-							},
-						},
-					},
-				},
-			},
-			{
-				Description: &model.NetworkManagementFeatureDescriptionDataType{
-					FeatureAddress: &model.FeatureAddressType{
-						Device:  util.Ptr(model.AddressDeviceType(remoteDeviceName)),
-						Entity:  []model.AddressEntityType{1, 1},
-						Feature: util.Ptr(model.AddressFeatureType(5)),
-					},
-					FeatureType: util.Ptr(model.FeatureTypeTypeIdentification),
-					Role:        util.Ptr(model.RoleTypeServer),
-					SupportedFunction: []model.FunctionPropertyType{
-						{
-							Function: util.Ptr(model.FunctionTypeIdentificationListData),
-							PossibleOperations: &model.PossibleOperationsType{
-								Read: &model.PossibleOperationsReadType{},
-							},
-						},
-					},
-				},
-			},
-			{
-				Description: &model.NetworkManagementFeatureDescriptionDataType{
-					FeatureAddress: &model.FeatureAddressType{
-						Device:  util.Ptr(model.AddressDeviceType(remoteDeviceName)),
-						Entity:  []model.AddressEntityType{1, 1},
-						Feature: util.Ptr(model.AddressFeatureType(6)),
-					},
-					FeatureType: util.Ptr(model.FeatureTypeTypeLoadControl),
-					Role:        util.Ptr(model.RoleTypeServer),
-					SupportedFunction: []model.FunctionPropertyType{
-						{
-							Function: util.Ptr(model.FunctionTypeLoadControlLimitDescriptionListData),
-							PossibleOperations: &model.PossibleOperationsType{
-								Read: &model.PossibleOperationsReadType{},
-							},
-						},
-						{
-							Function: util.Ptr(model.FunctionTypeLoadControlLimitListData),
-							PossibleOperations: &model.PossibleOperationsType{
-								Read: &model.PossibleOperationsReadType{},
-							},
-						},
-					},
-				},
-			},
-		},
+		FeatureInformation: featureInformations,
 	}
 	localDevice.AddRemoteDeviceForSki(remoteSki, remoteDevice)
 
@@ -406,6 +351,14 @@ func identificationConfiguration(localDevice *spine.DeviceLocalImpl, entity *spi
 
 func loadcontrol(localDevice *spine.DeviceLocalImpl, entity *spine.EntityRemoteImpl) *features.LoadControl {
 	feature, err := features.NewLoadControl(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return feature
+}
+
+func timeSeriesConfiguration(localDevice *spine.DeviceLocalImpl, entity *spine.EntityRemoteImpl) *features.TimeSeries {
+	feature, err := features.NewTimeSeries(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 	if err != nil {
 		fmt.Println(err)
 	}

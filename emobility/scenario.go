@@ -7,6 +7,7 @@ import (
 	"github.com/enbility/eebus-go/service"
 	"github.com/enbility/eebus-go/spine"
 	"github.com/enbility/eebus-go/spine/model"
+	"github.com/enbility/eebus-go/util"
 )
 
 type EmobilityScenarioImpl struct {
@@ -15,14 +16,17 @@ type EmobilityScenarioImpl struct {
 	remoteDevices map[string]*EMobilityImpl
 
 	mux sync.Mutex
+
+	currency model.CurrencyType
 }
 
 var _ scenarios.ScenariosI = (*EmobilityScenarioImpl)(nil)
 
-func NewEMobilityScenario(service *service.EEBUSService) *EmobilityScenarioImpl {
+func NewEMobilityScenario(service *service.EEBUSService, currency model.CurrencyType) *EmobilityScenarioImpl {
 	return &EmobilityScenarioImpl{
 		ScenarioImpl:  scenarios.NewScenarioImpl(service),
 		remoteDevices: make(map[string]*EMobilityImpl),
+		currency:      currency,
 	}
 }
 
@@ -30,46 +34,35 @@ func NewEMobilityScenario(service *service.EEBUSService) *EmobilityScenarioImpl 
 func (e *EmobilityScenarioImpl) AddFeatures() {
 	localEntity := e.Service.LocalEntity()
 
+	// server features
 	{
-		f := localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeClient, "Device Configuration Client")
-		f.AddResultHandler(e)
-	}
-	{
-		f := localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceClassification, model.RoleTypeClient, "Device Classification Client")
-		f.AddResultHandler(e)
-	}
-	{
-		f := localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient, "Device Diagnosis Client")
-		f.AddResultHandler(e)
-	}
-	{
-		f := localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer, "Device Diagnosis Server")
+		f := localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
 		f.AddResultHandler(e)
 		f.AddFunctionType(model.FunctionTypeDeviceDiagnosisStateData, true, false)
 
 		// Set the initial state
-		state := model.DeviceDiagnosisOperatingStateTypeNormalOperation
 		deviceDiagnosisStateDate := &model.DeviceDiagnosisStateDataType{
-			OperatingState: &state,
+			OperatingState: util.Ptr(model.DeviceDiagnosisOperatingStateTypeNormalOperation),
 		}
 		f.SetData(model.FunctionTypeDeviceDiagnosisStateData, deviceDiagnosisStateDate)
 
 		f.AddFunctionType(model.FunctionTypeDeviceDiagnosisHeartbeatData, true, false)
 	}
-	{
-		f := localEntity.GetOrAddFeature(model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient, "Electrical Connection Client")
-		f.AddResultHandler(e)
+
+	// client features
+	var clientFeatures = []model.FeatureTypeType{
+		model.FeatureTypeTypeDeviceDiagnosis,
+		model.FeatureTypeTypeDeviceClassification,
+		model.FeatureTypeTypeDeviceConfiguration,
+		model.FeatureTypeTypeElectricalConnection,
+		model.FeatureTypeTypeMeasurement,
+		model.FeatureTypeTypeLoadControl,
+		model.FeatureTypeTypeIdentification,
+		model.FeatureTypeTypeTimeSeries,
+		model.FeatureTypeTypeIncentiveTable,
 	}
-	{
-		f := localEntity.GetOrAddFeature(model.FeatureTypeTypeMeasurement, model.RoleTypeClient, "Measurement Client")
-		f.AddResultHandler(e)
-	}
-	{
-		f := localEntity.GetOrAddFeature(model.FeatureTypeTypeIdentification, model.RoleTypeClient, "Identification Client")
-		f.AddResultHandler(e)
-	}
-	{
-		f := localEntity.GetOrAddFeature(model.FeatureTypeTypeLoadControl, model.RoleTypeClient, "LoadControl Client")
+	for _, feature := range clientFeatures {
+		f := localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
 		f.AddResultHandler(e)
 	}
 }
@@ -121,7 +114,7 @@ func (e *EmobilityScenarioImpl) AddUseCases() {
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
 }
 
-func (e *EmobilityScenarioImpl) RegisterRemoteDevice(details *service.ServiceDetails) any {
+func (e *EmobilityScenarioImpl) RegisterRemoteDevice(details *service.ServiceDetails, dataProvider any) any {
 	// TODO: emobility should be stored per remote SKI and
 	// only be set for the SKI if the device supports it
 	e.mux.Lock()
@@ -131,7 +124,7 @@ func (e *EmobilityScenarioImpl) RegisterRemoteDevice(details *service.ServiceDet
 		return em
 	}
 
-	emobility := NewEMobility(e.Service, details)
+	emobility := NewEMobility(e.Service, details, e.currency, dataProvider.(EmobilityDataProvider))
 	e.remoteDevices[details.SKI()] = emobility
 	return emobility
 }

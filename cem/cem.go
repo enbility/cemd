@@ -3,17 +3,24 @@ package cem
 import (
 	"github.com/enbility/cemd/emobility"
 	"github.com/enbility/cemd/grid"
+	"github.com/enbility/cemd/scenarios"
 	"github.com/enbility/eebus-go/logging"
 	"github.com/enbility/eebus-go/service"
 	"github.com/enbility/eebus-go/spine"
+	"github.com/enbility/eebus-go/spine/model"
 )
+
+type CemConfiguration struct {
+	EmobilityScenarioEnabled bool
+	GridScenarioEnabled      bool
+	Currency                 model.CurrencyType
+}
 
 // Generic CEM implementation
 type CemImpl struct {
 	service *service.EEBUSService
 
-	emobilityScenario *emobility.EmobilityScenarioImpl
-	gridScenario      *grid.GridScenarioImpl
+	emobilityScenario, gridScenario scenarios.ScenariosI
 }
 
 func NewCEM(serviceDescription *service.Configuration, serviceHandler service.EEBUSServiceHandler, log logging.Logging) *CemImpl {
@@ -27,7 +34,7 @@ func NewCEM(serviceDescription *service.Configuration, serviceHandler service.EE
 }
 
 // Set up the supported usecases and features
-func (h *CemImpl) Setup(enableEmobility, enableGrid bool) error {
+func (h *CemImpl) Setup(configuration CemConfiguration) error {
 	if err := h.service.Setup(); err != nil {
 		return err
 	}
@@ -35,14 +42,14 @@ func (h *CemImpl) Setup(enableEmobility, enableGrid bool) error {
 	spine.Events.Subscribe(h)
 
 	// Setup the supported usecases and features
-	if enableEmobility {
-		h.emobilityScenario = emobility.NewEMobilityScenario(h.service)
+	if configuration.EmobilityScenarioEnabled {
+		h.emobilityScenario = emobility.NewEMobilityScenario(h.service, configuration.Currency)
 		h.emobilityScenario.AddFeatures()
 		h.emobilityScenario.AddUseCases()
 	}
 
 	// Setup the supported usecases and features
-	if enableGrid {
+	if configuration.GridScenarioEnabled {
 		h.gridScenario = grid.NewGridScenario(h.service)
 		h.gridScenario.AddFeatures()
 		h.gridScenario.AddUseCases()
@@ -59,8 +66,8 @@ func (h *CemImpl) Shutdown() {
 	h.service.Shutdown()
 }
 
-func (h *CemImpl) RegisterEmobilityRemoteDevice(details *service.ServiceDetails) *emobility.EMobilityImpl {
-	impl := h.emobilityScenario.RegisterRemoteDevice(details)
+func (h *CemImpl) RegisterEmobilityRemoteDevice(details *service.ServiceDetails, dataProvider emobility.EmobilityDataProvider) *emobility.EMobilityImpl {
+	impl := h.emobilityScenario.RegisterRemoteDevice(details, dataProvider)
 	return impl.(*emobility.EMobilityImpl)
 }
 
@@ -69,7 +76,7 @@ func (h *CemImpl) UnRegisterEmobilityRemoteDevice(remoteDeviceSki string) error 
 }
 
 func (h *CemImpl) RegisterGridRemoteDevice(details *service.ServiceDetails) *grid.GridImpl {
-	impl := h.gridScenario.RegisterRemoteDevice(details)
+	impl := h.gridScenario.RegisterRemoteDevice(details, nil)
 	return impl.(*grid.GridImpl)
 }
 

@@ -1,12 +1,58 @@
 package emobility
 
 import (
+	"time"
+
 	"github.com/enbility/eebus-go/features"
 	"github.com/enbility/eebus-go/service"
 	"github.com/enbility/eebus-go/spine"
+	"github.com/enbility/eebus-go/spine/model"
 	"github.com/enbility/eebus-go/util"
 )
 
+// used by emobility and implemented by the CEM
+type EmobilityDataProvider interface {
+	// Energy demand and duration is provided by the EV which requires the CEM
+	// to respond with time slots containing power limits for each slot
+	//
+	// `EVWritePowerLimits` must be invoked within <55s, idealy <15s, after receiving this call
+	//
+	// Parameters:
+	//   - energy: energy demand in Wh
+	//   - duration: timeframe in which the energy demand is required
+	//   - minSlots: the minimum number of slots, no minimum if 0
+	//   - maxSlots: the maximum number of slots, unlimited if 0
+	//   - minSlotDuration: the minimum duration of a slot, no minimum if 0
+	//   - maxSlotDuration: the maximum duration of a slot, unlimited if 0
+	//   - slotDurationStepSize: the duration has to be a multiple of this value if != 0
+	//
+	// General:
+	//  - If duration and energy is 0, charge mode is EVChargeStrategyTypeNoDemand
+	//  - If duration is 0, charge mode is EVChargeStrategyTypeDirectCharging and the slots should cover at least 48h
+	//  - If both are != 0, charge mode is EVChargeStrategyTypeTimedCharging and the slots should cover at least the duration, but at max 168h (7d)
+	EVRequestPowerLimits(energy float64, duration time.Duration, minSlots, maxSlots uint, minSlotDuration, maxSlotDuration, slotDurationStepSize time.Duration)
+
+	// Energy demand and duration is provided by the EV which requires the CEM
+	// to respond with time slots containing incentives for each slot
+	//
+	// `EVWriteIncentives` must be invoked within <20s after receiving this call
+	//
+	// Parameters:
+	//   - duration: timeframe in which the energy demand is required
+	//   - minSlots: minimum amount of slots required
+	//   - maxSlots: maximum amount of slots allowed
+	//
+	// General:
+	//  - If duration and energy is 0, charge mode is EVChargeStrategyTypeNoDemand
+	//  - If duration is 0, charge mode is EVChargeStrategyTypeDirectCharging and the slots should cover at least 48h
+	//  - If both are != 0, charge mode is EVChargeStrategyTypeTimedCharging and the slots should cover at least the duration, but at max 168h (7d)
+	EVRequestIncentives(duration time.Duration, minSlots, maxSlots uint)
+
+	// The EV provided a charge plan
+	EVProvideChargePlan(data []EVDurationSlotValue)
+}
+
+// used by the CEM and implemented by emobility
 type EmobilityI interface {
 	// return the current charge sate of the EV
 	EVCurrentChargeState() (EVChargeStateType, error)
@@ -131,6 +177,45 @@ type EmobilityI interface {
 	//   - ErrDataNotAvailable if that information is not (yet) available
 	//   - and others
 	EVCoordinatedChargingSupported() (bool, error)
+
+	// returns the current charging stratey
+	//
+	// returns EVChargeStrategyTypeUnknown if it could not be determined, e.g.
+	// if the vehicle communication is via IEC61851 or the EV doesn't provide
+	// any information about its charging mode or plan
+	EVChargeStrategy() EVChargeStrategyType
+
+	// returns the current energy demand
+	EVEnergyDemand() (float64, time.Duration, error)
+
+	// returns the constraints for the power slots
+	//   - minSlots: the minimum number of slots, no minimum if 0
+	//   - maxSlots: the maximum number of slots, unlimited if 0
+	//   - minSlotDuration: the minimum duration of a slot, no minimum if 0
+	//   - maxSlotDuration: the maximum duration of a slot, unlimited if 0
+	//   - slotDurationStepSize: the duration has to be a multiple of this value if != 0
+	EVGetPowerConstraints() (uint, uint, time.Duration, time.Duration, time.Duration)
+
+	// send power limits data to the EV
+	//
+	// returns an error if sending failed or charge slot count do not meet requirements
+	//
+	// this needs to be invoked either <55s, idealy <15s, of receiving a call to EVRequestPowerLimits
+	// or if the CEM requires the EV to change its charge plan
+	EVWritePowerLimits(data []EVDurationSlotValue) error
+
+	// returns the constraints for incentive slots
+	//   - minimum number of incentive slots, no minimum if 0
+	//   - maximum number of incentive slots, unlimited if 0
+	EVGetIncentiveConstraints() (uint, uint)
+
+	// send price slots data to the EV
+	//
+	// returns an error if sending failed or charge slot count do not meet requirements
+	//
+	// this needs to be invoked either within 20s of receiving a call to EVRequestIncentives
+	// or if the CEM requires the EV to change its charge plan
+	EVWriteIncentives(data []EVDurationSlotValue) error
 }
 
 type EMobilityImpl struct {
@@ -151,20 +236,27 @@ type EMobilityImpl struct {
 	evMeasurement          *features.Measurement
 	evIdentification       *features.Identification
 	evLoadControl          *features.LoadControl
+	evTimeSeries           *features.TimeSeries
+	evIncentiveTable       *features.IncentiveTable
 
-	ski string
+	ski      string
+	currency model.CurrencyType
+
+	dataProvider EmobilityDataProvider
 }
 
 var _ EmobilityI = (*EMobilityImpl)(nil)
 
 // Add E-Mobility support
-func NewEMobility(service *service.EEBUSService, details *service.ServiceDetails) *EMobilityImpl {
+func NewEMobility(service *service.EEBUSService, details *service.ServiceDetails, currency model.CurrencyType, dataProvider EmobilityDataProvider) *EMobilityImpl {
 	ski := util.NormalizeSKI(details.SKI())
 
 	emobility := &EMobilityImpl{
-		service: service,
-		entity:  service.LocalEntity(),
-		ski:     ski,
+		service:      service,
+		entity:       service.LocalEntity(),
+		ski:          ski,
+		currency:     currency,
+		dataProvider: dataProvider,
 	}
 	spine.Events.Subscribe(emobility)
 
