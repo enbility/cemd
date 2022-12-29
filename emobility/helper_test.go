@@ -136,6 +136,8 @@ func setupDevices(eebusService *service.EEBUSService) (*spine.DeviceLocalImpl, *
 	localEntity.AddFeature(f)
 	f = spine.NewFeatureLocalImpl(6, localEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeClient)
 	localEntity.AddFeature(f)
+	f = spine.NewFeatureLocalImpl(6, localEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeClient)
+	localEntity.AddFeature(f)
 
 	writeHandler := &WriteMessageHandler{}
 	remoteDevice := spine.NewDeviceRemoteImpl(localDevice, remoteSki, writeHandler)
@@ -187,6 +189,11 @@ func setupDevices(eebusService *service.EEBUSService) (*spine.DeviceLocalImpl, *
 				model.FunctionTypeTimeSeriesDescriptionListData,
 				model.FunctionTypeTimeSeriesListData,
 				model.FunctionTypeTimeSeriesConstraintsListData,
+			},
+		},
+		{model.FeatureTypeTypeIncentiveTable,
+			[]model.FunctionType{
+				model.FunctionTypeIncentiveTableConstraintsData,
 			},
 		},
 	}
@@ -359,6 +366,14 @@ func loadcontrol(localDevice *spine.DeviceLocalImpl, entity *spine.EntityRemoteI
 
 func timeSeriesConfiguration(localDevice *spine.DeviceLocalImpl, entity *spine.EntityRemoteImpl) *features.TimeSeries {
 	feature, err := features.NewTimeSeries(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return feature
+}
+
+func incentiveTableConfiguration(localDevice *spine.DeviceLocalImpl, entity *spine.EntityRemoteImpl) *features.IncentiveTable {
+	feature, err := features.NewIncentiveTable(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 	if err != nil {
 		fmt.Println(err)
 	}
