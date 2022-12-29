@@ -63,13 +63,13 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 	err = localDevice.ProcessCmd(datagramtt, remoteDevice)
 	assert.Nil(t, err)
 
-	minDemand, optDemand, maxDemand, durationStart, durationEnd, err := emobility.EVEnergyDemand()
+	demand, err := emobility.EVEnergyDemand()
 	assert.Nil(t, err)
-	assert.Equal(t, 0.0, minDemand)
-	assert.Equal(t, 0.0, optDemand)
-	assert.Equal(t, 74690.0, maxDemand)
-	assert.Equal(t, time.Duration(0), durationStart)
-	assert.Equal(t, time.Duration(0), durationEnd)
+	assert.Equal(t, 0.0, demand.MinDemand)
+	assert.Equal(t, 0.0, demand.OptDemand)
+	assert.Equal(t, 74690.0, demand.MaxDemand)
+	assert.Equal(t, time.Duration(0), demand.DurationUntilStart)
+	assert.Equal(t, time.Duration(0), demand.DurationUntilEnd)
 
 	// the final plan
 
@@ -141,13 +141,13 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 	err = localDevice.ProcessCmd(datagramtt, remoteDevice)
 	assert.Nil(t, err)
 
-	minDemand, optDemand, maxDemand, durationStart, durationEnd, err = emobility.EVEnergyDemand()
+	demand, err = emobility.EVEnergyDemand()
 	assert.Nil(t, err)
-	assert.Equal(t, 0.0, minDemand)
-	assert.Equal(t, 53400.0, optDemand)
-	assert.Equal(t, 74690.0, maxDemand)
-	assert.Equal(t, time.Duration(0), durationStart)
-	assert.Equal(t, time.Duration(time.Hour*52+time.Minute*40+time.Second*36), durationEnd)
+	assert.Equal(t, 0.0, demand.MinDemand)
+	assert.Equal(t, 53400.0, demand.OptDemand)
+	assert.Equal(t, 74690.0, demand.MaxDemand)
+	assert.Equal(t, time.Duration(0), demand.DurationUntilStart)
+	assert.Equal(t, time.Duration(time.Hour*52+time.Minute*40+time.Second*36), demand.DurationUntilEnd)
 
 	// the final plan
 
@@ -235,13 +235,13 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 	err = localDevice.ProcessCmd(datagramtt, remoteDevice)
 	assert.Nil(t, err)
 
-	minDemand, optDemand, maxDemand, durationStart, durationEnd, err = emobility.EVEnergyDemand()
+	demand, err = emobility.EVEnergyDemand()
 	assert.Nil(t, err)
-	assert.Equal(t, 600.0, minDemand)
-	assert.Equal(t, 600.0, optDemand)
-	assert.Equal(t, 75600.0, maxDemand)
-	assert.Equal(t, time.Duration(0), durationStart)
-	assert.Equal(t, time.Duration(0), durationEnd)
+	assert.Equal(t, 600.0, demand.MinDemand)
+	assert.Equal(t, 600.0, demand.OptDemand)
+	assert.Equal(t, 75600.0, demand.MaxDemand)
+	assert.Equal(t, time.Duration(0), demand.DurationUntilStart)
+	assert.Equal(t, time.Duration(0), demand.DurationUntilEnd)
 
 	// the final plan
 

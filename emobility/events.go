@@ -113,21 +113,21 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 						break
 					}
 
-					minDemand, optDemand, maxDemand, durationStart, durationEnd, err := e.EVEnergyDemand()
+					demand, err := e.EVEnergyDemand()
 					if err != nil {
 						logging.Log.Error("Error getting energy demand:", err)
 						break
 					}
 
 					// request CEM for power limits
-					minSlots, maxSlots, minDuration, maxDuration, durationStepSize := e.EVGetPowerConstraints()
+					constraints := e.EVGetPowerConstraints()
 					if err != nil {
 						logging.Log.Error("Error getting timeseries constraints:", err)
 					} else {
 						if e.dataProvider == nil {
 							break
 						}
-						e.dataProvider.EVRequestPowerLimits(minDemand, optDemand, maxDemand, durationStart, durationEnd, minSlots, maxSlots, minDuration, maxDuration, durationStepSize)
+						e.dataProvider.EVRequestPowerLimits(demand, constraints)
 					}
 				}
 
@@ -170,16 +170,16 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 						break
 					}
 
-					_, _, _, _, durationEnd, err := e.EVEnergyDemand()
+					demand, err := e.EVEnergyDemand()
 					if err != nil {
 						logging.Log.Error("Error getting energy demand:", err)
 						break
 					}
 
-					min, max := e.EVGetIncentiveConstraints()
+					constraints := e.EVGetIncentiveConstraints()
 
 					// request CEM for incentives
-					e.dataProvider.EVRequestIncentives(durationEnd, min, max)
+					e.dataProvider.EVRequestIncentives(demand, constraints)
 				}
 
 			case *model.IncentiveTableConstraintsDataType:

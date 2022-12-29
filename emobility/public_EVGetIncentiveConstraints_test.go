@@ -11,23 +11,23 @@ import (
 func Test_EVGetIncentiveConstraints(t *testing.T) {
 	emobilty, eebusService := setupEmobility()
 
-	minSlots, maxSlots := emobilty.EVGetIncentiveConstraints()
-	assert.Equal(t, uint(0), minSlots)
-	assert.Equal(t, uint(0), maxSlots)
+	constraints := emobilty.EVGetIncentiveConstraints()
+	assert.Equal(t, uint(0), constraints.MinSlots)
+	assert.Equal(t, uint(0), constraints.MaxSlots)
 
 	localDevice, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	minSlots, maxSlots = emobilty.EVGetIncentiveConstraints()
-	assert.Equal(t, uint(0), minSlots)
-	assert.Equal(t, uint(0), maxSlots)
+	constraints = emobilty.EVGetIncentiveConstraints()
+	assert.Equal(t, uint(0), constraints.MinSlots)
+	assert.Equal(t, uint(0), constraints.MaxSlots)
 
 	emobilty.evIncentiveTable = incentiveTableConfiguration(localDevice, emobilty.evEntity)
 
-	minSlots, maxSlots = emobilty.EVGetIncentiveConstraints()
-	assert.Equal(t, uint(0), minSlots)
-	assert.Equal(t, uint(0), maxSlots)
+	constraints = emobilty.EVGetIncentiveConstraints()
+	assert.Equal(t, uint(0), constraints.MinSlots)
+	assert.Equal(t, uint(0), constraints.MaxSlots)
 
 	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeServer, model.RoleTypeClient)
 
@@ -48,9 +48,9 @@ func Test_EVGetIncentiveConstraints(t *testing.T) {
 	err := localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	minSlots, maxSlots = emobilty.EVGetIncentiveConstraints()
-	assert.Equal(t, uint(1), minSlots)
-	assert.Equal(t, uint(10), maxSlots)
+	constraints = emobilty.EVGetIncentiveConstraints()
+	assert.Equal(t, uint(1), constraints.MinSlots)
+	assert.Equal(t, uint(10), constraints.MaxSlots)
 
 	cmd = []model.CmdType{{
 		IncentiveTableConstraintsData: &model.IncentiveTableConstraintsDataType{
@@ -68,7 +68,8 @@ func Test_EVGetIncentiveConstraints(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	minSlots, maxSlots = emobilty.EVGetIncentiveConstraints()
-	assert.Equal(t, uint(1), minSlots)
-	assert.Equal(t, uint(0), maxSlots)
+	constraints = emobilty.EVGetIncentiveConstraints()
+	assert.Equal(t, uint(1), constraints.MinSlots)
+	assert.Equal(t, uint(0), constraints.MaxSlots)
+
 }
