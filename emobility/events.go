@@ -140,10 +140,6 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 					break
 				}
 
-				if err := e.evTimeSeries.RequestConstraints(); err == nil {
-					break
-				}
-
 				e.evRequestTimeSeriesValues()
 
 			case *model.TimeSeriesListDataType:
@@ -212,17 +208,23 @@ func (e *EMobilityImpl) evRequestTimeSeriesValues() {
 
 // send the ev provided charge plan to the CEM
 func (e *EMobilityImpl) evForwardChargePlanIfProvided() {
+	if data, err := e.evGetTimeSeriesPlanData(); err == nil {
+		e.dataProvider.EVProvideChargePlan(data)
+	}
+}
+
+func (e *EMobilityImpl) evGetTimeSeriesPlanData() ([]EVDurationSlotValue, error) {
 	if e.evTimeSeries == nil || e.dataProvider == nil {
-		return
+		return nil, ErrNotSupported
 	}
 
 	timeSeries, err := e.evTimeSeries.GetValueForType(model.TimeSeriesTypeTypePlan)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	if len(timeSeries.TimeSeriesSlot) == 0 {
-		return
+		return nil, ErrNotSupported
 	}
 
 	var data []EVDurationSlotValue
@@ -231,18 +233,26 @@ func (e *EMobilityImpl) evForwardChargePlanIfProvided() {
 		duration, err := slot.Duration.GetTimeDuration()
 		if err != nil {
 			logging.Log.Error("ev charge plan contains invalid duration:", err)
-			return
+			return nil, err
+		}
+
+		if slot.MaxValue == nil {
+			continue
 		}
 
 		item := EVDurationSlotValue{
 			Duration: duration,
-			Value:    slot.Value.GetValue(),
+			Value:    slot.MaxValue.GetValue(),
 		}
 
 		data = append(data, item)
 	}
 
-	e.dataProvider.EVProvideChargePlan(data)
+	if len(data) == 0 {
+		return nil, ErrNotSupported
+	}
+
+	return data, nil
 }
 
 // request incentive table values
