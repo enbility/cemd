@@ -59,15 +59,15 @@ func (mr *MockEmobilityDataProviderMockRecorder) EVRequestIncentives(duration, m
 }
 
 // EVRequestPowerLimits mocks base method.
-func (m *MockEmobilityDataProvider) EVRequestPowerLimits(energy float64, duration time.Duration, minSlots, maxSlots uint, minSlotDuration, maxSlotDuration, slotDurationStepSize time.Duration) {
+func (m *MockEmobilityDataProvider) EVRequestPowerLimits(minDemand, optDemand, maxDemand float64, durationUntilStart, durationUntilEnd time.Duration, minSlots, maxSlots uint, minSlotDuration, maxSlotDuration, slotDurationStepSize time.Duration) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "EVRequestPowerLimits", energy, duration, minSlots, maxSlots, minSlotDuration, maxSlotDuration, slotDurationStepSize)
+	m.ctrl.Call(m, "EVRequestPowerLimits", minDemand, optDemand, maxDemand, durationUntilStart, durationUntilEnd, minSlots, maxSlots, minSlotDuration, maxSlotDuration, slotDurationStepSize)
 }
 
 // EVRequestPowerLimits indicates an expected call of EVRequestPowerLimits.
-func (mr *MockEmobilityDataProviderMockRecorder) EVRequestPowerLimits(energy, duration, minSlots, maxSlots, minSlotDuration, maxSlotDuration, slotDurationStepSize interface{}) *gomock.Call {
+func (mr *MockEmobilityDataProviderMockRecorder) EVRequestPowerLimits(minDemand, optDemand, maxDemand, durationUntilStart, durationUntilEnd, minSlots, maxSlots, minSlotDuration, maxSlotDuration, slotDurationStepSize interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVRequestPowerLimits", reflect.TypeOf((*MockEmobilityDataProvider)(nil).EVRequestPowerLimits), energy, duration, minSlots, maxSlots, minSlotDuration, maxSlotDuration, slotDurationStepSize)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVRequestPowerLimits", reflect.TypeOf((*MockEmobilityDataProvider)(nil).EVRequestPowerLimits), minDemand, optDemand, maxDemand, durationUntilStart, durationUntilEnd, minSlots, maxSlots, minSlotDuration, maxSlotDuration, slotDurationStepSize)
 }
 
 // MockEmobilityI is a mock of EmobilityI interface.
@@ -215,13 +215,16 @@ func (mr *MockEmobilityIMockRecorder) EVCurrentsPerPhase() *gomock.Call {
 }
 
 // EVEnergyDemand mocks base method.
-func (m *MockEmobilityI) EVEnergyDemand() (float64, time.Duration, error) {
+func (m *MockEmobilityI) EVEnergyDemand() (float64, float64, float64, time.Duration, time.Duration, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EVEnergyDemand")
 	ret0, _ := ret[0].(float64)
-	ret1, _ := ret[1].(time.Duration)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
+	ret1, _ := ret[1].(float64)
+	ret2, _ := ret[2].(float64)
+	ret3, _ := ret[3].(time.Duration)
+	ret4, _ := ret[4].(time.Duration)
+	ret5, _ := ret[5].(error)
+	return ret0, ret1, ret2, ret3, ret4, ret5
 }
 
 // EVEnergyDemand indicates an expected call of EVEnergyDemand.

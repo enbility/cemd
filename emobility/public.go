@@ -562,17 +562,13 @@ func (e *EMobilityImpl) EVCoordinatedChargingSupported() (bool, error) {
 
 // returns the current charging strategy
 func (e *EMobilityImpl) EVChargeStrategy() EVChargeStrategyType {
-	if e.evEntity == nil {
+	if e.evEntity == nil || e.evTimeSeries == nil {
 		return EVChargeStrategyTypeUnknown
 	}
 
 	// only ISO communication can provide a charging strategy information
 	com, err := e.EVCommunicationStandard()
 	if err != nil || com == EVCommunicationStandardTypeUnknown || com == EVCommunicationStandardTypeIEC61851 {
-		return EVChargeStrategyTypeUnknown
-	}
-
-	if e.evTimeSeries == nil {
 		return EVChargeStrategyTypeUnknown
 	}
 
@@ -589,70 +585,99 @@ func (e *EMobilityImpl) EVChargeStrategy() EVChargeStrategyType {
 
 	// get the value for the first slot
 	firstSlot := data.TimeSeriesSlot[0]
-	value := firstSlot.Value
-	if value == nil {
-		return EVChargeStrategyTypeUnknown
-	}
-	demand := value.GetValue() // demand in Wh
 
-	// the EV has no demand
-	if demand == 0 {
-		return EVChargeStrategyTypeNoDemand
+	switch {
+	case firstSlot.Duration == nil:
+		// if value is > 0 and duration does not exist, the EV is direct charging
+		if firstSlot.Value != nil {
+			return EVChargeStrategyTypeDirectCharging
+		}
+
+	case firstSlot.Duration != nil:
+		if _, err := firstSlot.Duration.GetTimeDuration(); err != nil {
+			// we got an invalid duration
+			return EVChargeStrategyTypeUnknown
+		}
+
+		if firstSlot.MinValue != nil && firstSlot.MinValue.GetValue() > 0 {
+			return EVChargeStrategyTypeMinSoC
+		}
+
+		if firstSlot.Value != nil {
+			if firstSlot.Value.GetValue() > 0 {
+				// there is demand and a duration
+				return EVChargeStrategyTypeTimedCharging
+			}
+
+			return EVChargeStrategyTypeNoDemand
+		}
+
 	}
 
-	// if demand is > 0 and duration does not exist, the EV is not charging via a timer
-	// but either via direct charging enabled or charging to minimum SoC using a profile
-	if firstSlot.Duration == nil {
-		return EVChargeStrategyTypeDirectCharging
-	}
-
-	if _, err := firstSlot.Duration.GetTimeDuration(); err != nil {
-		// we got an invalid duration
-		return EVChargeStrategyTypeUnknown
-	}
-
-	// there is demand and a duration
-	return EVChargeStrategyTypeTimedCharging
+	return EVChargeStrategyTypeUnknown
 }
 
 // returns the current energy demand in Wh and the duration
-func (e *EMobilityImpl) EVEnergyDemand() (float64, time.Duration, error) {
+func (e *EMobilityImpl) EVEnergyDemand() (float64, float64, float64, time.Duration, time.Duration, error) {
+	var minDemand, optDemand, maxDemand float64
+	var duration time.Duration
+
 	if e.evEntity == nil {
-		return 0, 0, ErrEVDisconnected
+		return 0, 0, 0, 0, 0, ErrEVDisconnected
 	}
 
 	if e.evTimeSeries == nil {
-		return 0, 0, features.ErrDataNotAvailable
+		return 0, 0, 0, 0, 0, features.ErrDataNotAvailable
 	}
 
 	data, err := e.evTimeSeries.GetValueForType(model.TimeSeriesTypeTypeSingleDemand)
 	if err != nil {
-		return 0, 0, features.ErrDataNotAvailable
+		return 0, 0, 0, 0, 0, features.ErrDataNotAvailable
 	}
 
-	// exactly one time series slot is required
-	if data.TimeSeriesSlot == nil || len(data.TimeSeriesSlot) != 1 {
-		return 0, 0, features.ErrDataNotAvailable
+	// we need at a time series slot
+	if data.TimeSeriesSlot == nil {
+		return 0, 0, 0, 0, 0, features.ErrDataNotAvailable
 	}
 
-	// get the value for the first slot
+	// get the value for the first slot, ignore all others, which
+	// in the tests so far always have min/max/value 0
 	firstSlot := data.TimeSeriesSlot[0]
-	value := firstSlot.Value
-	if value == nil {
-		return 0, 0, features.ErrDataNotAvailable
+	if firstSlot.MinValue != nil {
+		minDemand = firstSlot.MinValue.GetValue()
+	}
+	if firstSlot.Value != nil {
+		optDemand = firstSlot.Value.GetValue()
+	}
+	if firstSlot.MaxValue != nil {
+		maxDemand = firstSlot.MaxValue.GetValue()
+	}
+	if firstSlot.Duration != nil {
+		if tempDuration, err := firstSlot.Duration.GetTimeDuration(); err == nil {
+			duration = tempDuration
+		}
 	}
 
-	if firstSlot.Duration == nil {
-		return value.GetValue(), 0, nil
+	// start time has to be defined either in TimePeriod or the first slot
+	relStartTime := time.Duration(0)
+
+	startTimeSet := false
+	if data.TimePeriod != nil && data.TimePeriod.StartTime != nil {
+		if temp, err := data.TimePeriod.StartTime.GetTimeDuration(); err == nil {
+			relStartTime = temp
+			startTimeSet = true
+		}
 	}
 
-	duration, err := firstSlot.Duration.GetTimeDuration()
-	if err != nil {
-		// we got an invalid duration
-		return 0, 0, features.ErrDataNotAvailable
+	if !startTimeSet {
+		if firstSlot.TimePeriod != nil && firstSlot.TimePeriod.StartTime != nil {
+			if temp, err := firstSlot.TimePeriod.StartTime.GetTimeDuration(); err == nil {
+				relStartTime = temp
+			}
+		}
 	}
 
-	return value.GetValue(), duration, nil
+	return minDemand, optDemand, maxDemand, relStartTime, duration, nil
 }
 
 // returns the constraints for the power slots

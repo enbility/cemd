@@ -12,26 +12,35 @@ import (
 func Test_EVEnergySingleDemand(t *testing.T) {
 	emobilty, eebusService := setupEmobility()
 
-	data, duration, err := emobilty.EVEnergyDemand()
+	minDemand, optDemand, maxDemand, durationStart, durationEnd, err := emobilty.EVEnergyDemand()
 	assert.NotNil(t, err)
-	assert.Equal(t, 0.0, data)
-	assert.Equal(t, time.Duration(0), duration)
+	assert.Equal(t, 0.0, minDemand)
+	assert.Equal(t, 0.0, optDemand)
+	assert.Equal(t, 0.0, maxDemand)
+	assert.Equal(t, time.Duration(0), durationStart)
+	assert.Equal(t, time.Duration(0), durationEnd)
 
 	localDevice, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	data, duration, err = emobilty.EVEnergyDemand()
+	minDemand, optDemand, maxDemand, durationStart, durationEnd, err = emobilty.EVEnergyDemand()
 	assert.NotNil(t, err)
-	assert.Equal(t, 0.0, data)
-	assert.Equal(t, time.Duration(0), duration)
+	assert.Equal(t, 0.0, minDemand)
+	assert.Equal(t, 0.0, optDemand)
+	assert.Equal(t, 0.0, maxDemand)
+	assert.Equal(t, time.Duration(0), durationStart)
+	assert.Equal(t, time.Duration(0), durationEnd)
 
 	emobilty.evDeviceConfiguration = deviceConfiguration(localDevice, emobilty.evEntity)
 
-	data, duration, err = emobilty.EVEnergyDemand()
+	minDemand, optDemand, maxDemand, durationStart, durationEnd, err = emobilty.EVEnergyDemand()
 	assert.NotNil(t, err)
-	assert.Equal(t, 0.0, data)
-	assert.Equal(t, time.Duration(0), duration)
+	assert.Equal(t, 0.0, minDemand)
+	assert.Equal(t, 0.0, optDemand)
+	assert.Equal(t, 0.0, maxDemand)
+	assert.Equal(t, time.Duration(0), durationStart)
+	assert.Equal(t, time.Duration(0), durationEnd)
 
 	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer, model.RoleTypeClient)
 
@@ -49,10 +58,13 @@ func Test_EVEnergySingleDemand(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, duration, err = emobilty.EVEnergyDemand()
+	minDemand, optDemand, maxDemand, durationStart, durationEnd, err = emobilty.EVEnergyDemand()
 	assert.NotNil(t, err)
-	assert.Equal(t, 0.0, data)
-	assert.Equal(t, time.Duration(0), duration)
+	assert.Equal(t, 0.0, minDemand)
+	assert.Equal(t, 0.0, optDemand)
+	assert.Equal(t, 0.0, maxDemand)
+	assert.Equal(t, time.Duration(0), durationStart)
+	assert.Equal(t, time.Duration(0), durationEnd)
 
 	cmd = []model.CmdType{{
 		DeviceConfigurationKeyValueListData: &model.DeviceConfigurationKeyValueListDataType{
@@ -70,17 +82,23 @@ func Test_EVEnergySingleDemand(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, duration, err = emobilty.EVEnergyDemand()
+	minDemand, optDemand, maxDemand, durationStart, durationEnd, err = emobilty.EVEnergyDemand()
 	assert.NotNil(t, err)
-	assert.Equal(t, 0.0, data)
-	assert.Equal(t, time.Duration(0), duration)
+	assert.Equal(t, 0.0, minDemand)
+	assert.Equal(t, 0.0, optDemand)
+	assert.Equal(t, 0.0, maxDemand)
+	assert.Equal(t, time.Duration(0), durationStart)
+	assert.Equal(t, time.Duration(0), durationEnd)
 
 	emobilty.evTimeSeries = timeSeriesConfiguration(localDevice, emobilty.evEntity)
 
-	data, duration, err = emobilty.EVEnergyDemand()
+	minDemand, optDemand, maxDemand, durationStart, durationEnd, err = emobilty.EVEnergyDemand()
 	assert.NotNil(t, err)
-	assert.Equal(t, 0.0, data)
-	assert.Equal(t, time.Duration(0), duration)
+	assert.Equal(t, 0.0, minDemand)
+	assert.Equal(t, 0.0, optDemand)
+	assert.Equal(t, 0.0, maxDemand)
+	assert.Equal(t, time.Duration(0), durationStart)
+	assert.Equal(t, time.Duration(0), durationEnd)
 
 	datagram = datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer, model.RoleTypeClient)
 
@@ -113,10 +131,13 @@ func Test_EVEnergySingleDemand(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, duration, err = emobilty.EVEnergyDemand()
+	minDemand, optDemand, maxDemand, durationStart, durationEnd, err = emobilty.EVEnergyDemand()
 	assert.NotNil(t, err)
-	assert.Equal(t, 0.0, data)
-	assert.Equal(t, time.Duration(0), duration)
+	assert.Equal(t, 0.0, minDemand)
+	assert.Equal(t, 0.0, optDemand)
+	assert.Equal(t, 0.0, maxDemand)
+	assert.Equal(t, time.Duration(0), durationStart)
+	assert.Equal(t, time.Duration(0), durationEnd)
 
 	cmd = []model.CmdType{{
 		TimeSeriesListData: &model.TimeSeriesListDataType{
@@ -126,6 +147,9 @@ func Test_EVEnergySingleDemand(t *testing.T) {
 					TimeSeriesSlot: []model.TimeSeriesSlotType{
 						{
 							TimeSeriesSlotId: util.Ptr(model.TimeSeriesSlotIdType(0)),
+							TimePeriod: &model.TimePeriodType{
+								StartTime: model.NewAbsoluteOrRelativeTimeType("PT0S"),
+							},
 						},
 					},
 				},
@@ -137,20 +161,28 @@ func Test_EVEnergySingleDemand(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, duration, err = emobilty.EVEnergyDemand()
-	assert.NotNil(t, err)
-	assert.Equal(t, 0.0, data)
-	assert.Equal(t, time.Duration(0), duration)
+	minDemand, optDemand, maxDemand, durationStart, durationEnd, err = emobilty.EVEnergyDemand()
+	assert.Nil(t, err)
+	assert.Equal(t, 0.0, minDemand)
+	assert.Equal(t, 0.0, optDemand)
+	assert.Equal(t, 0.0, maxDemand)
+	assert.Equal(t, time.Duration(0), durationStart)
+	assert.Equal(t, time.Duration(0), durationEnd)
 
 	cmd = []model.CmdType{{
 		TimeSeriesListData: &model.TimeSeriesListDataType{
 			TimeSeriesData: []model.TimeSeriesDataType{
 				{
 					TimeSeriesId: util.Ptr(model.TimeSeriesIdType(0)),
+					TimePeriod: &model.TimePeriodType{
+						StartTime: model.NewAbsoluteOrRelativeTimeType("PT0S"),
+					},
 					TimeSeriesSlot: []model.TimeSeriesSlotType{
 						{
 							TimeSeriesSlotId: util.Ptr(model.TimeSeriesSlotIdType(0)),
+							MinValue:         model.NewScaledNumberType(1000),
 							Value:            model.NewScaledNumberType(10000),
+							MaxValue:         model.NewScaledNumberType(100000),
 						},
 					},
 				},
@@ -162,16 +194,22 @@ func Test_EVEnergySingleDemand(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, duration, err = emobilty.EVEnergyDemand()
+	minDemand, optDemand, maxDemand, durationStart, durationEnd, err = emobilty.EVEnergyDemand()
 	assert.Nil(t, err)
-	assert.Equal(t, 10000.0, data)
-	assert.Equal(t, time.Duration(0), duration)
+	assert.Equal(t, 1000.0, minDemand)
+	assert.Equal(t, 10000.0, optDemand)
+	assert.Equal(t, 100000.0, maxDemand)
+	assert.Equal(t, time.Duration(0), durationStart)
+	assert.Equal(t, time.Duration(0), durationEnd)
 
 	cmd = []model.CmdType{{
 		TimeSeriesListData: &model.TimeSeriesListDataType{
 			TimeSeriesData: []model.TimeSeriesDataType{
 				{
 					TimeSeriesId: util.Ptr(model.TimeSeriesIdType(0)),
+					TimePeriod: &model.TimePeriodType{
+						StartTime: model.NewAbsoluteOrRelativeTimeType("PT0S"),
+					},
 					TimeSeriesSlot: []model.TimeSeriesSlotType{
 						{
 							TimeSeriesSlotId: util.Ptr(model.TimeSeriesSlotIdType(0)),
@@ -188,8 +226,11 @@ func Test_EVEnergySingleDemand(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, duration, err = emobilty.EVEnergyDemand()
+	minDemand, optDemand, maxDemand, durationStart, durationEnd, err = emobilty.EVEnergyDemand()
 	assert.Nil(t, err)
-	assert.Equal(t, 10000.0, data)
-	assert.Equal(t, time.Duration(2*time.Hour), duration)
+	assert.Equal(t, 0.0, minDemand)
+	assert.Equal(t, 10000.0, optDemand)
+	assert.Equal(t, 0.0, maxDemand)
+	assert.Equal(t, time.Duration(0), durationStart)
+	assert.Equal(t, time.Duration(2*time.Hour), durationEnd)
 }

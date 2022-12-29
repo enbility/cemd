@@ -134,6 +134,7 @@ func Test_EVChargeStrategy(t *testing.T) {
 					TimeSeriesSlot: []model.TimeSeriesSlotType{
 						{
 							TimeSeriesSlotId: util.Ptr(model.TimeSeriesSlotIdType(0)),
+							Duration:         util.Ptr(model.DurationType("PT0S")),
 							Value:            model.NewScaledNumberType(0),
 						},
 					},

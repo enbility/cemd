@@ -33,6 +33,7 @@ const (
 	EVChargeStrategyTypeUnknown        EVChargeStrategyType = "unknown"
 	EVChargeStrategyTypeNoDemand       EVChargeStrategyType = "nodemand"
 	EVChargeStrategyTypeDirectCharging EVChargeStrategyType = "directcharging"
+	EVChargeStrategyTypeMinSoC         EVChargeStrategyType = "minsoc"
 	EVChargeStrategyTypeTimedCharging  EVChargeStrategyType = "timedcharging"
 )
 
