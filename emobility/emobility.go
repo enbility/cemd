@@ -18,11 +18,6 @@ type EmobilityDataProvider interface {
 	// Parameters:
 	//   - demand: Contains details about the actual demands from the EV
 	//   - constraints: Contains details about the time slot constraints
-	//
-	// General:
-	//  - If duration and energy is 0, charge mode is EVChargeStrategyTypeNoDemand
-	//  - If duration is 0, charge mode is EVChargeStrategyTypeDirectCharging and the slots should cover at least 48h
-	//  - If both are != 0, charge mode is EVChargeStrategyTypeTimedCharging and the slots should cover at least the duration, but at max 168h (7d)
 	EVRequestPowerLimits(demand EVDemand, constraints EVTimeSlotConstraints)
 
 	// Energy demand and duration is provided by the EV which requires the CEM
@@ -31,14 +26,8 @@ type EmobilityDataProvider interface {
 	// `EVWriteIncentives` must be invoked within <20s after receiving this call
 	//
 	// Parameters:
-	//   - duration: timeframe in which the energy demand is required
-	//   - minSlots: minimum amount of slots required
-	//   - maxSlots: maximum amount of slots allowed
-	//
-	// General:
-	//  - If duration and energy is 0, charge mode is EVChargeStrategyTypeNoDemand
-	//  - If duration is 0, charge mode is EVChargeStrategyTypeDirectCharging and the slots should cover at least 48h
-	//  - If both are != 0, charge mode is EVChargeStrategyTypeTimedCharging and the slots should cover at least the duration, but at max 168h (7d)
+	//   - demand: Contains details about the actual demands from the EV
+	//   - constraints: Contains details about the incentive slot constraints
 	EVRequestIncentives(demand EVDemand, constraints EVIncentiveSlotConstraints)
 
 	// The EV provided a charge plan

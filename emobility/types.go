@@ -38,6 +38,11 @@ const (
 )
 
 // Contains details about the actual demands from the EV
+//
+// General:
+//   - If duration and energy is 0, charge mode is EVChargeStrategyTypeNoDemand
+//   - If duration is 0, charge mode is EVChargeStrategyTypeDirectCharging and the slots should cover at least 48h
+//   - If both are != 0, charge mode is EVChargeStrategyTypeTimedCharging and the slots should cover at least the duration, but at max 168h (7d)
 type EVDemand struct {
 	MinDemand          float64       // minimum demand in Wh to reach the minSoC setting, 0 if not set
 	OptDemand          float64       // demand in Wh to reach the timer SoC setting
