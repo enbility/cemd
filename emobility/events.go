@@ -205,7 +205,7 @@ func (e *EMobilityImpl) evRequestTimeSeriesValues() {
 // send the ev provided charge plan to the CEM
 func (e *EMobilityImpl) evForwardChargePlanIfProvided() {
 	if data, err := e.evGetTimeSeriesPlanData(); err == nil {
-		e.dataProvider.EVProvideChargePlan(data)
+		e.dataProvider.EVProvidedChargePlan(data)
 	}
 }
 

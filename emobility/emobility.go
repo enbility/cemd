@@ -42,7 +42,7 @@ type EmobilityDataProvider interface {
 	EVRequestIncentives(demand EVDemand, constraints EVIncentiveSlotConstraints)
 
 	// The EV provided a charge plan
-	EVProvideChargePlan(data []EVDurationSlotValue)
+	EVProvidedChargePlan(data []EVDurationSlotValue)
 }
 
 // used by the CEM and implemented by emobility
