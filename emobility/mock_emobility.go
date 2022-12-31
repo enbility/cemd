@@ -45,6 +45,18 @@ func (mr *MockEmobilityDataProviderMockRecorder) EVProvidedChargePlan(data inter
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVProvidedChargePlan", reflect.TypeOf((*MockEmobilityDataProvider)(nil).EVProvidedChargePlan), data)
 }
 
+// EVProvidedChargeStrategy mocks base method.
+func (m *MockEmobilityDataProvider) EVProvidedChargeStrategy(strategy EVChargeStrategyType) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "EVProvidedChargeStrategy", strategy)
+}
+
+// EVProvidedChargeStrategy indicates an expected call of EVProvidedChargeStrategy.
+func (mr *MockEmobilityDataProviderMockRecorder) EVProvidedChargeStrategy(strategy interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVProvidedChargeStrategy", reflect.TypeOf((*MockEmobilityDataProvider)(nil).EVProvidedChargeStrategy), strategy)
+}
+
 // EVRequestIncentives mocks base method.
 func (m *MockEmobilityDataProvider) EVRequestIncentives(demand EVDemand, constraints EVIncentiveSlotConstraints) {
 	m.ctrl.T.Helper()

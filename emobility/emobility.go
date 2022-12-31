@@ -10,6 +10,9 @@ import (
 
 // used by emobility and implemented by the CEM
 type EmobilityDataProvider interface {
+	// The EV provided a charge strategy
+	EVProvidedChargeStrategy(strategy EVChargeStrategyType)
+
 	// Energy demand and duration is provided by the EV which requires the CEM
 	// to respond with time slots containing power limits for each slot
 	//
@@ -220,6 +223,8 @@ type EMobilityImpl struct {
 	evTimeSeries           *features.TimeSeries
 	evIncentiveTable       *features.IncentiveTable
 
+	evCurrentChargeStrategy EVChargeStrategyType
+
 	ski      string
 	currency model.CurrencyType
 
@@ -233,11 +238,12 @@ func NewEMobility(service *service.EEBUSService, details *service.ServiceDetails
 	ski := util.NormalizeSKI(details.SKI())
 
 	emobility := &EMobilityImpl{
-		service:      service,
-		entity:       service.LocalEntity(),
-		ski:          ski,
-		currency:     currency,
-		dataProvider: dataProvider,
+		service:                 service,
+		entity:                  service.LocalEntity(),
+		ski:                     ski,
+		currency:                currency,
+		dataProvider:            dataProvider,
+		evCurrentChargeStrategy: EVChargeStrategyTypeUnknown,
 	}
 	spine.Events.Subscribe(emobility)
 

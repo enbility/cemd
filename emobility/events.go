@@ -189,6 +189,20 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 			}
 		}
 	}
+
+	if e.dataProvider == nil {
+		return
+	}
+
+	// check if the charge strategy changed
+	chargeStrategy := e.EVChargeStrategy()
+	if chargeStrategy == e.evCurrentChargeStrategy {
+		return
+	}
+
+	// update the current value and inform the dataProvider
+	e.evCurrentChargeStrategy = chargeStrategy
+	e.dataProvider.EVProvidedChargeStrategy(chargeStrategy)
 }
 
 // request time series values
