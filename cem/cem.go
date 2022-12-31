@@ -12,6 +12,7 @@ import (
 
 type CemConfiguration struct {
 	EmobilityScenarioEnabled bool
+	EmobilityConfiguration   emobility.EmobilityConfiguration
 	GridScenarioEnabled      bool
 	Currency                 model.CurrencyType
 }
@@ -43,7 +44,7 @@ func (h *CemImpl) Setup(configuration CemConfiguration) error {
 
 	// Setup the supported usecases and features
 	if configuration.EmobilityScenarioEnabled {
-		h.emobilityScenario = emobility.NewEMobilityScenario(h.service, configuration.Currency)
+		h.emobilityScenario = emobility.NewEMobilityScenario(h.service, configuration.Currency, configuration.EmobilityConfiguration)
 		h.emobilityScenario.AddFeatures()
 		h.emobilityScenario.AddUseCases()
 	}

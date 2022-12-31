@@ -17,16 +17,18 @@ type EmobilityScenarioImpl struct {
 
 	mux sync.Mutex
 
-	currency model.CurrencyType
+	currency      model.CurrencyType
+	configuration EmobilityConfiguration
 }
 
 var _ scenarios.ScenariosI = (*EmobilityScenarioImpl)(nil)
 
-func NewEMobilityScenario(service *service.EEBUSService, currency model.CurrencyType) *EmobilityScenarioImpl {
+func NewEMobilityScenario(service *service.EEBUSService, currency model.CurrencyType, configuration EmobilityConfiguration) *EmobilityScenarioImpl {
 	return &EmobilityScenarioImpl{
 		ScenarioImpl:  scenarios.NewScenarioImpl(service),
 		remoteDevices: make(map[string]*EMobilityImpl),
 		currency:      currency,
+		configuration: configuration,
 	}
 }
 
@@ -58,8 +60,11 @@ func (e *EmobilityScenarioImpl) AddFeatures() {
 		model.FeatureTypeTypeMeasurement,
 		model.FeatureTypeTypeLoadControl,
 		model.FeatureTypeTypeIdentification,
-		model.FeatureTypeTypeTimeSeries,
-		model.FeatureTypeTypeIncentiveTable,
+	}
+
+	if !e.configuration.DisableCoordinatedCharging {
+		clientFeatures = append(clientFeatures, model.FeatureTypeTypeTimeSeries)
+		clientFeatures = append(clientFeatures, model.FeatureTypeTypeIncentiveTable)
 	}
 	for _, feature := range clientFeatures {
 		f := localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
@@ -107,11 +112,13 @@ func (e *EmobilityScenarioImpl) AddUseCases() {
 		model.SpecificationVersionType("1.0.1b"),
 		[]model.UseCaseScenarioSupportType{1, 2, 3})
 
-	_ = spine.NewUseCase(
-		localEntity,
-		model.UseCaseNameTypeCoordinatedEVCharging,
-		model.SpecificationVersionType("1.0.1"),
-		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
+	if !e.configuration.DisableCoordinatedCharging {
+		_ = spine.NewUseCase(
+			localEntity,
+			model.UseCaseNameTypeCoordinatedEVCharging,
+			model.SpecificationVersionType("1.0.1"),
+			[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
+	}
 }
 
 func (e *EmobilityScenarioImpl) RegisterRemoteDevice(details *service.ServiceDetails, dataProvider any) any {

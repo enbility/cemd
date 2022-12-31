@@ -74,3 +74,8 @@ type EVDurationSlotValue struct {
 
 var ErrEVDisconnected = errors.New("ev is disconnected")
 var ErrNotSupported = errors.New("function is not supported")
+
+// Allows to exclude some features
+type EmobilityConfiguration struct {
+	DisableCoordinatedCharging bool
+}
