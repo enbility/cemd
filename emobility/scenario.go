@@ -62,7 +62,7 @@ func (e *EmobilityScenarioImpl) AddFeatures() {
 		model.FeatureTypeTypeIdentification,
 	}
 
-	if !e.configuration.DisableCoordinatedCharging {
+	if !e.configuration.CoordinatedChargingEnabled {
 		clientFeatures = append(clientFeatures, model.FeatureTypeTypeTimeSeries)
 		clientFeatures = append(clientFeatures, model.FeatureTypeTypeIncentiveTable)
 	}
@@ -112,7 +112,7 @@ func (e *EmobilityScenarioImpl) AddUseCases() {
 		model.SpecificationVersionType("1.0.1b"),
 		[]model.UseCaseScenarioSupportType{1, 2, 3})
 
-	if !e.configuration.DisableCoordinatedCharging {
+	if !e.configuration.CoordinatedChargingEnabled {
 		_ = spine.NewUseCase(
 			localEntity,
 			model.UseCaseNameTypeCoordinatedEVCharging,
