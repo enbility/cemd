@@ -11,10 +11,10 @@ import (
 )
 
 type CemConfiguration struct {
-	EmobilityScenarioEnabled bool
-	EmobilityConfiguration   emobility.EmobilityConfiguration
-	GridScenarioEnabled      bool
-	Currency                 model.CurrencyType
+	EmobilityScenarioDisabled bool
+	EmobilityConfiguration    emobility.EmobilityConfiguration
+	GridScenarioDisabled      bool
+	Currency                  model.CurrencyType
 }
 
 // Generic CEM implementation
@@ -43,14 +43,14 @@ func (h *CemImpl) Setup(configuration CemConfiguration) error {
 	spine.Events.Subscribe(h)
 
 	// Setup the supported usecases and features
-	if configuration.EmobilityScenarioEnabled {
+	if !configuration.EmobilityScenarioDisabled {
 		h.emobilityScenario = emobility.NewEMobilityScenario(h.service, configuration.Currency, configuration.EmobilityConfiguration)
 		h.emobilityScenario.AddFeatures()
 		h.emobilityScenario.AddUseCases()
 	}
 
 	// Setup the supported usecases and features
-	if configuration.GridScenarioEnabled {
+	if !configuration.GridScenarioDisabled {
 		h.gridScenario = grid.NewGridScenario(h.service)
 		h.gridScenario.AddFeatures()
 		h.gridScenario.AddUseCases()

@@ -77,5 +77,5 @@ var ErrNotSupported = errors.New("function is not supported")
 
 // Allows to exclude some features
 type EmobilityConfiguration struct {
-	CoordinatedChargingEnabled bool
+	CoordinatedChargingDisabled bool
 }

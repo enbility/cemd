@@ -29,8 +29,8 @@ func NewDemoCem(configuration *service.Configuration) *DemoCem {
 
 func (d *DemoCem) Setup() error {
 	return d.cem.Setup(cem.CemConfiguration{
-		EmobilityScenarioEnabled: true,
-		GridScenarioEnabled:      true,
+		EmobilityScenarioDisabled: false,
+		GridScenarioDisabled:      false,
 	})
 }
 
