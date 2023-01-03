@@ -228,13 +228,14 @@ type EMobilityImpl struct {
 	ski      string
 	currency model.CurrencyType
 
-	dataProvider EmobilityDataProvider
+	configuration EmobilityConfiguration
+	dataProvider  EmobilityDataProvider
 }
 
 var _ EmobilityI = (*EMobilityImpl)(nil)
 
 // Add E-Mobility support
-func NewEMobility(service *service.EEBUSService, details *service.ServiceDetails, currency model.CurrencyType, dataProvider EmobilityDataProvider) *EMobilityImpl {
+func NewEMobility(service *service.EEBUSService, details *service.ServiceDetails, currency model.CurrencyType, configuration EmobilityConfiguration, dataProvider EmobilityDataProvider) *EMobilityImpl {
 	ski := util.NormalizeSKI(details.SKI())
 
 	emobility := &EMobilityImpl{
@@ -244,6 +245,7 @@ func NewEMobility(service *service.EEBUSService, details *service.ServiceDetails
 		currency:                currency,
 		dataProvider:            dataProvider,
 		evCurrentChargeStrategy: EVChargeStrategyTypeUnknown,
+		configuration:           configuration,
 	}
 	spine.Events.Subscribe(emobility)
 

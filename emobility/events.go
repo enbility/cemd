@@ -345,8 +345,10 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 	e.evMeasurement, _ = features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 	e.evIdentification, _ = features.NewIdentification(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 	e.evLoadControl, _ = features.NewLoadControl(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
-	e.evTimeSeries, _ = features.NewTimeSeries(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
-	e.evIncentiveTable, _ = features.NewIncentiveTable(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	if !e.configuration.CoordinatedChargingDisabled {
+		e.evTimeSeries, _ = features.NewTimeSeries(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+		e.evIncentiveTable, _ = features.NewIncentiveTable(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	}
 
 	// optional requests are only logged as debug
 
@@ -372,12 +374,15 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 	if err := e.evIdentification.SubscribeForEntity(); err != nil {
 		logging.Log.Debug(err)
 	}
-	if err := e.evTimeSeries.SubscribeForEntity(); err != nil {
-		logging.Log.Debug(err)
-	}
-	// this is optional
-	if err := e.evIncentiveTable.SubscribeForEntity(); err != nil {
-		logging.Log.Debug(err)
+
+	if !e.configuration.CoordinatedChargingDisabled {
+		if err := e.evTimeSeries.SubscribeForEntity(); err != nil {
+			logging.Log.Debug(err)
+		}
+		// this is optional
+		if err := e.evIncentiveTable.SubscribeForEntity(); err != nil {
+			logging.Log.Debug(err)
+		}
 	}
 
 	// bindings
@@ -385,14 +390,16 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 		logging.Log.Error(err)
 	}
 
-	// this is optional
-	if err := e.evTimeSeries.Bind(); err != nil {
-		logging.Log.Debug(err)
-	}
+	if !e.configuration.CoordinatedChargingDisabled {
+		// this is optional
+		if err := e.evTimeSeries.Bind(); err != nil {
+			logging.Log.Debug(err)
+		}
 
-	// this is optional
-	if err := e.evIncentiveTable.Bind(); err != nil {
-		logging.Log.Debug(err)
+		// this is optional
+		if err := e.evIncentiveTable.Bind(); err != nil {
+			logging.Log.Debug(err)
+		}
 	}
 
 	// get ev configuration data
@@ -434,14 +441,16 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 		logging.Log.Debug(err)
 	}
 
-	// get time series parameter
-	if err := e.evTimeSeries.RequestDescriptions(); err != nil {
-		logging.Log.Debug(err)
-	}
+	if !e.configuration.CoordinatedChargingDisabled {
+		// get time series parameter
+		if err := e.evTimeSeries.RequestDescriptions(); err != nil {
+			logging.Log.Debug(err)
+		}
 
-	// get incentive table parameter
-	if err := e.evIncentiveTable.RequestDescriptions(); err != nil {
-		logging.Log.Debug(err)
+		// get incentive table parameter
+		if err := e.evIncentiveTable.RequestDescriptions(); err != nil {
+			logging.Log.Debug(err)
+		}
 	}
 }
 

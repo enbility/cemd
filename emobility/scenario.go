@@ -135,7 +135,7 @@ func (e *EmobilityScenarioImpl) RegisterRemoteDevice(details *service.ServiceDet
 	if dataProvider != nil {
 		provider = dataProvider.(EmobilityDataProvider)
 	}
-	emobility := NewEMobility(e.Service, details, e.currency, provider)
+	emobility := NewEMobility(e.Service, details, e.currency, e.configuration, provider)
 	e.remoteDevices[details.SKI()] = emobility
 	return emobility
 }
