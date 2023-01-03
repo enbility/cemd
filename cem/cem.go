@@ -68,7 +68,14 @@ func (h *CemImpl) Shutdown() {
 }
 
 func (h *CemImpl) RegisterEmobilityRemoteDevice(details *service.ServiceDetails, dataProvider emobility.EmobilityDataProvider) *emobility.EMobilityImpl {
-	impl := h.emobilityScenario.RegisterRemoteDevice(details, dataProvider)
+	var impl any
+
+	if dataProvider != nil {
+		impl = h.emobilityScenario.RegisterRemoteDevice(details, dataProvider)
+	} else {
+		impl = h.emobilityScenario.RegisterRemoteDevice(details, nil)
+	}
+
 	return impl.(*emobility.EMobilityImpl)
 }
 
