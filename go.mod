@@ -3,7 +3,7 @@ module github.com/enbility/cemd
 go 1.18
 
 require (
-	github.com/enbility/eebus-go v0.0.0-20221225193332-825ba280252c
+	github.com/enbility/eebus-go v0.0.0-20230105103625-a5cdedbbee86
 	github.com/golang/mock v1.6.0
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/exp v0.0.0-20221217163422-3c43f8badb15
