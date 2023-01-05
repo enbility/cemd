@@ -127,13 +127,6 @@ func Test_EVCurrentLimits(t *testing.T) {
 		},
 	}
 
-	cmd = []model.CmdType{{
-		ElectricalConnectionPermittedValueSetListData: &model.ElectricalConnectionPermittedValueSetListDataType{
-			ElectricalConnectionPermittedValueSetData: []model.ElectricalConnectionPermittedValueSetDataType{
-				{},
-			},
-		}}}
-
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			dataSet := []model.ElectricalConnectionPermittedValueSetDataType{}
