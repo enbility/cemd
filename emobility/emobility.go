@@ -4,9 +4,40 @@ import (
 	"github.com/enbility/eebus-go/features"
 	"github.com/enbility/eebus-go/service"
 	"github.com/enbility/eebus-go/spine"
+	"github.com/enbility/eebus-go/spine/model"
 	"github.com/enbility/eebus-go/util"
 )
 
+// used by emobility and implemented by the CEM
+type EmobilityDataProvider interface {
+	// The EV provided a charge strategy
+	EVProvidedChargeStrategy(strategy EVChargeStrategyType)
+
+	// Energy demand and duration is provided by the EV which requires the CEM
+	// to respond with time slots containing power limits for each slot
+	//
+	// `EVWritePowerLimits` must be invoked within <55s, idealy <15s, after receiving this call
+	//
+	// Parameters:
+	//   - demand: Contains details about the actual demands from the EV
+	//   - constraints: Contains details about the time slot constraints
+	EVRequestPowerLimits(demand EVDemand, constraints EVTimeSlotConstraints)
+
+	// Energy demand and duration is provided by the EV which requires the CEM
+	// to respond with time slots containing incentives for each slot
+	//
+	// `EVWriteIncentives` must be invoked within <20s after receiving this call
+	//
+	// Parameters:
+	//   - demand: Contains details about the actual demands from the EV
+	//   - constraints: Contains details about the incentive slot constraints
+	EVRequestIncentives(demand EVDemand, constraints EVIncentiveSlotConstraints)
+
+	// The EV provided a charge plan
+	EVProvidedChargePlan(data []EVDurationSlotValue)
+}
+
+// used by the CEM and implemented by emobility
 type EmobilityI interface {
 	// return the current charge sate of the EV
 	EVCurrentChargeState() (EVChargeStateType, error)
@@ -131,6 +162,44 @@ type EmobilityI interface {
 	//   - ErrDataNotAvailable if that information is not (yet) available
 	//   - and others
 	EVCoordinatedChargingSupported() (bool, error)
+
+	// returns the current charging stratey
+	//
+	// returns EVChargeStrategyTypeUnknown if it could not be determined, e.g.
+	// if the vehicle communication is via IEC61851 or the EV doesn't provide
+	// any information about its charging mode or plan
+	EVChargeStrategy() EVChargeStrategyType
+
+	// returns the current energy demand
+	//   - EVDemand: details about the actual demands from the EV
+	//   - error: if no data is available
+	//
+	// if duration is 0, direct charging is active, otherwise timed charging is active
+	EVEnergyDemand() (EVDemand, error)
+
+	// returns the constraints for the power slots
+	//   - EVTimeSlotConstraints: details about the time slot constraints
+	EVGetPowerConstraints() EVTimeSlotConstraints
+
+	// send power limits data to the EV
+	//
+	// returns an error if sending failed or charge slot count do not meet requirements
+	//
+	// this needs to be invoked either <55s, idealy <15s, of receiving a call to EVRequestPowerLimits
+	// or if the CEM requires the EV to change its charge plan
+	EVWritePowerLimits(data []EVDurationSlotValue) error
+
+	// returns the constraints for incentive slots
+	//   - EVIncentiveConstraints: details about the incentive slot constraints
+	EVGetIncentiveConstraints() EVIncentiveSlotConstraints
+
+	// send price slots data to the EV
+	//
+	// returns an error if sending failed or charge slot count do not meet requirements
+	//
+	// this needs to be invoked either within 20s of receiving a call to EVRequestIncentives
+	// or if the CEM requires the EV to change its charge plan
+	EVWriteIncentives(data []EVDurationSlotValue) error
 }
 
 type EMobilityImpl struct {
@@ -151,20 +220,32 @@ type EMobilityImpl struct {
 	evMeasurement          *features.Measurement
 	evIdentification       *features.Identification
 	evLoadControl          *features.LoadControl
+	evTimeSeries           *features.TimeSeries
+	evIncentiveTable       *features.IncentiveTable
 
-	ski string
+	evCurrentChargeStrategy EVChargeStrategyType
+
+	ski      string
+	currency model.CurrencyType
+
+	configuration EmobilityConfiguration
+	dataProvider  EmobilityDataProvider
 }
 
 var _ EmobilityI = (*EMobilityImpl)(nil)
 
 // Add E-Mobility support
-func NewEMobility(service *service.EEBUSService, details *service.ServiceDetails) *EMobilityImpl {
+func NewEMobility(service *service.EEBUSService, details *service.ServiceDetails, currency model.CurrencyType, configuration EmobilityConfiguration, dataProvider EmobilityDataProvider) *EMobilityImpl {
 	ski := util.NormalizeSKI(details.SKI())
 
 	emobility := &EMobilityImpl{
-		service: service,
-		entity:  service.LocalEntity(),
-		ski:     ski,
+		service:                 service,
+		entity:                  service.LocalEntity(),
+		ski:                     ski,
+		currency:                currency,
+		dataProvider:            dataProvider,
+		evCurrentChargeStrategy: EVChargeStrategyTypeUnknown,
+		configuration:           configuration,
 	}
 	spine.Events.Subscribe(emobility)
 

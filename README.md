@@ -2,6 +2,7 @@
 
 [![Build Status](https://github.com/enbility/cemd/actions/workflows/default.yml/badge.svg?branch=dev)](https://github.com/enbility/cemd/actions/workflows/default.yml/badge.svg?branch=dev)
 [![GoDoc](https://img.shields.io/badge/godoc-reference-5272B4)](https://godoc.org/github.com/enbility/cemd)
+[![Coverage Status](https://coveralls.io/repos/github/enbility/cemd/badge.svg?branch=dev)](https://coveralls.io/github/enbility/cemd?branch=dev)
 [![Go report](https://goreportcard.com/badge/github.com/enbility/cemd)](https://goreportcard.com/report/github.com/enbility/cemd)
 
 The goal is to provide an EEBUS CEM implementation

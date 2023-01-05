@@ -30,16 +30,14 @@ func NewGridScenario(service *service.EEBUSService) *GridScenarioImpl {
 func (e *GridScenarioImpl) AddFeatures() {
 	localEntity := e.Service.LocalEntity()
 
-	{
-		f := localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeClient, "Device Configuration Client")
-		f.AddResultHandler(e)
+	// client features
+	var clientFeatures = []model.FeatureTypeType{
+		model.FeatureTypeTypeDeviceConfiguration,
+		model.FeatureTypeTypeElectricalConnection,
+		model.FeatureTypeTypeMeasurement,
 	}
-	{
-		f := localEntity.GetOrAddFeature(model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient, "Electrical Connection Client")
-		f.AddResultHandler(e)
-	}
-	{
-		f := localEntity.GetOrAddFeature(model.FeatureTypeTypeMeasurement, model.RoleTypeClient, "Measurement Client")
+	for _, feature := range clientFeatures {
+		f := localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
 		f.AddResultHandler(e)
 	}
 }
@@ -55,7 +53,7 @@ func (e *GridScenarioImpl) AddUseCases() {
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7})
 }
 
-func (e *GridScenarioImpl) RegisterRemoteDevice(details *service.ServiceDetails) any {
+func (e *GridScenarioImpl) RegisterRemoteDevice(details *service.ServiceDetails, dataProvider any) any {
 	// TODO: grid should be stored per remote SKI and
 	// only be set for the SKI if the device supports it
 	e.mux.Lock()

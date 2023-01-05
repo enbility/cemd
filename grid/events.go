@@ -48,12 +48,12 @@ func (e *GridImpl) HandleEvent(payload spine.EventPayload) {
 
 			case *model.DeviceConfigurationKeyValueDescriptionListDataType:
 				// key value descriptions received, now get the data
-				if _, err := e.gridDeviceConfiguration.RequestKeyValueList(); err != nil {
+				if _, err := e.gridDeviceConfiguration.RequestKeyValues(); err != nil {
 					logging.Log.Error("Error getting configuration key values:", err)
 				}
 
 			case *model.MeasurementDescriptionListDataType:
-				if _, err := e.gridMeasurement.Request(); err != nil {
+				if _, err := e.gridMeasurement.RequestValues(); err != nil {
 					logging.Log.Error("Error getting measurement list values:", err)
 				}
 			}
@@ -101,24 +101,24 @@ func (e *GridImpl) gridConnected(ski string, entity *spine.EntityRemoteImpl) {
 	}
 
 	// get configuration data
-	if err := e.gridDeviceConfiguration.RequestDescription(); err != nil {
+	if err := e.gridDeviceConfiguration.RequestDescriptions(); err != nil {
 		logging.Log.Error(err)
 		return
 	}
 
 	// get electrical connection parameter
-	if err := e.gridElectricalConnection.RequestDescription(); err != nil {
+	if err := e.gridElectricalConnection.RequestDescriptions(); err != nil {
 		logging.Log.Error(err)
 		return
 	}
 
-	if err := e.gridElectricalConnection.RequestParameterDescription(); err != nil {
+	if err := e.gridElectricalConnection.RequestParameterDescriptions(); err != nil {
 		logging.Log.Error(err)
 		return
 	}
 
 	// get measurement parameters
-	if err := e.gridMeasurement.RequestDescription(); err != nil {
+	if err := e.gridMeasurement.RequestDescriptions(); err != nil {
 		logging.Log.Error(err)
 		return
 	}

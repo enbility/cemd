@@ -1,7 +1,6 @@
 package grid
 
 import (
-	"github.com/enbility/cemd/util"
 	"github.com/enbility/eebus-go/features"
 	"github.com/enbility/eebus-go/spine/model"
 )
@@ -14,31 +13,28 @@ import (
 //   - and others
 func (g *GridImpl) PowerLimitationFactor() (float64, error) {
 	if g.gridEntity == nil {
-		return 0.0, ErrDeviceDisconnected
+		return 0, ErrDeviceDisconnected
 	}
 
 	if g.gridMeasurement == nil {
-		return 0.0, features.ErrDataNotAvailable
+		return 0, features.ErrDataNotAvailable
 	}
 
 	keyname := model.DeviceConfigurationKeyNameTypePvCurtailmentLimitFactor
 
 	// check if device configuration description has curtailment limit factor key name
-	support, err := g.gridDeviceConfiguration.GetDescriptionKeyNameSupport(keyname)
+	_, err := g.gridDeviceConfiguration.GetDescriptionForKeyName(keyname)
 	if err != nil {
-		return 0.0, nil
-	}
-	if !support {
-		return 0.0, features.ErrNotSupported
+		return 0, err
 	}
 
-	data, err := g.gridDeviceConfiguration.GetValueForKeyName(keyname, model.DeviceConfigurationKeyValueTypeTypeScaledNumber)
+	data, err := g.gridDeviceConfiguration.GetKeyValueForKeyName(keyname, model.DeviceConfigurationKeyValueTypeTypeScaledNumber)
 	if err != nil {
-		return 0.0, err
+		return 0, err
 	}
 
 	if data == nil {
-		return 0.0, features.ErrDataNotAvailable
+		return 0, features.ErrDataNotAvailable
 	}
 
 	value := data.(*model.ScaledNumberType)
@@ -51,36 +47,35 @@ func (g *GridImpl) PowerLimitationFactor() (float64, error) {
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (g *GridImpl) MomentaryPowerConsumptionOrProduction() (float64, error) {
-	if g.gridEntity == nil {
-		return 0.0, ErrDeviceDisconnected
-	}
-
-	if g.gridMeasurement == nil {
-		return 0.0, features.ErrDataNotAvailable
-	}
-
 	measurement := model.MeasurementTypeTypePower
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACPowerTotal
-	value, mId, err := g.gridMeasurement.GetValueForTypeCommodityScope(measurement, commodity, scope)
+	data, err := g.getValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
-		return 0.0, err
+		return 0, err
+	}
+
+	// we assume there is only one value
+	mId := data[0].MeasurementId
+	value := data[0].Value
+	if mId == nil || value == nil {
+		return 0, features.ErrDataNotAvailable
 	}
 
 	// according to UC_TS_MonitoringOfGridConnectionPoint 3.2.2.2.4.1
 	// positive values are with description "PositiveEnergyDirection" value "consume"
 	// but we verify this
-	desc, err := g.gridElectricalConnection.GetDescriptionForMeasurementId(mId)
+	desc, err := g.gridElectricalConnection.GetDescriptionForMeasurementId(*mId)
 	if err != nil {
-		return 0.0, err
+		return 0, err
 	}
 
 	// if energy direction is not consume, invert it
-	if desc.PositiveEnergyDirection != model.EnergyDirectionTypeConsume {
-		return -1 * value, nil
+	if desc.PositiveEnergyDirection != nil && *desc.PositiveEnergyDirection != model.EnergyDirectionTypeConsume {
+		return -1 * value.GetValue(), nil
 	}
 
-	return value, nil
+	return value.GetValue(), nil
 }
 
 // return the total feed-in energy
@@ -89,23 +84,21 @@ func (g *GridImpl) MomentaryPowerConsumptionOrProduction() (float64, error) {
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (g *GridImpl) TotalFeedInEnergy() (float64, error) {
-	if g.gridEntity == nil {
-		return 0.0, ErrDeviceDisconnected
-	}
-
-	if g.gridMeasurement == nil {
-		return 0.0, features.ErrDataNotAvailable
-	}
-
 	measurement := model.MeasurementTypeTypeEnergy
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeGridFeedIn
-	value, _, err := g.gridMeasurement.GetValueForTypeCommodityScope(measurement, commodity, scope)
+	data, err := g.getValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
-		return 0.0, err
+		return 0, err
 	}
 
-	return value, nil
+	// we assume thre is only one result
+	value := data[0].Value
+	if value == nil {
+		return 0, features.ErrDataNotAvailable
+	}
+
+	return value.GetValue(), nil
 }
 
 // return the total consumed energy
@@ -114,23 +107,21 @@ func (g *GridImpl) TotalFeedInEnergy() (float64, error) {
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (g *GridImpl) TotalConsumedEnergy() (float64, error) {
-	if g.gridEntity == nil {
-		return 0.0, ErrDeviceDisconnected
-	}
-
-	if g.gridMeasurement == nil {
-		return 0.0, features.ErrDataNotAvailable
-	}
-
 	measurement := model.MeasurementTypeTypeEnergy
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeGridConsumption
-	value, _, err := g.gridMeasurement.GetValueForTypeCommodityScope(measurement, commodity, scope)
+	data, err := g.getValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
-		return 0.0, err
+		return 0, err
 	}
 
-	return value, nil
+	// we assume thre is only one result
+	value := data[0].Value
+	if value == nil {
+		return 0, features.ErrDataNotAvailable
+	}
+
+	return value.GetValue(), nil
 }
 
 // return the momentary current consumption (positive) or production (negative) per phase
@@ -139,47 +130,49 @@ func (g *GridImpl) TotalConsumedEnergy() (float64, error) {
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (g *GridImpl) MomentaryCurrentConsumptionOrProduction() ([]float64, error) {
-	if g.gridEntity == nil {
-		return nil, ErrDeviceDisconnected
-	}
-
-	if g.gridMeasurement == nil {
-		return nil, features.ErrDataNotAvailable
-	}
-
 	measurement := model.MeasurementTypeTypeCurrent
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACCurrent
-	data, measuremtIdData, err := g.gridMeasurement.GetValuesPerPhaseForTypeCommodityScope(measurement, commodity, scope, g.gridElectricalConnection)
+	values, err := g.getValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return nil, err
 	}
 
-	var result []float64
+	var phaseA, phaseB, phaseC float64
 
-	for _, phase := range util.PhaseMapping {
-		value := 0.0
-		if theValue, exists := data[phase]; exists {
-			value = theValue
+	for _, item := range values {
+		if item.Value == nil || item.MeasurementId == nil {
+			continue
 		}
+
+		param, err := g.gridElectricalConnection.GetParameterDescriptionForMeasurementId(*item.MeasurementId)
+		if err != nil || param.AcMeasuredPhases == nil {
+			continue
+		}
+
+		value := item.Value.GetValue()
 
 		// according to UC_TS_MonitoringOfGridConnectionPoint 3.2.1.3.2.4
 		// positive values are with description "PositiveEnergyDirection" value "consume"
-		// but we verify this
-		mId, exists := measuremtIdData[phase]
-		if exists {
-			if desc, err := g.gridElectricalConnection.GetDescriptionForMeasurementId(mId); err == nil {
-				// if energy direction is not consume, invert it
-				if desc.PositiveEnergyDirection != model.EnergyDirectionTypeConsume {
-					value = -1 * value
-				}
+		// but we should verify this
+		if desc, err := g.gridElectricalConnection.GetDescriptionForMeasurementId(*item.MeasurementId); err == nil {
+			// if energy direction is not consume, invert it
+			if desc.PositiveEnergyDirection != nil && *desc.PositiveEnergyDirection != model.EnergyDirectionTypeConsume {
+				value = -1 * value
 			}
 		}
 
-		result = append(result, value)
+		switch *param.AcMeasuredPhases {
+		case model.ElectricalConnectionPhaseNameTypeA:
+			phaseA = value
+		case model.ElectricalConnectionPhaseNameTypeB:
+			phaseB = value
+		case model.ElectricalConnectionPhaseNameTypeC:
+			phaseC = value
+		}
 	}
 
-	return result, nil
+	return []float64{phaseA, phaseB, phaseC}, nil
 }
 
 // return the voltage per phase
@@ -188,34 +181,39 @@ func (g *GridImpl) MomentaryCurrentConsumptionOrProduction() ([]float64, error) 
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (g *GridImpl) Voltage() ([]float64, error) {
-	if g.gridEntity == nil {
-		return nil, ErrDeviceDisconnected
-	}
-
-	if g.gridMeasurement == nil {
-		return nil, features.ErrDataNotAvailable
-	}
-
 	measurement := model.MeasurementTypeTypeVoltage
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACVoltage
-	data, _, err := g.gridMeasurement.GetValuesPerPhaseForTypeCommodityScope(measurement, commodity, scope, g.gridElectricalConnection)
+	data, err := g.getValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return nil, err
 	}
 
-	var result []float64
+	var phaseA, phaseB, phaseC float64
 
-	for _, phase := range util.PhaseMapping {
-		value := 0.0
-		if theValue, exists := data[phase]; exists {
-			value = theValue
+	for _, item := range data {
+		if item.Value == nil || item.MeasurementId == nil {
+			continue
 		}
 
-		result = append(result, value)
+		param, err := g.gridElectricalConnection.GetParameterDescriptionForMeasurementId(*item.MeasurementId)
+		if err != nil || param.AcMeasuredPhases == nil {
+			continue
+		}
+
+		value := item.Value.GetValue()
+
+		switch *param.AcMeasuredPhases {
+		case model.ElectricalConnectionPhaseNameTypeA:
+			phaseA = value
+		case model.ElectricalConnectionPhaseNameTypeB:
+			phaseB = value
+		case model.ElectricalConnectionPhaseNameTypeC:
+			phaseC = value
+		}
 	}
 
-	return result, nil
+	return []float64{phaseA, phaseB, phaseC}, nil
 }
 
 // return the frequence
@@ -224,21 +222,33 @@ func (g *GridImpl) Voltage() ([]float64, error) {
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (g *GridImpl) Frequency() (float64, error) {
-	if g.gridEntity == nil {
-		return 0.0, ErrDeviceDisconnected
-	}
-
-	if g.gridMeasurement == nil {
-		return 0.0, features.ErrDataNotAvailable
-	}
-
 	measurement := model.MeasurementTypeTypeFrequency
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACFrequency
-	value, _, err := g.gridMeasurement.GetValueForTypeCommodityScope(measurement, commodity, scope)
+	item, err := g.getValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
-		return 0.0, err
+		return 0, err
 	}
 
-	return value, nil
+	// take the first item
+	value := item[0].Value
+	if value == nil {
+		return 0, features.ErrDataNotAvailable
+	}
+
+	return value.GetValue(), nil
+}
+
+// helper
+
+func (g *GridImpl) getValuesForTypeCommodityScope(measurement model.MeasurementTypeType, commodity model.CommodityTypeType, scope model.ScopeTypeType) ([]model.MeasurementDataType, error) {
+	if g.gridEntity == nil {
+		return nil, ErrDeviceDisconnected
+	}
+
+	if g.gridMeasurement == nil {
+		return nil, features.ErrDataNotAvailable
+	}
+
+	return g.gridMeasurement.GetValuesForTypeCommodityScope(measurement, commodity, scope)
 }

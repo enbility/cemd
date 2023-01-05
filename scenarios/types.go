@@ -4,9 +4,9 @@ import (
 	"github.com/enbility/eebus-go/service"
 )
 
-// Implemented by EmobilityScenarioImpl, used by CemImpl
+// Implemented by *ScenarioImpl, used by CemImpl
 type ScenariosI interface {
-	RegisterRemoteDevice(details *service.ServiceDetails) any
+	RegisterRemoteDevice(details *service.ServiceDetails, dataProvider any) any
 	UnRegisterRemoteDevice(remoteDeviceSki string) error
 	AddFeatures()
 	AddUseCases()
