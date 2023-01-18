@@ -4,5 +4,5 @@ import (
 	"github.com/enbility/eebus-go/spine"
 )
 
-func (e *InverterVisImpl) HandleResult(errorMsg spine.ResultMessage) {
+func (i *InverterPVVisImpl) HandleResult(errorMsg spine.ResultMessage) {
 }

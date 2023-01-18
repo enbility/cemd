@@ -1,6 +1,7 @@
 package grid
 
 import (
+	"github.com/enbility/cemd/util"
 	"github.com/enbility/eebus-go/features"
 	"github.com/enbility/eebus-go/spine/model"
 )
@@ -13,7 +14,7 @@ import (
 //   - and others
 func (g *GridImpl) PowerLimitationFactor() (float64, error) {
 	if g.gridEntity == nil {
-		return 0, ErrDeviceDisconnected
+		return 0, util.ErrDeviceDisconnected
 	}
 
 	if g.gridMeasurement == nil {
@@ -243,7 +244,7 @@ func (g *GridImpl) Frequency() (float64, error) {
 
 func (g *GridImpl) getValuesForTypeCommodityScope(measurement model.MeasurementTypeType, commodity model.CommodityTypeType, scope model.ScopeTypeType) ([]model.MeasurementDataType, error) {
 	if g.gridEntity == nil {
-		return nil, ErrDeviceDisconnected
+		return nil, util.ErrDeviceDisconnected
 	}
 
 	if g.gridMeasurement == nil {

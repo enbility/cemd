@@ -1,4 +1,4 @@
-package invertervis
+package util
 
 import "errors"
 

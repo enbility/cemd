@@ -1,20 +1,25 @@
-package invertervis
+package inverterbatteryvis
 
 import (
+	"github.com/enbility/cemd/util"
 	"github.com/enbility/eebus-go/features"
 	"github.com/enbility/eebus-go/spine/model"
 )
 
-// return the current battery system (dis)charge power (W)
+// return the current battery (dis-)charge power (W)
+//
+//   - positive values charge power
+//   - negative values discharge power
 //
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (g *InverterVisImpl) CurrentDisChargePower() (float64, error) {
+func (i *InverterBatteryVisImpl) CurrentDisChargePower() (float64, error) {
 	measurement := model.MeasurementTypeTypePower
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACPowerTotal
-	data, err := g.getValuesForTypeCommodityScope(measurement, commodity, scope)
+
+	data, err := i.getValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return 0, err
 	}
@@ -34,11 +39,11 @@ func (g *InverterVisImpl) CurrentDisChargePower() (float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (g *InverterVisImpl) TotalChargeEnergy() (float64, error) {
+func (i *InverterBatteryVisImpl) TotalChargeEnergy() (float64, error) {
 	measurement := model.MeasurementTypeTypeEnergy
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeCharge
-	data, err := g.getValuesForTypeCommodityScope(measurement, commodity, scope)
+	data, err := i.getValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return 0, err
 	}
@@ -57,11 +62,11 @@ func (g *InverterVisImpl) TotalChargeEnergy() (float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (g *InverterVisImpl) TotalDischargeEnergy() (float64, error) {
+func (i *InverterBatteryVisImpl) TotalDischargeEnergy() (float64, error) {
 	measurement := model.MeasurementTypeTypeEnergy
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeDischarge
-	data, err := g.getValuesForTypeCommodityScope(measurement, commodity, scope)
+	data, err := i.getValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return 0, err
 	}
@@ -80,11 +85,11 @@ func (g *InverterVisImpl) TotalDischargeEnergy() (float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (g *InverterVisImpl) CurrentStateOfCharge() (float64, error) {
+func (i *InverterBatteryVisImpl) CurrentStateOfCharge() (float64, error) {
 	measurement := model.MeasurementTypeTypePercentage
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeStateOfCharge
-	data, err := g.getValuesForTypeCommodityScope(measurement, commodity, scope)
+	data, err := i.getValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return 0, err
 	}
@@ -100,14 +105,14 @@ func (g *InverterVisImpl) CurrentStateOfCharge() (float64, error) {
 
 // helper
 
-func (g *InverterVisImpl) getValuesForTypeCommodityScope(measurement model.MeasurementTypeType, commodity model.CommodityTypeType, scope model.ScopeTypeType) ([]model.MeasurementDataType, error) {
-	if g.inverterEntity == nil {
-		return nil, ErrDeviceDisconnected
+func (i *InverterBatteryVisImpl) getValuesForTypeCommodityScope(measurement model.MeasurementTypeType, commodity model.CommodityTypeType, scope model.ScopeTypeType) ([]model.MeasurementDataType, error) {
+	if i.inverterEntity == nil {
+		return nil, util.ErrDeviceDisconnected
 	}
 
-	if g.inverterMeasurement == nil {
+	if i.inverterMeasurement == nil {
 		return nil, features.ErrDataNotAvailable
 	}
 
-	return g.inverterMeasurement.GetValuesForTypeCommodityScope(measurement, commodity, scope)
+	return i.inverterMeasurement.GetValuesForTypeCommodityScope(measurement, commodity, scope)
 }

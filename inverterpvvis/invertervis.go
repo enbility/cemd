@@ -7,33 +7,32 @@ import (
 	"github.com/enbility/eebus-go/util"
 )
 
-type InverterVisI interface {
-	CurrentDisChargePower() (float64, error)
-	TotalChargeEnergy() (float64, error)
-	TotalDischargeEnergy() (float64, error)
-	CurrentStateOfCharge() (float64, error)
+type InverterPVVisI interface {
+	CurrentProductionPower() (float64, error)
+	NominalPeakPower() (float64, error)
+	TotalPVYield() (float64, error)
 }
 
-type InverterVisImpl struct {
+type InverterPVVisImpl struct {
 	entity *spine.EntityLocalImpl
 
 	service *service.EEBUSService
 
-	inverterEntity *spine.EntityRemoteImpl
-
+	inverterEntity               *spine.EntityRemoteImpl
+	inverterDeviceConfiguration  *features.DeviceConfiguration
 	inverterElectricalConnection *features.ElectricalConnection
 	inverterMeasurement          *features.Measurement
 
 	ski string
 }
 
-var _ InverterVisI = (*InverterVisImpl)(nil)
+var _ InverterPVVisI = (*InverterPVVisImpl)(nil)
 
-// Add InverterVis support
-func NewInverterVis(service *service.EEBUSService, details *service.ServiceDetails) *InverterVisImpl {
+// Add InverterPVVis support
+func NewInverterPVVis(service *service.EEBUSService, details *service.ServiceDetails) *InverterPVVisImpl {
 	ski := util.NormalizeSKI(details.SKI())
 
-	inverter := &InverterVisImpl{
+	inverter := &InverterPVVisImpl{
 		service: service,
 		entity:  service.LocalEntity(),
 		ski:     ski,
