@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/enbility/cemd/cem"
+	"github.com/enbility/cemd/emobility"
 	"github.com/enbility/eebus-go/logging"
 	"github.com/enbility/eebus-go/service"
 	"github.com/enbility/eebus-go/spine/model"
@@ -29,8 +30,13 @@ func NewDemoCem(configuration *service.Configuration) *DemoCem {
 
 func (d *DemoCem) Setup() error {
 	return d.cem.Setup(cem.CemConfiguration{
-		EmobilityScenarioDisabled: false,
-		GridScenarioDisabled:      false,
+		EmobilityScenarioDisabled:            false,
+		GridScenarioDisabled:                 false,
+		InverterBatteryVisualizationDisabled: false,
+		InverterPVVisualizationDisabled:      false,
+		EmobilityConfiguration: emobility.EmobilityConfiguration{
+			CoordinatedChargingDisabled: false,
+		},
 	})
 }
 
