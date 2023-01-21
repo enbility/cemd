@@ -1,4 +1,4 @@
-package invertervis
+package inverterpvvis
 
 import (
 	"github.com/enbility/eebus-go/features"
