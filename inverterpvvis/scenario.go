@@ -19,7 +19,7 @@ type InverterPVVisScenarioImpl struct {
 
 var _ scenarios.ScenariosI = (*InverterPVVisScenarioImpl)(nil)
 
-func NewInverterPVVisScenario(service *service.EEBUSService) *InverterPVVisScenarioImpl {
+func NewInverterVisScenario(service *service.EEBUSService) *InverterPVVisScenarioImpl {
 	return &InverterPVVisScenarioImpl{
 		ScenarioImpl:  scenarios.NewScenarioImpl(service),
 		remoteDevices: make(map[string]*InverterPVVisImpl),
