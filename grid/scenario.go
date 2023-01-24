@@ -48,7 +48,7 @@ func (e *GridScenarioImpl) AddUseCases() {
 
 	_ = spine.NewUseCase(
 		localEntity,
-		model.UseCaseNameTypeEVSECommissioningAndConfiguration,
+		model.UseCaseNameTypeMonitoringOfGridConnectionPoint,
 		model.SpecificationVersionType("1.0.0 RC5"),
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7})
 }
