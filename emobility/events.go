@@ -122,7 +122,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 			case *model.ElectricalConnectionParameterDescriptionListDataType:
 				_, err := e.evElectricalConnection.RequestPermittedValueSet()
 				if err != nil {
-					logging.Log.Error("Error getting electrical permitted values:", err)
+					logging.Log.Debug("Error getting electrical permitted values:", err)
 				}
 
 				/*
@@ -140,7 +140,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 			case *model.LoadControlLimitDescriptionListDataType:
 				_, err := e.evLoadControl.RequestLimits()
 				if err != nil {
-					logging.Log.Error("Error getting loadcontrol limit values:", err)
+					logging.Log.Debug("Error getting loadcontrol limit values:", err)
 				}
 
 				/*
@@ -158,7 +158,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 			case *model.MeasurementDescriptionListDataType:
 				_, err := e.evMeasurement.Request()
 				if err != nil {
-					logging.Log.Error("Error getting measurement list values:", err)
+					logging.Log.Debug("Error getting measurement list values:", err)
 				}
 
 				/*
@@ -262,31 +262,31 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 
 	// subscribe
 	if err := e.evDeviceClassification.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 		return
 	}
 	if err := e.evDeviceConfiguration.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 		return
 	}
 	if err := e.evDeviceDiagnosis.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 		return
 	}
 	if err := e.evElectricalConnection.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 		return
 	}
 	if err := e.evMeasurement.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 		return
 	}
 	if err := e.evIdentification.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 		return
 	}
 	if err := e.evLoadControl.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 		return
 	}
 	// if err := util.SubscribeTimeSeriesForEntity(e.service, entity); err != nil {
@@ -300,54 +300,54 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 
 	// bindings
 	if err := e.evLoadControl.Bind(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 		return
 	}
 
 	// get ev configuration data
 	if err := e.evDeviceConfiguration.Request(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 		return
 	}
 
 	// get manufacturer details
 	if _, err := e.evDeviceClassification.RequestManufacturerDetailsForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 		return
 	}
 
 	// get device diagnosis state
 	if _, err := e.evDeviceDiagnosis.RequestStateForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 		return
 	}
 
 	// get electrical connection parameter
 	if err := e.evElectricalConnection.RequestDescription(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 		return
 	}
 
 	if err := e.evElectricalConnection.RequestParameterDescription(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 		return
 	}
 
 	// get measurement parameters
 	if err := e.evMeasurement.RequestDescription(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 		return
 	}
 
 	// get identification
 	if _, err := e.evIdentification.Request(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 		return
 	}
 
 	// get loadlimit parameter
 	if err := e.evLoadControl.RequestLimitDescription(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 		return
 	}
 
