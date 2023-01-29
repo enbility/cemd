@@ -354,22 +354,22 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 
 	// subscribe
 	if err := e.evDeviceClassification.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 	}
 	if err := e.evDeviceConfiguration.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 	}
 	if err := e.evDeviceDiagnosis.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 	}
 	if err := e.evElectricalConnection.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 	}
 	if err := e.evMeasurement.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 	}
 	if err := e.evLoadControl.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 	}
 	if err := e.evIdentification.SubscribeForEntity(); err != nil {
 		logging.Log.Debug(err)
@@ -387,7 +387,7 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 
 	// bindings
 	if err := e.evLoadControl.Bind(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 	}
 
 	if !e.configuration.CoordinatedChargingDisabled {
@@ -404,7 +404,7 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 
 	// get ev configuration data
 	if err := e.evDeviceConfiguration.RequestDescriptions(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 	}
 
 	// get manufacturer details
@@ -414,26 +414,26 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 
 	// get device diagnosis state
 	if _, err := e.evDeviceDiagnosis.RequestState(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 	}
 
 	// get electrical connection parameter
 	if err := e.evElectricalConnection.RequestDescriptions(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 	}
 
 	if err := e.evElectricalConnection.RequestParameterDescriptions(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 	}
 
 	// get measurement parameters
 	if err := e.evMeasurement.RequestDescriptions(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 	}
 
 	// get loadlimit parameter
 	if err := e.evLoadControl.RequestLimitDescriptions(); err != nil {
-		logging.Log.Error(err)
+		logging.Log.Debug(err)
 	}
 
 	// get identification
