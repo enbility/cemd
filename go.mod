@@ -2,7 +2,7 @@ module github.com/enbility/cemd
 
 go 1.18
 
-require github.com/enbility/eebus-go v0.0.0-20230127113655-e548d2dd6a43
+require github.com/enbility/eebus-go v0.1.6
 
 require (
 	github.com/ahmetb/go-linq/v3 v3.2.0 // indirect
