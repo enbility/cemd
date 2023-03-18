@@ -20,8 +20,9 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 	}
 
 	// we care only about events from an EVSE or EV entity or device changes for this remote device
+	var entityType model.EntityTypeType
 	if payload.Entity != nil {
-		entityType := payload.Entity.EntityType()
+		entityType = payload.Entity.EntityType()
 		if entityType != model.EntityTypeTypeEVSE && entityType != model.EntityTypeTypeEV {
 			return
 		}
@@ -36,7 +37,9 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 		}
 
 	case spine.EventTypeEntityChange:
-		entityType := payload.Entity.EntityType()
+		if payload.Entity == nil {
+			return
+		}
 
 		switch payload.ChangeType {
 		case spine.ElementChangeAdd:
