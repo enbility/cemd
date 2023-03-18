@@ -239,7 +239,7 @@ func (e *EMobilityImpl) evDisconnected() {
 	e.evIdentification = nil
 	e.evLoadControl = nil
 
-	logging.Log.Info("ev disconnected")
+	logging.Log.Debug("ev disconnected")
 
 	// TODO: add error handling
 
@@ -250,7 +250,7 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 	e.evEntity = entity
 	localDevice := e.service.LocalDevice()
 
-	logging.Log.Info("ev connected")
+	logging.Log.Debug("ev connected")
 
 	// TODO: add error handling
 
