@@ -350,7 +350,7 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 	e.evMeasurement, _ = features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 	e.evIdentification, _ = features.NewIdentification(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 	e.evLoadControl, _ = features.NewLoadControl(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
-	if !e.configuration.CoordinatedChargingDisabled {
+	if e.configuration.CoordinatedChargingEnabled {
 		e.evTimeSeries, _ = features.NewTimeSeries(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 		e.evIncentiveTable, _ = features.NewIncentiveTable(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
 	}
@@ -380,7 +380,7 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 		logging.Log.Debug(err)
 	}
 
-	if !e.configuration.CoordinatedChargingDisabled {
+	if e.configuration.CoordinatedChargingEnabled {
 		if err := e.evTimeSeries.SubscribeForEntity(); err != nil {
 			logging.Log.Debug(err)
 		}
@@ -395,7 +395,7 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 		logging.Log.Debug(err)
 	}
 
-	if !e.configuration.CoordinatedChargingDisabled {
+	if e.configuration.CoordinatedChargingEnabled {
 		// this is optional
 		if err := e.evTimeSeries.Bind(); err != nil {
 			logging.Log.Debug(err)
@@ -446,7 +446,7 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 		logging.Log.Debug(err)
 	}
 
-	if !e.configuration.CoordinatedChargingDisabled {
+	if e.configuration.CoordinatedChargingEnabled {
 		// get time series parameter
 		if err := e.evTimeSeries.RequestDescriptions(); err != nil {
 			logging.Log.Debug(err)

@@ -29,15 +29,18 @@ func NewDemoCem(configuration *service.Configuration) *DemoCem {
 }
 
 func (d *DemoCem) Setup() error {
-	return d.cem.Setup(cem.CemConfiguration{
-		EmobilityScenarioDisabled:            false,
-		GridScenarioDisabled:                 false,
-		InverterBatteryVisualizationDisabled: false,
-		InverterPVVisualizationDisabled:      false,
-		EmobilityConfiguration: emobility.EmobilityConfiguration{
-			CoordinatedChargingDisabled: false,
-		},
+	if err := d.cem.Setup(); err != nil {
+		return err
+	}
+
+	d.cem.EnableEmobility(emobility.EmobilityConfiguration{
+		CoordinatedChargingEnabled: true,
 	})
+	d.cem.EnableGrid()
+	d.cem.EnableBatteryVisualization()
+	d.cem.EnablePVVisualization()
+
+	return nil
 }
 
 // report the Ship ID of a newly trusted connection

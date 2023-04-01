@@ -12,25 +12,19 @@ import (
 	"github.com/enbility/eebus-go/spine/model"
 )
 
-type CemConfiguration struct {
-	EmobilityScenarioDisabled            bool
-	EmobilityConfiguration               emobility.EmobilityConfiguration
-	GridScenarioDisabled                 bool
-	Currency                             model.CurrencyType
-	InverterBatteryVisualizationDisabled bool
-	InverterPVVisualizationDisabled      bool
-}
-
 // Generic CEM implementation
 type CemImpl struct {
 	service *service.EEBUSService
 
 	emobilityScenario, gridScenario, inverterBatteryVisScenario, inverterPVVisScenario scenarios.ScenariosI
+
+	Currency model.CurrencyType
 }
 
 func NewCEM(serviceDescription *service.Configuration, serviceHandler service.EEBUSServiceHandler, log logging.Logging) *CemImpl {
 	cem := &CemImpl{
-		service: service.NewEEBUSService(serviceDescription, serviceHandler),
+		service:  service.NewEEBUSService(serviceDescription, serviceHandler),
+		Currency: model.CurrencyTypeEur,
 	}
 
 	cem.service.SetLogging(log)
@@ -39,40 +33,40 @@ func NewCEM(serviceDescription *service.Configuration, serviceHandler service.EE
 }
 
 // Set up the supported usecases and features
-func (h *CemImpl) Setup(configuration CemConfiguration) error {
+func (h *CemImpl) Setup() error {
 	if err := h.service.Setup(); err != nil {
 		return err
 	}
 
 	spine.Events.Subscribe(h)
 
-	// Setup the supported usecases and features
-	if !configuration.EmobilityScenarioDisabled {
-		h.emobilityScenario = emobility.NewEMobilityScenario(h.service, configuration.Currency, configuration.EmobilityConfiguration)
-		h.emobilityScenario.AddFeatures()
-		h.emobilityScenario.AddUseCases()
-	}
-
-	// Setup the supported usecases and features
-	if !configuration.GridScenarioDisabled {
-		h.gridScenario = grid.NewGridScenario(h.service)
-		h.gridScenario.AddFeatures()
-		h.gridScenario.AddUseCases()
-	}
-
-	if !configuration.InverterBatteryVisualizationDisabled {
-		h.inverterBatteryVisScenario = inverterbatteryvis.NewInverterVisScenario(h.service)
-		h.inverterBatteryVisScenario.AddFeatures()
-		h.inverterBatteryVisScenario.AddUseCases()
-	}
-
-	if !configuration.InverterPVVisualizationDisabled {
-		h.inverterPVVisScenario = inverterpvvis.NewInverterVisScenario(h.service)
-		h.inverterPVVisScenario.AddFeatures()
-		h.inverterPVVisScenario.AddUseCases()
-	}
-
 	return nil
+}
+
+// Enable the supported usecases and features
+
+func (h *CemImpl) EnableEmobility(configuration emobility.EmobilityConfiguration) {
+	h.emobilityScenario = emobility.NewEMobilityScenario(h.service, h.Currency, configuration)
+	h.emobilityScenario.AddFeatures()
+	h.emobilityScenario.AddUseCases()
+}
+
+func (h *CemImpl) EnableGrid() {
+	h.gridScenario = grid.NewGridScenario(h.service)
+	h.gridScenario.AddFeatures()
+	h.gridScenario.AddUseCases()
+}
+
+func (h *CemImpl) EnableBatteryVisualization() {
+	h.inverterBatteryVisScenario = inverterbatteryvis.NewInverterVisScenario(h.service)
+	h.inverterBatteryVisScenario.AddFeatures()
+	h.inverterBatteryVisScenario.AddUseCases()
+}
+
+func (h *CemImpl) EnablePVVisualization() {
+	h.inverterPVVisScenario = inverterpvvis.NewInverterVisScenario(h.service)
+	h.inverterPVVisScenario.AddFeatures()
+	h.inverterPVVisScenario.AddUseCases()
 }
 
 func (h *CemImpl) Start() {
