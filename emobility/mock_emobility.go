@@ -283,6 +283,21 @@ func (mr *MockEmobilityIMockRecorder) EVIdentification() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVIdentification", reflect.TypeOf((*MockEmobilityI)(nil).EVIdentification))
 }
 
+// EVLoadControlObligationLimits mocks base method.
+func (m *MockEmobilityI) EVLoadControlObligationLimits() ([]float64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EVLoadControlObligationLimits")
+	ret0, _ := ret[0].([]float64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// EVLoadControlObligationLimits indicates an expected call of EVLoadControlObligationLimits.
+func (mr *MockEmobilityIMockRecorder) EVLoadControlObligationLimits() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVLoadControlObligationLimits", reflect.TypeOf((*MockEmobilityI)(nil).EVLoadControlObligationLimits))
+}
+
 // EVOptimizationOfSelfConsumptionSupported mocks base method.
 func (m *MockEmobilityI) EVOptimizationOfSelfConsumptionSupported() (bool, error) {
 	m.ctrl.T.Helper()
