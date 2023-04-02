@@ -3,8 +3,8 @@ github.com/ahmetb/go-linq/v3 v3.2.0/go.mod h1:haQ3JfOeWK8HpVxMtHHEMPVgBKiYyQ+f1/
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/enbility/eebus-go v0.0.0-20230323155235-2b777082c22f h1:39QEeDqDcUexvD8emco4w4VFoGq6AN2HEjn63Bp+250=
-github.com/enbility/eebus-go v0.0.0-20230323155235-2b777082c22f/go.mod h1:Ozg1eDUfSbHfQ1dWfyAUa3h8dMtgM/01eO30kHca5zk=
+github.com/enbility/eebus-go v0.0.0-20230330085405-a9841f4bca6b h1:GAg7l0KFI9JI2cpehTmJK46144OdkMnTq5ui8Owco90=
+github.com/enbility/eebus-go v0.0.0-20230330085405-a9841f4bca6b/go.mod h1:Ozg1eDUfSbHfQ1dWfyAUa3h8dMtgM/01eO30kHca5zk=
 github.com/godbus/dbus/v5 v5.0.4/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
 github.com/godbus/dbus/v5 v5.1.0 h1:4KLkAxT3aOY8Li4FRJe/KvhoNFFxo0m6fNuFUO8QJUk=
 github.com/godbus/dbus/v5 v5.1.0/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
