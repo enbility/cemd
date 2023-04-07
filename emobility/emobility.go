@@ -73,6 +73,13 @@ type EmobilityI interface {
 	//   - and others
 	EVCurrentLimits() ([]float64, []float64, []float64, error)
 
+	// return the current loadcontrol obligation limits
+	//
+	// possible errors:
+	//   - ErrDataNotAvailable if no such measurement is (yet) available
+	//   - and others
+	EVLoadControlObligationLimits() ([]float64, error)
+
 	// send new LoadControlLimits to the remote EV
 	//
 	// parameters:

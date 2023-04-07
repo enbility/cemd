@@ -252,6 +252,67 @@ func (e *EMobilityImpl) EVCurrentLimits() ([]float64, []float64, []float64, erro
 	return resultMin, resultMax, resultDefault, nil
 }
 
+// return the current loadcontrol obligation limits
+//
+// possible errors:
+//   - ErrDataNotAvailable if no such measurement is (yet) available
+//   - and others
+func (e *EMobilityImpl) EVLoadControlObligationLimits() ([]float64, error) {
+	if e.evEntity == nil {
+		return nil, ErrEVDisconnected
+	}
+
+	if e.evElectricalConnection == nil || e.evLoadControl == nil {
+		return nil, features.ErrDataNotAvailable
+	}
+
+	// find out the appropriate limitId for each phase value
+	// limitDescription contains the measurementId for each limitId
+	limitDescriptions, err := e.evLoadControl.GetLimitDescriptionsForCategory(model.LoadControlCategoryTypeObligation)
+	if err != nil {
+		return nil, features.ErrDataNotAvailable
+	}
+
+	var result []float64
+
+	for i := 0; i < 3; i++ {
+		phaseName := util.PhaseNameMapping[i]
+
+		// electricalParameterDescription contains the measured phase for each measurementId
+		elParamDesc, err := e.evElectricalConnection.GetParameterDescriptionForMeasuredPhase(phaseName)
+		if err != nil || elParamDesc.MeasurementId == nil {
+			// there is no data for this phase, the phase may not exit
+			result = append(result, 0)
+			continue
+		}
+
+		var limitDesc *model.LoadControlLimitDescriptionDataType
+		for _, desc := range limitDescriptions {
+			if desc.MeasurementId != nil && *desc.MeasurementId == *elParamDesc.MeasurementId {
+				limitDesc = &desc
+				break
+			}
+		}
+
+		if limitDesc == nil || limitDesc.LimitId == nil {
+			return nil, features.ErrDataNotAvailable
+		}
+
+		limitIdData, err := e.evLoadControl.GetLimitValueForLimitId(*limitDesc.LimitId)
+		if err != nil {
+			return nil, features.ErrDataNotAvailable
+		}
+
+		if limitIdData.Value == nil {
+			return nil, features.ErrDataNotAvailable
+		}
+
+		result = append(result, limitIdData.Value.GetValue())
+	}
+
+	return result, nil
+}
+
 // send new LoadControlLimits to the remote EV
 //
 // parameters:
