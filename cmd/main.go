@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/enbility/cemd/cem"
+	"github.com/enbility/cemd/emobility"
 	"github.com/enbility/eebus-go/logging"
 	"github.com/enbility/eebus-go/service"
 	"github.com/enbility/eebus-go/spine/model"
@@ -28,7 +29,18 @@ func NewDemoCem(configuration *service.Configuration) *DemoCem {
 }
 
 func (d *DemoCem) Setup() error {
-	return d.cem.Setup(true)
+	if err := d.cem.Setup(); err != nil {
+		return err
+	}
+
+	d.cem.EnableEmobility(emobility.EmobilityConfiguration{
+		CoordinatedChargingEnabled: true,
+	})
+	d.cem.EnableGrid()
+	d.cem.EnableBatteryVisualization()
+	d.cem.EnablePVVisualization()
+
+	return nil
 }
 
 // report the Ship ID of a newly trusted connection
@@ -135,7 +147,7 @@ func main() {
 	}
 
 	remoteService := service.NewServiceDetails(os.Args[2])
-	demo.cem.RegisterEmobilityRemoteDevice(remoteService)
+	demo.cem.RegisterEmobilityRemoteDevice(remoteService, nil)
 
 	// Clean exit to make sure mdns shutdown is invoked
 	sig := make(chan os.Signal, 1)
