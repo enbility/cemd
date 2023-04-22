@@ -10,7 +10,7 @@ import (
 	eebusUtil "github.com/enbility/eebus-go/util"
 )
 
-// return the current charge sate of the EV
+// return the current charge state of the EV
 func (e *EMobilityImpl) EVCurrentChargeState() (EVChargeStateType, error) {
 	if e.evEntity == nil {
 		return EVChargeStateTypeUnplugged, nil
