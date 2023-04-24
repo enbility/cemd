@@ -148,6 +148,20 @@ func (mr *MockEmobilityIMockRecorder) EVCommunicationStandard() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVCommunicationStandard", reflect.TypeOf((*MockEmobilityI)(nil).EVCommunicationStandard))
 }
 
+// EVConnected mocks base method.
+func (m *MockEmobilityI) EVConnected() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EVConnected")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// EVConnected indicates an expected call of EVConnected.
+func (mr *MockEmobilityIMockRecorder) EVConnected() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVConnected", reflect.TypeOf((*MockEmobilityI)(nil).EVConnected))
+}
+
 // EVConnectedPhases mocks base method.
 func (m *MockEmobilityI) EVConnectedPhases() (uint, error) {
 	m.ctrl.T.Helper()

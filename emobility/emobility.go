@@ -39,6 +39,9 @@ type EmobilityDataProvider interface {
 
 // used by the CEM and implemented by emobility
 type EmobilityI interface {
+	// return if an EV is connected
+	EVConnected() bool
+
 	// return the current charge state of the EV
 	EVCurrentChargeState() (EVChargeStateType, error)
 
