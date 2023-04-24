@@ -20,8 +20,8 @@ func Test_EVCurrentChargeState(t *testing.T) {
 	emobilty.evEntity = entites[1]
 
 	data, err = emobilty.EVCurrentChargeState()
-	assert.NotNil(t, err)
-	assert.Equal(t, EVChargeStateTypeUnknown, data)
+	assert.Nil(t, err)
+	assert.Equal(t, EVChargeStateTypeUnplugged, data)
 
 	emobilty.evDeviceDiagnosis = deviceDiagnosis(localDevice, emobilty.evEntity)
 

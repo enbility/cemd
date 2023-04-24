@@ -10,9 +10,11 @@ import (
 	eebusUtil "github.com/enbility/eebus-go/util"
 )
 
-// internal method used to check wether the required entity
-// and features are available
-func (e *EMobilityImpl) isEVConnected() bool {
+// return if an EV is connected
+//
+// this includes all required features and
+// minimal data being available
+func (e *EMobilityImpl) EVConnected() bool {
 	// To report an EV as being connected, also consider all required
 	// features to be available and assigned
 	if e.evEntity == nil ||
@@ -21,18 +23,6 @@ func (e *EMobilityImpl) isEVConnected() bool {
 		e.evMeasurement == nil ||
 		e.evLoadControl == nil ||
 		e.evDeviceConfiguration == nil {
-		return false
-	}
-
-	return true
-}
-
-// return if an EV is connected
-//
-// this includes all required features and
-// minimal data being available
-func (e *EMobilityImpl) EVConnected() bool {
-	if !e.isEVConnected() {
 		return false
 	}
 
@@ -61,7 +51,7 @@ func (e *EMobilityImpl) EVConnected() bool {
 
 // return the current charge state of the EV
 func (e *EMobilityImpl) EVCurrentChargeState() (EVChargeStateType, error) {
-	if !e.isEVConnected() {
+	if e.evEntity == nil || e.evDeviceDiagnosis == nil {
 		return EVChargeStateTypeUnplugged, nil
 	}
 
@@ -91,7 +81,7 @@ func (e *EMobilityImpl) EVCurrentChargeState() (EVChargeStateType, error) {
 
 // return the number of ac connected phases of the EV or 0 if it is unknown
 func (e *EMobilityImpl) EVConnectedPhases() (uint, error) {
-	if !e.isEVConnected() {
+	if e.evEntity == nil || e.evElectricalConnection == nil {
 		return 0, ErrEVDisconnected
 	}
 
@@ -120,7 +110,7 @@ func (e *EMobilityImpl) EVConnectedPhases() (uint, error) {
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *EMobilityImpl) EVChargedEnergy() (float64, error) {
-	if !e.isEVConnected() {
+	if e.evEntity == nil || e.evMeasurement == nil {
 		return 0, ErrEVDisconnected
 	}
 
@@ -147,7 +137,7 @@ func (e *EMobilityImpl) EVChargedEnergy() (float64, error) {
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *EMobilityImpl) EVPowerPerPhase() ([]float64, error) {
-	if !e.isEVConnected() {
+	if e.evEntity == nil || e.evMeasurement == nil {
 		return nil, ErrEVDisconnected
 	}
 
@@ -201,7 +191,7 @@ func (e *EMobilityImpl) EVPowerPerPhase() ([]float64, error) {
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *EMobilityImpl) EVCurrentsPerPhase() ([]float64, error) {
-	if !e.isEVConnected() {
+	if e.evEntity == nil || e.evElectricalConnection == nil {
 		return nil, ErrEVDisconnected
 	}
 
@@ -240,7 +230,7 @@ func (e *EMobilityImpl) EVCurrentsPerPhase() ([]float64, error) {
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *EMobilityImpl) EVCurrentLimits() ([]float64, []float64, []float64, error) {
-	if !e.isEVConnected() {
+	if e.evEntity == nil || e.evElectricalConnection == nil {
 		return nil, nil, nil, ErrEVDisconnected
 	}
 
@@ -283,7 +273,7 @@ func (e *EMobilityImpl) EVCurrentLimits() ([]float64, []float64, []float64, erro
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *EMobilityImpl) EVLoadControlObligationLimits() ([]float64, error) {
-	if !e.isEVConnected() {
+	if e.evEntity == nil || e.evElectricalConnection == nil || e.evLoadControl == nil {
 		return nil, ErrEVDisconnected
 	}
 
@@ -361,8 +351,12 @@ func (e *EMobilityImpl) EVLoadControlObligationLimits() ([]float64, error) {
 //   - In ISO15118-20 this is a standard feature which does not need special support on the EVSE.
 //   - Min power data is only provided via IEC61851 or using VAS in ISO15118-2.
 func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []float64) error {
-	if !e.isEVConnected() {
+	if e.evEntity == nil {
 		return ErrEVDisconnected
+	}
+
+	if e.evElectricalConnection == nil || e.evLoadControl == nil {
+		return features.ErrDataNotAvailable
 	}
 
 	var limitData []model.LoadControlLimitDataType
@@ -447,7 +441,7 @@ func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []
 //   - ErrNotSupported if getting the communication standard is not supported
 //   - and others
 func (e *EMobilityImpl) EVCommunicationStandard() (EVCommunicationStandardType, error) {
-	if !e.isEVConnected() {
+	if e.evEntity == nil || e.evDeviceConfiguration == nil {
 		return EVCommunicationStandardTypeUnknown, ErrEVDisconnected
 	}
 
@@ -476,7 +470,7 @@ func (e *EMobilityImpl) EVCommunicationStandard() (EVCommunicationStandardType, 
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
 func (e *EMobilityImpl) EVIdentification() (string, error) {
-	if !e.isEVConnected() {
+	if e.evEntity == nil {
 		return "", ErrEVDisconnected
 	}
 
@@ -506,7 +500,7 @@ func (e *EMobilityImpl) EVIdentification() (string, error) {
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
 func (e *EMobilityImpl) EVOptimizationOfSelfConsumptionSupported() (bool, error) {
-	if !e.isEVConnected() {
+	if e.evEntity == nil || e.evLoadControl == nil {
 		return false, ErrEVDisconnected
 	}
 
@@ -538,7 +532,7 @@ func (e *EMobilityImpl) EVOptimizationOfSelfConsumptionSupported() (bool, error)
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *EMobilityImpl) EVSoCSupported() (bool, error) {
-	if !e.isEVConnected() {
+	if e.evEntity == nil || e.evMeasurement == nil {
 		return false, ErrEVDisconnected
 	}
 
@@ -575,7 +569,7 @@ func (e *EMobilityImpl) EVSoCSupported() (bool, error) {
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *EMobilityImpl) EVSoC() (float64, error) {
-	if !e.isEVConnected() {
+	if e.evEntity == nil || e.evMeasurement == nil {
 		return 0, ErrEVDisconnected
 	}
 
@@ -605,7 +599,7 @@ func (e *EMobilityImpl) EVSoC() (float64, error) {
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
 func (e *EMobilityImpl) EVCoordinatedChargingSupported() (bool, error) {
-	if !e.isEVConnected() {
+	if e.evEntity == nil {
 		return false, ErrEVDisconnected
 	}
 
@@ -624,7 +618,7 @@ func (e *EMobilityImpl) EVCoordinatedChargingSupported() (bool, error) {
 
 // returns the current charging strategy
 func (e *EMobilityImpl) EVChargeStrategy() EVChargeStrategyType {
-	if !e.isEVConnected() || e.evTimeSeries == nil {
+	if e.evEntity == nil || e.evTimeSeries == nil {
 		return EVChargeStrategyTypeUnknown
 	}
 
@@ -683,7 +677,7 @@ func (e *EMobilityImpl) EVChargeStrategy() EVChargeStrategyType {
 func (e *EMobilityImpl) EVEnergyDemand() (EVDemand, error) {
 	demand := EVDemand{}
 
-	if !e.isEVConnected() {
+	if e.evEntity == nil {
 		return demand, ErrEVDisconnected
 	}
 
@@ -747,7 +741,7 @@ func (e *EMobilityImpl) EVEnergyDemand() (EVDemand, error) {
 func (e *EMobilityImpl) EVGetPowerConstraints() EVTimeSlotConstraints {
 	result := EVTimeSlotConstraints{}
 
-	if !e.isEVConnected() || e.evTimeSeries == nil {
+	if e.evEntity == nil || e.evTimeSeries == nil {
 		return result
 	}
 
@@ -786,7 +780,7 @@ func (e *EMobilityImpl) EVGetPowerConstraints() EVTimeSlotConstraints {
 
 // send power limits to the EV
 func (e *EMobilityImpl) EVWritePowerLimits(data []EVDurationSlotValue) error {
-	if !e.isEVConnected() || e.evTimeSeries == nil {
+	if e.evEntity == nil || e.evTimeSeries == nil {
 		return ErrNotSupported
 	}
 
@@ -850,7 +844,7 @@ func (e *EMobilityImpl) EVWritePowerLimits(data []EVDurationSlotValue) error {
 func (e *EMobilityImpl) EVGetIncentiveConstraints() EVIncentiveSlotConstraints {
 	result := EVIncentiveSlotConstraints{}
 
-	if !e.isEVConnected() || e.evIncentiveTable == nil {
+	if e.evEntity == nil || e.evIncentiveTable == nil {
 		return result
 	}
 
@@ -874,7 +868,7 @@ func (e *EMobilityImpl) EVGetIncentiveConstraints() EVIncentiveSlotConstraints {
 
 // send incentives to the EV
 func (e *EMobilityImpl) EVWriteIncentives(data []EVDurationSlotValue) error {
-	if !e.isEVConnected() || e.evIncentiveTable == nil {
+	if e.evEntity == nil || e.evIncentiveTable == nil {
 		return features.ErrDataNotAvailable
 	}
 
