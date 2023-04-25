@@ -100,8 +100,9 @@ func (e *EmobilityScenarioImpl) AddUseCases() {
 		model.SpecificationVersionType("1.0.1b"),
 		[]model.UseCaseScenarioSupportType{1, 2, 3})
 
-	_ = spine.NewUseCase(
+	_ = spine.NewUseCaseWithActor(
 		localEntity,
+		model.UseCaseActorTypeMonitoringAppliance,
 		model.UseCaseNameTypeEVStateOfCharge,
 		model.SpecificationVersionType("1.0.0"),
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4})
