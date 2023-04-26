@@ -37,12 +37,14 @@ func (e *EMobilityImpl) EVConnected() bool {
 	}
 
 	// getting currents measurements should work
-	if _, err := e.EVCurrentsPerPhase(); err != nil {
+	if _, err := e.EVCurrentsPerPhase(); err != nil && err != features.ErrDataNotAvailable {
+		// features.ErrDataNotAvailable check in case of measurements not being provided but the feature works
 		return false
 	}
 
 	// getting limits should work
-	if _, err := e.EVLoadControlObligationLimits(); err != nil {
+	if _, err := e.EVLoadControlObligationLimits(); err != nil && err != features.ErrDataNotAvailable {
+		// features.ErrDataNotAvailable check in case of load control limits not being provided but the feature works
 		return false
 	}
 
@@ -314,11 +316,20 @@ func (e *EMobilityImpl) EVLoadControlObligationLimits() ([]float64, error) {
 			return nil, features.ErrDataNotAvailable
 		}
 
+		var limitValue float64
 		if limitIdData.Value == nil {
-			return nil, features.ErrDataNotAvailable
+			// assume maximum possible
+			_, dataMax, _, err := e.evElectricalConnection.GetLimitsForParameterId(*elParamDesc.ParameterId)
+			if err != nil {
+				return nil, features.ErrDataNotAvailable
+			}
+
+			limitValue = dataMax
+		} else {
+			limitValue = limitIdData.Value.GetValue()
 		}
 
-		result = append(result, limitIdData.Value.GetValue())
+		result = append(result, limitValue)
 	}
 
 	return result, nil
