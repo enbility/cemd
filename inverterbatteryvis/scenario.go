@@ -51,6 +51,7 @@ func (i *InverterBatteryVisScenarioImpl) AddUseCases() {
 		model.UseCaseActorTypeVisualizationAppliance,
 		model.UseCaseNameTypeVisualizationOfAggregatedBatteryData,
 		model.SpecificationVersionType("1.0.0 RC1"),
+		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4})
 }
 

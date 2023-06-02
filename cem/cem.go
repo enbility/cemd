@@ -14,7 +14,7 @@ import (
 
 // Generic CEM implementation
 type CemImpl struct {
-	service *service.EEBUSService
+	Service *service.EEBUSService
 
 	emobilityScenario, gridScenario, inverterBatteryVisScenario, inverterPVVisScenario scenarios.ScenariosI
 
@@ -23,18 +23,18 @@ type CemImpl struct {
 
 func NewCEM(serviceDescription *service.Configuration, serviceHandler service.EEBUSServiceHandler, log logging.Logging) *CemImpl {
 	cem := &CemImpl{
-		service:  service.NewEEBUSService(serviceDescription, serviceHandler),
+		Service:  service.NewEEBUSService(serviceDescription, serviceHandler),
 		Currency: model.CurrencyTypeEur,
 	}
 
-	cem.service.SetLogging(log)
+	cem.Service.SetLogging(log)
 
 	return cem
 }
 
 // Set up the supported usecases and features
 func (h *CemImpl) Setup() error {
-	if err := h.service.Setup(); err != nil {
+	if err := h.Service.Setup(); err != nil {
 		return err
 	}
 
@@ -46,35 +46,35 @@ func (h *CemImpl) Setup() error {
 // Enable the supported usecases and features
 
 func (h *CemImpl) EnableEmobility(configuration emobility.EmobilityConfiguration) {
-	h.emobilityScenario = emobility.NewEMobilityScenario(h.service, h.Currency, configuration)
+	h.emobilityScenario = emobility.NewEMobilityScenario(h.Service, h.Currency, configuration)
 	h.emobilityScenario.AddFeatures()
 	h.emobilityScenario.AddUseCases()
 }
 
 func (h *CemImpl) EnableGrid() {
-	h.gridScenario = grid.NewGridScenario(h.service)
+	h.gridScenario = grid.NewGridScenario(h.Service)
 	h.gridScenario.AddFeatures()
 	h.gridScenario.AddUseCases()
 }
 
 func (h *CemImpl) EnableBatteryVisualization() {
-	h.inverterBatteryVisScenario = inverterbatteryvis.NewInverterVisScenario(h.service)
+	h.inverterBatteryVisScenario = inverterbatteryvis.NewInverterVisScenario(h.Service)
 	h.inverterBatteryVisScenario.AddFeatures()
 	h.inverterBatteryVisScenario.AddUseCases()
 }
 
 func (h *CemImpl) EnablePVVisualization() {
-	h.inverterPVVisScenario = inverterpvvis.NewInverterVisScenario(h.service)
+	h.inverterPVVisScenario = inverterpvvis.NewInverterVisScenario(h.Service)
 	h.inverterPVVisScenario.AddFeatures()
 	h.inverterPVVisScenario.AddUseCases()
 }
 
 func (h *CemImpl) Start() {
-	h.service.Start()
+	h.Service.Start()
 }
 
 func (h *CemImpl) Shutdown() {
-	h.service.Shutdown()
+	h.Service.Shutdown()
 }
 
 func (h *CemImpl) RegisterEmobilityRemoteDevice(details *service.ServiceDetails, dataProvider emobility.EmobilityDataProvider) *emobility.EMobilityImpl {

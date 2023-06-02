@@ -51,6 +51,7 @@ func (i *InverterPVVisScenarioImpl) AddUseCases() {
 		model.UseCaseActorTypeVisualizationAppliance,
 		model.UseCaseNameTypeVisualizationOfAggregatedPhotovoltaicData,
 		model.SpecificationVersionType("1.0.0 RC1"),
+		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3})
 }
 

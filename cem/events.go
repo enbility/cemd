@@ -26,13 +26,13 @@ func (h *CemImpl) subscriptionRequestHandling(payload spine.EventPayload) {
 		return
 	}
 
-	remoteDevice := h.service.RemoteDeviceForSki(payload.Ski)
+	remoteDevice := h.Service.RemoteDeviceForSki(payload.Ski)
 	if remoteDevice == nil {
 		logging.Log.Info("No remote device found for SKI:", payload.Ski)
 		return
 	}
 
-	senderAddr := h.service.LocalDevice().FeatureByTypeAndRole(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer).Address()
+	senderAddr := h.Service.LocalDevice().FeatureByTypeAndRole(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer).Address()
 	destinationAddr := payload.Feature.Address()
 	if senderAddr == nil || destinationAddr == nil {
 		logging.Log.Info("No sender or destination address found for SKI:", payload.Ski)

@@ -80,24 +80,28 @@ func (e *EmobilityScenarioImpl) AddUseCases() {
 		localEntity,
 		model.UseCaseNameTypeEVSECommissioningAndConfiguration,
 		model.SpecificationVersionType("1.0.1"),
+		true,
 		[]model.UseCaseScenarioSupportType{1, 2})
 
 	_ = spine.NewUseCase(
 		localEntity,
 		model.UseCaseNameTypeEVCommissioningAndConfiguration,
 		model.SpecificationVersionType("1.0.1"),
+		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
 
 	_ = spine.NewUseCase(
 		localEntity,
 		model.UseCaseNameTypeMeasurementOfElectricityDuringEVCharging,
 		model.SpecificationVersionType("1.0.1"),
+		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3})
 
 	_ = spine.NewUseCase(
 		localEntity,
 		model.UseCaseNameTypeOverloadProtectionByEVChargingCurrentCurtailment,
 		model.SpecificationVersionType("1.0.1b"),
+		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3})
 
 	_ = spine.NewUseCaseWithActor(
@@ -105,12 +109,14 @@ func (e *EmobilityScenarioImpl) AddUseCases() {
 		model.UseCaseActorTypeMonitoringAppliance,
 		model.UseCaseNameTypeEVStateOfCharge,
 		model.SpecificationVersionType("1.0.0"),
+		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4})
 
 	_ = spine.NewUseCase(
 		localEntity,
 		model.UseCaseNameTypeOptimizationOfSelfConsumptionDuringEVCharging,
 		model.SpecificationVersionType("1.0.1b"),
+		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3})
 
 	if e.configuration.CoordinatedChargingEnabled {
@@ -118,6 +124,7 @@ func (e *EmobilityScenarioImpl) AddUseCases() {
 			localEntity,
 			model.UseCaseNameTypeCoordinatedEVCharging,
 			model.SpecificationVersionType("1.0.1"),
+			true,
 			[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
 	}
 }
