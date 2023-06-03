@@ -135,7 +135,7 @@ func (e *EmobilityScenarioImpl) RegisterRemoteDevice(details *service.ServiceDet
 	e.mux.Lock()
 	defer e.mux.Unlock()
 
-	if em, ok := e.remoteDevices[details.SKI()]; ok {
+	if em, ok := e.remoteDevices[details.SKI]; ok {
 		return em
 	}
 
@@ -144,17 +144,17 @@ func (e *EmobilityScenarioImpl) RegisterRemoteDevice(details *service.ServiceDet
 		provider = dataProvider.(EmobilityDataProvider)
 	}
 	emobility := NewEMobility(e.Service, details, e.currency, e.configuration, provider)
-	e.remoteDevices[details.SKI()] = emobility
+	e.remoteDevices[details.SKI] = emobility
 	return emobility
 }
 
-func (e *EmobilityScenarioImpl) UnRegisterRemoteDevice(remoteDeviceSki string) error {
+func (e *EmobilityScenarioImpl) UnRegisterRemoteDevice(remoteDeviceSki string) {
 	e.mux.Lock()
 	defer e.mux.Unlock()
 
 	delete(e.remoteDevices, remoteDeviceSki)
 
-	return e.Service.UnpairRemoteService(remoteDeviceSki)
+	e.Service.RegisterRemoteSKI(remoteDeviceSki, false)
 }
 
 func (e *EmobilityScenarioImpl) HandleResult(errorMsg spine.ResultMessage) {

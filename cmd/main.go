@@ -54,7 +54,14 @@ func (d *DemoCem) RemoteSKIConnected(service *service.EEBUSService, ski string) 
 
 func (d *DemoCem) RemoteSKIDisconnected(service *service.EEBUSService, ski string) {}
 
-func (h *DemoCem) ReportServiceShipID(ski string, shipdID string) {}
+func (d *DemoCem) VisibleRemoteServicesUpdated(service *service.EEBUSService, entries []service.RemoteService) {
+}
+
+func (h *DemoCem) ServiceShipIDUpdate(ski string, shipdID string) {}
+
+func (h *DemoCem) ServicePairingDetailUpdate(ski string, detail service.ConnectionStateDetail) {}
+
+func (h *DemoCem) AllowWaitingForTrust(ski string) bool { return true }
 
 // Logging interface
 

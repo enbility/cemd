@@ -30,7 +30,7 @@ var _ InverterPVVisI = (*InverterPVVisImpl)(nil)
 
 // Add InverterPVVis support
 func NewInverterPVVis(service *service.EEBUSService, details *service.ServiceDetails) *InverterPVVisImpl {
-	ski := util.NormalizeSKI(details.SKI())
+	ski := util.NormalizeSKI(details.SKI)
 
 	inverter := &InverterPVVisImpl{
 		service: service,
@@ -39,7 +39,7 @@ func NewInverterPVVis(service *service.EEBUSService, details *service.ServiceDet
 	}
 	spine.Events.Subscribe(inverter)
 
-	service.PairRemoteService(details)
+	service.RegisterRemoteSKI(ski, true)
 
 	return inverter
 }

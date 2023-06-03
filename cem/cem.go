@@ -89,8 +89,8 @@ func (h *CemImpl) RegisterEmobilityRemoteDevice(details *service.ServiceDetails,
 	return impl.(*emobility.EMobilityImpl)
 }
 
-func (h *CemImpl) UnRegisterEmobilityRemoteDevice(remoteDeviceSki string) error {
-	return h.emobilityScenario.UnRegisterRemoteDevice(remoteDeviceSki)
+func (h *CemImpl) UnRegisterEmobilityRemoteDevice(remoteDeviceSki string) {
+	h.emobilityScenario.UnRegisterRemoteDevice(remoteDeviceSki)
 }
 
 func (h *CemImpl) RegisterGridRemoteDevice(details *service.ServiceDetails) *grid.GridImpl {
@@ -98,8 +98,8 @@ func (h *CemImpl) RegisterGridRemoteDevice(details *service.ServiceDetails) *gri
 	return impl.(*grid.GridImpl)
 }
 
-func (h *CemImpl) UnRegisterGridRemoteDevice(remoteDeviceSki string) error {
-	return h.gridScenario.UnRegisterRemoteDevice(remoteDeviceSki)
+func (h *CemImpl) UnRegisterGridRemoteDevice(remoteDeviceSki string) {
+	h.gridScenario.UnRegisterRemoteDevice(remoteDeviceSki)
 }
 
 func (h *CemImpl) RegisterInverterBatteryVisRemoteDevice(details *service.ServiceDetails) *grid.GridImpl {
@@ -107,8 +107,8 @@ func (h *CemImpl) RegisterInverterBatteryVisRemoteDevice(details *service.Servic
 	return impl.(*grid.GridImpl)
 }
 
-func (h *CemImpl) UnRegisterInverterBatteryVisRemoteDevice(remoteDeviceSki string) error {
-	return h.inverterBatteryVisScenario.UnRegisterRemoteDevice(remoteDeviceSki)
+func (h *CemImpl) UnRegisterInverterBatteryVisRemoteDevice(remoteDeviceSki string) {
+	h.inverterBatteryVisScenario.UnRegisterRemoteDevice(remoteDeviceSki)
 }
 
 func (h *CemImpl) RegisterInverterPVVisRemoteDevice(details *service.ServiceDetails) *grid.GridImpl {
@@ -116,6 +116,6 @@ func (h *CemImpl) RegisterInverterPVVisRemoteDevice(details *service.ServiceDeta
 	return impl.(*grid.GridImpl)
 }
 
-func (h *CemImpl) UnRegisterInverterPVVisRemoteDevice(remoteDeviceSki string) error {
-	return h.inverterPVVisScenario.UnRegisterRemoteDevice(remoteDeviceSki)
+func (h *CemImpl) UnRegisterInverterPVVisRemoteDevice(remoteDeviceSki string) {
+	h.inverterPVVisScenario.UnRegisterRemoteDevice(remoteDeviceSki)
 }

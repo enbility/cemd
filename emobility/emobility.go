@@ -246,7 +246,7 @@ var _ EmobilityI = (*EMobilityImpl)(nil)
 
 // Add E-Mobility support
 func NewEMobility(service *service.EEBUSService, details *service.ServiceDetails, currency model.CurrencyType, configuration EmobilityConfiguration, dataProvider EmobilityDataProvider) *EMobilityImpl {
-	ski := util.NormalizeSKI(details.SKI())
+	ski := util.NormalizeSKI(details.SKI)
 
 	emobility := &EMobilityImpl{
 		service:                 service,
@@ -259,7 +259,7 @@ func NewEMobility(service *service.EEBUSService, details *service.ServiceDetails
 	}
 	spine.Events.Subscribe(emobility)
 
-	service.PairRemoteService(details)
+	service.RegisterRemoteSKI(ski, true)
 
 	return emobility
 }

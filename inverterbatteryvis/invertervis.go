@@ -30,7 +30,7 @@ var _ InverterBatteryVisI = (*InverterBatteryVisImpl)(nil)
 
 // Add InverterBatteryVis support
 func NewInverterBatteryVis(service *service.EEBUSService, details *service.ServiceDetails) *InverterBatteryVisImpl {
-	ski := util.NormalizeSKI(details.SKI())
+	ski := util.NormalizeSKI(details.SKI)
 
 	inverter := &InverterBatteryVisImpl{
 		service: service,
@@ -39,7 +39,7 @@ func NewInverterBatteryVis(service *service.EEBUSService, details *service.Servi
 	}
 	spine.Events.Subscribe(inverter)
 
-	service.PairRemoteService(details)
+	service.RegisterRemoteSKI(ski, true)
 
 	return inverter
 }

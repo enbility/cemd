@@ -7,7 +7,7 @@ import (
 // Implemented by *ScenarioImpl, used by CemImpl
 type ScenariosI interface {
 	RegisterRemoteDevice(details *service.ServiceDetails, dataProvider any) any
-	UnRegisterRemoteDevice(remoteDeviceSki string) error
+	UnRegisterRemoteDevice(remoteDeviceSki string)
 	AddFeatures()
 	AddUseCases()
 }

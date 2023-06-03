@@ -61,22 +61,22 @@ func (i *InverterPVVisScenarioImpl) RegisterRemoteDevice(details *service.Servic
 	i.mux.Lock()
 	defer i.mux.Unlock()
 
-	if em, ok := i.remoteDevices[details.SKI()]; ok {
+	if em, ok := i.remoteDevices[details.SKI]; ok {
 		return em
 	}
 
 	inverter := NewInverterPVVis(i.Service, details)
-	i.remoteDevices[details.SKI()] = inverter
+	i.remoteDevices[details.SKI] = inverter
 	return inverter
 }
 
-func (i *InverterPVVisScenarioImpl) UnRegisterRemoteDevice(remoteDeviceSki string) error {
+func (i *InverterPVVisScenarioImpl) UnRegisterRemoteDevice(remoteDeviceSki string) {
 	i.mux.Lock()
 	defer i.mux.Unlock()
 
 	delete(i.remoteDevices, remoteDeviceSki)
 
-	return i.Service.UnpairRemoteService(remoteDeviceSki)
+	i.Service.RegisterRemoteSKI(remoteDeviceSki, false)
 }
 
 func (i *InverterPVVisScenarioImpl) HandleResult(errorMsg spine.ResultMessage) {

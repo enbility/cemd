@@ -60,22 +60,22 @@ func (e *GridScenarioImpl) RegisterRemoteDevice(details *service.ServiceDetails,
 	e.mux.Lock()
 	defer e.mux.Unlock()
 
-	if em, ok := e.remoteDevices[details.SKI()]; ok {
+	if em, ok := e.remoteDevices[details.SKI]; ok {
 		return em
 	}
 
 	grid := NewGrid(e.Service, details)
-	e.remoteDevices[details.SKI()] = grid
+	e.remoteDevices[details.SKI] = grid
 	return grid
 }
 
-func (e *GridScenarioImpl) UnRegisterRemoteDevice(remoteDeviceSki string) error {
+func (e *GridScenarioImpl) UnRegisterRemoteDevice(remoteDeviceSki string) {
 	e.mux.Lock()
 	defer e.mux.Unlock()
 
 	delete(e.remoteDevices, remoteDeviceSki)
 
-	return e.Service.UnpairRemoteService(remoteDeviceSki)
+	e.Service.RegisterRemoteSKI(remoteDeviceSki, false)
 }
 
 func (e *GridScenarioImpl) HandleResult(errorMsg spine.ResultMessage) {

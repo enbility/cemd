@@ -35,7 +35,7 @@ var _ GridI = (*GridImpl)(nil)
 
 // Add Grid support
 func NewGrid(service *service.EEBUSService, details *service.ServiceDetails) *GridImpl {
-	ski := util.NormalizeSKI(details.SKI())
+	ski := util.NormalizeSKI(details.SKI)
 
 	grid := &GridImpl{
 		service: service,
@@ -44,7 +44,7 @@ func NewGrid(service *service.EEBUSService, details *service.ServiceDetails) *Gr
 	}
 	spine.Events.Subscribe(grid)
 
-	service.PairRemoteService(details)
+	service.RegisterRemoteSKI(ski, true)
 
 	return grid
 }

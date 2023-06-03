@@ -94,7 +94,7 @@ const remoteSki string = "testremoteski"
 
 // we don't want to handle events in these tests for now, so we don't use NewEMobility(...)
 func NewTestEMobility(service *service.EEBUSService, details *service.ServiceDetails) *EMobilityImpl {
-	ski := util.NormalizeSKI(details.SKI())
+	ski := util.NormalizeSKI(details.SKI)
 
 	emobility := &EMobilityImpl{
 		service: service,
@@ -102,7 +102,7 @@ func NewTestEMobility(service *service.EEBUSService, details *service.ServiceDet
 		ski:     ski,
 	}
 
-	service.PairRemoteService(details)
+	service.RegisterRemoteSKI(ski, true)
 
 	return emobility
 }
