@@ -656,9 +656,12 @@ func (e *EMobilityImpl) EVChargeStrategy() EVChargeStrategyType {
 	switch {
 	case firstSlot.Duration == nil:
 		// if value is > 0 and duration does not exist, the EV is direct charging
-		if firstSlot.Value != nil {
+		if firstSlot.Value != nil && firstSlot.Value.GetValue() > 0 {
 			return EVChargeStrategyTypeDirectCharging
 		}
+
+		// maxValue will show the maximum amount the battery could take
+		return EVChargeStrategyTypeNoDemand
 
 	case firstSlot.Duration != nil:
 		if _, err := firstSlot.Duration.GetTimeDuration(); err != nil {
