@@ -338,17 +338,16 @@ func (e *EMobilityImpl) EVLoadControlObligationLimits() ([]float64, error) {
 // send new LoadControlLimits to the remote EV
 //
 // parameters:
-//   - obligations: Overload Protection Limits per phase in A
-//   - recommendations: Self Consumption recommendations per phase in A
+//   - limits: a set of limits for a  given limit category containing phase specific limit data
 //
-// obligations:
+// category obligations:
 // Sets a maximum A limit for each phase that the EV may not exceed.
 // Mainly used for implementing overload protection of the site or limiting the
 // maximum charge power of EVs when the EV and EVSE communicate via IEC61851
 // and with ISO15118 if the EV does not support the Optimization of Self Consumption
 // usecase.
 //
-// recommendations:
+// category recommendations:
 // Sets a recommended charge power in A for each phase. This is mainly
 // used if the EV and EVSE communicate via ISO15118 to support charging excess solar power.
 // The EV either needs to support the Optimization of Self Consumption usecase or
@@ -361,7 +360,7 @@ func (e *EMobilityImpl) EVLoadControlObligationLimits() ([]float64, error) {
 //   - In ISO15118-2 the usecase is only supported via VAS extensions which are vendor specific and needs to have specific EVSE support for the specific EV brand.
 //   - In ISO15118-20 this is a standard feature which does not need special support on the EVSE.
 //   - Min power data is only provided via IEC61851 or using VAS in ISO15118-2.
-func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []float64) error {
+func (e *EMobilityImpl) EVWriteLoadControlLimits(limits []EVLoadLimits) error {
 	if e.evEntity == nil {
 		return ErrEVDisconnected
 	}
@@ -372,17 +371,10 @@ func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []
 
 	var limitData []model.LoadControlLimitDataType
 
-	for scopeTypes := 0; scopeTypes < 2; scopeTypes++ {
-		category := model.LoadControlCategoryTypeObligation
-		currentsPerPhase := obligations
-		if scopeTypes == 1 {
-			category = model.LoadControlCategoryTypeRecommendation
-			currentsPerPhase = recommendations
-		}
+	for _, scope := range limits {
+		category := scope.Category
 
-		for index, phaseLimit := range currentsPerPhase {
-			phaseName := util.PhaseNameMapping[index]
-
+		for _, phaseLimit := range scope.PhaseData {
 			// find out the appropriate limitId for each phase value
 			// limitDescription contains the measurementId for each limitId
 			limitDescriptions, err := e.evLoadControl.GetLimitDescriptionsForCategory(category)
@@ -391,7 +383,7 @@ func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []
 			}
 
 			// electricalParameterDescription contains the measured phase for each measurementId
-			elParamDesc, err := e.evElectricalConnection.GetParameterDescriptionForMeasuredPhase(phaseName)
+			elParamDesc, err := e.evElectricalConnection.GetParameterDescriptionForMeasuredPhase(phaseLimit.Phase)
 			if err != nil || elParamDesc.MeasurementId == nil {
 				continue
 			}
@@ -420,12 +412,12 @@ func (e *EMobilityImpl) EVWriteLoadControlLimits(obligations, recommendations []
 			}
 
 			// electricalPermittedValueSet contains the allowed min, max and the default values per phase
-			phaseLimit = e.evElectricalConnection.AdjustValueToBeWithinPermittedValuesForParameter(phaseLimit, *elParamDesc.ParameterId)
+			limit := e.evElectricalConnection.AdjustValueToBeWithinPermittedValuesForParameter(phaseLimit.Value, *elParamDesc.ParameterId)
 
 			newLimit := model.LoadControlLimitDataType{
 				LimitId:       limitDesc.LimitId,
-				IsLimitActive: eebusUtil.Ptr(true),
-				Value:         model.NewScaledNumberType(phaseLimit),
+				IsLimitActive: eebusUtil.Ptr(phaseLimit.IsActive),
+				Value:         model.NewScaledNumberType(limit),
 			}
 			limitData = append(limitData, newLimit)
 		}

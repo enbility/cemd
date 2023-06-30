@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/enbility/cemd/util"
 	"github.com/enbility/eebus-go/spine/model"
-	"github.com/enbility/eebus-go/util"
+	eebusUtil "github.com/enbility/eebus-go/util"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/exp/slices"
 )
@@ -13,23 +14,22 @@ import (
 func Test_EVWriteLoadControlLimits(t *testing.T) {
 	emobilty, eebusService := setupEmobility()
 
-	obligations := []float64{}
-	recommendations := []float64{}
+	loadLimits := []EVLoadLimits{}
 
-	err := emobilty.EVWriteLoadControlLimits(obligations, recommendations)
+	err := emobilty.EVWriteLoadControlLimits(loadLimits)
 	assert.NotNil(t, err)
 
 	localDevice, remoteDevice, entites, writeHandler := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	err = emobilty.EVWriteLoadControlLimits(obligations, recommendations)
+	err = emobilty.EVWriteLoadControlLimits(loadLimits)
 	assert.NotNil(t, err)
 
 	emobilty.evElectricalConnection = electricalConnection(localDevice, emobilty.evEntity)
 	emobilty.evLoadControl = loadcontrol(localDevice, emobilty.evEntity)
 
-	err = emobilty.EVWriteLoadControlLimits(obligations, recommendations)
+	err = emobilty.EVWriteLoadControlLimits(loadLimits)
 	assert.NotNil(t, err)
 
 	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer, model.RoleTypeClient)
@@ -38,22 +38,22 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 		ElectricalConnectionParameterDescriptionListData: &model.ElectricalConnectionParameterDescriptionListDataType{
 			ElectricalConnectionParameterDescriptionData: []model.ElectricalConnectionParameterDescriptionDataType{
 				{
-					ElectricalConnectionId: util.Ptr(model.ElectricalConnectionIdType(0)),
-					ParameterId:            util.Ptr(model.ElectricalConnectionParameterIdType(0)),
-					MeasurementId:          util.Ptr(model.MeasurementIdType(0)),
-					AcMeasuredPhases:       util.Ptr(model.ElectricalConnectionPhaseNameTypeA),
+					ElectricalConnectionId: eebusUtil.Ptr(model.ElectricalConnectionIdType(0)),
+					ParameterId:            eebusUtil.Ptr(model.ElectricalConnectionParameterIdType(0)),
+					MeasurementId:          eebusUtil.Ptr(model.MeasurementIdType(0)),
+					AcMeasuredPhases:       eebusUtil.Ptr(model.ElectricalConnectionPhaseNameTypeA),
 				},
 				{
-					ElectricalConnectionId: util.Ptr(model.ElectricalConnectionIdType(0)),
-					ParameterId:            util.Ptr(model.ElectricalConnectionParameterIdType(1)),
-					MeasurementId:          util.Ptr(model.MeasurementIdType(1)),
-					AcMeasuredPhases:       util.Ptr(model.ElectricalConnectionPhaseNameTypeB),
+					ElectricalConnectionId: eebusUtil.Ptr(model.ElectricalConnectionIdType(0)),
+					ParameterId:            eebusUtil.Ptr(model.ElectricalConnectionParameterIdType(1)),
+					MeasurementId:          eebusUtil.Ptr(model.MeasurementIdType(1)),
+					AcMeasuredPhases:       eebusUtil.Ptr(model.ElectricalConnectionPhaseNameTypeB),
 				},
 				{
-					ElectricalConnectionId: util.Ptr(model.ElectricalConnectionIdType(0)),
-					ParameterId:            util.Ptr(model.ElectricalConnectionParameterIdType(2)),
-					MeasurementId:          util.Ptr(model.MeasurementIdType(2)),
-					AcMeasuredPhases:       util.Ptr(model.ElectricalConnectionPhaseNameTypeC),
+					ElectricalConnectionId: eebusUtil.Ptr(model.ElectricalConnectionIdType(0)),
+					ParameterId:            eebusUtil.Ptr(model.ElectricalConnectionParameterIdType(2)),
+					MeasurementId:          eebusUtil.Ptr(model.MeasurementIdType(2)),
+					AcMeasuredPhases:       eebusUtil.Ptr(model.ElectricalConnectionPhaseNameTypeC),
 				},
 			},
 		}}}
@@ -62,7 +62,7 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	err = emobilty.EVWriteLoadControlLimits(obligations, recommendations)
+	err = emobilty.EVWriteLoadControlLimits(loadLimits)
 	assert.NotNil(t, err)
 
 	type dataStruct struct {
@@ -146,8 +146,8 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 					permittedData = append(permittedData, item)
 
 					permittedItem := model.ElectricalConnectionPermittedValueSetDataType{
-						ElectricalConnectionId: util.Ptr(model.ElectricalConnectionIdType(0)),
-						ParameterId:            util.Ptr(model.ElectricalConnectionParameterIdType(phase)),
+						ElectricalConnectionId: eebusUtil.Ptr(model.ElectricalConnectionIdType(0)),
+						ParameterId:            eebusUtil.Ptr(model.ElectricalConnectionParameterIdType(phase)),
 						PermittedValueSet:      permittedData,
 					}
 					dataSet = append(dataSet, permittedItem)
@@ -164,7 +164,7 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 				err = localDevice.ProcessCmd(datagram, remoteDevice)
 				assert.Nil(t, err)
 
-				err = emobilty.EVWriteLoadControlLimits(obligations, recommendations)
+				err = emobilty.EVWriteLoadControlLimits(loadLimits)
 				assert.NotNil(t, err)
 
 				datagram = datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeLoadControl, model.RoleTypeServer, model.RoleTypeClient)
@@ -174,9 +174,9 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 				for index := range data.obligations {
 					id := model.LoadControlLimitIdType(index)
 					limitItem := model.LoadControlLimitDescriptionDataType{
-						LimitId:       util.Ptr(id),
-						LimitCategory: util.Ptr(model.LoadControlCategoryTypeObligation),
-						MeasurementId: util.Ptr(model.MeasurementIdType(index)),
+						LimitId:       eebusUtil.Ptr(id),
+						LimitCategory: eebusUtil.Ptr(model.LoadControlCategoryTypeObligation),
+						MeasurementId: eebusUtil.Ptr(model.MeasurementIdType(index)),
 					}
 					limitDesc = append(limitDesc, limitItem)
 					limitIdsObligation = append(limitIdsObligation, id)
@@ -185,9 +185,9 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 				for index := range data.recommendations {
 					id := model.LoadControlLimitIdType(index + add)
 					limitItem := model.LoadControlLimitDescriptionDataType{
-						LimitId:       util.Ptr(id),
-						LimitCategory: util.Ptr(model.LoadControlCategoryTypeRecommendation),
-						MeasurementId: util.Ptr(model.MeasurementIdType(index + add)),
+						LimitId:       eebusUtil.Ptr(id),
+						LimitCategory: eebusUtil.Ptr(model.LoadControlCategoryTypeRecommendation),
+						MeasurementId: eebusUtil.Ptr(model.MeasurementIdType(index + add)),
 					}
 					limitDesc = append(limitDesc, limitItem)
 					limitIdsRecommendation = append(limitIdsRecommendation, id)
@@ -202,14 +202,14 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 				err = localDevice.ProcessCmd(datagram, remoteDevice)
 				assert.Nil(t, err)
 
-				err = emobilty.EVWriteLoadControlLimits(obligations, recommendations)
+				err = emobilty.EVWriteLoadControlLimits(loadLimits)
 				assert.NotNil(t, err)
 
 				limitData := []model.LoadControlLimitDataType{}
 				for index := range limitDesc {
 					limitItem := model.LoadControlLimitDataType{
-						LimitId:           util.Ptr(model.LoadControlLimitIdType(index)),
-						IsLimitChangeable: util.Ptr(true),
+						LimitId:           eebusUtil.Ptr(model.LoadControlLimitIdType(index)),
+						IsLimitChangeable: eebusUtil.Ptr(true),
 					}
 					limitData = append(limitData, limitItem)
 				}
@@ -224,10 +224,32 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 				err = localDevice.ProcessCmd(datagram, remoteDevice)
 				assert.Nil(t, err)
 
-				err = emobilty.EVWriteLoadControlLimits(obligations, recommendations)
+				err = emobilty.EVWriteLoadControlLimits(loadLimits)
 				assert.NotNil(t, err)
 
-				err = emobilty.EVWriteLoadControlLimits(data.obligations, data.recommendations)
+				obligations := []EVLoadLimitsPhase{}
+				for index, obligation := range data.obligations {
+					phase := util.PhaseNameMapping[index]
+					obligations = append(obligations, EVLoadLimitsPhase{
+						Phase:    phase,
+						IsActive: true,
+						Value:    obligation,
+					})
+				}
+				recommendations := []EVLoadLimitsPhase{}
+				for index, obligation := range data.recommendations {
+					phase := util.PhaseNameMapping[index]
+					obligations = append(obligations, EVLoadLimitsPhase{
+						Phase:    phase,
+						IsActive: true,
+						Value:    obligation,
+					})
+				}
+
+				err = emobilty.EVWriteLoadControlLimits([]EVLoadLimits{
+					{Category: model.LoadControlCategoryTypeObligation, PhaseData: obligations},
+					{Category: model.LoadControlCategoryTypeRecommendation, PhaseData: recommendations},
+				})
 				assert.Nil(t, err)
 
 				sentDatagram := model.Datagram{}

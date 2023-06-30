@@ -110,7 +110,7 @@ type EmobilityI interface {
 	// In ISO15118-2 the usecase is only supported via VAS extensions which are vendor specific
 	// and needs to have specific EVSE support for the specific EV brand.
 	// In ISO15118-20 this is a standard feature which does not need special support on the EVSE.
-	EVWriteLoadControlLimits(obligations, recommendations []float64) error
+	EVWriteLoadControlLimits(limits []EVLoadLimits) error
 
 	// return the current communication standard type used to communicate between EVSE and EV
 	//

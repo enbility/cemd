@@ -37,6 +37,19 @@ const (
 	EVChargeStrategyTypeTimedCharging  EVChargeStrategyType = "timedcharging"
 )
 
+// Defines a phase specific limit
+type EVLoadLimitsPhase struct {
+	Phase    model.ElectricalConnectionPhaseNameType
+	IsActive bool
+	Value    float64
+}
+
+// Contains limit data for a defined category
+type EVLoadLimits struct {
+	Category  model.LoadControlCategoryType
+	PhaseData []EVLoadLimitsPhase
+}
+
 // Contains details about the actual demands from the EV
 //
 // General:
