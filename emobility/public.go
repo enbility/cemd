@@ -317,7 +317,7 @@ func (e *EMobilityImpl) EVLoadControlObligationLimits() ([]float64, error) {
 		}
 
 		var limitValue float64
-		if limitIdData.Value == nil || (limitIdData.IsLimitActive != nil && *limitIdData.IsLimitActive == false) {
+		if limitIdData.Value == nil || (limitIdData.IsLimitActive != nil && !*limitIdData.IsLimitActive) {
 			// report maximum possible if no limit is available or the limit is not active
 			_, dataMax, _, err := e.evElectricalConnection.GetLimitsForParameterId(*elParamDesc.ParameterId)
 			if err != nil {
