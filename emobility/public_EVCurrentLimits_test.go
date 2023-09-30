@@ -86,7 +86,7 @@ func Test_EVCurrentLimits(t *testing.T) {
 		{
 			"1 Phase ISO15118",
 			[]permittedStruct{
-				{true, 0.1, 0.1, 2, 2.2, 16, 16},
+				{true, 0.1, 0.1, 2, 2, 16, 16},
 			},
 		},
 		{
@@ -104,9 +104,9 @@ func Test_EVCurrentLimits(t *testing.T) {
 		{
 			"3 Phase ISO15118",
 			[]permittedStruct{
-				{true, 0.1, 0.1, 2, 2.2, 16, 16},
-				{true, 0.1, 0.1, 2, 2.2, 16, 16},
-				{true, 0.1, 0.1, 2, 2.2, 16, 16},
+				{true, 0.1, 0.1, 2, 2, 16, 16},
+				{true, 0.1, 0.1, 2, 2, 16, 16},
+				{true, 0.1, 0.1, 2, 2, 16, 16},
 			},
 		},
 		{
