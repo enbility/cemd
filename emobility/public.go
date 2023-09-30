@@ -206,6 +206,8 @@ func (e *EMobilityImpl) EVCurrentsPerPhase() ([]float64, error) {
 	}
 
 	var result []float64
+	refetch := true
+	compare := time.Now().Add(-1 * time.Minute)
 
 	for _, phase := range util.PhaseNameMapping {
 		for _, item := range data {
@@ -220,7 +222,19 @@ func (e *EMobilityImpl) EVCurrentsPerPhase() ([]float64, error) {
 
 			phaseValue := item.Value.GetValue()
 			result = append(result, phaseValue)
+
+			if item.Timestamp != nil {
+				if timestamp, err := item.Timestamp.GetTime(); err == nil {
+					refetch = timestamp.Before(compare)
+				}
+			}
 		}
+	}
+
+	// if there was no timestamp provided or the time for the last value
+	// is older than 1 minute, send a read request
+	if refetch {
+		_, _ = e.evMeasurement.RequestValues()
 	}
 
 	return result, nil
