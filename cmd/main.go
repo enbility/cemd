@@ -2,10 +2,11 @@ package main
 
 import (
 	"crypto/tls"
+	"flag"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
 	"time"
 
@@ -39,6 +40,8 @@ func (d *DemoCem) Setup() error {
 	d.cem.EnableGrid()
 	d.cem.EnableBatteryVisualization()
 	d.cem.EnablePVVisualization()
+
+	d.cem.Service.Start()
 
 	return nil
 }
@@ -108,29 +111,29 @@ func (d *DemoCem) Errorf(format string, args ...interface{}) {
 }
 
 // main app
-func usage() {
-	fmt.Println("Usage: go run /cmd/main.go <serverport> <evse-ski> <crtfile> <keyfile> <iface>")
-}
-
 func main() {
-	if len(os.Args) < 5 {
-		usage()
+	remoteSki := flag.String("remoteski", "", "The remote device SKI")
+	port := flag.Int("port", 4815, "Optional port for the EEBUS service")
+	crt := flag.String("crt", "cert.crt", "Optional filepath for the cert file")
+	key := flag.String("key", "cert.key", "Optional filepath for the key file")
+	iface := flag.String("iface", "", "Optional network interface the EEBUS connection should be limited to")
+
+	flag.Parse()
+
+	if len(os.Args) == 1 || remoteSki == nil || *remoteSki == "" {
+		flag.Usage()
 		return
 	}
 
-	portValue, err := strconv.Atoi(os.Args[1])
+	certificate, err := tls.LoadX509KeyPair(*crt, *key)
 	if err != nil {
-		fmt.Println("Port is invalid:", err)
-		return
+		certificate, err = service.CreateCertificate("Demo", "Demo", "DE", "Demo-Unit-10")
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		fmt.Println("Using certificate file", *crt, "and key file", *key)
 	}
-
-	certificate, err := tls.LoadX509KeyPair(os.Args[3], os.Args[4])
-	if err != nil {
-		fmt.Println("Certificate is invalid:", err)
-		return
-	}
-
-	ifaces := []string{os.Args[5]}
 
 	configuration, err := service.NewConfiguration(
 		"Demo",
@@ -138,14 +141,19 @@ func main() {
 		"HEMS",
 		"123456789",
 		model.DeviceTypeTypeEnergyManagementSystem,
-		portValue,
+		*port,
 		certificate,
 		230)
 	if err != nil {
 		fmt.Println("Service data is invalid:", err)
 		return
 	}
-	configuration.SetInterfaces(ifaces)
+
+	if iface != nil && *iface != "" {
+		ifaces := []string{*iface}
+
+		configuration.SetInterfaces(ifaces)
+	}
 
 	demo := NewDemoCem(configuration)
 	if err := demo.Setup(); err != nil {
@@ -153,7 +161,7 @@ func main() {
 		return
 	}
 
-	remoteService := service.NewServiceDetails(os.Args[2])
+	remoteService := service.NewServiceDetails(*remoteSki)
 	demo.cem.RegisterEmobilityRemoteDevice(remoteService, nil)
 
 	// Clean exit to make sure mdns shutdown is invoked

@@ -33,11 +33,13 @@ More use cases and scenarios will hopefully follow in the future as well.
 
 ## Usage
 
+Run the following command to see all the options:
+
 ```sh
-Usage: go run cmd/main.go <serverport> <remoteski> <certfile> <keyfile>
+Usage: go run cmd/main.go
 ```
 
-Example certificate and key files are located in the keys folder
+Example certificate and key files are located in the keys folder. If no certificate and key are provided in the options, new ones will be generated in the current folder.
 
 ### Explanation
 
