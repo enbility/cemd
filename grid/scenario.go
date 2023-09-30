@@ -46,8 +46,9 @@ func (e *GridScenarioImpl) AddFeatures() {
 func (e *GridScenarioImpl) AddUseCases() {
 	localEntity := e.Service.LocalEntity()
 
-	_ = spine.NewUseCase(
+	_ = spine.NewUseCaseWithActor(
 		localEntity,
+		model.UseCaseActorTypeMonitoringAppliance,
 		model.UseCaseNameTypeMonitoringOfGridConnectionPoint,
 		model.SpecificationVersionType("1.0.0 RC5"),
 		true,
