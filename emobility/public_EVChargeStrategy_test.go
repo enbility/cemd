@@ -124,7 +124,7 @@ func Test_EVChargeStrategy(t *testing.T) {
 	assert.Nil(t, err)
 
 	data = emobilty.EVChargeStrategy()
-	assert.Equal(t, EVChargeStrategyTypeUnknown, data)
+	assert.Equal(t, EVChargeStrategyTypeNoDemand, data)
 
 	cmd = []model.CmdType{{
 		TimeSeriesListData: &model.TimeSeriesListDataType{
