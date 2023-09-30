@@ -253,10 +253,6 @@ func (e *EMobilityImpl) EVCurrentLimits() ([]float64, []float64, []float64, erro
 		// Min current data should be derived from min power data
 		// but as this value is only properly provided via VAS the
 		// currrent min values can not be trusted.
-		// Min current for 3-phase should be at least 2.2A (ISO)
-		if dataMin < 2.2 {
-			dataMin = 2.2
-		}
 
 		resultMin = append(resultMin, dataMin)
 		resultMax = append(resultMax, dataMax)
