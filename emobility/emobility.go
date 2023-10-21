@@ -8,6 +8,8 @@ import (
 	"github.com/enbility/eebus-go/util"
 )
 
+//go:generate mockgen -source emobility.go -destination mock_emobility.go -package emobility
+
 // used by emobility and implemented by the CEM
 type EmobilityDataProvider interface {
 	// The EV provided a charge strategy
@@ -187,9 +189,9 @@ type EmobilityI interface {
 	// if duration is 0, direct charging is active, otherwise timed charging is active
 	EVEnergyDemand() (EVDemand, error)
 
-	// returns the constraints for the power slots
+	// returns the constraints for the time slots
 	//   - EVTimeSlotConstraints: details about the time slot constraints
-	EVGetPowerConstraints() EVTimeSlotConstraints
+	EVGetTimeSlotConstraints() EVTimeSlotConstraints
 
 	// send power limits data to the EV
 	//

@@ -123,7 +123,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 					}
 
 					// request CEM for power limits
-					constraints := e.EVGetPowerConstraints()
+					constraints := e.EVGetTimeSlotConstraints()
 					if err != nil {
 						logging.Log.Error("Error getting timeseries constraints:", err)
 					} else {

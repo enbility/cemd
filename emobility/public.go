@@ -753,8 +753,8 @@ func (e *EMobilityImpl) EVEnergyDemand() (EVDemand, error) {
 	return demand, nil
 }
 
-// returns the constraints for the power slots
-func (e *EMobilityImpl) EVGetPowerConstraints() EVTimeSlotConstraints {
+// returns the constraints for the time slots
+func (e *EMobilityImpl) EVGetTimeSlotConstraints() EVTimeSlotConstraints {
 	result := EVTimeSlotConstraints{}
 
 	if e.evEntity == nil || e.evTimeSeries == nil {
@@ -804,7 +804,7 @@ func (e *EMobilityImpl) EVWritePowerLimits(data []EVDurationSlotValue) error {
 		return errors.New("missing power limit data")
 	}
 
-	constraints := e.EVGetPowerConstraints()
+	constraints := e.EVGetTimeSlotConstraints()
 
 	if constraints.MinSlots != 0 && constraints.MinSlots > uint(len(data)) {
 		return errors.New("too few charge slots provided")

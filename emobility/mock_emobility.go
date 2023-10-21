@@ -268,18 +268,18 @@ func (mr *MockEmobilityIMockRecorder) EVGetIncentiveConstraints() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVGetIncentiveConstraints", reflect.TypeOf((*MockEmobilityI)(nil).EVGetIncentiveConstraints))
 }
 
-// EVGetPowerConstraints mocks base method.
-func (m *MockEmobilityI) EVGetPowerConstraints() EVTimeSlotConstraints {
+// EVGetTimeSlotConstraints mocks base method.
+func (m *MockEmobilityI) EVGetTimeSlotConstraints() EVTimeSlotConstraints {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EVGetPowerConstraints")
+	ret := m.ctrl.Call(m, "EVGetTimeSlotConstraints")
 	ret0, _ := ret[0].(EVTimeSlotConstraints)
 	return ret0
 }
 
-// EVGetPowerConstraints indicates an expected call of EVGetPowerConstraints.
-func (mr *MockEmobilityIMockRecorder) EVGetPowerConstraints() *gomock.Call {
+// EVGetTimeSlotConstraints indicates an expected call of EVGetTimeSlotConstraints.
+func (mr *MockEmobilityIMockRecorder) EVGetTimeSlotConstraints() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVGetPowerConstraints", reflect.TypeOf((*MockEmobilityI)(nil).EVGetPowerConstraints))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVGetTimeSlotConstraints", reflect.TypeOf((*MockEmobilityI)(nil).EVGetTimeSlotConstraints))
 }
 
 // EVIdentification mocks base method.
@@ -387,17 +387,17 @@ func (mr *MockEmobilityIMockRecorder) EVWriteIncentives(data interface{}) *gomoc
 }
 
 // EVWriteLoadControlLimits mocks base method.
-func (m *MockEmobilityI) EVWriteLoadControlLimits(obligations, recommendations []float64) error {
+func (m *MockEmobilityI) EVWriteLoadControlLimits(limits []EVLoadLimits) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EVWriteLoadControlLimits", obligations, recommendations)
+	ret := m.ctrl.Call(m, "EVWriteLoadControlLimits", limits)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // EVWriteLoadControlLimits indicates an expected call of EVWriteLoadControlLimits.
-func (mr *MockEmobilityIMockRecorder) EVWriteLoadControlLimits(obligations, recommendations interface{}) *gomock.Call {
+func (mr *MockEmobilityIMockRecorder) EVWriteLoadControlLimits(limits interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVWriteLoadControlLimits", reflect.TypeOf((*MockEmobilityI)(nil).EVWriteLoadControlLimits), obligations, recommendations)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVWriteLoadControlLimits", reflect.TypeOf((*MockEmobilityI)(nil).EVWriteLoadControlLimits), limits)
 }
 
 // EVWritePowerLimits mocks base method.
