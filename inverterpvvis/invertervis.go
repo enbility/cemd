@@ -37,7 +37,7 @@ func NewInverterPVVis(service *service.EEBUSService, details *service.ServiceDet
 		entity:  service.LocalEntity(),
 		ski:     ski,
 	}
-	spine.Events.Subscribe(inverter)
+	_ = spine.Events.Subscribe(spine.EventHandlerLevelMiddleware, inverter)
 
 	service.RegisterRemoteSKI(ski, true)
 
