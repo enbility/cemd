@@ -12,6 +12,10 @@ import (
 
 	"github.com/enbility/cemd/cem"
 	"github.com/enbility/cemd/emobility"
+	"github.com/enbility/cemd/grid"
+	"github.com/enbility/cemd/inverterbatteryvis"
+	"github.com/enbility/cemd/inverterpvvis"
+	"github.com/enbility/cemd/scenarios"
 	"github.com/enbility/eebus-go/logging"
 	"github.com/enbility/eebus-go/service"
 	"github.com/enbility/eebus-go/spine/model"
@@ -19,6 +23,8 @@ import (
 
 type DemoCem struct {
 	cem *cem.CemImpl
+
+	emobilityScenario, gridScenario, inverterBatteryVisScenario, inverterPVVisScenario scenarios.ScenariosI
 }
 
 func NewDemoCem(configuration *service.Configuration) *DemoCem {
@@ -34,12 +40,23 @@ func (d *DemoCem) Setup() error {
 		return err
 	}
 
-	d.cem.EnableEmobility(emobility.EmobilityConfiguration{
+	d.emobilityScenario = emobility.NewEMobilityScenario(d.cem.Service, d.cem.Currency, emobility.EmobilityConfiguration{
 		CoordinatedChargingEnabled: true,
 	})
-	d.cem.EnableGrid()
-	d.cem.EnableBatteryVisualization()
-	d.cem.EnablePVVisualization()
+	d.emobilityScenario.AddFeatures()
+	d.emobilityScenario.AddUseCases()
+
+	d.gridScenario = grid.NewGridScenario(d.cem.Service)
+	d.gridScenario.AddFeatures()
+	d.gridScenario.AddUseCases()
+
+	d.inverterBatteryVisScenario = inverterbatteryvis.NewInverterVisScenario(d.cem.Service)
+	d.inverterBatteryVisScenario.AddFeatures()
+	d.inverterBatteryVisScenario.AddUseCases()
+
+	d.inverterPVVisScenario = inverterpvvis.NewInverterVisScenario(d.cem.Service)
+	d.inverterPVVisScenario.AddFeatures()
+	d.inverterPVVisScenario.AddUseCases()
 
 	d.cem.Service.Start()
 
@@ -162,7 +179,7 @@ func main() {
 	}
 
 	remoteService := service.NewServiceDetails(*remoteSki)
-	demo.cem.RegisterEmobilityRemoteDevice(remoteService, nil)
+	demo.emobilityScenario.RegisterRemoteDevice(remoteService, nil)
 
 	// Clean exit to make sure mdns shutdown is invoked
 	sig := make(chan os.Signal, 1)
