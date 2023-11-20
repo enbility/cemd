@@ -32,17 +32,10 @@ func (h *CemImpl) subscriptionRequestHandling(payload spine.EventPayload) {
 		return
 	}
 
-	senderAddr := h.Service.LocalDevice().FeatureByTypeAndRole(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer).Address()
-	destinationAddr := payload.Feature.Address()
-	if senderAddr == nil || destinationAddr == nil {
-		logging.Log.Info("No sender or destination address found for SKI:", payload.Ski)
-		return
-	}
-
 	switch payload.ChangeType {
 	case spine.ElementChangeAdd:
 		// start sending heartbeats
-		remoteDevice.StartHeartbeatSend(senderAddr, destinationAddr)
+		remoteDevice.StartHeartbeatSend(data.ServerAddress, data.ClientAddress)
 	case spine.ElementChangeRemove:
 		// stop sending heartbeats
 		remoteDevice.Stopheartbeat()
