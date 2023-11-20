@@ -57,24 +57,24 @@ type EVLoadLimits struct {
 //   - If duration is 0, charge mode is EVChargeStrategyTypeDirectCharging and the slots should cover at least 48h
 //   - If both are != 0, charge mode is EVChargeStrategyTypeTimedCharging and the slots should cover at least the duration, but at max 168h (7d)
 type EVDemand struct {
-	MinDemand          float64       // minimum demand in Wh to reach the minSoC setting, 0 if not set
-	OptDemand          float64       // demand in Wh to reach the timer SoC setting
-	MaxDemand          float64       // the maximum possible demand until the battery is full
-	DurationUntilStart time.Duration // the duration from now until charging will start, this could be in the future but usualy is now
-	DurationUntilEnd   time.Duration // the duration from now until minDemand or optDemand has to be reached, 0 if direct charge strategy is active
+	MinDemand float64   // minimum demand in Wh to reach the minSoC setting, 0 if not set
+	OptDemand float64   // demand in Wh to reach the timer SoC setting
+	MaxDemand float64   // the maximum possible demand until the battery is full
+	Start     time.Time // the time when charging will start, this could be in the future but usualy is now
+	End       time.Time // the time when minDemand or optDemand has to be reached, 0 if direct charge strategy is active
 }
 
 type EVChargePlan struct {
-	DurationUntilStart time.Duration           // the duration from now until charging will start, this could be in the future but usualy is now
-	Slots              []EVChargePlanSlotValue // Individual charging slot details
+	Slots []EVChargePlanSlotValue // Individual charging slot details
 }
 
 // Contains details about a charging plan slot
 type EVChargePlanSlotValue struct {
-	Duration time.Duration // Duration of the slot
-	Value    float64
-	MinValue float64
-	MaxValue float64
+	Start    time.Time // The start time of the slot
+	End      time.Time // The duration of the slot
+	Value    float64   // planned power value
+	MinValue float64   // minimum power value
+	MaxValue float64   // maximum power value
 }
 
 // Details about the time slot constraints

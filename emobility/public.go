@@ -725,7 +725,7 @@ func (e *EMobilityImpl) EVEnergyDemand() (EVDemand, error) {
 	}
 	if firstSlot.Duration != nil {
 		if tempDuration, err := firstSlot.Duration.GetTimeDuration(); err == nil {
-			demand.DurationUntilEnd = tempDuration
+			demand.End = time.Now().Add(tempDuration)
 		}
 	}
 
@@ -748,7 +748,7 @@ func (e *EMobilityImpl) EVEnergyDemand() (EVDemand, error) {
 		}
 	}
 
-	demand.DurationUntilStart = relStartTime
+	demand.Start = time.Now().Add(relStartTime)
 
 	return demand, nil
 }
@@ -774,21 +774,40 @@ func (e *EMobilityImpl) EVChargePlan() (EVChargePlan, error) {
 		return plan, features.ErrDataNotAvailable
 	}
 
+	startAvailable := false
 	// check the start time relative to now of the plan, default is now
+	currentStart := time.Now()
+	currentEnd := currentStart
 	if data.TimePeriod != nil && data.TimePeriod.StartTime != nil {
-		plan.DurationUntilStart = 0.0
 
 		if start, err := data.TimePeriod.StartTime.GetTimeDuration(); err == nil {
-			plan.DurationUntilStart = start
+			currentStart = currentStart.Add(start)
+			startAvailable = true
 		}
 	}
 
 	// get the values for all slots
-	for _, slot := range data.TimeSeriesSlot {
+	for index, slot := range data.TimeSeriesSlot {
 		newSlot := EVChargePlanSlotValue{}
 
+		slotStartDefined := false
+		if index == 0 && startAvailable && (slot.TimePeriod == nil || slot.TimePeriod.StartTime == nil) {
+			newSlot.Start = currentStart
+			slotStartDefined = true
+		}
+		if slot.TimePeriod != nil && slot.TimePeriod.StartTime != nil {
+			if time, err := slot.TimePeriod.StartTime.GetTime(); err == nil {
+				newSlot.Start = time
+				slotStartDefined = true
+			}
+		}
+		if !slotStartDefined {
+			newSlot.Start = currentEnd
+		}
+
 		if duration, err := slot.Duration.GetTimeDuration(); err == nil {
-			newSlot.Duration = duration
+			newSlot.End = newSlot.Start.Add(duration)
+			currentEnd = newSlot.End
 		}
 
 		if slot.Value != nil {
