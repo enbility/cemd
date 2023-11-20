@@ -64,6 +64,19 @@ type EVDemand struct {
 	DurationUntilEnd   time.Duration // the duration from now until minDemand or optDemand has to be reached, 0 if direct charge strategy is active
 }
 
+type EVChargePlan struct {
+	DurationUntilStart time.Duration           // the duration from now until charging will start, this could be in the future but usualy is now
+	Slots              []EVChargePlanSlotValue // Individual charging slot details
+}
+
+// Contains details about a charging plan slot
+type EVChargePlanSlotValue struct {
+	Duration time.Duration // Duration of the slot
+	Value    float64
+	MinValue float64
+	MaxValue float64
+}
+
 // Details about the time slot constraints
 type EVTimeSlotConstraints struct {
 	MinSlots             uint          // the minimum number of slots, no minimum if 0

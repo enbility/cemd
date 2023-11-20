@@ -11,7 +11,7 @@ import (
 func Test_EVGetIncentiveConstraints(t *testing.T) {
 	emobilty, eebusService := setupEmobility()
 
-	constraints := emobilty.EVGetIncentiveConstraints()
+	constraints := emobilty.EVIncentiveConstraints()
 	assert.Equal(t, uint(0), constraints.MinSlots)
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 
@@ -19,13 +19,13 @@ func Test_EVGetIncentiveConstraints(t *testing.T) {
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	constraints = emobilty.EVGetIncentiveConstraints()
+	constraints = emobilty.EVIncentiveConstraints()
 	assert.Equal(t, uint(0), constraints.MinSlots)
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 
 	emobilty.evIncentiveTable = incentiveTableConfiguration(localDevice, emobilty.evEntity)
 
-	constraints = emobilty.EVGetIncentiveConstraints()
+	constraints = emobilty.EVIncentiveConstraints()
 	assert.Equal(t, uint(0), constraints.MinSlots)
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 
@@ -48,7 +48,7 @@ func Test_EVGetIncentiveConstraints(t *testing.T) {
 	err := localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	constraints = emobilty.EVGetIncentiveConstraints()
+	constraints = emobilty.EVIncentiveConstraints()
 	assert.Equal(t, uint(1), constraints.MinSlots)
 	assert.Equal(t, uint(10), constraints.MaxSlots)
 
@@ -68,7 +68,7 @@ func Test_EVGetIncentiveConstraints(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	constraints = emobilty.EVGetIncentiveConstraints()
+	constraints = emobilty.EVIncentiveConstraints()
 	assert.Equal(t, uint(1), constraints.MinSlots)
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 

@@ -189,9 +189,14 @@ type EmobilityI interface {
 	// if duration is 0, direct charging is active, otherwise timed charging is active
 	EVEnergyDemand() (EVDemand, error)
 
+	// returns the current charge plan
+	//   - EVChargePlan: details about the actual charge plan provided by the EV
+	//   - error: if no data is available
+	EVChargePlan() (EVChargePlan, error)
+
 	// returns the constraints for the time slots
 	//   - EVTimeSlotConstraints: details about the time slot constraints
-	EVGetTimeSlotConstraints() EVTimeSlotConstraints
+	EVTimeSlotConstraints() EVTimeSlotConstraints
 
 	// send power limits data to the EV
 	//
@@ -203,7 +208,7 @@ type EmobilityI interface {
 
 	// returns the constraints for incentive slots
 	//   - EVIncentiveConstraints: details about the incentive slot constraints
-	EVGetIncentiveConstraints() EVIncentiveSlotConstraints
+	EVIncentiveConstraints() EVIncentiveSlotConstraints
 
 	// send price slots data to the EV
 	//

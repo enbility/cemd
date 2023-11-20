@@ -123,7 +123,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 					}
 
 					// request CEM for power limits
-					constraints := e.EVGetTimeSlotConstraints()
+					constraints := e.EVTimeSlotConstraints()
 					if err != nil {
 						logging.Log.Error("Error getting timeseries constraints:", err)
 					} else {
@@ -153,14 +153,14 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 				// check if we received a plan
 				e.evForwardChargePlanIfProvided()
 
-			case *model.IncentiveDescriptionDataType:
+			case *model.IncentiveTableDescriptionDataType:
 				if e.evIncentiveTable == nil || payload.CmdClassifier == nil {
 					break
 				}
 
 				switch *payload.CmdClassifier {
 				case model.CmdClassifierTypeReply:
-					if err := e.evIncentiveTable.RequestConstraints(); err != nil {
+					if err := e.evIncentiveTable.RequestConstraints(); err == nil {
 						break
 					}
 
@@ -179,7 +179,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 						break
 					}
 
-					constraints := e.EVGetIncentiveConstraints()
+					constraints := e.EVIncentiveConstraints()
 
 					// request CEM for incentives
 					e.dataProvider.EVRequestIncentives(demand, constraints)

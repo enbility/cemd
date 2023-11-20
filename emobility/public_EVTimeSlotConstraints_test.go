@@ -12,7 +12,7 @@ import (
 func Test_EVGetTimeSlotConstraints(t *testing.T) {
 	emobilty, eebusService := setupEmobility()
 
-	constraints := emobilty.EVGetTimeSlotConstraints()
+	constraints := emobilty.EVTimeSlotConstraints()
 	assert.Equal(t, uint(0), constraints.MinSlots)
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 	assert.Equal(t, time.Duration(0), constraints.MinSlotDuration)
@@ -23,7 +23,7 @@ func Test_EVGetTimeSlotConstraints(t *testing.T) {
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	constraints = emobilty.EVGetTimeSlotConstraints()
+	constraints = emobilty.EVTimeSlotConstraints()
 	assert.Equal(t, uint(0), constraints.MinSlots)
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 	assert.Equal(t, time.Duration(0), constraints.MinSlotDuration)
@@ -32,7 +32,7 @@ func Test_EVGetTimeSlotConstraints(t *testing.T) {
 
 	emobilty.evTimeSeries = timeSeriesConfiguration(localDevice, emobilty.evEntity)
 
-	constraints = emobilty.EVGetTimeSlotConstraints()
+	constraints = emobilty.EVTimeSlotConstraints()
 	assert.Equal(t, uint(0), constraints.MinSlots)
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 	assert.Equal(t, time.Duration(0), constraints.MinSlotDuration)
@@ -60,7 +60,7 @@ func Test_EVGetTimeSlotConstraints(t *testing.T) {
 	err := localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	constraints = emobilty.EVGetTimeSlotConstraints()
+	constraints = emobilty.EVTimeSlotConstraints()
 	assert.Equal(t, uint(1), constraints.MinSlots)
 	assert.Equal(t, uint(10), constraints.MaxSlots)
 	assert.Equal(t, time.Duration(1*time.Minute), constraints.MinSlotDuration)

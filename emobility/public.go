@@ -706,7 +706,7 @@ func (e *EMobilityImpl) EVEnergyDemand() (EVDemand, error) {
 		return demand, features.ErrDataNotAvailable
 	}
 
-	// we need at a time series slot
+	// we need at least a time series slot
 	if data.TimeSeriesSlot == nil {
 		return demand, features.ErrDataNotAvailable
 	}
@@ -753,8 +753,62 @@ func (e *EMobilityImpl) EVEnergyDemand() (EVDemand, error) {
 	return demand, nil
 }
 
+func (e *EMobilityImpl) EVChargePlan() (EVChargePlan, error) {
+	plan := EVChargePlan{}
+
+	if e.evEntity == nil {
+		return plan, ErrEVDisconnected
+	}
+
+	if e.evTimeSeries == nil {
+		return plan, features.ErrDataNotAvailable
+	}
+
+	data, err := e.evTimeSeries.GetValueForType(model.TimeSeriesTypeTypePlan)
+	if err != nil {
+		return plan, features.ErrDataNotAvailable
+	}
+
+	// we need at least a time series slot
+	if data.TimeSeriesSlot == nil {
+		return plan, features.ErrDataNotAvailable
+	}
+
+	// check the start time relative to now of the plan, default is now
+	if data.TimePeriod != nil && data.TimePeriod.StartTime != nil {
+		plan.DurationUntilStart = 0.0
+
+		if start, err := data.TimePeriod.StartTime.GetTimeDuration(); err == nil {
+			plan.DurationUntilStart = start
+		}
+	}
+
+	// get the values for all slots
+	for _, slot := range data.TimeSeriesSlot {
+		newSlot := EVChargePlanSlotValue{}
+
+		if duration, err := slot.Duration.GetTimeDuration(); err == nil {
+			newSlot.Duration = duration
+		}
+
+		if slot.Value != nil {
+			newSlot.Value = slot.Value.GetValue()
+		}
+		if slot.MinValue != nil {
+			newSlot.MinValue = slot.MinValue.GetValue()
+		}
+		if slot.MaxValue != nil {
+			newSlot.MaxValue = slot.MaxValue.GetValue()
+		}
+
+		plan.Slots = append(plan.Slots, newSlot)
+	}
+
+	return plan, nil
+}
+
 // returns the constraints for the time slots
-func (e *EMobilityImpl) EVGetTimeSlotConstraints() EVTimeSlotConstraints {
+func (e *EMobilityImpl) EVTimeSlotConstraints() EVTimeSlotConstraints {
 	result := EVTimeSlotConstraints{}
 
 	if e.evEntity == nil || e.evTimeSeries == nil {
@@ -804,7 +858,7 @@ func (e *EMobilityImpl) EVWritePowerLimits(data []EVDurationSlotValue) error {
 		return errors.New("missing power limit data")
 	}
 
-	constraints := e.EVGetTimeSlotConstraints()
+	constraints := e.EVTimeSlotConstraints()
 
 	if constraints.MinSlots != 0 && constraints.MinSlots > uint(len(data)) {
 		return errors.New("too few charge slots provided")
@@ -857,7 +911,7 @@ func (e *EMobilityImpl) EVWritePowerLimits(data []EVDurationSlotValue) error {
 }
 
 // returns the minimum and maximum number of incentive slots allowed
-func (e *EMobilityImpl) EVGetIncentiveConstraints() EVIncentiveSlotConstraints {
+func (e *EMobilityImpl) EVIncentiveConstraints() EVIncentiveSlotConstraints {
 	result := EVIncentiveSlotConstraints{}
 
 	if e.evEntity == nil || e.evIncentiveTable == nil {
@@ -892,7 +946,7 @@ func (e *EMobilityImpl) EVWriteIncentives(data []EVDurationSlotValue) error {
 		return errors.New("missing incentive data")
 	}
 
-	constraints := e.EVGetIncentiveConstraints()
+	constraints := e.EVIncentiveConstraints()
 
 	if constraints.MinSlots != 0 && constraints.MinSlots > uint(len(data)) {
 		return errors.New("too few charge slots provided")

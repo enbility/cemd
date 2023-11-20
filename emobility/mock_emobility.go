@@ -104,6 +104,21 @@ func (m *MockEmobilityI) EXPECT() *MockEmobilityIMockRecorder {
 	return m.recorder
 }
 
+// EVChargePlan mocks base method.
+func (m *MockEmobilityI) EVChargePlan() (EVChargePlan, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EVChargePlan")
+	ret0, _ := ret[0].(EVChargePlan)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// EVChargePlan indicates an expected call of EVChargePlan.
+func (mr *MockEmobilityIMockRecorder) EVChargePlan() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVChargePlan", reflect.TypeOf((*MockEmobilityI)(nil).EVChargePlan))
+}
+
 // EVChargeStrategy mocks base method.
 func (m *MockEmobilityI) EVChargeStrategy() EVChargeStrategyType {
 	m.ctrl.T.Helper()
@@ -254,34 +269,6 @@ func (mr *MockEmobilityIMockRecorder) EVEnergyDemand() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVEnergyDemand", reflect.TypeOf((*MockEmobilityI)(nil).EVEnergyDemand))
 }
 
-// EVGetIncentiveConstraints mocks base method.
-func (m *MockEmobilityI) EVGetIncentiveConstraints() EVIncentiveSlotConstraints {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EVGetIncentiveConstraints")
-	ret0, _ := ret[0].(EVIncentiveSlotConstraints)
-	return ret0
-}
-
-// EVGetIncentiveConstraints indicates an expected call of EVGetIncentiveConstraints.
-func (mr *MockEmobilityIMockRecorder) EVGetIncentiveConstraints() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVGetIncentiveConstraints", reflect.TypeOf((*MockEmobilityI)(nil).EVGetIncentiveConstraints))
-}
-
-// EVGetTimeSlotConstraints mocks base method.
-func (m *MockEmobilityI) EVGetTimeSlotConstraints() EVTimeSlotConstraints {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EVGetTimeSlotConstraints")
-	ret0, _ := ret[0].(EVTimeSlotConstraints)
-	return ret0
-}
-
-// EVGetTimeSlotConstraints indicates an expected call of EVGetTimeSlotConstraints.
-func (mr *MockEmobilityIMockRecorder) EVGetTimeSlotConstraints() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVGetTimeSlotConstraints", reflect.TypeOf((*MockEmobilityI)(nil).EVGetTimeSlotConstraints))
-}
-
 // EVIdentification mocks base method.
 func (m *MockEmobilityI) EVIdentification() (string, error) {
 	m.ctrl.T.Helper()
@@ -295,6 +282,20 @@ func (m *MockEmobilityI) EVIdentification() (string, error) {
 func (mr *MockEmobilityIMockRecorder) EVIdentification() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVIdentification", reflect.TypeOf((*MockEmobilityI)(nil).EVIdentification))
+}
+
+// EVIncentiveConstraints mocks base method.
+func (m *MockEmobilityI) EVIncentiveConstraints() EVIncentiveSlotConstraints {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EVIncentiveConstraints")
+	ret0, _ := ret[0].(EVIncentiveSlotConstraints)
+	return ret0
+}
+
+// EVIncentiveConstraints indicates an expected call of EVIncentiveConstraints.
+func (mr *MockEmobilityIMockRecorder) EVIncentiveConstraints() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVIncentiveConstraints", reflect.TypeOf((*MockEmobilityI)(nil).EVIncentiveConstraints))
 }
 
 // EVLoadControlObligationLimits mocks base method.
@@ -370,6 +371,20 @@ func (m *MockEmobilityI) EVSoCSupported() (bool, error) {
 func (mr *MockEmobilityIMockRecorder) EVSoCSupported() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVSoCSupported", reflect.TypeOf((*MockEmobilityI)(nil).EVSoCSupported))
+}
+
+// EVTimeSlotConstraints mocks base method.
+func (m *MockEmobilityI) EVTimeSlotConstraints() EVTimeSlotConstraints {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EVTimeSlotConstraints")
+	ret0, _ := ret[0].(EVTimeSlotConstraints)
+	return ret0
+}
+
+// EVTimeSlotConstraints indicates an expected call of EVTimeSlotConstraints.
+func (mr *MockEmobilityIMockRecorder) EVTimeSlotConstraints() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVTimeSlotConstraints", reflect.TypeOf((*MockEmobilityI)(nil).EVTimeSlotConstraints))
 }
 
 // EVWriteIncentives mocks base method.
