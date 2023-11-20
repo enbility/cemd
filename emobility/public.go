@@ -725,7 +725,7 @@ func (e *EMobilityImpl) EVEnergyDemand() (EVDemand, error) {
 	}
 	if firstSlot.Duration != nil {
 		if tempDuration, err := firstSlot.Duration.GetTimeDuration(); err == nil {
-			demand.End = time.Now().Add(tempDuration)
+			demand.DurationUntilEnd = tempDuration
 		}
 	}
 
@@ -748,7 +748,7 @@ func (e *EMobilityImpl) EVEnergyDemand() (EVDemand, error) {
 		}
 	}
 
-	demand.Start = time.Now().Add(relStartTime)
+	demand.DurationUntilStart = relStartTime
 
 	return demand, nil
 }
