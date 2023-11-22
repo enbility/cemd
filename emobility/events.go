@@ -279,48 +279,6 @@ func (e *EMobilityImpl) evForwardChargePlanIfProvided() {
 	}
 }
 
-func (e *EMobilityImpl) evGetTimeSeriesPlanData() ([]EVDurationSlotValue, error) {
-	if e.evTimeSeries == nil || e.dataProvider == nil {
-		return nil, ErrNotSupported
-	}
-
-	timeSeries, err := e.evTimeSeries.GetValueForType(model.TimeSeriesTypeTypePlan)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(timeSeries.TimeSeriesSlot) == 0 {
-		return nil, ErrNotSupported
-	}
-
-	var data []EVDurationSlotValue
-
-	for _, slot := range timeSeries.TimeSeriesSlot {
-		duration, err := slot.Duration.GetTimeDuration()
-		if err != nil {
-			logging.Log.Error("ev charge plan contains invalid duration:", err)
-			return nil, err
-		}
-
-		if slot.MaxValue == nil {
-			continue
-		}
-
-		item := EVDurationSlotValue{
-			Duration: duration,
-			Value:    slot.MaxValue.GetValue(),
-		}
-
-		data = append(data, item)
-	}
-
-	if len(data) == 0 {
-		return nil, ErrNotSupported
-	}
-
-	return data, nil
-}
-
 // request incentive table values
 func (e *EMobilityImpl) evRequestIncentiveValues() {
 	if e.evIncentiveTable == nil {

@@ -9,12 +9,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_evGetTimeSeriesPlanData(t *testing.T) {
+func Test_EVChargePlan(t *testing.T) {
 	emobilty, eebusService := setupEmobility()
 
-	data, err := emobilty.evGetTimeSeriesPlanData()
+	_, err := emobilty.EVChargePlan()
 	assert.NotNil(t, err)
-	assert.Nil(t, data)
 
 	localDevice, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
@@ -25,15 +24,13 @@ func Test_evGetTimeSeriesPlanData(t *testing.T) {
 	dataProviderMock := NewMockEmobilityDataProvider(ctrl)
 	emobilty.dataProvider = dataProviderMock
 
-	data, err = emobilty.evGetTimeSeriesPlanData()
+	_, err = emobilty.EVChargePlan()
 	assert.NotNil(t, err)
-	assert.Nil(t, data)
 
 	emobilty.evTimeSeries = timeSeriesConfiguration(localDevice, emobilty.evEntity)
 
-	data, err = emobilty.evGetTimeSeriesPlanData()
+	_, err = emobilty.EVChargePlan()
 	assert.NotNil(t, err)
-	assert.Nil(t, data)
 
 	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer, model.RoleTypeClient)
 
@@ -67,9 +64,8 @@ func Test_evGetTimeSeriesPlanData(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.evGetTimeSeriesPlanData()
+	_, err = emobilty.EVChargePlan()
 	assert.NotNil(t, err)
-	assert.Nil(t, data)
 
 	cmd = []model.CmdType{{
 		TimeSeriesListData: &model.TimeSeriesListDataType{
@@ -100,8 +96,6 @@ func Test_evGetTimeSeriesPlanData(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.evGetTimeSeriesPlanData()
+	_, err = emobilty.EVChargePlan()
 	assert.Nil(t, err)
-	assert.NotNil(t, data)
-
 }
