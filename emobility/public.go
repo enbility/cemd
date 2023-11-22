@@ -827,16 +827,16 @@ func (e *EMobilityImpl) EVChargePlan() (EVChargePlan, error) {
 }
 
 // returns the constraints for the time slots
-func (e *EMobilityImpl) EVTimeSlotConstraints() EVTimeSlotConstraints {
+func (e *EMobilityImpl) EVTimeSlotConstraints() (EVTimeSlotConstraints, error) {
 	result := EVTimeSlotConstraints{}
 
 	if e.evEntity == nil || e.evTimeSeries == nil {
-		return result
+		return result, features.ErrDataNotAvailable
 	}
 
 	constraints, err := e.evTimeSeries.GetConstraints()
 	if err != nil {
-		return result
+		return result, err
 	}
 
 	// only use the first constraint
@@ -864,7 +864,7 @@ func (e *EMobilityImpl) EVTimeSlotConstraints() EVTimeSlotConstraints {
 		}
 	}
 
-	return result
+	return result, nil
 }
 
 // send power limits to the EV
@@ -877,7 +877,10 @@ func (e *EMobilityImpl) EVWritePowerLimits(data []EVDurationSlotValue) error {
 		return errors.New("missing power limit data")
 	}
 
-	constraints := e.EVTimeSlotConstraints()
+	constraints, err := e.EVTimeSlotConstraints()
+	if err != nil {
+		return err
+	}
 
 	if constraints.MinSlots != 0 && constraints.MinSlots > uint(len(data)) {
 		return errors.New("too few charge slots provided")
@@ -930,16 +933,16 @@ func (e *EMobilityImpl) EVWritePowerLimits(data []EVDurationSlotValue) error {
 }
 
 // returns the minimum and maximum number of incentive slots allowed
-func (e *EMobilityImpl) EVIncentiveConstraints() EVIncentiveSlotConstraints {
+func (e *EMobilityImpl) EVIncentiveConstraints() (EVIncentiveSlotConstraints, error) {
 	result := EVIncentiveSlotConstraints{}
 
 	if e.evEntity == nil || e.evIncentiveTable == nil {
-		return result
+		return result, features.ErrDataNotAvailable
 	}
 
 	constraints, err := e.evIncentiveTable.GetConstraints()
 	if err != nil {
-		return result
+		return result, err
 	}
 
 	// only use the first constraint
@@ -952,7 +955,7 @@ func (e *EMobilityImpl) EVIncentiveConstraints() EVIncentiveSlotConstraints {
 		result.MaxSlots = uint(*constraint.IncentiveSlotConstraints.SlotCountMax)
 	}
 
-	return result
+	return result, nil
 }
 
 // send incentives to the EV
@@ -965,7 +968,10 @@ func (e *EMobilityImpl) EVWriteIncentives(data []EVDurationSlotValue) error {
 		return errors.New("missing incentive data")
 	}
 
-	constraints := e.EVIncentiveConstraints()
+	constraints, err := e.EVIncentiveConstraints()
+	if err != nil {
+		return err
+	}
 
 	if constraints.MinSlots != 0 && constraints.MinSlots > uint(len(data)) {
 		return errors.New("too few charge slots provided")
@@ -1028,7 +1034,7 @@ func (e *EMobilityImpl) EVWriteIncentives(data []EVDurationSlotValue) error {
 		IncentiveSlot: incentiveSlots,
 	}
 
-	_, err := e.evIncentiveTable.WriteValues([]model.IncentiveTableType{incentiveData})
+	_, err = e.evIncentiveTable.WriteValues([]model.IncentiveTableType{incentiveData})
 
 	return err
 }

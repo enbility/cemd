@@ -15,6 +15,12 @@ type EmobilityDataProvider interface {
 	// The EV provided a charge strategy
 	EVProvidedChargeStrategy(strategy EVChargeStrategyType)
 
+	// EV provided an energy demand
+	//
+	// Parameters:
+	//   - demand: Contains details about the actual demands from the EV
+	EVProvidedEnergyDemand(demand EVDemand)
+
 	// Energy demand and duration is provided by the EV which requires the CEM
 	// to respond with time slots containing power limits for each slot
 	//
@@ -196,7 +202,8 @@ type EmobilityI interface {
 
 	// returns the constraints for the time slots
 	//   - EVTimeSlotConstraints: details about the time slot constraints
-	EVTimeSlotConstraints() EVTimeSlotConstraints
+	//   - error: if no data is available
+	EVTimeSlotConstraints() (EVTimeSlotConstraints, error)
 
 	// send power limits data to the EV
 	//
@@ -208,7 +215,8 @@ type EmobilityI interface {
 
 	// returns the constraints for incentive slots
 	//   - EVIncentiveConstraints: details about the incentive slot constraints
-	EVIncentiveConstraints() EVIncentiveSlotConstraints
+	//   - error: if no data is available
+	EVIncentiveConstraints() (EVIncentiveSlotConstraints, error)
 
 	// send price slots data to the EV
 	//

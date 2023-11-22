@@ -57,6 +57,18 @@ func (mr *MockEmobilityDataProviderMockRecorder) EVProvidedChargeStrategy(strate
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVProvidedChargeStrategy", reflect.TypeOf((*MockEmobilityDataProvider)(nil).EVProvidedChargeStrategy), strategy)
 }
 
+// EVProvidedEnergyDemand mocks base method.
+func (m *MockEmobilityDataProvider) EVProvidedEnergyDemand(demand EVDemand) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "EVProvidedEnergyDemand", demand)
+}
+
+// EVProvidedEnergyDemand indicates an expected call of EVProvidedEnergyDemand.
+func (mr *MockEmobilityDataProviderMockRecorder) EVProvidedEnergyDemand(demand interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVProvidedEnergyDemand", reflect.TypeOf((*MockEmobilityDataProvider)(nil).EVProvidedEnergyDemand), demand)
+}
+
 // EVRequestIncentives mocks base method.
 func (m *MockEmobilityDataProvider) EVRequestIncentives(demand EVDemand, constraints EVIncentiveSlotConstraints) {
 	m.ctrl.T.Helper()
@@ -285,11 +297,12 @@ func (mr *MockEmobilityIMockRecorder) EVIdentification() *gomock.Call {
 }
 
 // EVIncentiveConstraints mocks base method.
-func (m *MockEmobilityI) EVIncentiveConstraints() EVIncentiveSlotConstraints {
+func (m *MockEmobilityI) EVIncentiveConstraints() (EVIncentiveSlotConstraints, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EVIncentiveConstraints")
 	ret0, _ := ret[0].(EVIncentiveSlotConstraints)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // EVIncentiveConstraints indicates an expected call of EVIncentiveConstraints.
@@ -374,11 +387,12 @@ func (mr *MockEmobilityIMockRecorder) EVSoCSupported() *gomock.Call {
 }
 
 // EVTimeSlotConstraints mocks base method.
-func (m *MockEmobilityI) EVTimeSlotConstraints() EVTimeSlotConstraints {
+func (m *MockEmobilityI) EVTimeSlotConstraints() (EVTimeSlotConstraints, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EVTimeSlotConstraints")
 	ret0, _ := ret[0].(EVTimeSlotConstraints)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // EVTimeSlotConstraints indicates an expected call of EVTimeSlotConstraints.

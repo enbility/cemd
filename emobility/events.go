@@ -1,6 +1,8 @@
 package emobility
 
 import (
+	"time"
+
 	"github.com/enbility/eebus-go/features"
 	"github.com/enbility/eebus-go/logging"
 	"github.com/enbility/eebus-go/spine"
@@ -122,16 +124,30 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 						break
 					}
 
-					// request CEM for power limits
-					constraints := e.EVTimeSlotConstraints()
+					if e.dataProvider != nil {
+						e.dataProvider.EVProvidedEnergyDemand(demand)
+					}
+
+					timeConstraints, err := e.EVTimeSlotConstraints()
 					if err != nil {
 						logging.Log.Error("Error getting timeseries constraints:", err)
-					} else {
-						if e.dataProvider == nil {
-							break
-						}
-						e.dataProvider.EVRequestPowerLimits(demand, constraints)
+						break
 					}
+
+					incentiveConstraints, err := e.EVIncentiveConstraints()
+					if err != nil {
+						logging.Log.Error("Error getting incentive constraints:", err)
+						break
+					}
+
+					if e.dataProvider != nil {
+						e.dataProvider.EVRequestPowerLimits(demand, timeConstraints)
+						e.dataProvider.EVRequestIncentives(demand, incentiveConstraints)
+						break
+					}
+
+					e.evWriteDefaultIncentives()
+					e.evWriteDefaultPowerLimits()
 				}
 
 			case *model.TimeSeriesConstraintsListDataType:
@@ -169,20 +185,11 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 
 				case model.CmdClassifierTypeNotify:
 					// check if we are required to update the plan
-					if e.dataProvider == nil || !e.evCheckIncentiveTableDescriptionUpdateRequired() {
+					if !e.evCheckIncentiveTableDescriptionUpdateRequired() {
 						break
 					}
 
-					demand, err := e.EVEnergyDemand()
-					if err != nil {
-						logging.Log.Error("Error getting energy demand:", err)
-						break
-					}
-
-					constraints := e.EVIncentiveConstraints()
-
-					// request CEM for incentives
-					e.dataProvider.EVRequestIncentives(demand, constraints)
+					e.evWriteIncentiveTableDescriptions()
 				}
 
 			case *model.IncentiveTableConstraintsDataType:
@@ -208,6 +215,44 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 	e.dataProvider.EVProvidedChargeStrategy(chargeStrategy)
 }
 
+func (e *EMobilityImpl) evWriteDefaultIncentives() {
+	// send default incentives for the maximum timeframe
+	// to fullfill spec, as there is no data provided
+	logging.Log.Info("Fallback sending default incentives")
+	data := []EVDurationSlotValue{
+		{Duration: 7 * time.Hour * 24, Value: 0.30},
+	}
+	_ = e.EVWriteIncentives(data)
+}
+
+func (e *EMobilityImpl) evWriteDefaultPowerLimits() {
+	// send default power limits for the maximum timeframe
+	// to fullfill spec, as there is no data provided
+	logging.Log.Info("Fallback sending default power limits")
+
+	paramDesc, err := e.evElectricalConnection.GetParameterDescriptionForScopeType(model.ScopeTypeTypeACPower)
+	if err != nil {
+		logging.Log.Error("Error getting parameter descriptions:", err)
+		return
+	}
+
+	permitted, err := e.evElectricalConnection.GetPermittedValueSetForParameterId(*paramDesc.ParameterId)
+	if err != nil {
+		logging.Log.Error("Error getting permitted values:", err)
+		return
+	}
+
+	if len(permitted.PermittedValueSet) < 1 || len(permitted.PermittedValueSet[0].Range) < 1 {
+		logging.Log.Error("No permitted value set available")
+		return
+	}
+
+	data := []EVDurationSlotValue{
+		{Duration: 7 * time.Hour * 24, Value: permitted.PermittedValueSet[0].Range[0].Max.GetValue()},
+	}
+	_ = e.EVWritePowerLimits(data)
+}
+
 // request time series values
 func (e *EMobilityImpl) evRequestTimeSeriesValues() {
 	if e.evTimeSeries == nil {
@@ -221,6 +266,10 @@ func (e *EMobilityImpl) evRequestTimeSeriesValues() {
 
 // send the ev provided charge plan to the CEM
 func (e *EMobilityImpl) evForwardChargePlanIfProvided() {
+	if e.dataProvider == nil {
+		return
+	}
+
 	if data, err := e.evGetTimeSeriesPlanData(); err == nil {
 		e.dataProvider.EVProvidedChargePlan(data)
 	}
@@ -277,8 +326,6 @@ func (e *EMobilityImpl) evRequestIncentiveValues() {
 	if _, err := e.evIncentiveTable.RequestValues(); err != nil {
 		logging.Log.Error("Error getting time series list values:", err)
 	}
-
-	e.evWriteIncentiveTableDescriptions()
 }
 
 // process required steps when an evse is connected

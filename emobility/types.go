@@ -64,6 +64,7 @@ type EVDemand struct {
 	DurationUntilEnd   time.Duration // the duration from now until minDemand or optDemand has to be reached, 0 if direct charge strategy is active
 }
 
+// Contains details about an EV generated charging plan
 type EVChargePlan struct {
 	Slots []EVChargePlanSlotValue // Individual charging slot details
 }
