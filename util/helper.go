@@ -30,6 +30,10 @@ func IsUsecaseSupported(usecase model.UseCaseNameType, actor model.UseCaseActorT
 func EntityOfTypeForSki(service *service.EEBUSService, entityType model.EntityTypeType, ski string) (*spine.EntityRemoteImpl, error) {
 	rDevice := service.RemoteDeviceForSki(ski)
 
+	if rDevice == nil {
+		return nil, features.ErrEntityNotFound
+	}
+
 	entities := rDevice.Entities()
 	for _, entity := range entities {
 		if entity.EntityType() == entityType {
