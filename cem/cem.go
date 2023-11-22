@@ -31,7 +31,7 @@ func (h *CemImpl) Setup() error {
 		return err
 	}
 
-	_ = spine.Events.Subscribe(spine.EventHandlerLevelMiddleware, h)
+	_ = spine.Events.Subscribe(h)
 
 	return nil
 }

@@ -264,7 +264,7 @@ func NewEMobility(service *service.EEBUSService, details *service.ServiceDetails
 		evCurrentChargeStrategy: EVChargeStrategyTypeUnknown,
 		configuration:           configuration,
 	}
-	_ = spine.Events.Subscribe(spine.EventHandlerLevelMiddleware, emobility)
+	_ = spine.Events.Subscribe(emobility)
 
 	service.RegisterRemoteSKI(ski, true)
 

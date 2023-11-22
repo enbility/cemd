@@ -37,7 +37,7 @@ func NewInverterBatteryVis(service *service.EEBUSService, details *service.Servi
 		entity:  service.LocalEntity(),
 		ski:     ski,
 	}
-	_ = spine.Events.Subscribe(spine.EventHandlerLevelMiddleware, inverter)
+	_ = spine.Events.Subscribe(inverter)
 
 	service.RegisterRemoteSKI(ski, true)
 

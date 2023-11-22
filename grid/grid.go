@@ -42,7 +42,7 @@ func NewGrid(service *service.EEBUSService, details *service.ServiceDetails) *Gr
 		entity:  service.LocalEntity(),
 		ski:     ski,
 	}
-	_ = spine.Events.Subscribe(spine.EventHandlerLevelMiddleware, grid)
+	_ = spine.Events.Subscribe(grid)
 
 	service.RegisterRemoteSKI(ski, true)
 
