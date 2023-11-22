@@ -725,7 +725,7 @@ func (e *EMobilityImpl) EVEnergyDemand() (EVDemand, error) {
 	}
 	if firstSlot.Duration != nil {
 		if tempDuration, err := firstSlot.Duration.GetTimeDuration(); err == nil {
-			demand.DurationUntilEnd = tempDuration
+			demand.DurationUntilEnd = tempDuration.Seconds()
 		}
 	}
 
@@ -748,9 +748,63 @@ func (e *EMobilityImpl) EVEnergyDemand() (EVDemand, error) {
 		}
 	}
 
-	demand.DurationUntilStart = relStartTime
+	demand.DurationUntilStart = relStartTime.Seconds()
 
 	return demand, nil
+}
+
+func (e *EMobilityImpl) EVChargePlanConstraints() ([]EVDurationSlotValue, error) {
+	constraints := []EVDurationSlotValue{}
+
+	if e.evEntity == nil {
+		return constraints, ErrEVDisconnected
+	}
+
+	if e.evTimeSeries == nil {
+		return constraints, features.ErrDataNotAvailable
+	}
+
+	data, err := e.evTimeSeries.GetValueForType(model.TimeSeriesTypeTypeConstraints)
+	if err != nil {
+		return constraints, features.ErrDataNotAvailable
+	}
+
+	// we need at least a time series slot
+	if data.TimeSeriesSlot == nil {
+		return constraints, features.ErrDataNotAvailable
+	}
+
+	// get the values for all slots
+	for _, slot := range data.TimeSeriesSlot {
+		newSlot := EVDurationSlotValue{}
+
+		if slot.Duration != nil {
+			if duration, err := slot.Duration.GetTimeDuration(); err == nil {
+				newSlot.Duration = duration
+			}
+		} else if slot.TimePeriod != nil {
+			var slotStart, slotEnd time.Time
+			if slot.TimePeriod.StartTime != nil {
+				if time, err := slot.TimePeriod.StartTime.GetTime(); err == nil {
+					slotStart = time
+				}
+			}
+			if slot.TimePeriod.EndTime != nil {
+				if time, err := slot.TimePeriod.EndTime.GetTime(); err == nil {
+					slotEnd = time
+				}
+			}
+			newSlot.Duration = slotEnd.Sub(slotStart)
+		}
+
+		if slot.MaxValue != nil {
+			newSlot.Value = slot.MaxValue.GetValue()
+		}
+
+		constraints = append(constraints, newSlot)
+	}
+
+	return constraints, nil
 }
 
 func (e *EMobilityImpl) EVChargePlan() (EVChargePlan, error) {
@@ -805,9 +859,16 @@ func (e *EMobilityImpl) EVChargePlan() (EVChargePlan, error) {
 			newSlot.Start = currentEnd
 		}
 
-		if duration, err := slot.Duration.GetTimeDuration(); err == nil {
-			newSlot.End = newSlot.Start.Add(duration)
-			currentEnd = newSlot.End
+		if slot.Duration != nil {
+			if duration, err := slot.Duration.GetTimeDuration(); err == nil {
+				newSlot.End = newSlot.Start.Add(duration)
+				currentEnd = newSlot.End
+			}
+		} else if slot.TimePeriod != nil && slot.TimePeriod.EndTime != nil {
+			if time, err := slot.TimePeriod.StartTime.GetTime(); err == nil {
+				newSlot.End = time
+				currentEnd = newSlot.End
+			}
 		}
 
 		if slot.Value != nil {

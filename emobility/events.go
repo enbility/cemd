@@ -270,8 +270,12 @@ func (e *EMobilityImpl) evForwardChargePlanIfProvided() {
 		return
 	}
 
-	if data, err := e.evGetTimeSeriesPlanData(); err == nil {
-		e.dataProvider.EVProvidedChargePlan(data)
+	if plan, err := e.EVChargePlan(); err == nil {
+		e.dataProvider.EVProvidedChargePlan(plan)
+	}
+
+	if constraints, err := e.EVChargePlanConstraints(); err == nil {
+		e.dataProvider.EVProvidedChargePlanConstraints(constraints)
 	}
 }
 

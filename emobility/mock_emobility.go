@@ -34,15 +34,27 @@ func (m *MockEmobilityDataProvider) EXPECT() *MockEmobilityDataProviderMockRecor
 }
 
 // EVProvidedChargePlan mocks base method.
-func (m *MockEmobilityDataProvider) EVProvidedChargePlan(data []EVDurationSlotValue) {
+func (m *MockEmobilityDataProvider) EVProvidedChargePlan(plan EVChargePlan) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "EVProvidedChargePlan", data)
+	m.ctrl.Call(m, "EVProvidedChargePlan", plan)
 }
 
 // EVProvidedChargePlan indicates an expected call of EVProvidedChargePlan.
-func (mr *MockEmobilityDataProviderMockRecorder) EVProvidedChargePlan(data interface{}) *gomock.Call {
+func (mr *MockEmobilityDataProviderMockRecorder) EVProvidedChargePlan(plan interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVProvidedChargePlan", reflect.TypeOf((*MockEmobilityDataProvider)(nil).EVProvidedChargePlan), data)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVProvidedChargePlan", reflect.TypeOf((*MockEmobilityDataProvider)(nil).EVProvidedChargePlan), plan)
+}
+
+// EVProvidedChargePlanConstraints mocks base method.
+func (m *MockEmobilityDataProvider) EVProvidedChargePlanConstraints(constraints []EVDurationSlotValue) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "EVProvidedChargePlanConstraints", constraints)
+}
+
+// EVProvidedChargePlanConstraints indicates an expected call of EVProvidedChargePlanConstraints.
+func (mr *MockEmobilityDataProviderMockRecorder) EVProvidedChargePlanConstraints(constraints interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EVProvidedChargePlanConstraints", reflect.TypeOf((*MockEmobilityDataProvider)(nil).EVProvidedChargePlanConstraints), constraints)
 }
 
 // EVProvidedChargeStrategy mocks base method.
