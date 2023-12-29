@@ -125,8 +125,7 @@ func setupEmobility() (*EMobilityImpl, *service.EEBUSService) {
 
 func setupDevices(eebusService *service.EEBUSService) (*spine.DeviceLocalImpl, *spine.EntityLocalImpl, *spine.DeviceRemoteImpl, []*spine.EntityRemoteImpl, *WriteMessageHandler) {
 	localDevice := eebusService.LocalDevice()
-	localEntity := spine.NewEntityLocalImpl(localDevice, model.EntityTypeTypeCEM, []model.AddressEntityType{1})
-	localDevice.AddEntity(localEntity)
+	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
 
 	f := spine.NewFeatureLocalImpl(1, localEntity, model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient)
 	localEntity.AddFeature(f)
