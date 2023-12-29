@@ -18,19 +18,19 @@ func Test_EVWriteIncentives(t *testing.T) {
 	err := emobilty.EVWriteIncentives(data)
 	assert.NotNil(t, err)
 
-	localDevice, remoteDevice, entites, writeHandler := setupDevices(eebusService)
+	localDevice, localEntity, remoteDevice, entites, writeHandler := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
 	err = emobilty.EVWriteIncentives(data)
 	assert.NotNil(t, err)
 
-	emobilty.evIncentiveTable = incentiveTableConfiguration(localDevice, emobilty.evEntity)
+	emobilty.evIncentiveTable = incentiveTableConfiguration(localEntity, emobilty.evEntity)
 
 	err = emobilty.EVWriteIncentives(data)
 	assert.NotNil(t, err)
 
-	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeServer, model.RoleTypeClient)
+	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd := []model.CmdType{{
 		IncentiveTableConstraintsData: &model.IncentiveTableConstraintsDataType{
@@ -111,7 +111,7 @@ func Test_EVWriteIncentives(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			for _, data := range tc.data {
-				datagram = datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeServer, model.RoleTypeClient)
+				datagram = datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeServer, model.RoleTypeClient)
 
 				cmd = []model.CmdType{{
 					IncentiveTableConstraintsData: &model.IncentiveTableConstraintsDataType{

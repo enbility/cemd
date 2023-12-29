@@ -34,7 +34,7 @@ func NewEMobilityScenario(service *service.EEBUSService, currency model.Currency
 
 // adds all the supported features to the local entity
 func (e *EmobilityScenarioImpl) AddFeatures() {
-	localEntity := e.Service.LocalEntity()
+	localEntity := e.Service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	// server features
 	{
@@ -74,7 +74,7 @@ func (e *EmobilityScenarioImpl) AddFeatures() {
 
 // add supported e-mobility usecases
 func (e *EmobilityScenarioImpl) AddUseCases() {
-	localEntity := e.Service.LocalEntity()
+	localEntity := e.Service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	_ = spine.NewUseCase(
 		localEntity,

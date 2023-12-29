@@ -16,7 +16,7 @@ func Test_EVGetIncentiveConstraints(t *testing.T) {
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 	assert.NotEqual(t, err, nil)
 
-	localDevice, remoteDevice, entites, _ := setupDevices(eebusService)
+	localDevice, localEntity, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
@@ -25,14 +25,14 @@ func Test_EVGetIncentiveConstraints(t *testing.T) {
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 	assert.NotEqual(t, err, nil)
 
-	emobilty.evIncentiveTable = incentiveTableConfiguration(localDevice, emobilty.evEntity)
+	emobilty.evIncentiveTable = incentiveTableConfiguration(localEntity, emobilty.evEntity)
 
 	constraints, err = emobilty.EVIncentiveConstraints()
 	assert.Equal(t, uint(0), constraints.MinSlots)
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 	assert.NotEqual(t, err, nil)
 
-	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeServer, model.RoleTypeClient)
+	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd := []model.CmdType{{
 		IncentiveTableConstraintsData: &model.IncentiveTableConstraintsDataType{

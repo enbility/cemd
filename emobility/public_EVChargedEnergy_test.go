@@ -15,7 +15,7 @@ func Test_EVChargedEnergy(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
-	localDevice, remoteDevice, entites, _ := setupDevices(eebusService)
+	localDevice, localEntity, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
@@ -23,13 +23,13 @@ func Test_EVChargedEnergy(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
-	emobilty.evMeasurement = measurement(localDevice, emobilty.evEntity)
+	emobilty.evMeasurement = measurement(localEntity, emobilty.evEntity)
 
 	data, err = emobilty.EVChargedEnergy()
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
-	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeMeasurement, model.RoleTypeServer, model.RoleTypeClient)
+	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeMeasurement, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd := []model.CmdType{{
 		MeasurementDescriptionListData: &model.MeasurementDescriptionListDataType{

@@ -294,14 +294,15 @@ func (e *EMobilityImpl) evRequestIncentiveValues() {
 func (e *EMobilityImpl) evseConnected(ski string, entity *spine.EntityRemoteImpl) {
 	e.evseEntity = entity
 	localDevice := e.service.LocalDevice()
+	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
 
-	f1, err := features.NewDeviceClassification(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	f1, err := features.NewDeviceClassification(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		return
 	}
 	e.evseDeviceClassification = f1
 
-	f2, err := features.NewDeviceDiagnosis(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	f2, err := features.NewDeviceDiagnosis(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		return
 	}
@@ -348,20 +349,21 @@ func (e *EMobilityImpl) evDisconnected() {
 func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 	e.evEntity = entity
 	localDevice := e.service.LocalDevice()
+	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
 
 	logging.Log.Debug("ev connected")
 
 	// setup features
-	e.evDeviceClassification, _ = features.NewDeviceClassification(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
-	e.evDeviceDiagnosis, _ = features.NewDeviceDiagnosis(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
-	e.evDeviceConfiguration, _ = features.NewDeviceConfiguration(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
-	e.evElectricalConnection, _ = features.NewElectricalConnection(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
-	e.evMeasurement, _ = features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
-	e.evIdentification, _ = features.NewIdentification(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
-	e.evLoadControl, _ = features.NewLoadControl(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	e.evDeviceClassification, _ = features.NewDeviceClassification(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
+	e.evDeviceDiagnosis, _ = features.NewDeviceDiagnosis(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
+	e.evDeviceConfiguration, _ = features.NewDeviceConfiguration(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
+	e.evElectricalConnection, _ = features.NewElectricalConnection(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
+	e.evMeasurement, _ = features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
+	e.evIdentification, _ = features.NewIdentification(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
+	e.evLoadControl, _ = features.NewLoadControl(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if e.configuration.CoordinatedChargingEnabled {
-		e.evTimeSeries, _ = features.NewTimeSeries(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
-		e.evIncentiveTable, _ = features.NewIncentiveTable(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+		e.evTimeSeries, _ = features.NewTimeSeries(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
+		e.evIncentiveTable, _ = features.NewIncentiveTable(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	}
 
 	// optional requests are only logged as debug

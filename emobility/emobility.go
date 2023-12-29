@@ -266,9 +266,11 @@ var _ EmobilityI = (*EMobilityImpl)(nil)
 func NewEMobility(service *service.EEBUSService, details *service.ServiceDetails, currency model.CurrencyType, configuration EmobilityConfiguration, dataProvider EmobilityDataProvider) *EMobilityImpl {
 	ski := util.NormalizeSKI(details.SKI)
 
+	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
+
 	emobility := &EMobilityImpl{
 		service:                 service,
-		entity:                  service.LocalEntity(),
+		entity:                  localEntity,
 		ski:                     ski,
 		currency:                currency,
 		dataProvider:            dataProvider,

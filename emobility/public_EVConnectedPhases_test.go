@@ -15,7 +15,7 @@ func Test_EVConnectedPhases(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, uint(0), data)
 
-	localDevice, remoteDevice, entites, _ := setupDevices(eebusService)
+	localDevice, localEntity, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
@@ -23,13 +23,13 @@ func Test_EVConnectedPhases(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, uint(0), data)
 
-	emobilty.evElectricalConnection = electricalConnection(localDevice, emobilty.evEntity)
+	emobilty.evElectricalConnection = electricalConnection(localEntity, emobilty.evEntity)
 
 	data, err = emobilty.EVConnectedPhases()
 	assert.NotNil(t, err)
 	assert.Equal(t, uint(0), data)
 
-	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer, model.RoleTypeClient)
+	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd := []model.CmdType{{
 		ElectricalConnectionDescriptionListData: &model.ElectricalConnectionDescriptionListDataType{

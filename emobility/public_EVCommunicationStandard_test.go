@@ -15,7 +15,7 @@ func Test_EVCommunicationStandard(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, EVCommunicationStandardTypeUnknown, data)
 
-	localDevice, remoteDevice, entites, _ := setupDevices(eebusService)
+	localDevice, localEntity, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
@@ -23,13 +23,13 @@ func Test_EVCommunicationStandard(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, EVCommunicationStandardTypeUnknown, data)
 
-	emobilty.evDeviceConfiguration = deviceConfiguration(localDevice, emobilty.evEntity)
+	emobilty.evDeviceConfiguration = deviceConfiguration(localEntity, emobilty.evEntity)
 
 	data, err = emobilty.EVCommunicationStandard()
 	assert.NotNil(t, err)
 	assert.Equal(t, EVCommunicationStandardTypeUnknown, data)
 
-	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer, model.RoleTypeClient)
+	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd := []model.CmdType{{
 		DeviceConfigurationKeyValueDescriptionListData: &model.DeviceConfigurationKeyValueDescriptionListDataType{

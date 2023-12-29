@@ -17,7 +17,7 @@ func Test_EVCurrentLimits(t *testing.T) {
 	assert.Nil(t, maxData)
 	assert.Nil(t, defaultData)
 
-	localDevice, remoteDevice, entites, _ := setupDevices(eebusService)
+	localDevice, localEntity, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
@@ -27,7 +27,7 @@ func Test_EVCurrentLimits(t *testing.T) {
 	assert.Nil(t, maxData)
 	assert.Nil(t, defaultData)
 
-	emobilty.evElectricalConnection = electricalConnection(localDevice, emobilty.evEntity)
+	emobilty.evElectricalConnection = electricalConnection(localEntity, emobilty.evEntity)
 
 	minData, maxData, defaultData, err = emobilty.EVCurrentLimits()
 	assert.NotNil(t, err)
@@ -35,7 +35,7 @@ func Test_EVCurrentLimits(t *testing.T) {
 	assert.Nil(t, maxData)
 	assert.Nil(t, defaultData)
 
-	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer, model.RoleTypeClient)
+	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd := []model.CmdType{{
 		ElectricalConnectionParameterDescriptionListData: &model.ElectricalConnectionParameterDescriptionListDataType{

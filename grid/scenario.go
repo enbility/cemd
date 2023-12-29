@@ -28,7 +28,7 @@ func NewGridScenario(service *service.EEBUSService) *GridScenarioImpl {
 
 // adds all the supported features to the local entity
 func (e *GridScenarioImpl) AddFeatures() {
-	localEntity := e.Service.LocalEntity()
+	localEntity := e.Service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	// client features
 	var clientFeatures = []model.FeatureTypeType{
@@ -44,7 +44,7 @@ func (e *GridScenarioImpl) AddFeatures() {
 
 // add supported grid usecases
 func (e *GridScenarioImpl) AddUseCases() {
-	localEntity := e.Service.LocalEntity()
+	localEntity := e.Service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	_ = spine.NewUseCaseWithActor(
 		localEntity,

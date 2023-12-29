@@ -28,7 +28,7 @@ func IsUsecaseSupported(usecase model.UseCaseNameType, actor model.UseCaseActorT
 
 // return the remote entity of a given type and device ski
 func EntityOfTypeForSki(service *service.EEBUSService, entityType model.EntityTypeType, ski string) (*spine.EntityRemoteImpl, error) {
-	rDevice := service.RemoteDeviceForSki(ski)
+	rDevice := service.LocalDevice().RemoteDeviceForSki(ski)
 
 	if rDevice == nil {
 		return nil, features.ErrEntityNotFound

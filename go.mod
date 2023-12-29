@@ -3,7 +3,7 @@ module github.com/enbility/cemd
 go 1.18
 
 require (
-	github.com/enbility/eebus-go v0.0.0-20231029191406-3b80a7a18d41
+	github.com/enbility/eebus-go v0.0.0-20231229202420-a56f83821f31
 	github.com/golang/mock v1.6.0
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
@@ -15,6 +15,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/holoplot/go-avahi v1.0.1 // indirect
 	github.com/miekg/dns v1.1.56 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -27,5 +28,3 @@ require (
 	golang.org/x/tools v0.14.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-// replace github.com/enbility/eebus-go => ../eebus-go

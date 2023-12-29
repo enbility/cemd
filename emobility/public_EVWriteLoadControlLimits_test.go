@@ -19,20 +19,20 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 	err := emobilty.EVWriteLoadControlLimits(loadLimits)
 	assert.NotNil(t, err)
 
-	localDevice, remoteDevice, entites, writeHandler := setupDevices(eebusService)
+	localDevice, localEntity, remoteDevice, entites, writeHandler := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
 	err = emobilty.EVWriteLoadControlLimits(loadLimits)
 	assert.NotNil(t, err)
 
-	emobilty.evElectricalConnection = electricalConnection(localDevice, emobilty.evEntity)
-	emobilty.evLoadControl = loadcontrol(localDevice, emobilty.evEntity)
+	emobilty.evElectricalConnection = electricalConnection(localEntity, emobilty.evEntity)
+	emobilty.evLoadControl = loadcontrol(localEntity, emobilty.evEntity)
 
 	err = emobilty.EVWriteLoadControlLimits(loadLimits)
 	assert.NotNil(t, err)
 
-	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer, model.RoleTypeClient)
+	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd := []model.CmdType{{
 		ElectricalConnectionParameterDescriptionListData: &model.ElectricalConnectionParameterDescriptionListDataType{
@@ -153,7 +153,7 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 					dataSet = append(dataSet, permittedItem)
 				}
 
-				datagram = datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer, model.RoleTypeClient)
+				datagram = datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer, model.RoleTypeClient)
 
 				cmd = []model.CmdType{{
 					ElectricalConnectionPermittedValueSetListData: &model.ElectricalConnectionPermittedValueSetListDataType{
@@ -167,7 +167,7 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 				err = emobilty.EVWriteLoadControlLimits(loadLimits)
 				assert.NotNil(t, err)
 
-				datagram = datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeLoadControl, model.RoleTypeServer, model.RoleTypeClient)
+				datagram = datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeLoadControl, model.RoleTypeServer, model.RoleTypeClient)
 
 				limitDesc := []model.LoadControlLimitDescriptionDataType{}
 				var limitIdsObligation, limitIdsRecommendation []model.LoadControlLimitIdType

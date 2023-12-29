@@ -15,7 +15,7 @@ func Test_EVSoC(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
-	localDevice, remoteDevice, entites, _ := setupDevices(eebusService)
+	localDevice, localEntity, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
@@ -23,13 +23,13 @@ func Test_EVSoC(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
-	emobilty.evMeasurement = measurement(localDevice, emobilty.evEntity)
+	emobilty.evMeasurement = measurement(localEntity, emobilty.evEntity)
 
 	data, err = emobilty.EVSoC()
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
-	datagram := datagramForEntityAndFeatures(true, localDevice, nil, model.FeatureTypeTypeNodeManagement, model.RoleTypeSpecial, model.RoleTypeSpecial)
+	datagram := datagramForEntityAndFeatures(true, localDevice, localEntity, nil, model.FeatureTypeTypeNodeManagement, model.RoleTypeSpecial, model.RoleTypeSpecial)
 
 	cmd := []model.CmdType{{
 		NodeManagementUseCaseData: &model.NodeManagementUseCaseDataType{
@@ -55,7 +55,7 @@ func Test_EVSoC(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
-	datagram = datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeMeasurement, model.RoleTypeServer, model.RoleTypeClient)
+	datagram = datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeMeasurement, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd = []model.CmdType{{
 		MeasurementDescriptionListData: &model.MeasurementDescriptionListDataType{
@@ -77,7 +77,7 @@ func Test_EVSoC(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
-	datagram = datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeMeasurement, model.RoleTypeServer, model.RoleTypeClient)
+	datagram = datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeMeasurement, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd = []model.CmdType{{
 		MeasurementListData: &model.MeasurementListDataType{
@@ -96,7 +96,7 @@ func Test_EVSoC(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
-	datagram = datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeMeasurement, model.RoleTypeServer, model.RoleTypeClient)
+	datagram = datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeMeasurement, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd = []model.CmdType{{
 		MeasurementListData: &model.MeasurementListDataType{

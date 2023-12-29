@@ -67,20 +67,21 @@ func (e *GridImpl) HandleEvent(payload spine.EventPayload) {
 func (e *GridImpl) gridConnected(ski string, entity *spine.EntityRemoteImpl) {
 	e.gridEntity = entity
 	localDevice := e.service.LocalDevice()
+	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
 
-	f1, err := features.NewDeviceConfiguration(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	f1, err := features.NewDeviceConfiguration(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		return
 	}
 	e.gridDeviceConfiguration = f1
 
-	f2, err := features.NewElectricalConnection(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	f2, err := features.NewElectricalConnection(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		return
 	}
 	e.gridElectricalConnection = f2
 
-	f3, err := features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	f3, err := features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		return
 	}

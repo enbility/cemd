@@ -3,7 +3,6 @@ package cem
 import (
 	"github.com/enbility/eebus-go/logging"
 	"github.com/enbility/eebus-go/service"
-	"github.com/enbility/eebus-go/spine"
 	"github.com/enbility/eebus-go/spine/model"
 )
 
@@ -30,8 +29,6 @@ func (h *CemImpl) Setup() error {
 	if err := h.Service.Setup(); err != nil {
 		return err
 	}
-
-	_ = spine.Events.Subscribe(h)
 
 	return nil
 }

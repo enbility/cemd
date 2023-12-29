@@ -15,7 +15,7 @@ func Test_EVIdentification(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, "", data)
 
-	localDevice, remoteDevice, entites, _ := setupDevices(eebusService)
+	localDevice, localEntity, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
@@ -23,13 +23,13 @@ func Test_EVIdentification(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, "", data)
 
-	emobilty.evIdentification = identificationConfiguration(localDevice, emobilty.evEntity)
+	emobilty.evIdentification = identificationConfiguration(localEntity, emobilty.evEntity)
 
 	data, err = emobilty.EVIdentification()
 	assert.NotNil(t, err)
 	assert.Equal(t, "", data)
 
-	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeIdentification, model.RoleTypeServer, model.RoleTypeClient)
+	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeIdentification, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd := []model.CmdType{{
 		IdentificationListData: &model.IdentificationListDataType{

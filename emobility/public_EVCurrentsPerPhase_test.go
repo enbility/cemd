@@ -15,7 +15,7 @@ func Test_EVCurrentsPerPhase(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Nil(t, data)
 
-	localDevice, remoteDevice, entites, _ := setupDevices(eebusService)
+	localDevice, localEntity, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
@@ -23,14 +23,14 @@ func Test_EVCurrentsPerPhase(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Nil(t, data)
 
-	emobilty.evElectricalConnection = electricalConnection(localDevice, emobilty.evEntity)
-	emobilty.evMeasurement = measurement(localDevice, emobilty.evEntity)
+	emobilty.evElectricalConnection = electricalConnection(localEntity, emobilty.evEntity)
+	emobilty.evMeasurement = measurement(localEntity, emobilty.evEntity)
 
 	data, err = emobilty.EVCurrentsPerPhase()
 	assert.NotNil(t, err)
 	assert.Nil(t, data)
 
-	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer, model.RoleTypeClient)
+	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd := []model.CmdType{{
 		ElectricalConnectionParameterDescriptionListData: &model.ElectricalConnectionParameterDescriptionListDataType{
@@ -54,7 +54,7 @@ func Test_EVCurrentsPerPhase(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Nil(t, data)
 
-	datagram = datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeMeasurement, model.RoleTypeServer, model.RoleTypeClient)
+	datagram = datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeMeasurement, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd = []model.CmdType{{
 		MeasurementDescriptionListData: &model.MeasurementDescriptionListDataType{

@@ -18,7 +18,7 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
-	localDevice, remoteDevice, entites, _ := setupDevices(eebusService)
+	localDevice, localEntity, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobility.evseEntity = entites[0]
 	emobility.evEntity = entites[1]
 
@@ -27,11 +27,11 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 	dataProviderMock := NewMockEmobilityDataProvider(ctrl)
 	emobility.dataProvider = dataProviderMock
 
-	emobility.evTimeSeries = timeSeriesConfiguration(localDevice, emobility.evEntity)
-	emobility.evIncentiveTable = incentiveTableConfiguration(localDevice, emobility.evEntity)
+	emobility.evTimeSeries = timeSeriesConfiguration(localEntity, emobility.evEntity)
+	emobility.evIncentiveTable = incentiveTableConfiguration(localEntity, emobility.evEntity)
 
-	datagramtt := datagramForEntityAndFeatures(false, localDevice, emobility.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer, model.RoleTypeClient)
-	datagramit := datagramForEntityAndFeatures(false, localDevice, emobility.evEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeServer, model.RoleTypeClient)
+	datagramtt := datagramForEntityAndFeatures(false, localDevice, localEntity, emobility.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer, model.RoleTypeClient)
+	datagramit := datagramForEntityAndFeatures(false, localDevice, localEntity, emobility.evEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeServer, model.RoleTypeClient)
 
 	setupTimeSeries(t, datagramtt, localDevice, remoteDevice)
 	setupIncentiveTable(t, datagramit, localDevice, remoteDevice)
@@ -68,8 +68,8 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 	assert.Equal(t, 0.0, demand.MinDemand)
 	assert.Equal(t, 0.0, demand.OptDemand)
 	assert.Equal(t, 74690.0, demand.MaxDemand)
-	assert.Equal(t, time.Duration(0), demand.DurationUntilStart)
-	assert.Equal(t, time.Duration(0), demand.DurationUntilEnd)
+	assert.Equal(t, 0.0, demand.DurationUntilStart)
+	assert.Equal(t, 0.0, demand.DurationUntilEnd)
 
 	// the final plan
 
@@ -146,8 +146,8 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 	assert.Equal(t, 0.0, demand.MinDemand)
 	assert.Equal(t, 53400.0, demand.OptDemand)
 	assert.Equal(t, 74690.0, demand.MaxDemand)
-	assert.Equal(t, time.Duration(0), demand.DurationUntilStart)
-	assert.Equal(t, time.Duration(time.Hour*52+time.Minute*40+time.Second*36), demand.DurationUntilEnd)
+	assert.Equal(t, 0.0, demand.DurationUntilStart)
+	assert.Equal(t, time.Duration(time.Hour*52+time.Minute*40+time.Second*36).Seconds(), demand.DurationUntilEnd)
 
 	// the final plan
 
@@ -240,8 +240,8 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 	assert.Equal(t, 600.0, demand.MinDemand)
 	assert.Equal(t, 600.0, demand.OptDemand)
 	assert.Equal(t, 75600.0, demand.MaxDemand)
-	assert.Equal(t, time.Duration(0), demand.DurationUntilStart)
-	assert.Equal(t, time.Duration(0), demand.DurationUntilEnd)
+	assert.Equal(t, 0.0, demand.DurationUntilStart)
+	assert.Equal(t, 0.0, demand.DurationUntilEnd)
 
 	// the final plan
 

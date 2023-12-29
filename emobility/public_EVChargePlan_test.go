@@ -15,7 +15,7 @@ func Test_EVChargePlan(t *testing.T) {
 	_, err := emobilty.EVChargePlan()
 	assert.NotNil(t, err)
 
-	localDevice, remoteDevice, entites, _ := setupDevices(eebusService)
+	localDevice, localEntity, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
@@ -27,12 +27,12 @@ func Test_EVChargePlan(t *testing.T) {
 	_, err = emobilty.EVChargePlan()
 	assert.NotNil(t, err)
 
-	emobilty.evTimeSeries = timeSeriesConfiguration(localDevice, emobilty.evEntity)
+	emobilty.evTimeSeries = timeSeriesConfiguration(localEntity, emobilty.evEntity)
 
 	_, err = emobilty.EVChargePlan()
 	assert.NotNil(t, err)
 
-	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer, model.RoleTypeClient)
+	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd := []model.CmdType{{
 		TimeSeriesDescriptionListData: &model.TimeSeriesDescriptionListDataType{

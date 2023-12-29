@@ -82,14 +82,15 @@ func (i *InverterBatteryVisImpl) HandleEvent(payload spine.EventPayload) {
 func (i *InverterBatteryVisImpl) inverterConnected(ski string, entity *spine.EntityRemoteImpl) {
 	i.inverterEntity = entity
 	localDevice := i.service.LocalDevice()
+	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
 
-	f1, err := features.NewElectricalConnection(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	f1, err := features.NewElectricalConnection(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		return
 	}
 	i.inverterElectricalConnection = f1
 
-	f2, err := features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	f2, err := features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		return
 	}

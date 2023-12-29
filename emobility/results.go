@@ -6,15 +6,11 @@ import (
 )
 
 func (e *EMobilityImpl) HandleResult(errorMsg spine.ResultMessage) {
-	if errorMsg.EntityRemote == e.evseEntity {
-		// handle errors coming from the remote EVSE entity
-		switch errorMsg.FeatureLocal.Type() {
-		case model.FeatureTypeTypeDeviceDiagnosis:
-			e.handleResultDeviceDiagnosis(errorMsg)
-		}
+	isEvse := errorMsg.EntityRemote == e.evseEntity
+	isEv := e.evEntity != nil && errorMsg.EntityRemote == e.evEntity
 
-	} else if e.evEntity != nil && errorMsg.EntityRemote == e.evEntity {
-		// handle errors coming from a remote EV entity
+	if isEvse || isEv {
+		// handle errors coming from the remote EVSE entity
 		switch errorMsg.FeatureLocal.Type() {
 		case model.FeatureTypeTypeDeviceDiagnosis:
 			e.handleResultDeviceDiagnosis(errorMsg)
@@ -30,9 +26,14 @@ func (e *EMobilityImpl) handleResultDeviceDiagnosis(resultMsg spine.ResultMessag
 		return
 	}
 
-	if resultMsg.DeviceRemote.IsHeartbeatMsgCounter(resultMsg.MsgCounterReference) {
-		resultMsg.DeviceRemote.Stopheartbeat()
+	// check if this is for a cached notify message
+	datagram, err := resultMsg.DeviceRemote.Sender().DatagramForMsgCounter(resultMsg.MsgCounterReference)
+	if err != nil {
+		return
+	}
 
+	if len(datagram.Payload.Cmd) > 0 &&
+		datagram.Payload.Cmd[0].DeviceDiagnosisHeartbeatData != nil {
 		// something is horribly wrong, disconnect and hope a new connection will fix it
 		e.service.DisconnectSKI(resultMsg.DeviceRemote.Ski(), string(*resultMsg.Result.Description))
 	}

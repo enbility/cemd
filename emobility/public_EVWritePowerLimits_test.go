@@ -18,19 +18,19 @@ func Test_EVWritePowerLimits(t *testing.T) {
 	err := emobilty.EVWritePowerLimits(data)
 	assert.NotNil(t, err)
 
-	localDevice, remoteDevice, entites, writeHandler := setupDevices(eebusService)
+	localDevice, localEntity, remoteDevice, entites, writeHandler := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
 	err = emobilty.EVWritePowerLimits(data)
 	assert.NotNil(t, err)
 
-	emobilty.evTimeSeries = timeSeriesConfiguration(localDevice, emobilty.evEntity)
+	emobilty.evTimeSeries = timeSeriesConfiguration(localEntity, emobilty.evEntity)
 
 	err = emobilty.EVWritePowerLimits(data)
 	assert.NotNil(t, err)
 
-	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer, model.RoleTypeClient)
+	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd := []model.CmdType{{
 		TimeSeriesDescriptionListData: &model.TimeSeriesDescriptionListDataType{
@@ -109,7 +109,7 @@ func Test_EVWritePowerLimits(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			for _, data := range tc.data {
-				datagram = datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer, model.RoleTypeClient)
+				datagram = datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer, model.RoleTypeClient)
 
 				cmd = []model.CmdType{{
 					TimeSeriesConstraintsListData: &model.TimeSeriesConstraintsListDataType{

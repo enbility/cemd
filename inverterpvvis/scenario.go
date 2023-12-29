@@ -28,7 +28,7 @@ func NewInverterVisScenario(service *service.EEBUSService) *InverterPVVisScenari
 
 // adds all the supported features to the local entity
 func (i *InverterPVVisScenarioImpl) AddFeatures() {
-	localEntity := i.Service.LocalEntity()
+	localEntity := i.Service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	// client features
 	var clientFeatures = []model.FeatureTypeType{
@@ -44,7 +44,7 @@ func (i *InverterPVVisScenarioImpl) AddFeatures() {
 
 // add supported inverter usecases
 func (i *InverterPVVisScenarioImpl) AddUseCases() {
-	localEntity := i.Service.LocalEntity()
+	localEntity := i.Service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	_ = spine.NewUseCaseWithActor(
 		localEntity,

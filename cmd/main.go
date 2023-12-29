@@ -158,9 +158,11 @@ func main() {
 		"HEMS",
 		"123456789",
 		model.DeviceTypeTypeEnergyManagementSystem,
+		[]model.EntityTypeType{model.EntityTypeTypeCEM},
 		*port,
 		certificate,
-		230)
+		230,
+		time.Second*4)
 	if err != nil {
 		fmt.Println("Service data is invalid:", err)
 		return

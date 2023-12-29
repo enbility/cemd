@@ -15,19 +15,19 @@ func Test_EVChargeStrategy(t *testing.T) {
 	data := emobilty.EVChargeStrategy()
 	assert.Equal(t, EVChargeStrategyTypeUnknown, data)
 
-	localDevice, remoteDevice, entites, _ := setupDevices(eebusService)
+	localDevice, localEntity, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
 	data = emobilty.EVChargeStrategy()
 	assert.Equal(t, EVChargeStrategyTypeUnknown, data)
 
-	emobilty.evDeviceConfiguration = deviceConfiguration(localDevice, emobilty.evEntity)
+	emobilty.evDeviceConfiguration = deviceConfiguration(localEntity, emobilty.evEntity)
 
 	data = emobilty.EVChargeStrategy()
 	assert.Equal(t, EVChargeStrategyTypeUnknown, data)
 
-	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer, model.RoleTypeClient)
+	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd := []model.CmdType{{
 		DeviceConfigurationKeyValueDescriptionListData: &model.DeviceConfigurationKeyValueDescriptionListDataType{
@@ -65,12 +65,12 @@ func Test_EVChargeStrategy(t *testing.T) {
 	data = emobilty.EVChargeStrategy()
 	assert.Equal(t, EVChargeStrategyTypeUnknown, data)
 
-	emobilty.evTimeSeries = timeSeriesConfiguration(localDevice, emobilty.evEntity)
+	emobilty.evTimeSeries = timeSeriesConfiguration(localEntity, emobilty.evEntity)
 
 	data = emobilty.EVChargeStrategy()
 	assert.Equal(t, EVChargeStrategyTypeUnknown, data)
 
-	datagram = datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer, model.RoleTypeClient)
+	datagram = datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd = []model.CmdType{{
 		TimeSeriesDescriptionListData: &model.TimeSeriesDescriptionListDataType{

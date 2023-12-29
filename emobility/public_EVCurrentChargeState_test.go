@@ -15,7 +15,7 @@ func Test_EVCurrentChargeState(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, EVChargeStateTypeUnplugged, data)
 
-	localDevice, remoteDevice, entites, _ := setupDevices(eebusService)
+	localDevice, localEntity, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
@@ -23,13 +23,13 @@ func Test_EVCurrentChargeState(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, EVChargeStateTypeUnplugged, data)
 
-	emobilty.evDeviceDiagnosis = deviceDiagnosis(localDevice, emobilty.evEntity)
+	emobilty.evDeviceDiagnosis = deviceDiagnosis(localEntity, emobilty.evEntity)
 
 	data, err = emobilty.EVCurrentChargeState()
 	assert.NotNil(t, err)
 	assert.Equal(t, EVChargeStateTypeUnknown, data)
 
-	datagram := datagramForEntityAndFeatures(false, localDevice, emobilty.evEntity, model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer, model.RoleTypeClient)
+	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer, model.RoleTypeClient)
 
 	cmd := []model.CmdType{{
 		DeviceDiagnosisStateData: &model.DeviceDiagnosisStateDataType{

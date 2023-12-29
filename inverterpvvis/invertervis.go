@@ -4,6 +4,7 @@ import (
 	"github.com/enbility/eebus-go/features"
 	"github.com/enbility/eebus-go/service"
 	"github.com/enbility/eebus-go/spine"
+	"github.com/enbility/eebus-go/spine/model"
 	"github.com/enbility/eebus-go/util"
 )
 
@@ -32,9 +33,11 @@ var _ InverterPVVisI = (*InverterPVVisImpl)(nil)
 func NewInverterPVVis(service *service.EEBUSService, details *service.ServiceDetails) *InverterPVVisImpl {
 	ski := util.NormalizeSKI(details.SKI)
 
+	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
+
 	inverter := &InverterPVVisImpl{
 		service: service,
-		entity:  service.LocalEntity(),
+		entity:  localEntity,
 		ski:     ski,
 	}
 	_ = spine.Events.Subscribe(inverter)

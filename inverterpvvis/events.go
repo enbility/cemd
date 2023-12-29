@@ -92,20 +92,21 @@ func (i *InverterPVVisImpl) HandleEvent(payload spine.EventPayload) {
 func (e *InverterPVVisImpl) inverterConnected(ski string, entity *spine.EntityRemoteImpl) {
 	e.inverterEntity = entity
 	localDevice := e.service.LocalDevice()
+	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
 
-	f1, err := features.NewElectricalConnection(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	f1, err := features.NewElectricalConnection(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		return
 	}
 	e.inverterElectricalConnection = f1
 
-	f2, err := features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	f2, err := features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		return
 	}
 	e.inverterMeasurement = f2
 
-	f3, err := features.NewDeviceConfiguration(model.RoleTypeClient, model.RoleTypeServer, localDevice, entity)
+	f3, err := features.NewDeviceConfiguration(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		return
 	}
