@@ -79,7 +79,7 @@ func (d *DemoCem) VisibleRemoteServicesUpdated(service *service.EEBUSService, en
 
 func (h *DemoCem) ServiceShipIDUpdate(ski string, shipdID string) {}
 
-func (h *DemoCem) ServicePairingDetailUpdate(ski string, detail service.ConnectionStateDetail) {}
+func (h *DemoCem) ServicePairingDetailUpdate(ski string, detail *service.ConnectionStateDetail) {}
 
 func (h *DemoCem) AllowWaitingForTrust(ski string) bool { return true }
 
