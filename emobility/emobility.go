@@ -231,12 +231,12 @@ type EmobilityI interface {
 }
 
 type EMobilityImpl struct {
-	entity *spine.EntityLocalImpl
+	entity spine.EntityLocal
 
 	service *service.EEBUSService
 
-	evseEntity *spine.EntityRemoteImpl
-	evEntity   *spine.EntityRemoteImpl
+	evseEntity spine.EntityRemote
+	evEntity   spine.EntityRemote
 
 	evseDeviceClassification *features.DeviceClassification
 	evseDeviceDiagnosis      *features.DeviceDiagnosis

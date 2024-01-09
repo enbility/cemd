@@ -58,7 +58,7 @@ func (i *InverterPVVisImpl) HandleEvent(payload spine.EventPayload) {
 
 			// key value descriptions received, now get the data
 			if _, err := i.inverterDeviceConfiguration.RequestKeyValues(); err != nil {
-				logging.Log.Error("Error getting configuration key values:", err)
+				logging.Log().Error("Error getting configuration key values:", err)
 			}
 
 		case *model.ElectricalConnectionParameterDescriptionListDataType:
@@ -66,7 +66,7 @@ func (i *InverterPVVisImpl) HandleEvent(payload spine.EventPayload) {
 				break
 			}
 			if _, err := i.inverterElectricalConnection.RequestPermittedValueSets(); err != nil {
-				logging.Log.Error("Error getting electrical permitted values:", err)
+				logging.Log().Error("Error getting electrical permitted values:", err)
 			}
 
 		case *model.ElectricalConnectionDescriptionListDataType:
@@ -74,7 +74,7 @@ func (i *InverterPVVisImpl) HandleEvent(payload spine.EventPayload) {
 				break
 			}
 			if err := i.inverterElectricalConnection.RequestDescriptions(); err != nil {
-				logging.Log.Error("Error getting electrical permitted values:", err)
+				logging.Log().Error("Error getting electrical permitted values:", err)
 			}
 
 		case *model.MeasurementDescriptionListDataType:
@@ -82,14 +82,14 @@ func (i *InverterPVVisImpl) HandleEvent(payload spine.EventPayload) {
 				break
 			}
 			if _, err := i.inverterMeasurement.RequestValues(); err != nil {
-				logging.Log.Error("Error getting measurement list values:", err)
+				logging.Log().Error("Error getting measurement list values:", err)
 			}
 		}
 	}
 }
 
 // process required steps when a pv device entity is connected
-func (e *InverterPVVisImpl) inverterConnected(ski string, entity *spine.EntityRemoteImpl) {
+func (e *InverterPVVisImpl) inverterConnected(ski string, entity spine.EntityRemote) {
 	e.inverterEntity = entity
 	localDevice := e.service.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
@@ -114,36 +114,36 @@ func (e *InverterPVVisImpl) inverterConnected(ski string, entity *spine.EntityRe
 
 	// subscribe
 	if err := e.inverterDeviceConfiguration.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 	}
 	if err := e.inverterElectricalConnection.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 	}
 	if err := e.inverterMeasurement.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 	}
 
 	// get device configuration data
 	if err := e.inverterDeviceConfiguration.RequestDescriptions(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 	}
 
 	// get electrical connection parameter
 	if err := e.inverterElectricalConnection.RequestDescriptions(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 	}
 
 	if err := e.inverterElectricalConnection.RequestParameterDescriptions(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 	}
 
 	// get measurement parameters
 	if err := e.inverterMeasurement.RequestDescriptions(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 	}
 
 	if err := e.inverterMeasurement.RequestConstraints(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 	}
 }
 

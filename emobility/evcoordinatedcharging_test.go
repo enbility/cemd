@@ -276,7 +276,7 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func setupTimeSeries(t *testing.T, datagram model.DatagramType, localDevice *spine.DeviceLocalImpl, remoteDevice *spine.DeviceRemoteImpl) {
+func setupTimeSeries(t *testing.T, datagram model.DatagramType, localDevice spine.DeviceLocal, remoteDevice spine.DeviceRemote) {
 	cmd := []model.CmdType{{
 		TimeSeriesConstraintsListData: &model.TimeSeriesConstraintsListDataType{
 			TimeSeriesConstraintsData: []model.TimeSeriesConstraintsDataType{
@@ -325,7 +325,7 @@ func setupTimeSeries(t *testing.T, datagram model.DatagramType, localDevice *spi
 	assert.Nil(t, err)
 }
 
-func setupIncentiveTable(t *testing.T, datagram model.DatagramType, localDevice *spine.DeviceLocalImpl, remoteDevice *spine.DeviceRemoteImpl) {
+func setupIncentiveTable(t *testing.T, datagram model.DatagramType, localDevice spine.DeviceLocal, remoteDevice spine.DeviceRemote) {
 	cmd := []model.CmdType{{
 		IncentiveTableDescriptionData: &model.IncentiveTableDescriptionDataType{
 			IncentiveTableDescription: []model.IncentiveTableDescriptionType{
@@ -348,7 +348,7 @@ func setupIncentiveTable(t *testing.T, datagram model.DatagramType, localDevice 
 }
 
 /*
-func requestIncentiveUpdate(t *testing.T, datagram model.DatagramType, localDevice *spine.DeviceLocalImpl, remoteDevice *spine.DeviceRemoteImpl) {
+func requestIncentiveUpdate(t *testing.T, datagram model.DatagramType, localDevice spine.DeviceLocal, remoteDevice spine.DeviceRemote) {
 	cmd := []model.CmdType{{
 		IncentiveTableDescriptionData: &model.IncentiveTableDescriptionDataType{
 			IncentiveTableDescription: []model.IncentiveTableDescriptionType{
@@ -370,7 +370,7 @@ func requestIncentiveUpdate(t *testing.T, datagram model.DatagramType, localDevi
 	assert.Nil(t, err)
 }
 
-func requestPowerTableUpdate(t *testing.T, datagram model.DatagramType, localDevice *spine.DeviceLocalImpl, remoteDevice *spine.DeviceRemoteImpl) {
+func requestPowerTableUpdate(t *testing.T, datagram model.DatagramType, localDevice spine.DeviceLocal, remoteDevice spine.DeviceRemote) {
 	cmd := []model.CmdType{{
 		TimeSeriesDescriptionListData: &model.TimeSeriesDescriptionListDataType{
 			TimeSeriesDescriptionData: []model.TimeSeriesDescriptionDataType{

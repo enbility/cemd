@@ -3,7 +3,7 @@ module github.com/enbility/cemd
 go 1.18
 
 require (
-	github.com/enbility/eebus-go v0.0.0-20231231144849-50a44231039b
+	github.com/enbility/eebus-go v0.0.0-20240109121001-eb9a1f604a40
 	github.com/golang/mock v1.6.0
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/exp v0.0.0-20231226003508-02704c960a9b
@@ -28,3 +28,5 @@ require (
 	golang.org/x/tools v0.16.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/enbility/eebus-go => ../eebus-go

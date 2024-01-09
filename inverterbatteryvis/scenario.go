@@ -46,11 +46,11 @@ func (i *InverterBatteryVisScenarioImpl) AddFeatures() {
 func (i *InverterBatteryVisScenarioImpl) AddUseCases() {
 	localEntity := i.Service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
-	_ = spine.NewUseCaseWithActor(
-		localEntity,
+	localEntity.AddUseCaseSupport(
 		model.UseCaseActorTypeVisualizationAppliance,
 		model.UseCaseNameTypeVisualizationOfAggregatedBatteryData,
-		model.SpecificationVersionType("1.0.0 RC1"),
+		model.SpecificationVersionType("1.0.0"),
+		"RC1",
 		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4})
 }

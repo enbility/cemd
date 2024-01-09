@@ -16,11 +16,11 @@ type InverterBatteryVisI interface {
 }
 
 type InverterBatteryVisImpl struct {
-	entity *spine.EntityLocalImpl
+	entity spine.EntityLocal
 
 	service *service.EEBUSService
 
-	inverterEntity               *spine.EntityRemoteImpl
+	inverterEntity               spine.EntityRemote
 	inverterElectricalConnection *features.ElectricalConnection
 	inverterMeasurement          *features.Measurement
 

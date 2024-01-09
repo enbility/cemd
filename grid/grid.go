@@ -19,11 +19,11 @@ type GridI interface {
 }
 
 type GridImpl struct {
-	entity *spine.EntityLocalImpl
+	entity spine.EntityLocal
 
 	service *service.EEBUSService
 
-	gridEntity *spine.EntityRemoteImpl
+	gridEntity spine.EntityRemote
 
 	gridDeviceConfiguration  *features.DeviceConfiguration
 	gridElectricalConnection *features.ElectricalConnection

@@ -46,11 +46,11 @@ func (i *InverterPVVisScenarioImpl) AddFeatures() {
 func (i *InverterPVVisScenarioImpl) AddUseCases() {
 	localEntity := i.Service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
-	_ = spine.NewUseCaseWithActor(
-		localEntity,
+	localEntity.AddUseCaseSupport(
 		model.UseCaseActorTypeVisualizationAppliance,
 		model.UseCaseNameTypeVisualizationOfAggregatedPhotovoltaicData,
-		model.SpecificationVersionType("1.0.0 RC1"),
+		model.SpecificationVersionType("1.0.0"),
+		"RC1",
 		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3})
 }

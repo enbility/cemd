@@ -123,7 +123,7 @@ func setupEmobility() (*EMobilityImpl, *service.EEBUSService) {
 	return emobility, eebusService
 }
 
-func setupDevices(eebusService *service.EEBUSService) (*spine.DeviceLocalImpl, *spine.EntityLocalImpl, *spine.DeviceRemoteImpl, []*spine.EntityRemoteImpl, *WriteMessageHandler) {
+func setupDevices(eebusService *service.EEBUSService) (spine.DeviceLocal, spine.EntityLocal, spine.DeviceRemote, []spine.EntityRemote, *WriteMessageHandler) {
 	localDevice := eebusService.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
 
@@ -274,7 +274,7 @@ func setupDevices(eebusService *service.EEBUSService) (*spine.DeviceLocalImpl, *
 	return localDevice, localEntity, remoteDevice, entities, writeHandler
 }
 
-func datagramForEntityAndFeatures(notify bool, localDevice *spine.DeviceLocalImpl, localEntity *spine.EntityLocalImpl, remoteEntity *spine.EntityRemoteImpl, featureType model.FeatureTypeType, remoteRole, localRole model.RoleType) model.DatagramType {
+func datagramForEntityAndFeatures(notify bool, localDevice spine.DeviceLocal, localEntity spine.EntityLocal, remoteEntity spine.EntityRemote, featureType model.FeatureTypeType, remoteRole, localRole model.RoleType) model.DatagramType {
 	var addressSource, addressDestination *model.FeatureAddressType
 	if remoteEntity == nil {
 		// NodeManagement
@@ -313,7 +313,7 @@ func datagramForEntityAndFeatures(notify bool, localDevice *spine.DeviceLocalImp
 	return datagram
 }
 
-func featureOfTypeAndRole(entity *spine.EntityRemoteImpl, featureType model.FeatureTypeType, role model.RoleType) *spine.FeatureRemoteImpl {
+func featureOfTypeAndRole(entity spine.EntityRemote, featureType model.FeatureTypeType, role model.RoleType) spine.FeatureRemote {
 	for _, f := range entity.Features() {
 		if f.Type() == featureType && f.Role() == role {
 			return f
@@ -322,7 +322,7 @@ func featureOfTypeAndRole(entity *spine.EntityRemoteImpl, featureType model.Feat
 	return nil
 }
 
-func deviceDiagnosis(localEntity *spine.EntityLocalImpl, entity *spine.EntityRemoteImpl) *features.DeviceDiagnosis {
+func deviceDiagnosis(localEntity spine.EntityLocal, entity spine.EntityRemote) *features.DeviceDiagnosis {
 	feature, err := features.NewDeviceDiagnosis(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -330,7 +330,7 @@ func deviceDiagnosis(localEntity *spine.EntityLocalImpl, entity *spine.EntityRem
 	return feature
 }
 
-func electricalConnection(localEntity *spine.EntityLocalImpl, entity *spine.EntityRemoteImpl) *features.ElectricalConnection {
+func electricalConnection(localEntity spine.EntityLocal, entity spine.EntityRemote) *features.ElectricalConnection {
 	feature, err := features.NewElectricalConnection(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -338,7 +338,7 @@ func electricalConnection(localEntity *spine.EntityLocalImpl, entity *spine.Enti
 	return feature
 }
 
-func measurement(localEntity *spine.EntityLocalImpl, entity *spine.EntityRemoteImpl) *features.Measurement {
+func measurement(localEntity spine.EntityLocal, entity spine.EntityRemote) *features.Measurement {
 	feature, err := features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -346,7 +346,7 @@ func measurement(localEntity *spine.EntityLocalImpl, entity *spine.EntityRemoteI
 	return feature
 }
 
-func deviceConfiguration(localEntity *spine.EntityLocalImpl, entity *spine.EntityRemoteImpl) *features.DeviceConfiguration {
+func deviceConfiguration(localEntity spine.EntityLocal, entity spine.EntityRemote) *features.DeviceConfiguration {
 	feature, err := features.NewDeviceConfiguration(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -354,7 +354,7 @@ func deviceConfiguration(localEntity *spine.EntityLocalImpl, entity *spine.Entit
 	return feature
 }
 
-func identificationConfiguration(localEntity *spine.EntityLocalImpl, entity *spine.EntityRemoteImpl) *features.Identification {
+func identificationConfiguration(localEntity spine.EntityLocal, entity spine.EntityRemote) *features.Identification {
 	feature, err := features.NewIdentification(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -362,7 +362,7 @@ func identificationConfiguration(localEntity *spine.EntityLocalImpl, entity *spi
 	return feature
 }
 
-func loadcontrol(localEntity *spine.EntityLocalImpl, entity *spine.EntityRemoteImpl) *features.LoadControl {
+func loadcontrol(localEntity spine.EntityLocal, entity spine.EntityRemote) *features.LoadControl {
 	feature, err := features.NewLoadControl(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -370,7 +370,7 @@ func loadcontrol(localEntity *spine.EntityLocalImpl, entity *spine.EntityRemoteI
 	return feature
 }
 
-func timeSeriesConfiguration(localEntity *spine.EntityLocalImpl, entity *spine.EntityRemoteImpl) *features.TimeSeries {
+func timeSeriesConfiguration(localEntity spine.EntityLocal, entity spine.EntityRemote) *features.TimeSeries {
 	feature, err := features.NewTimeSeries(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -378,7 +378,7 @@ func timeSeriesConfiguration(localEntity *spine.EntityLocalImpl, entity *spine.E
 	return feature
 }
 
-func incentiveTableConfiguration(localEntity *spine.EntityLocalImpl, entity *spine.EntityRemoteImpl) *features.IncentiveTable {
+func incentiveTableConfiguration(localEntity spine.EntityLocal, entity spine.EntityRemote) *features.IncentiveTable {
 	feature, err := features.NewIncentiveTable(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		fmt.Println(err)

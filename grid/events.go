@@ -49,12 +49,12 @@ func (e *GridImpl) HandleEvent(payload spine.EventPayload) {
 			case *model.DeviceConfigurationKeyValueDescriptionListDataType:
 				// key value descriptions received, now get the data
 				if _, err := e.gridDeviceConfiguration.RequestKeyValues(); err != nil {
-					logging.Log.Error("Error getting configuration key values:", err)
+					logging.Log().Error("Error getting configuration key values:", err)
 				}
 
 			case *model.MeasurementDescriptionListDataType:
 				if _, err := e.gridMeasurement.RequestValues(); err != nil {
-					logging.Log.Error("Error getting measurement list values:", err)
+					logging.Log().Error("Error getting measurement list values:", err)
 				}
 			}
 
@@ -64,7 +64,7 @@ func (e *GridImpl) HandleEvent(payload spine.EventPayload) {
 }
 
 // process required steps when a grid device is connected
-func (e *GridImpl) gridConnected(ski string, entity *spine.EntityRemoteImpl) {
+func (e *GridImpl) gridConnected(ski string, entity spine.EntityRemote) {
 	e.gridEntity = entity
 	localDevice := e.service.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
@@ -89,43 +89,43 @@ func (e *GridImpl) gridConnected(ski string, entity *spine.EntityRemoteImpl) {
 
 	// subscribe
 	if err := e.gridDeviceConfiguration.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 		return
 	}
 	if err := e.gridElectricalConnection.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 		return
 	}
 	if err := e.gridMeasurement.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 		return
 	}
 
 	// get configuration data
 	if err := e.gridDeviceConfiguration.RequestDescriptions(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 		return
 	}
 
 	// get electrical connection parameter
 	if err := e.gridElectricalConnection.RequestDescriptions(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 		return
 	}
 
 	if err := e.gridElectricalConnection.RequestParameterDescriptions(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 		return
 	}
 
 	// get measurement parameters
 	if err := e.gridMeasurement.RequestDescriptions(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 		return
 	}
 
 	if err := e.gridMeasurement.RequestConstraints(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 		return
 	}
 }

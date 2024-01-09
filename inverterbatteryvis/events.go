@@ -56,7 +56,7 @@ func (i *InverterBatteryVisImpl) HandleEvent(payload spine.EventPayload) {
 				break
 			}
 			if _, err := i.inverterElectricalConnection.RequestPermittedValueSets(); err != nil {
-				logging.Log.Error("Error getting electrical permitted values:", err)
+				logging.Log().Error("Error getting electrical permitted values:", err)
 			}
 
 		case *model.ElectricalConnectionDescriptionListDataType:
@@ -64,7 +64,7 @@ func (i *InverterBatteryVisImpl) HandleEvent(payload spine.EventPayload) {
 				break
 			}
 			if err := i.inverterElectricalConnection.RequestDescriptions(); err != nil {
-				logging.Log.Error("Error getting electrical permitted values:", err)
+				logging.Log().Error("Error getting electrical permitted values:", err)
 			}
 
 		case *model.MeasurementDescriptionListDataType:
@@ -72,14 +72,14 @@ func (i *InverterBatteryVisImpl) HandleEvent(payload spine.EventPayload) {
 				break
 			}
 			if _, err := i.inverterMeasurement.RequestValues(); err != nil {
-				logging.Log.Error("Error getting measurement list values:", err)
+				logging.Log().Error("Error getting measurement list values:", err)
 			}
 		}
 	}
 }
 
 // process required steps when a battery device entity is connected
-func (i *InverterBatteryVisImpl) inverterConnected(ski string, entity *spine.EntityRemoteImpl) {
+func (i *InverterBatteryVisImpl) inverterConnected(ski string, entity spine.EntityRemote) {
 	i.inverterEntity = entity
 	localDevice := i.service.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
@@ -98,28 +98,28 @@ func (i *InverterBatteryVisImpl) inverterConnected(ski string, entity *spine.Ent
 
 	// subscribe
 	if err := i.inverterElectricalConnection.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 	}
 	if err := i.inverterMeasurement.SubscribeForEntity(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 	}
 
 	// get electrical connection parameter
 	if err := i.inverterElectricalConnection.RequestDescriptions(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 	}
 
 	if err := i.inverterElectricalConnection.RequestParameterDescriptions(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 	}
 
 	// get measurement parameters
 	if err := i.inverterMeasurement.RequestDescriptions(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 	}
 
 	if err := i.inverterMeasurement.RequestConstraints(); err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 	}
 }
 

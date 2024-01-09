@@ -15,11 +15,11 @@ type InverterPVVisI interface {
 }
 
 type InverterPVVisImpl struct {
-	entity *spine.EntityLocalImpl
+	entity spine.EntityLocal
 
 	service *service.EEBUSService
 
-	inverterEntity               *spine.EntityRemoteImpl
+	inverterEntity               spine.EntityRemote
 	inverterDeviceConfiguration  *features.DeviceConfiguration
 	inverterElectricalConnection *features.ElectricalConnection
 	inverterMeasurement          *features.Measurement

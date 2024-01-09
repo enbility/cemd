@@ -67,7 +67,7 @@ func (d *DemoCem) Setup() error {
 func (d *DemoCem) RemoteServiceShipIDReported(service *service.EEBUSService, ski string, shipID string) {
 	// we should associated the Ship ID with the SKI and store it
 	// so the next connection can start trusted
-	logging.Log.Info("SKI", ski, "has Ship ID:", shipID)
+	logging.Log().Info("SKI", ski, "has Ship ID:", shipID)
 }
 
 func (d *DemoCem) RemoteSKIConnected(service *service.EEBUSService, ski string) {}

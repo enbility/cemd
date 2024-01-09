@@ -76,54 +76,60 @@ func (e *EmobilityScenarioImpl) AddFeatures() {
 func (e *EmobilityScenarioImpl) AddUseCases() {
 	localEntity := e.Service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
-	_ = spine.NewUseCase(
-		localEntity,
+	localEntity.AddUseCaseSupport(
+		model.UseCaseActorTypeCEM,
 		model.UseCaseNameTypeEVSECommissioningAndConfiguration,
 		model.SpecificationVersionType("1.0.1"),
+		"",
 		true,
 		[]model.UseCaseScenarioSupportType{1, 2})
 
-	_ = spine.NewUseCase(
-		localEntity,
+	localEntity.AddUseCaseSupport(
+		model.UseCaseActorTypeCEM,
 		model.UseCaseNameTypeEVCommissioningAndConfiguration,
 		model.SpecificationVersionType("1.0.1"),
+		"",
 		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
 
-	_ = spine.NewUseCase(
-		localEntity,
+	localEntity.AddUseCaseSupport(
+		model.UseCaseActorTypeCEM,
 		model.UseCaseNameTypeMeasurementOfElectricityDuringEVCharging,
 		model.SpecificationVersionType("1.0.1"),
+		"",
 		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3})
 
-	_ = spine.NewUseCase(
-		localEntity,
+	localEntity.AddUseCaseSupport(
+		model.UseCaseActorTypeCEM,
 		model.UseCaseNameTypeOverloadProtectionByEVChargingCurrentCurtailment,
 		model.SpecificationVersionType("1.0.1b"),
+		"",
 		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3})
 
-	_ = spine.NewUseCaseWithActor(
-		localEntity,
+	localEntity.AddUseCaseSupport(
 		model.UseCaseActorTypeMonitoringAppliance,
 		model.UseCaseNameTypeEVStateOfCharge,
 		model.SpecificationVersionType("1.0.0"),
+		"",
 		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4})
 
-	_ = spine.NewUseCase(
-		localEntity,
+	localEntity.AddUseCaseSupport(
+		model.UseCaseActorTypeCEM,
 		model.UseCaseNameTypeOptimizationOfSelfConsumptionDuringEVCharging,
 		model.SpecificationVersionType("1.0.1b"),
+		"",
 		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3})
 
 	if e.configuration.CoordinatedChargingEnabled {
-		_ = spine.NewUseCase(
-			localEntity,
+		localEntity.AddUseCaseSupport(
+			model.UseCaseActorTypeCEM,
 			model.UseCaseNameTypeCoordinatedEVCharging,
 			model.SpecificationVersionType("1.0.1"),
+			"",
 			true,
 			[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
 	}

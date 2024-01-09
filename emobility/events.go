@@ -71,7 +71,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 
 				// key value descriptions received, now get the data
 				if _, err := e.evDeviceConfiguration.RequestKeyValues(); err != nil {
-					logging.Log.Error("Error getting configuration key values:", err)
+					logging.Log().Error("Error getting configuration key values:", err)
 				}
 
 			case *model.ElectricalConnectionParameterDescriptionListDataType:
@@ -79,7 +79,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 					break
 				}
 				if _, err := e.evElectricalConnection.RequestPermittedValueSets(); err != nil {
-					logging.Log.Error("Error getting electrical permitted values:", err)
+					logging.Log().Error("Error getting electrical permitted values:", err)
 				}
 
 			case *model.LoadControlLimitDescriptionListDataType:
@@ -87,7 +87,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 					break
 				}
 				if _, err := e.evLoadControl.RequestLimitValues(); err != nil {
-					logging.Log.Error("Error getting loadcontrol limit values:", err)
+					logging.Log().Error("Error getting loadcontrol limit values:", err)
 				}
 
 			case *model.MeasurementDescriptionListDataType:
@@ -95,7 +95,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 					break
 				}
 				if _, err := e.evMeasurement.RequestValues(); err != nil {
-					logging.Log.Error("Error getting measurement list values:", err)
+					logging.Log().Error("Error getting measurement list values:", err)
 				}
 
 			case *model.TimeSeriesDescriptionListDataType:
@@ -120,7 +120,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 
 					demand, err := e.EVEnergyDemand()
 					if err != nil {
-						logging.Log.Error("Error getting energy demand:", err)
+						logging.Log().Error("Error getting energy demand:", err)
 						break
 					}
 
@@ -130,13 +130,13 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 
 					timeConstraints, err := e.EVTimeSlotConstraints()
 					if err != nil {
-						logging.Log.Error("Error getting timeseries constraints:", err)
+						logging.Log().Error("Error getting timeseries constraints:", err)
 						break
 					}
 
 					incentiveConstraints, err := e.EVIncentiveConstraints()
 					if err != nil {
-						logging.Log.Error("Error getting incentive constraints:", err)
+						logging.Log().Error("Error getting incentive constraints:", err)
 						break
 					}
 
@@ -218,7 +218,7 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 func (e *EMobilityImpl) evWriteDefaultIncentives() {
 	// send default incentives for the maximum timeframe
 	// to fullfill spec, as there is no data provided
-	logging.Log.Info("Fallback sending default incentives")
+	logging.Log().Info("Fallback sending default incentives")
 	data := []EVDurationSlotValue{
 		{Duration: 7 * time.Hour * 24, Value: 0.30},
 	}
@@ -228,22 +228,22 @@ func (e *EMobilityImpl) evWriteDefaultIncentives() {
 func (e *EMobilityImpl) evWriteDefaultPowerLimits() {
 	// send default power limits for the maximum timeframe
 	// to fullfill spec, as there is no data provided
-	logging.Log.Info("Fallback sending default power limits")
+	logging.Log().Info("Fallback sending default power limits")
 
 	paramDesc, err := e.evElectricalConnection.GetParameterDescriptionForScopeType(model.ScopeTypeTypeACPower)
 	if err != nil {
-		logging.Log.Error("Error getting parameter descriptions:", err)
+		logging.Log().Error("Error getting parameter descriptions:", err)
 		return
 	}
 
 	permitted, err := e.evElectricalConnection.GetPermittedValueSetForParameterId(*paramDesc.ParameterId)
 	if err != nil {
-		logging.Log.Error("Error getting permitted values:", err)
+		logging.Log().Error("Error getting permitted values:", err)
 		return
 	}
 
 	if len(permitted.PermittedValueSet) < 1 || len(permitted.PermittedValueSet[0].Range) < 1 {
-		logging.Log.Error("No permitted value set available")
+		logging.Log().Error("No permitted value set available")
 		return
 	}
 
@@ -260,7 +260,7 @@ func (e *EMobilityImpl) evRequestTimeSeriesValues() {
 	}
 
 	if _, err := e.evTimeSeries.RequestValues(); err != nil {
-		logging.Log.Error("Error getting time series list values:", err)
+		logging.Log().Error("Error getting time series list values:", err)
 	}
 }
 
@@ -286,12 +286,12 @@ func (e *EMobilityImpl) evRequestIncentiveValues() {
 	}
 
 	if _, err := e.evIncentiveTable.RequestValues(); err != nil {
-		logging.Log.Error("Error getting time series list values:", err)
+		logging.Log().Error("Error getting time series list values:", err)
 	}
 }
 
 // process required steps when an evse is connected
-func (e *EMobilityImpl) evseConnected(ski string, entity *spine.EntityRemoteImpl) {
+func (e *EMobilityImpl) evseConnected(ski string, entity spine.EntityRemote) {
 	e.evseEntity = entity
 	localDevice := e.service.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
@@ -340,18 +340,18 @@ func (e *EMobilityImpl) evDisconnected() {
 	e.evTimeSeries = nil
 	e.evIncentiveTable = nil
 
-	logging.Log.Debug("ev disconnected")
+	logging.Log().Debug("ev disconnected")
 
 	// TODO: add error handling
 }
 
 // an EV was connected, trigger required communication
-func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
+func (e *EMobilityImpl) evConnected(entity spine.EntityRemote) {
 	e.evEntity = entity
 	localDevice := e.service.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
 
-	logging.Log.Debug("ev connected")
+	logging.Log().Debug("ev connected")
 
 	// setup features
 	e.evDeviceClassification, _ = features.NewDeviceClassification(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
@@ -370,102 +370,102 @@ func (e *EMobilityImpl) evConnected(entity *spine.EntityRemoteImpl) {
 
 	// subscribe
 	if err := e.evDeviceClassification.SubscribeForEntity(); err != nil {
-		logging.Log.Debug(err)
+		logging.Log().Debug(err)
 	}
 	if err := e.evDeviceConfiguration.SubscribeForEntity(); err != nil {
-		logging.Log.Debug(err)
+		logging.Log().Debug(err)
 	}
 	if err := e.evDeviceDiagnosis.SubscribeForEntity(); err != nil {
-		logging.Log.Debug(err)
+		logging.Log().Debug(err)
 	}
 	if err := e.evElectricalConnection.SubscribeForEntity(); err != nil {
-		logging.Log.Debug(err)
+		logging.Log().Debug(err)
 	}
 	if err := e.evMeasurement.SubscribeForEntity(); err != nil {
-		logging.Log.Debug(err)
+		logging.Log().Debug(err)
 	}
 	if err := e.evLoadControl.SubscribeForEntity(); err != nil {
-		logging.Log.Debug(err)
+		logging.Log().Debug(err)
 	}
 	if err := e.evIdentification.SubscribeForEntity(); err != nil {
-		logging.Log.Debug(err)
+		logging.Log().Debug(err)
 	}
 
 	if e.configuration.CoordinatedChargingEnabled {
 		if err := e.evTimeSeries.SubscribeForEntity(); err != nil {
-			logging.Log.Debug(err)
+			logging.Log().Debug(err)
 		}
 		// this is optional
 		if err := e.evIncentiveTable.SubscribeForEntity(); err != nil {
-			logging.Log.Debug(err)
+			logging.Log().Debug(err)
 		}
 	}
 
 	// bindings
 	if err := e.evLoadControl.Bind(); err != nil {
-		logging.Log.Debug(err)
+		logging.Log().Debug(err)
 	}
 
 	if e.configuration.CoordinatedChargingEnabled {
 		// this is optional
 		if err := e.evTimeSeries.Bind(); err != nil {
-			logging.Log.Debug(err)
+			logging.Log().Debug(err)
 		}
 
 		// this is optional
 		if err := e.evIncentiveTable.Bind(); err != nil {
-			logging.Log.Debug(err)
+			logging.Log().Debug(err)
 		}
 	}
 
 	// get ev configuration data
 	if err := e.evDeviceConfiguration.RequestDescriptions(); err != nil {
-		logging.Log.Debug(err)
+		logging.Log().Debug(err)
 	}
 
 	// get manufacturer details
 	if _, err := e.evDeviceClassification.RequestManufacturerDetails(); err != nil {
-		logging.Log.Debug(err)
+		logging.Log().Debug(err)
 	}
 
 	// get device diagnosis state
 	if _, err := e.evDeviceDiagnosis.RequestState(); err != nil {
-		logging.Log.Debug(err)
+		logging.Log().Debug(err)
 	}
 
 	// get electrical connection parameter
 	if err := e.evElectricalConnection.RequestDescriptions(); err != nil {
-		logging.Log.Debug(err)
+		logging.Log().Debug(err)
 	}
 
 	if err := e.evElectricalConnection.RequestParameterDescriptions(); err != nil {
-		logging.Log.Debug(err)
+		logging.Log().Debug(err)
 	}
 
 	// get measurement parameters
 	if err := e.evMeasurement.RequestDescriptions(); err != nil {
-		logging.Log.Debug(err)
+		logging.Log().Debug(err)
 	}
 
 	// get loadlimit parameter
 	if err := e.evLoadControl.RequestLimitDescriptions(); err != nil {
-		logging.Log.Debug(err)
+		logging.Log().Debug(err)
 	}
 
 	// get identification
 	if _, err := e.evIdentification.RequestValues(); err != nil {
-		logging.Log.Debug(err)
+		logging.Log().Debug(err)
 	}
 
 	if e.configuration.CoordinatedChargingEnabled {
 		// get time series parameter
 		if err := e.evTimeSeries.RequestDescriptions(); err != nil {
-			logging.Log.Debug(err)
+			logging.Log().Debug(err)
 		}
 
 		// get incentive table parameter
 		if err := e.evIncentiveTable.RequestDescriptions(); err != nil {
-			logging.Log.Debug(err)
+			logging.Log().Debug(err)
 		}
 	}
 }
@@ -480,7 +480,7 @@ func (e *EMobilityImpl) evWriteIncentiveTableDescriptions() {
 
 	descriptions, err := e.evIncentiveTable.GetDescriptionsForScope(model.ScopeTypeTypeSimpleIncentiveTable)
 	if err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 		return
 	}
 
@@ -530,7 +530,7 @@ func (e *EMobilityImpl) evWriteIncentiveTableDescriptions() {
 
 	_, err = e.evIncentiveTable.WriteDescriptions(data)
 	if err != nil {
-		logging.Log.Error(err)
+		logging.Log().Error(err)
 	}
 }
 
