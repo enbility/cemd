@@ -5,8 +5,8 @@ import (
 
 	"github.com/enbility/eebus-go/spine/model"
 	"github.com/enbility/eebus-go/util"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	gomock "go.uber.org/mock/gomock"
 )
 
 func Test_EVChargePlan(t *testing.T) {

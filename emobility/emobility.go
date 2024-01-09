@@ -8,7 +8,7 @@ import (
 	"github.com/enbility/eebus-go/util"
 )
 
-//go:generate mockgen -source emobility.go -destination mock_emobility.go -package emobility
+//go:generate mockgen -source emobility.go -destination mock_emobility_test.go -package emobility
 
 // used by emobility and implemented by the CEM
 type EmobilityDataProvider interface {

@@ -4,8 +4,8 @@ go 1.18
 
 require (
 	github.com/enbility/eebus-go v0.0.0-20240109121001-eb9a1f604a40
-	github.com/golang/mock v1.6.0
 	github.com/stretchr/testify v1.8.4
+	go.uber.org/mock v0.4.0
 	golang.org/x/exp v0.0.0-20231226003508-02704c960a9b
 )
 
