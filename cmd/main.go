@@ -17,7 +17,7 @@ import (
 	"github.com/enbility/cemd/inverterpvvis"
 	"github.com/enbility/cemd/scenarios"
 	"github.com/enbility/eebus-go/api"
-	"github.com/enbility/eebus-go/cert"
+	"github.com/enbility/ship-go/cert"
 	"github.com/enbility/ship-go/logging"
 	"github.com/enbility/spine-go/model"
 )

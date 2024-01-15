@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/enbility/eebus-go/api"
-	"github.com/enbility/eebus-go/cert"
 	"github.com/enbility/eebus-go/features"
 	"github.com/enbility/eebus-go/service"
 	"github.com/enbility/eebus-go/util"
 	shipapi "github.com/enbility/ship-go/api"
+	"github.com/enbility/ship-go/cert"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
