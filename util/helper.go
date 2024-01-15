@@ -1,16 +1,16 @@
 package util
 
 import (
+	"github.com/enbility/eebus-go/api"
 	"github.com/enbility/eebus-go/features"
-	"github.com/enbility/eebus-go/service"
-	"github.com/enbility/eebus-go/spine"
-	"github.com/enbility/eebus-go/spine/model"
+	spineapi "github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
 )
 
 var PhaseNameMapping = []model.ElectricalConnectionPhaseNameType{model.ElectricalConnectionPhaseNameTypeA, model.ElectricalConnectionPhaseNameTypeB, model.ElectricalConnectionPhaseNameTypeC}
 
 // check if the given usecase, actor is supported by the remote device
-func IsUsecaseSupported(usecase model.UseCaseNameType, actor model.UseCaseActorType, remoteDevice spine.DeviceRemote) bool {
+func IsUsecaseSupported(usecase model.UseCaseNameType, actor model.UseCaseActorType, remoteDevice spineapi.DeviceRemote) bool {
 	uci := remoteDevice.UseCases()
 
 	for _, element := range uci {
@@ -28,7 +28,7 @@ func IsUsecaseSupported(usecase model.UseCaseNameType, actor model.UseCaseActorT
 }
 
 // return the remote entity of a given type and device ski
-func EntityOfTypeForSki(service *service.EEBUSService, entityType model.EntityTypeType, ski string) (spine.EntityRemote, error) {
+func EntityOfTypeForSki(service api.EEBUSService, entityType model.EntityTypeType, ski string) (spineapi.EntityRemote, error) {
 	rDevice := service.LocalDevice().RemoteDeviceForSki(ski)
 
 	if rDevice == nil {

@@ -1,8 +1,8 @@
 package grid
 
 import (
-	"github.com/enbility/eebus-go/spine"
+	"github.com/enbility/spine-go/api"
 )
 
-func (e *GridImpl) HandleResult(errorMsg spine.ResultMessage) {
+func (e *GridImpl) HandleResult(errorMsg api.ResultMessage) {
 }

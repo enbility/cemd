@@ -4,14 +4,14 @@ import (
 	"time"
 
 	"github.com/enbility/eebus-go/features"
-	"github.com/enbility/eebus-go/logging"
-	"github.com/enbility/eebus-go/spine"
-	"github.com/enbility/eebus-go/spine/model"
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/ship-go/logging"
+	"github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
 )
 
 // Internal EventHandler Interface for the CEM
-func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
+func (e *EMobilityImpl) HandleEvent(payload api.EventPayload) {
 	// only care about the registered SKI
 	if payload.Ski != e.ski {
 		return
@@ -32,27 +32,27 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 	}
 
 	switch payload.EventType {
-	case spine.EventTypeDeviceChange:
+	case api.EventTypeDeviceChange:
 		switch payload.ChangeType {
-		case spine.ElementChangeRemove:
+		case api.ElementChangeRemove:
 			e.evseDisconnected()
 			e.evDisconnected()
 		}
 
-	case spine.EventTypeEntityChange:
+	case api.EventTypeEntityChange:
 		if payload.Entity == nil {
 			return
 		}
 
 		switch payload.ChangeType {
-		case spine.ElementChangeAdd:
+		case api.ElementChangeAdd:
 			switch entityType {
 			case model.EntityTypeTypeEVSE:
 				e.evseConnected(payload.Ski, payload.Entity)
 			case model.EntityTypeTypeEV:
 				e.evConnected(payload.Entity)
 			}
-		case spine.ElementChangeRemove:
+		case api.ElementChangeRemove:
 			switch entityType {
 			case model.EntityTypeTypeEVSE:
 				e.evseDisconnected()
@@ -61,8 +61,8 @@ func (e *EMobilityImpl) HandleEvent(payload spine.EventPayload) {
 			}
 		}
 
-	case spine.EventTypeDataChange:
-		if payload.ChangeType == spine.ElementChangeUpdate {
+	case api.EventTypeDataChange:
+		if payload.ChangeType == api.ElementChangeUpdate {
 			switch payload.Data.(type) {
 			case *model.DeviceConfigurationKeyValueDescriptionListDataType:
 				if e.evDeviceConfiguration == nil {
@@ -291,7 +291,7 @@ func (e *EMobilityImpl) evRequestIncentiveValues() {
 }
 
 // process required steps when an evse is connected
-func (e *EMobilityImpl) evseConnected(ski string, entity spine.EntityRemote) {
+func (e *EMobilityImpl) evseConnected(ski string, entity api.EntityRemote) {
 	e.evseEntity = entity
 	localDevice := e.service.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
@@ -346,7 +346,7 @@ func (e *EMobilityImpl) evDisconnected() {
 }
 
 // an EV was connected, trigger required communication
-func (e *EMobilityImpl) evConnected(entity spine.EntityRemote) {
+func (e *EMobilityImpl) evConnected(entity api.EntityRemote) {
 	e.evEntity = entity
 	localDevice := e.service.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)

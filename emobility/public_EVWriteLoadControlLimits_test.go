@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/enbility/cemd/util"
-	"github.com/enbility/eebus-go/spine/model"
 	eebusUtil "github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/exp/slices"
 )

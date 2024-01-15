@@ -4,9 +4,9 @@ import (
 	"sync"
 
 	"github.com/enbility/cemd/scenarios"
-	"github.com/enbility/eebus-go/service"
-	"github.com/enbility/eebus-go/spine"
-	"github.com/enbility/eebus-go/spine/model"
+	"github.com/enbility/eebus-go/api"
+	spineapi "github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
 )
 
 type InverterBatteryVisScenarioImpl struct {
@@ -19,7 +19,7 @@ type InverterBatteryVisScenarioImpl struct {
 
 var _ scenarios.ScenariosI = (*InverterBatteryVisScenarioImpl)(nil)
 
-func NewInverterVisScenario(service *service.EEBUSService) *InverterBatteryVisScenarioImpl {
+func NewInverterVisScenario(service api.EEBUSService) *InverterBatteryVisScenarioImpl {
 	return &InverterBatteryVisScenarioImpl{
 		ScenarioImpl:  scenarios.NewScenarioImpl(service),
 		remoteDevices: make(map[string]*InverterBatteryVisImpl),
@@ -55,7 +55,7 @@ func (i *InverterBatteryVisScenarioImpl) AddUseCases() {
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4})
 }
 
-func (i *InverterBatteryVisScenarioImpl) RegisterRemoteDevice(details *service.ServiceDetails, dataProvider any) any {
+func (i *InverterBatteryVisScenarioImpl) RegisterRemoteDevice(details *api.ServiceDetails, dataProvider any) any {
 	// TODO: invertervis should be stored per remote SKI and
 	// only be set for the SKI if the device supports it
 	i.mux.Lock()
@@ -79,7 +79,7 @@ func (i *InverterBatteryVisScenarioImpl) UnRegisterRemoteDevice(remoteDeviceSki 
 	i.Service.RegisterRemoteSKI(remoteDeviceSki, false)
 }
 
-func (i *InverterBatteryVisScenarioImpl) HandleResult(errorMsg spine.ResultMessage) {
+func (i *InverterBatteryVisScenarioImpl) HandleResult(errorMsg spineapi.ResultMessage) {
 	i.mux.Lock()
 	defer i.mux.Unlock()
 

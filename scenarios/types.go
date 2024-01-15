@@ -1,22 +1,22 @@
 package scenarios
 
 import (
-	"github.com/enbility/eebus-go/service"
+	"github.com/enbility/eebus-go/api"
 )
 
 // Implemented by *ScenarioImpl, used by CemImpl
 type ScenariosI interface {
-	RegisterRemoteDevice(details *service.ServiceDetails, dataProvider any) any
+	RegisterRemoteDevice(details *api.ServiceDetails, dataProvider any) any
 	UnRegisterRemoteDevice(remoteDeviceSki string)
 	AddFeatures()
 	AddUseCases()
 }
 
 type ScenarioImpl struct {
-	Service *service.EEBUSService
+	Service api.EEBUSService
 }
 
-func NewScenarioImpl(service *service.EEBUSService) *ScenarioImpl {
+func NewScenarioImpl(service api.EEBUSService) *ScenarioImpl {
 	return &ScenarioImpl{
 		Service: service,
 	}

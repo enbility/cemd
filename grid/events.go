@@ -2,13 +2,13 @@ package grid
 
 import (
 	"github.com/enbility/eebus-go/features"
-	"github.com/enbility/eebus-go/logging"
-	"github.com/enbility/eebus-go/spine"
-	"github.com/enbility/eebus-go/spine/model"
+	"github.com/enbility/ship-go/logging"
+	"github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
 )
 
 // Internal EventHandler Interface for the CEM
-func (e *GridImpl) HandleEvent(payload spine.EventPayload) {
+func (e *GridImpl) HandleEvent(payload api.EventPayload) {
 	// we only care about the registered SKI
 	if payload.Ski != e.ski {
 		return
@@ -20,30 +20,30 @@ func (e *GridImpl) HandleEvent(payload spine.EventPayload) {
 	}
 
 	switch payload.EventType {
-	case spine.EventTypeDeviceChange:
+	case api.EventTypeDeviceChange:
 		switch payload.ChangeType {
-		case spine.ElementChangeRemove:
+		case api.ElementChangeRemove:
 			e.gridDisconnected()
 		}
 
-	case spine.EventTypeEntityChange:
+	case api.EventTypeEntityChange:
 		entityType := payload.Entity.EntityType()
 
 		switch payload.ChangeType {
-		case spine.ElementChangeAdd:
+		case api.ElementChangeAdd:
 			switch entityType {
 			case model.EntityTypeTypeGridConnectionPointOfPremises:
 				e.gridConnected(payload.Ski, payload.Entity)
 			}
-		case spine.ElementChangeRemove:
+		case api.ElementChangeRemove:
 			switch entityType {
 			case model.EntityTypeTypeGridConnectionPointOfPremises:
 				e.gridDisconnected()
 			}
 		}
 
-	case spine.EventTypeDataChange:
-		if payload.ChangeType == spine.ElementChangeUpdate {
+	case api.EventTypeDataChange:
+		if payload.ChangeType == api.ElementChangeUpdate {
 			switch payload.Data.(type) {
 
 			case *model.DeviceConfigurationKeyValueDescriptionListDataType:
@@ -64,7 +64,7 @@ func (e *GridImpl) HandleEvent(payload spine.EventPayload) {
 }
 
 // process required steps when a grid device is connected
-func (e *GridImpl) gridConnected(ski string, entity spine.EntityRemote) {
+func (e *GridImpl) gridConnected(ski string, entity api.EntityRemote) {
 	e.gridEntity = entity
 	localDevice := e.service.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)

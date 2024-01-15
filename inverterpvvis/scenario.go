@@ -4,9 +4,9 @@ import (
 	"sync"
 
 	"github.com/enbility/cemd/scenarios"
-	"github.com/enbility/eebus-go/service"
-	"github.com/enbility/eebus-go/spine"
-	"github.com/enbility/eebus-go/spine/model"
+	"github.com/enbility/eebus-go/api"
+	spineapi "github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
 )
 
 type InverterPVVisScenarioImpl struct {
@@ -19,7 +19,7 @@ type InverterPVVisScenarioImpl struct {
 
 var _ scenarios.ScenariosI = (*InverterPVVisScenarioImpl)(nil)
 
-func NewInverterVisScenario(service *service.EEBUSService) *InverterPVVisScenarioImpl {
+func NewInverterVisScenario(service api.EEBUSService) *InverterPVVisScenarioImpl {
 	return &InverterPVVisScenarioImpl{
 		ScenarioImpl:  scenarios.NewScenarioImpl(service),
 		remoteDevices: make(map[string]*InverterPVVisImpl),
@@ -55,7 +55,7 @@ func (i *InverterPVVisScenarioImpl) AddUseCases() {
 		[]model.UseCaseScenarioSupportType{1, 2, 3})
 }
 
-func (i *InverterPVVisScenarioImpl) RegisterRemoteDevice(details *service.ServiceDetails, dataProvider any) any {
+func (i *InverterPVVisScenarioImpl) RegisterRemoteDevice(details *api.ServiceDetails, dataProvider any) any {
 	// TODO: invertervis should be stored per remote SKI and
 	// only be set for the SKI if the device supports it
 	i.mux.Lock()
@@ -79,7 +79,7 @@ func (i *InverterPVVisScenarioImpl) UnRegisterRemoteDevice(remoteDeviceSki strin
 	i.Service.RegisterRemoteSKI(remoteDeviceSki, false)
 }
 
-func (i *InverterPVVisScenarioImpl) HandleResult(errorMsg spine.ResultMessage) {
+func (i *InverterPVVisScenarioImpl) HandleResult(errorMsg spineapi.ResultMessage) {
 	i.mux.Lock()
 	defer i.mux.Unlock()
 

@@ -4,10 +4,10 @@ import (
 	"sync"
 
 	"github.com/enbility/cemd/scenarios"
-	"github.com/enbility/eebus-go/service"
-	"github.com/enbility/eebus-go/spine"
-	"github.com/enbility/eebus-go/spine/model"
+	"github.com/enbility/eebus-go/api"
 	"github.com/enbility/eebus-go/util"
+	spineapi "github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
 )
 
 type EmobilityScenarioImpl struct {
@@ -23,7 +23,7 @@ type EmobilityScenarioImpl struct {
 
 var _ scenarios.ScenariosI = (*EmobilityScenarioImpl)(nil)
 
-func NewEMobilityScenario(service *service.EEBUSService, currency model.CurrencyType, configuration EmobilityConfiguration) *EmobilityScenarioImpl {
+func NewEMobilityScenario(service api.EEBUSService, currency model.CurrencyType, configuration EmobilityConfiguration) *EmobilityScenarioImpl {
 	return &EmobilityScenarioImpl{
 		ScenarioImpl:  scenarios.NewScenarioImpl(service),
 		remoteDevices: make(map[string]*EMobilityImpl),
@@ -135,7 +135,7 @@ func (e *EmobilityScenarioImpl) AddUseCases() {
 	}
 }
 
-func (e *EmobilityScenarioImpl) RegisterRemoteDevice(details *service.ServiceDetails, dataProvider any) any {
+func (e *EmobilityScenarioImpl) RegisterRemoteDevice(details *api.ServiceDetails, dataProvider any) any {
 	// TODO: emobility should be stored per remote SKI and
 	// only be set for the SKI if the device supports it
 	e.mux.Lock()
@@ -163,7 +163,7 @@ func (e *EmobilityScenarioImpl) UnRegisterRemoteDevice(remoteDeviceSki string) {
 	e.Service.RegisterRemoteSKI(remoteDeviceSki, false)
 }
 
-func (e *EmobilityScenarioImpl) HandleResult(errorMsg spine.ResultMessage) {
+func (e *EmobilityScenarioImpl) HandleResult(errorMsg spineapi.ResultMessage) {
 	e.mux.Lock()
 	defer e.mux.Unlock()
 

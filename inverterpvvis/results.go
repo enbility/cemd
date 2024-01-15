@@ -1,8 +1,8 @@
 package inverterpvvis
 
 import (
-	"github.com/enbility/eebus-go/spine"
+	"github.com/enbility/spine-go/api"
 )
 
-func (i *InverterPVVisImpl) HandleResult(errorMsg spine.ResultMessage) {
+func (i *InverterPVVisImpl) HandleResult(errorMsg api.ResultMessage) {
 }

@@ -1,11 +1,12 @@
 package grid
 
 import (
+	"github.com/enbility/eebus-go/api"
 	"github.com/enbility/eebus-go/features"
-	"github.com/enbility/eebus-go/service"
-	"github.com/enbility/eebus-go/spine"
-	"github.com/enbility/eebus-go/spine/model"
 	"github.com/enbility/eebus-go/util"
+	spineapi "github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
+	"github.com/enbility/spine-go/spine"
 )
 
 type GridI interface {
@@ -19,11 +20,11 @@ type GridI interface {
 }
 
 type GridImpl struct {
-	entity spine.EntityLocal
+	entity spineapi.EntityLocal
 
-	service *service.EEBUSService
+	service api.EEBUSService
 
-	gridEntity spine.EntityRemote
+	gridEntity spineapi.EntityRemote
 
 	gridDeviceConfiguration  *features.DeviceConfiguration
 	gridElectricalConnection *features.ElectricalConnection
@@ -35,7 +36,7 @@ type GridImpl struct {
 var _ GridI = (*GridImpl)(nil)
 
 // Add Grid support
-func NewGrid(service *service.EEBUSService, details *service.ServiceDetails) *GridImpl {
+func NewGrid(service api.EEBUSService, details *api.ServiceDetails) *GridImpl {
 	ski := util.NormalizeSKI(details.SKI)
 
 	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)

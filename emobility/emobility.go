@@ -1,11 +1,12 @@
 package emobility
 
 import (
+	"github.com/enbility/eebus-go/api"
 	"github.com/enbility/eebus-go/features"
-	"github.com/enbility/eebus-go/service"
-	"github.com/enbility/eebus-go/spine"
-	"github.com/enbility/eebus-go/spine/model"
 	"github.com/enbility/eebus-go/util"
+	spineapi "github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
+	"github.com/enbility/spine-go/spine"
 )
 
 //go:generate mockgen -source emobility.go -destination mock_emobility_test.go -package emobility
@@ -231,12 +232,12 @@ type EmobilityI interface {
 }
 
 type EMobilityImpl struct {
-	entity spine.EntityLocal
+	entity spineapi.EntityLocal
 
-	service *service.EEBUSService
+	service api.EEBUSService
 
-	evseEntity spine.EntityRemote
-	evEntity   spine.EntityRemote
+	evseEntity spineapi.EntityRemote
+	evEntity   spineapi.EntityRemote
 
 	evseDeviceClassification *features.DeviceClassification
 	evseDeviceDiagnosis      *features.DeviceDiagnosis
@@ -263,7 +264,7 @@ type EMobilityImpl struct {
 var _ EmobilityI = (*EMobilityImpl)(nil)
 
 // Add E-Mobility support
-func NewEMobility(service *service.EEBUSService, details *service.ServiceDetails, currency model.CurrencyType, configuration EmobilityConfiguration, dataProvider EmobilityDataProvider) *EMobilityImpl {
+func NewEMobility(service api.EEBUSService, details *api.ServiceDetails, currency model.CurrencyType, configuration EmobilityConfiguration, dataProvider EmobilityDataProvider) *EMobilityImpl {
 	ski := util.NormalizeSKI(details.SKI)
 
 	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)

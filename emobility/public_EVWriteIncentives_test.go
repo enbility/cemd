@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/enbility/eebus-go/spine/model"
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
 )
 

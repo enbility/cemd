@@ -16,9 +16,10 @@ import (
 	"github.com/enbility/cemd/inverterbatteryvis"
 	"github.com/enbility/cemd/inverterpvvis"
 	"github.com/enbility/cemd/scenarios"
-	"github.com/enbility/eebus-go/logging"
-	"github.com/enbility/eebus-go/service"
-	"github.com/enbility/eebus-go/spine/model"
+	"github.com/enbility/eebus-go/api"
+	"github.com/enbility/eebus-go/cert"
+	"github.com/enbility/ship-go/logging"
+	"github.com/enbility/spine-go/model"
 )
 
 type DemoCem struct {
@@ -27,7 +28,7 @@ type DemoCem struct {
 	emobilityScenario, gridScenario, inverterBatteryVisScenario, inverterPVVisScenario scenarios.ScenariosI
 }
 
-func NewDemoCem(configuration *service.Configuration) *DemoCem {
+func NewDemoCem(configuration *api.Configuration) *DemoCem {
 	demo := &DemoCem{}
 
 	demo.cem = cem.NewCEM(configuration, demo, demo)
@@ -64,22 +65,22 @@ func (d *DemoCem) Setup() error {
 }
 
 // report the Ship ID of a newly trusted connection
-func (d *DemoCem) RemoteServiceShipIDReported(service *service.EEBUSService, ski string, shipID string) {
+func (d *DemoCem) RemoteServiceShipIDReported(service api.EEBUSService, ski string, shipID string) {
 	// we should associated the Ship ID with the SKI and store it
 	// so the next connection can start trusted
 	logging.Log().Info("SKI", ski, "has Ship ID:", shipID)
 }
 
-func (d *DemoCem) RemoteSKIConnected(service *service.EEBUSService, ski string) {}
+func (d *DemoCem) RemoteSKIConnected(service api.EEBUSService, ski string) {}
 
-func (d *DemoCem) RemoteSKIDisconnected(service *service.EEBUSService, ski string) {}
+func (d *DemoCem) RemoteSKIDisconnected(service api.EEBUSService, ski string) {}
 
-func (d *DemoCem) VisibleRemoteServicesUpdated(service *service.EEBUSService, entries []service.RemoteService) {
+func (d *DemoCem) VisibleRemoteServicesUpdated(service api.EEBUSService, entries []api.RemoteService) {
 }
 
 func (h *DemoCem) ServiceShipIDUpdate(ski string, shipdID string) {}
 
-func (h *DemoCem) ServicePairingDetailUpdate(ski string, detail *service.ConnectionStateDetail) {}
+func (h *DemoCem) ServicePairingDetailUpdate(ski string, detail *api.ConnectionStateDetail) {}
 
 func (h *DemoCem) AllowWaitingForTrust(ski string) bool { return true }
 
@@ -144,7 +145,7 @@ func main() {
 
 	certificate, err := tls.LoadX509KeyPair(*crt, *key)
 	if err != nil {
-		certificate, err = service.CreateCertificate("Demo", "Demo", "DE", "Demo-Unit-10")
+		certificate, err = cert.CreateCertificate("Demo", "Demo", "DE", "Demo-Unit-10")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -152,7 +153,7 @@ func main() {
 		fmt.Println("Using certificate file", *crt, "and key file", *key)
 	}
 
-	configuration, err := service.NewConfiguration(
+	configuration, err := api.NewConfiguration(
 		"Demo",
 		"Demo",
 		"HEMS",
@@ -180,7 +181,7 @@ func main() {
 		return
 	}
 
-	remoteService := service.NewServiceDetails(*remoteSki)
+	remoteService := api.NewServiceDetails(*remoteSki)
 	demo.emobilityScenario.RegisterRemoteDevice(remoteService, nil)
 
 	// Clean exit to make sure mdns shutdown is invoked

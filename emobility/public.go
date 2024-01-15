@@ -6,8 +6,8 @@ import (
 
 	"github.com/enbility/cemd/util"
 	"github.com/enbility/eebus-go/features"
-	"github.com/enbility/eebus-go/spine/model"
 	eebusUtil "github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/model"
 )
 
 // return if an EV is connected
@@ -177,7 +177,7 @@ func (e *EMobilityImpl) EVPowerPerPhase() ([]float64, error) {
 
 			phaseValue := item.Value.GetValue()
 			if !powerAvailable {
-				phaseValue *= e.service.Configuration.Voltage()
+				phaseValue *= e.service.Configuration().Voltage()
 			}
 
 			result = append(result, phaseValue)

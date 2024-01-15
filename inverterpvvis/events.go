@@ -2,13 +2,13 @@ package inverterpvvis
 
 import (
 	"github.com/enbility/eebus-go/features"
-	"github.com/enbility/eebus-go/logging"
-	"github.com/enbility/eebus-go/spine"
-	"github.com/enbility/eebus-go/spine/model"
+	"github.com/enbility/ship-go/logging"
+	"github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
 )
 
 // Internal EventHandler Interface for the CEM
-func (i *InverterPVVisImpl) HandleEvent(payload spine.EventPayload) {
+func (i *InverterPVVisImpl) HandleEvent(payload api.EventPayload) {
 	// we only care about the registered SKI
 	if payload.Ski != i.ski {
 		return
@@ -20,28 +20,28 @@ func (i *InverterPVVisImpl) HandleEvent(payload spine.EventPayload) {
 	}
 
 	switch payload.EventType {
-	case spine.EventTypeDeviceChange:
+	case api.EventTypeDeviceChange:
 		switch payload.ChangeType {
-		case spine.ElementChangeRemove:
+		case api.ElementChangeRemove:
 			i.inverterDisconnected()
 		}
 
-	case spine.EventTypeEntityChange:
+	case api.EventTypeEntityChange:
 		entityType := payload.Entity.EntityType()
 		if entityType != model.EntityTypeTypeBatterySystem {
 			return
 		}
 
 		switch payload.ChangeType {
-		case spine.ElementChangeAdd:
+		case api.ElementChangeAdd:
 			i.inverterConnected(payload.Ski, payload.Entity)
 
-		case spine.ElementChangeRemove:
+		case api.ElementChangeRemove:
 			i.inverterDisconnected()
 		}
 
-	case spine.EventTypeDataChange:
-		if payload.ChangeType != spine.ElementChangeUpdate {
+	case api.EventTypeDataChange:
+		if payload.ChangeType != api.ElementChangeUpdate {
 			return
 		}
 
@@ -89,7 +89,7 @@ func (i *InverterPVVisImpl) HandleEvent(payload spine.EventPayload) {
 }
 
 // process required steps when a pv device entity is connected
-func (e *InverterPVVisImpl) inverterConnected(ski string, entity spine.EntityRemote) {
+func (e *InverterPVVisImpl) inverterConnected(ski string, entity api.EntityRemote) {
 	e.inverterEntity = entity
 	localDevice := e.service.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)

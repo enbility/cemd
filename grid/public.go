@@ -3,7 +3,7 @@ package grid
 import (
 	"github.com/enbility/cemd/util"
 	"github.com/enbility/eebus-go/features"
-	"github.com/enbility/eebus-go/spine/model"
+	"github.com/enbility/spine-go/model"
 )
 
 // return the power limitation factor

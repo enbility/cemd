@@ -1,11 +1,11 @@
 package emobility
 
 import (
-	"github.com/enbility/eebus-go/spine"
-	"github.com/enbility/eebus-go/spine/model"
+	"github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
 )
 
-func (e *EMobilityImpl) HandleResult(errorMsg spine.ResultMessage) {
+func (e *EMobilityImpl) HandleResult(errorMsg api.ResultMessage) {
 	isEvse := errorMsg.EntityRemote == e.evseEntity
 	isEv := e.evEntity != nil && errorMsg.EntityRemote == e.evEntity
 
@@ -20,7 +20,7 @@ func (e *EMobilityImpl) HandleResult(errorMsg spine.ResultMessage) {
 }
 
 // Handle DeviceDiagnosis Results
-func (e *EMobilityImpl) handleResultDeviceDiagnosis(resultMsg spine.ResultMessage) {
+func (e *EMobilityImpl) handleResultDeviceDiagnosis(resultMsg api.ResultMessage) {
 	// is this an error for a heartbeat message?
 	if *resultMsg.Result.ErrorNumber == model.ErrorNumberTypeNoError {
 		return

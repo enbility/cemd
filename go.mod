@@ -3,7 +3,9 @@ module github.com/enbility/cemd
 go 1.18
 
 require (
-	github.com/enbility/eebus-go v0.0.0-20240109191414-52f14d2033f6
+	github.com/enbility/eebus-go v0.0.0-20240115104025-e009d60ba532
+	github.com/enbility/ship-go v0.0.0-20240115080029-8cabdf4011c6
+	github.com/enbility/spine-go v0.0.0-20240114194628-333ba9f8762c
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/mock v0.4.0
 	golang.org/x/exp v0.0.0-20231226003508-02704c960a9b
@@ -23,8 +25,10 @@ require (
 	github.com/rickb777/plural v1.4.1 // indirect
 	gitlab.com/c0b/go-ordered-json v0.0.0-20201030195603-febf46534d5a // indirect
 	golang.org/x/mod v0.14.0 // indirect
-	golang.org/x/net v0.19.0 // indirect
-	golang.org/x/sys v0.15.0 // indirect
-	golang.org/x/tools v0.16.1 // indirect
+	golang.org/x/net v0.20.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/tools v0.17.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+// replace github.com/enbility/eebus-go => ../eebus-go

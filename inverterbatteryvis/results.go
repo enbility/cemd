@@ -1,8 +1,8 @@
 package inverterbatteryvis
 
 import (
-	"github.com/enbility/eebus-go/spine"
+	"github.com/enbility/spine-go/api"
 )
 
-func (i *InverterBatteryVisImpl) HandleResult(errorMsg spine.ResultMessage) {
+func (i *InverterBatteryVisImpl) HandleResult(errorMsg api.ResultMessage) {
 }

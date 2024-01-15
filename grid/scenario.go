@@ -4,9 +4,9 @@ import (
 	"sync"
 
 	"github.com/enbility/cemd/scenarios"
-	"github.com/enbility/eebus-go/service"
-	"github.com/enbility/eebus-go/spine"
-	"github.com/enbility/eebus-go/spine/model"
+	"github.com/enbility/eebus-go/api"
+	spineapi "github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
 )
 
 type GridScenarioImpl struct {
@@ -19,7 +19,7 @@ type GridScenarioImpl struct {
 
 var _ scenarios.ScenariosI = (*GridScenarioImpl)(nil)
 
-func NewGridScenario(service *service.EEBUSService) *GridScenarioImpl {
+func NewGridScenario(service api.EEBUSService) *GridScenarioImpl {
 	return &GridScenarioImpl{
 		ScenarioImpl:  scenarios.NewScenarioImpl(service),
 		remoteDevices: make(map[string]*GridImpl),
@@ -55,7 +55,7 @@ func (e *GridScenarioImpl) AddUseCases() {
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7})
 }
 
-func (e *GridScenarioImpl) RegisterRemoteDevice(details *service.ServiceDetails, dataProvider any) any {
+func (e *GridScenarioImpl) RegisterRemoteDevice(details *api.ServiceDetails, dataProvider any) any {
 	// TODO: grid should be stored per remote SKI and
 	// only be set for the SKI if the device supports it
 	e.mux.Lock()
@@ -79,7 +79,7 @@ func (e *GridScenarioImpl) UnRegisterRemoteDevice(remoteDeviceSki string) {
 	e.Service.RegisterRemoteSKI(remoteDeviceSki, false)
 }
 
-func (e *GridScenarioImpl) HandleResult(errorMsg spine.ResultMessage) {
+func (e *GridScenarioImpl) HandleResult(errorMsg spineapi.ResultMessage) {
 	e.mux.Lock()
 	defer e.mux.Unlock()
 

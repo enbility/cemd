@@ -1,11 +1,12 @@
 package inverterbatteryvis
 
 import (
+	"github.com/enbility/eebus-go/api"
 	"github.com/enbility/eebus-go/features"
-	"github.com/enbility/eebus-go/service"
-	"github.com/enbility/eebus-go/spine"
-	"github.com/enbility/eebus-go/spine/model"
 	"github.com/enbility/eebus-go/util"
+	spineapi "github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
+	"github.com/enbility/spine-go/spine"
 )
 
 type InverterBatteryVisI interface {
@@ -16,11 +17,11 @@ type InverterBatteryVisI interface {
 }
 
 type InverterBatteryVisImpl struct {
-	entity spine.EntityLocal
+	entity spineapi.EntityLocal
 
-	service *service.EEBUSService
+	service api.EEBUSService
 
-	inverterEntity               spine.EntityRemote
+	inverterEntity               spineapi.EntityRemote
 	inverterElectricalConnection *features.ElectricalConnection
 	inverterMeasurement          *features.Measurement
 
@@ -30,7 +31,7 @@ type InverterBatteryVisImpl struct {
 var _ InverterBatteryVisI = (*InverterBatteryVisImpl)(nil)
 
 // Add InverterBatteryVis support
-func NewInverterBatteryVis(service *service.EEBUSService, details *service.ServiceDetails) *InverterBatteryVisImpl {
+func NewInverterBatteryVis(service api.EEBUSService, details *api.ServiceDetails) *InverterBatteryVisImpl {
 	ski := util.NormalizeSKI(details.SKI)
 
 	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)

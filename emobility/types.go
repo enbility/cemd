@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/enbility/eebus-go/spine/model"
+	"github.com/enbility/spine-go/model"
 )
 
 type EVCommunicationStandardType model.DeviceConfigurationKeyValueStringType

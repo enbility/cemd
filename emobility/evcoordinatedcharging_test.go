@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/enbility/eebus-go/spine"
-	"github.com/enbility/eebus-go/spine/model"
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -276,7 +276,7 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func setupTimeSeries(t *testing.T, datagram model.DatagramType, localDevice spine.DeviceLocal, remoteDevice spine.DeviceRemote) {
+func setupTimeSeries(t *testing.T, datagram model.DatagramType, localDevice api.DeviceLocal, remoteDevice api.DeviceRemote) {
 	cmd := []model.CmdType{{
 		TimeSeriesConstraintsListData: &model.TimeSeriesConstraintsListDataType{
 			TimeSeriesConstraintsData: []model.TimeSeriesConstraintsDataType{
@@ -325,7 +325,7 @@ func setupTimeSeries(t *testing.T, datagram model.DatagramType, localDevice spin
 	assert.Nil(t, err)
 }
 
-func setupIncentiveTable(t *testing.T, datagram model.DatagramType, localDevice spine.DeviceLocal, remoteDevice spine.DeviceRemote) {
+func setupIncentiveTable(t *testing.T, datagram model.DatagramType, localDevice api.DeviceLocal, remoteDevice api.DeviceRemote) {
 	cmd := []model.CmdType{{
 		IncentiveTableDescriptionData: &model.IncentiveTableDescriptionDataType{
 			IncentiveTableDescription: []model.IncentiveTableDescriptionType{
@@ -348,7 +348,7 @@ func setupIncentiveTable(t *testing.T, datagram model.DatagramType, localDevice 
 }
 
 /*
-func requestIncentiveUpdate(t *testing.T, datagram model.DatagramType, localDevice spine.DeviceLocal, remoteDevice spine.DeviceRemote) {
+func requestIncentiveUpdate(t *testing.T, datagram model.DatagramType, localDevice api.DeviceLocal, remoteDevice api.DeviceRemote) {
 	cmd := []model.CmdType{{
 		IncentiveTableDescriptionData: &model.IncentiveTableDescriptionDataType{
 			IncentiveTableDescription: []model.IncentiveTableDescriptionType{
@@ -370,7 +370,7 @@ func requestIncentiveUpdate(t *testing.T, datagram model.DatagramType, localDevi
 	assert.Nil(t, err)
 }
 
-func requestPowerTableUpdate(t *testing.T, datagram model.DatagramType, localDevice spine.DeviceLocal, remoteDevice spine.DeviceRemote) {
+func requestPowerTableUpdate(t *testing.T, datagram model.DatagramType, localDevice api.DeviceLocal, remoteDevice api.DeviceRemote) {
 	cmd := []model.CmdType{{
 		TimeSeriesDescriptionListData: &model.TimeSeriesDescriptionListDataType{
 			TimeSeriesDescriptionData: []model.TimeSeriesDescriptionDataType{
