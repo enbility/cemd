@@ -3,7 +3,8 @@ package inverterpvvis
 import (
 	"github.com/enbility/eebus-go/api"
 	"github.com/enbility/eebus-go/features"
-	"github.com/enbility/eebus-go/util"
+	shipapi "github.com/enbility/ship-go/api"
+	"github.com/enbility/ship-go/util"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
@@ -31,7 +32,7 @@ type InverterPVVisImpl struct {
 var _ InverterPVVisI = (*InverterPVVisImpl)(nil)
 
 // Add InverterPVVis support
-func NewInverterPVVis(service api.EEBUSService, details *api.ServiceDetails) *InverterPVVisImpl {
+func NewInverterPVVis(service api.EEBUSService, details *shipapi.ServiceDetails) *InverterPVVisImpl {
 	ski := util.NormalizeSKI(details.SKI)
 
 	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)

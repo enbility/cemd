@@ -2,11 +2,12 @@ package scenarios
 
 import (
 	"github.com/enbility/eebus-go/api"
+	shipapi "github.com/enbility/ship-go/api"
 )
 
 // Implemented by *ScenarioImpl, used by CemImpl
 type ScenariosI interface {
-	RegisterRemoteDevice(details *api.ServiceDetails, dataProvider any) any
+	RegisterRemoteDevice(details *shipapi.ServiceDetails, dataProvider any) any
 	UnRegisterRemoteDevice(remoteDeviceSki string)
 	AddFeatures()
 	AddUseCases()

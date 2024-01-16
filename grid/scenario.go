@@ -5,6 +5,7 @@ import (
 
 	"github.com/enbility/cemd/scenarios"
 	"github.com/enbility/eebus-go/api"
+	shipapi "github.com/enbility/ship-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
@@ -55,7 +56,7 @@ func (e *GridScenarioImpl) AddUseCases() {
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7})
 }
 
-func (e *GridScenarioImpl) RegisterRemoteDevice(details *api.ServiceDetails, dataProvider any) any {
+func (e *GridScenarioImpl) RegisterRemoteDevice(details *shipapi.ServiceDetails, dataProvider any) any {
 	// TODO: grid should be stored per remote SKI and
 	// only be set for the SKI if the device supports it
 	e.mux.Lock()

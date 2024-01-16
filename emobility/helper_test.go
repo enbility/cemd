@@ -9,9 +9,9 @@ import (
 	"github.com/enbility/eebus-go/api"
 	"github.com/enbility/eebus-go/features"
 	"github.com/enbility/eebus-go/service"
-	"github.com/enbility/eebus-go/util"
 	shipapi "github.com/enbility/ship-go/api"
 	"github.com/enbility/ship-go/cert"
+	"github.com/enbility/ship-go/util"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
@@ -98,7 +98,7 @@ func (t *WriteMessageHandler) ResultWithReference(msgCounterReference *model.Msg
 const remoteSki string = "testremoteski"
 
 // we don't want to handle events in these tests for now, so we don't use NewEMobility(...)
-func NewTestEMobility(service api.EEBUSService, details *api.ServiceDetails) *EMobilityImpl {
+func NewTestEMobility(service api.EEBUSService, details *shipapi.ServiceDetails) *EMobilityImpl {
 	ski := util.NormalizeSKI(details.SKI)
 
 	localEntity := service.LocalDevice().Entity([]model.AddressEntityType{1})
@@ -122,7 +122,7 @@ func setupEmobility() (*EMobilityImpl, api.EEBUSService) {
 		9999, cert, 230.0, time.Second*4)
 	eebusService := service.NewEEBUSService(configuration, nil)
 	_ = eebusService.Setup()
-	details := api.NewServiceDetails(remoteSki)
+	details := shipapi.NewServiceDetails(remoteSki)
 	emobility := NewTestEMobility(eebusService, details)
 	return emobility, eebusService
 }

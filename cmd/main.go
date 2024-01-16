@@ -17,6 +17,7 @@ import (
 	"github.com/enbility/cemd/inverterpvvis"
 	"github.com/enbility/cemd/scenarios"
 	"github.com/enbility/eebus-go/api"
+	shipapi "github.com/enbility/ship-go/api"
 	"github.com/enbility/ship-go/cert"
 	"github.com/enbility/ship-go/logging"
 	"github.com/enbility/spine-go/model"
@@ -75,12 +76,12 @@ func (d *DemoCem) RemoteSKIConnected(service api.EEBUSService, ski string) {}
 
 func (d *DemoCem) RemoteSKIDisconnected(service api.EEBUSService, ski string) {}
 
-func (d *DemoCem) VisibleRemoteServicesUpdated(service api.EEBUSService, entries []api.RemoteService) {
+func (d *DemoCem) VisibleRemoteServicesUpdated(service api.EEBUSService, entries []shipapi.RemoteService) {
 }
 
 func (h *DemoCem) ServiceShipIDUpdate(ski string, shipdID string) {}
 
-func (h *DemoCem) ServicePairingDetailUpdate(ski string, detail *api.ConnectionStateDetail) {}
+func (h *DemoCem) ServicePairingDetailUpdate(ski string, detail *shipapi.ConnectionStateDetail) {}
 
 func (h *DemoCem) AllowWaitingForTrust(ski string) bool { return true }
 
@@ -181,7 +182,7 @@ func main() {
 		return
 	}
 
-	remoteService := api.NewServiceDetails(*remoteSki)
+	remoteService := shipapi.NewServiceDetails(*remoteSki)
 	demo.emobilityScenario.RegisterRemoteDevice(remoteService, nil)
 
 	// Clean exit to make sure mdns shutdown is invoked

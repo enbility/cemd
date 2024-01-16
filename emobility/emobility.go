@@ -3,7 +3,8 @@ package emobility
 import (
 	"github.com/enbility/eebus-go/api"
 	"github.com/enbility/eebus-go/features"
-	"github.com/enbility/eebus-go/util"
+	shipapi "github.com/enbility/ship-go/api"
+	"github.com/enbility/ship-go/util"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
@@ -264,7 +265,7 @@ type EMobilityImpl struct {
 var _ EmobilityI = (*EMobilityImpl)(nil)
 
 // Add E-Mobility support
-func NewEMobility(service api.EEBUSService, details *api.ServiceDetails, currency model.CurrencyType, configuration EmobilityConfiguration, dataProvider EmobilityDataProvider) *EMobilityImpl {
+func NewEMobility(service api.EEBUSService, details *shipapi.ServiceDetails, currency model.CurrencyType, configuration EmobilityConfiguration, dataProvider EmobilityDataProvider) *EMobilityImpl {
 	ski := util.NormalizeSKI(details.SKI)
 
 	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
