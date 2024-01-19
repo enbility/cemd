@@ -369,35 +369,53 @@ func (e *EMobilityImpl) evConnected(entity api.EntityRemote) {
 	// optional requests are only logged as debug
 
 	// subscribe
-	if err := e.evDeviceClassification.SubscribeForEntity(); err != nil {
-		logging.Log().Debug(err)
+	if e.evDeviceClassification != nil {
+		if err := e.evDeviceClassification.SubscribeForEntity(); err != nil {
+			logging.Log().Debug(err)
+		}
 	}
-	if err := e.evDeviceConfiguration.SubscribeForEntity(); err != nil {
-		logging.Log().Debug(err)
+	if e.evDeviceConfiguration != nil {
+		if err := e.evDeviceConfiguration.SubscribeForEntity(); err != nil {
+			logging.Log().Debug(err)
+		}
 	}
-	if err := e.evDeviceDiagnosis.SubscribeForEntity(); err != nil {
-		logging.Log().Debug(err)
+	if e.evDeviceDiagnosis != nil {
+		if err := e.evDeviceDiagnosis.SubscribeForEntity(); err != nil {
+			logging.Log().Debug(err)
+		}
 	}
-	if err := e.evElectricalConnection.SubscribeForEntity(); err != nil {
-		logging.Log().Debug(err)
+	if e.evElectricalConnection != nil {
+		if err := e.evElectricalConnection.SubscribeForEntity(); err != nil {
+			logging.Log().Debug(err)
+		}
 	}
-	if err := e.evMeasurement.SubscribeForEntity(); err != nil {
-		logging.Log().Debug(err)
+	if e.evMeasurement != nil {
+		if err := e.evMeasurement.SubscribeForEntity(); err != nil {
+			logging.Log().Debug(err)
+		}
 	}
-	if err := e.evLoadControl.SubscribeForEntity(); err != nil {
-		logging.Log().Debug(err)
+	if e.evLoadControl != nil {
+		if err := e.evLoadControl.SubscribeForEntity(); err != nil {
+			logging.Log().Debug(err)
+		}
 	}
-	if err := e.evIdentification.SubscribeForEntity(); err != nil {
-		logging.Log().Debug(err)
+	if e.evIdentification != nil {
+		if err := e.evIdentification.SubscribeForEntity(); err != nil {
+			logging.Log().Debug(err)
+		}
 	}
 
 	if e.configuration.CoordinatedChargingEnabled {
-		if err := e.evTimeSeries.SubscribeForEntity(); err != nil {
-			logging.Log().Debug(err)
+		if e.evTimeSeries != nil {
+			if err := e.evTimeSeries.SubscribeForEntity(); err != nil {
+				logging.Log().Debug(err)
+			}
 		}
 		// this is optional
-		if err := e.evIncentiveTable.SubscribeForEntity(); err != nil {
-			logging.Log().Debug(err)
+		if e.evIncentiveTable != nil {
+			if err := e.evIncentiveTable.SubscribeForEntity(); err != nil {
+				logging.Log().Debug(err)
+			}
 		}
 	}
 
@@ -407,65 +425,89 @@ func (e *EMobilityImpl) evConnected(entity api.EntityRemote) {
 	}
 
 	if e.configuration.CoordinatedChargingEnabled {
-		// this is optional
-		if err := e.evTimeSeries.Bind(); err != nil {
-			logging.Log().Debug(err)
+		if e.evTimeSeries != nil {
+			// this is optional
+			if err := e.evTimeSeries.Bind(); err != nil {
+				logging.Log().Debug(err)
+			}
 		}
 
-		// this is optional
-		if err := e.evIncentiveTable.Bind(); err != nil {
-			logging.Log().Debug(err)
+		if e.evIncentiveTable != nil {
+			// this is optional
+			if err := e.evIncentiveTable.Bind(); err != nil {
+				logging.Log().Debug(err)
+			}
 		}
 	}
 
 	// get ev configuration data
-	if err := e.evDeviceConfiguration.RequestDescriptions(); err != nil {
-		logging.Log().Debug(err)
+	if e.evDeviceConfiguration != nil {
+		if err := e.evDeviceConfiguration.RequestDescriptions(); err != nil {
+			logging.Log().Debug(err)
+		}
 	}
 
 	// get manufacturer details
-	if _, err := e.evDeviceClassification.RequestManufacturerDetails(); err != nil {
-		logging.Log().Debug(err)
+	if e.evDeviceClassification != nil {
+		if _, err := e.evDeviceClassification.RequestManufacturerDetails(); err != nil {
+			logging.Log().Debug(err)
+		}
 	}
 
 	// get device diagnosis state
-	if _, err := e.evDeviceDiagnosis.RequestState(); err != nil {
-		logging.Log().Debug(err)
+	if e.evDeviceDiagnosis != nil {
+		if _, err := e.evDeviceDiagnosis.RequestState(); err != nil {
+			logging.Log().Debug(err)
+		}
 	}
 
 	// get electrical connection parameter
-	if err := e.evElectricalConnection.RequestDescriptions(); err != nil {
-		logging.Log().Debug(err)
+	if e.evElectricalConnection != nil {
+		if err := e.evElectricalConnection.RequestDescriptions(); err != nil {
+			logging.Log().Debug(err)
+		}
 	}
 
-	if err := e.evElectricalConnection.RequestParameterDescriptions(); err != nil {
-		logging.Log().Debug(err)
+	if e.evElectricalConnection != nil {
+		if err := e.evElectricalConnection.RequestParameterDescriptions(); err != nil {
+			logging.Log().Debug(err)
+		}
 	}
 
 	// get measurement parameters
-	if err := e.evMeasurement.RequestDescriptions(); err != nil {
-		logging.Log().Debug(err)
+	if e.evMeasurement != nil {
+		if err := e.evMeasurement.RequestDescriptions(); err != nil {
+			logging.Log().Debug(err)
+		}
 	}
 
 	// get loadlimit parameter
-	if err := e.evLoadControl.RequestLimitDescriptions(); err != nil {
-		logging.Log().Debug(err)
+	if e.evLoadControl != nil {
+		if err := e.evLoadControl.RequestLimitDescriptions(); err != nil {
+			logging.Log().Debug(err)
+		}
 	}
 
 	// get identification
-	if _, err := e.evIdentification.RequestValues(); err != nil {
-		logging.Log().Debug(err)
+	if e.evIdentification != nil {
+		if _, err := e.evIdentification.RequestValues(); err != nil {
+			logging.Log().Debug(err)
+		}
 	}
 
 	if e.configuration.CoordinatedChargingEnabled {
-		// get time series parameter
-		if err := e.evTimeSeries.RequestDescriptions(); err != nil {
-			logging.Log().Debug(err)
+		if e.evTimeSeries != nil {
+			// get time series parameter
+			if err := e.evTimeSeries.RequestDescriptions(); err != nil {
+				logging.Log().Debug(err)
+			}
 		}
 
-		// get incentive table parameter
-		if err := e.evIncentiveTable.RequestDescriptions(); err != nil {
-			logging.Log().Debug(err)
+		if e.evIncentiveTable != nil {
+			// get incentive table parameter
+			if err := e.evIncentiveTable.RequestDescriptions(); err != nil {
+				logging.Log().Debug(err)
+			}
 		}
 	}
 }
