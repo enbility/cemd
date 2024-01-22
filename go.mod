@@ -3,9 +3,9 @@ module github.com/enbility/cemd
 go 1.18
 
 require (
-	github.com/enbility/eebus-go v0.0.0-20240120142050-b29ee60146a7
-	github.com/enbility/ship-go v0.0.0-20240119171219-2171f41f6571
-	github.com/enbility/spine-go v0.0.0-20240120141738-1c73b9c726ca
+	github.com/enbility/eebus-go v0.0.0-20240122104002-521794de4bff
+	github.com/enbility/ship-go v0.0.0-20240122103724-e4de8c1a1f29
+	github.com/enbility/spine-go v0.0.0-20240122103838-f106aec9041f
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/mock v0.4.0
 	golang.org/x/exp v0.0.0-20231226003508-02704c960a9b
