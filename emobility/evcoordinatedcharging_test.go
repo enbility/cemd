@@ -12,7 +12,7 @@ import (
 )
 
 func Test_CoordinatedChargingScenarios(t *testing.T) {
-	emobility, eebusService := setupEmobility()
+	emobility, eebusService := setupEmobility(t)
 
 	data, err := emobility.EVChargedEnergy()
 	assert.NotNil(t, err)

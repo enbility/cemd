@@ -9,7 +9,7 @@ import (
 )
 
 func Test_EVCoordinatedChargingSupported(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	data, err := emobilty.EVCoordinatedChargingSupported()
 	assert.NotNil(t, err)

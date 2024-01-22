@@ -10,7 +10,7 @@ import (
 )
 
 func Test_EVGetTimeSlotConstraints(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	constraints, err := emobilty.EVTimeSlotConstraints()
 	assert.Equal(t, uint(0), constraints.MinSlots)

@@ -9,7 +9,7 @@ import (
 )
 
 func Test_EVIdentification(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	data, err := emobilty.EVIdentification()
 	assert.NotNil(t, err)

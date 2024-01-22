@@ -9,7 +9,7 @@ import (
 )
 
 func Test_EVCommunicationStandard(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	data, err := emobilty.EVCommunicationStandard()
 	assert.NotNil(t, err)

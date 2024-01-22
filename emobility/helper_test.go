@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
+	"testing"
 	"time"
 
 	"github.com/enbility/eebus-go/api"
 	"github.com/enbility/eebus-go/features"
+	"github.com/enbility/eebus-go/mocks"
 	"github.com/enbility/eebus-go/service"
 	shipapi "github.com/enbility/ship-go/api"
 	"github.com/enbility/ship-go/cert"
@@ -15,6 +17,7 @@ import (
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
+	"github.com/stretchr/testify/mock"
 )
 
 type WriteMessageHandler struct {
@@ -113,14 +116,18 @@ func NewTestEMobility(service api.EEBUSService, details *shipapi.ServiceDetails)
 	return emobility
 }
 
-func setupEmobility() (*EMobilityImpl, api.EEBUSService) {
+func setupEmobility(t *testing.T) (*EMobilityImpl, api.EEBUSService) {
 	cert, _ := cert.CreateCertificate("test", "test", "DE", "test")
 	configuration, _ := api.NewConfiguration(
 		"test", "test", "test", "test",
 		model.DeviceTypeTypeEnergyManagementSystem,
 		[]model.EntityTypeType{model.EntityTypeTypeCEM},
 		9999, cert, 230.0, time.Second*4)
-	eebusService := service.NewEEBUSService(configuration, nil)
+
+	serviceHandler := mocks.NewEEBUSServiceHandler(t)
+	serviceHandler.EXPECT().ServicePairingDetailUpdate(mock.Anything, mock.Anything).Return().Maybe()
+
+	eebusService := service.NewEEBUSService(configuration, serviceHandler)
 	_ = eebusService.Setup()
 	details := shipapi.NewServiceDetails(remoteSki)
 	emobility := NewTestEMobility(eebusService, details)

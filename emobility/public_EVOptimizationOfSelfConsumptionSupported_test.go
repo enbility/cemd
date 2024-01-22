@@ -9,7 +9,7 @@ import (
 )
 
 func Test_EVOptimizationOfSelfConsumptionSupported(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	data, err := emobilty.EVOptimizationOfSelfConsumptionSupported()
 	assert.NotNil(t, err)

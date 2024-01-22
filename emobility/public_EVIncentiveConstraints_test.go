@@ -9,7 +9,7 @@ import (
 )
 
 func Test_EVGetIncentiveConstraints(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	constraints, err := emobilty.EVIncentiveConstraints()
 	assert.Equal(t, uint(0), constraints.MinSlots)

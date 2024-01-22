@@ -9,7 +9,7 @@ import (
 )
 
 func Test_EVPowerPerPhase_Power(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	data, err := emobilty.EVPowerPerPhase()
 	assert.NotNil(t, err)
@@ -97,7 +97,7 @@ func Test_EVPowerPerPhase_Power(t *testing.T) {
 }
 
 func Test_EVPowerPerPhase_Current(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	data, err := emobilty.EVPowerPerPhase()
 	assert.NotNil(t, err)

@@ -9,7 +9,7 @@ import (
 )
 
 func Test_EVCurrentLimits(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	minData, maxData, defaultData, err := emobilty.EVCurrentLimits()
 	assert.NotNil(t, err)

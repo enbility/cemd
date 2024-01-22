@@ -9,7 +9,7 @@ import (
 )
 
 func Test_EVSoCSupported(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	data, err := emobilty.EVSoCSupported()
 	assert.NotNil(t, err)

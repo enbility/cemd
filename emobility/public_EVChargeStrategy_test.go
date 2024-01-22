@@ -10,7 +10,7 @@ import (
 )
 
 func Test_EVChargeStrategy(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	data := emobilty.EVChargeStrategy()
 	assert.Equal(t, EVChargeStrategyTypeUnknown, data)

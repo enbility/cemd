@@ -11,7 +11,7 @@ import (
 )
 
 func Test_EVWritePowerLimits(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	data := []EVDurationSlotValue{}
 

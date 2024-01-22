@@ -10,7 +10,7 @@ import (
 )
 
 func Test_EVChargePlan(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	_, err := emobilty.EVChargePlan()
 	assert.NotNil(t, err)

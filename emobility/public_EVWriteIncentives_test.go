@@ -11,7 +11,7 @@ import (
 )
 
 func Test_EVWriteIncentives(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	data := []EVDurationSlotValue{}
 

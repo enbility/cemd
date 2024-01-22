@@ -9,7 +9,7 @@ import (
 )
 
 func Test_EVCurrentChargeState(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	data, err := emobilty.EVCurrentChargeState()
 	assert.Nil(t, err)

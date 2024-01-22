@@ -12,7 +12,7 @@ import (
 )
 
 func Test_EVWriteLoadControlLimits(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	loadLimits := []EVLoadLimits{}
 

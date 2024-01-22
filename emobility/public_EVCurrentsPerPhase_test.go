@@ -9,7 +9,7 @@ import (
 )
 
 func Test_EVCurrentsPerPhase(t *testing.T) {
-	emobilty, eebusService := setupEmobility()
+	emobilty, eebusService := setupEmobility(t)
 
 	data, err := emobilty.EVCurrentsPerPhase()
 	assert.NotNil(t, err)
