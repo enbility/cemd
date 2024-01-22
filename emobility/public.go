@@ -311,8 +311,11 @@ func (e *EMobilityImpl) EVLoadControlObligationLimits() ([]float64, error) {
 
 		var limitDesc *model.LoadControlLimitDescriptionDataType
 		for _, desc := range limitDescriptions {
-			if desc.MeasurementId != nil && *desc.MeasurementId == *elParamDesc.MeasurementId {
-				limitDesc = &desc
+			if desc.MeasurementId != nil &&
+				elParamDesc.MeasurementId != nil &&
+				*desc.MeasurementId == *elParamDesc.MeasurementId {
+				safeDesc := desc
+				limitDesc = &safeDesc
 				break
 			}
 		}
@@ -400,8 +403,11 @@ func (e *EMobilityImpl) EVWriteLoadControlLimits(limits []EVLoadLimits) error {
 
 			var limitDesc *model.LoadControlLimitDescriptionDataType
 			for _, desc := range limitDescriptions {
-				if desc.MeasurementId != nil && *desc.MeasurementId == *elParamDesc.MeasurementId {
-					limitDesc = &desc
+				if desc.MeasurementId != nil &&
+					elParamDesc.MeasurementId != nil &&
+					*desc.MeasurementId == *elParamDesc.MeasurementId {
+					safeDesc := desc
+					limitDesc = &safeDesc
 					break
 				}
 			}
