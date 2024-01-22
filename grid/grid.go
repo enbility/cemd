@@ -38,7 +38,7 @@ var _ GridI = (*GridImpl)(nil)
 
 // Add Grid support
 func NewGrid(service api.EEBUSService, details *shipapi.ServiceDetails) *GridImpl {
-	ski := util.NormalizeSKI(details.SKI)
+	ski := util.NormalizeSKI(details.SKI())
 
 	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 

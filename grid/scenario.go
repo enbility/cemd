@@ -62,12 +62,12 @@ func (e *GridScenarioImpl) RegisterRemoteDevice(details *shipapi.ServiceDetails,
 	e.mux.Lock()
 	defer e.mux.Unlock()
 
-	if em, ok := e.remoteDevices[details.SKI]; ok {
+	if em, ok := e.remoteDevices[details.SKI()]; ok {
 		return em
 	}
 
 	grid := NewGrid(e.Service, details)
-	e.remoteDevices[details.SKI] = grid
+	e.remoteDevices[details.SKI()] = grid
 	return grid
 }
 

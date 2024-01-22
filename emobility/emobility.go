@@ -266,7 +266,7 @@ var _ EmobilityI = (*EMobilityImpl)(nil)
 
 // Add E-Mobility support
 func NewEMobility(service api.EEBUSService, details *shipapi.ServiceDetails, currency model.CurrencyType, configuration EmobilityConfiguration, dataProvider EmobilityDataProvider) *EMobilityImpl {
-	ski := util.NormalizeSKI(details.SKI)
+	ski := util.NormalizeSKI(details.SKI())
 
 	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 

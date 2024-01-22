@@ -102,7 +102,7 @@ const remoteSki string = "testremoteski"
 
 // we don't want to handle events in these tests for now, so we don't use NewEMobility(...)
 func NewTestEMobility(service api.EEBUSService, details *shipapi.ServiceDetails) *EMobilityImpl {
-	ski := util.NormalizeSKI(details.SKI)
+	ski := util.NormalizeSKI(details.SKI())
 
 	localEntity := service.LocalDevice().Entity([]model.AddressEntityType{1})
 	emobility := &EMobilityImpl{

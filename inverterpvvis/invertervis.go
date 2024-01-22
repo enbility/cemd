@@ -33,7 +33,7 @@ var _ InverterPVVisI = (*InverterPVVisImpl)(nil)
 
 // Add InverterPVVis support
 func NewInverterPVVis(service api.EEBUSService, details *shipapi.ServiceDetails) *InverterPVVisImpl {
-	ski := util.NormalizeSKI(details.SKI)
+	ski := util.NormalizeSKI(details.SKI())
 
 	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 

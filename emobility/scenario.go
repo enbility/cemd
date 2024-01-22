@@ -142,7 +142,7 @@ func (e *EmobilityScenarioImpl) RegisterRemoteDevice(details *shipapi.ServiceDet
 	e.mux.Lock()
 	defer e.mux.Unlock()
 
-	if em, ok := e.remoteDevices[details.SKI]; ok {
+	if em, ok := e.remoteDevices[details.SKI()]; ok {
 		return em
 	}
 
@@ -151,7 +151,7 @@ func (e *EmobilityScenarioImpl) RegisterRemoteDevice(details *shipapi.ServiceDet
 		provider = dataProvider.(EmobilityDataProvider)
 	}
 	emobility := NewEMobility(e.Service, details, e.currency, e.configuration, provider)
-	e.remoteDevices[details.SKI] = emobility
+	e.remoteDevices[details.SKI()] = emobility
 	return emobility
 }
 

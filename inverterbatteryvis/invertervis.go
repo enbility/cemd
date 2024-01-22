@@ -33,7 +33,7 @@ var _ InverterBatteryVisI = (*InverterBatteryVisImpl)(nil)
 
 // Add InverterBatteryVis support
 func NewInverterBatteryVis(service api.EEBUSService, details *shipapi.ServiceDetails) *InverterBatteryVisImpl {
-	ski := util.NormalizeSKI(details.SKI)
+	ski := util.NormalizeSKI(details.SKI())
 
 	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
