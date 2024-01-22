@@ -33,8 +33,7 @@ func (e *EMobilityImpl) HandleEvent(payload api.EventPayload) {
 
 	switch payload.EventType {
 	case api.EventTypeDeviceChange:
-		switch payload.ChangeType {
-		case api.ElementChangeRemove:
+		if payload.ChangeType == api.ElementChangeRemove {
 			e.evseDisconnected()
 			e.evDisconnected()
 		}
