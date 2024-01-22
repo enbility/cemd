@@ -23,6 +23,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rickb777/date v1.20.5 // indirect
 	github.com/rickb777/plural v1.4.1 // indirect
+	github.com/stretchr/objx v0.5.1 // indirect
 	gitlab.com/c0b/go-ordered-json v0.0.0-20201030195603-febf46534d5a // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/net v0.20.0 // indirect
@@ -30,3 +31,7 @@ require (
 	golang.org/x/tools v0.17.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+// replace github.com/enbility/eebus-go => ../eebus-go
+// replace github.com/enbility/ship-go => ../ship-go
+// replace github.com/enbility/spine-go => ../spine-go
