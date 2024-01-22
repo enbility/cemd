@@ -108,7 +108,7 @@ func NewTestEMobility(service api.EEBUSService, details *shipapi.ServiceDetails)
 		ski:     ski,
 	}
 
-	service.RegisterRemoteSKI(ski, true)
+	service.RegisterRemoteSKI(ski, false)
 
 	return emobility
 }
