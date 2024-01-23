@@ -10,13 +10,13 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/cem"
 	"github.com/enbility/cemd/emobility"
 	"github.com/enbility/cemd/grid"
 	"github.com/enbility/cemd/inverterbatteryvis"
 	"github.com/enbility/cemd/inverterpvvis"
-	"github.com/enbility/cemd/scenarios"
-	"github.com/enbility/eebus-go/api"
+	eebusapi "github.com/enbility/eebus-go/api"
 	shipapi "github.com/enbility/ship-go/api"
 	"github.com/enbility/ship-go/cert"
 	"github.com/enbility/ship-go/logging"
@@ -26,10 +26,10 @@ import (
 type DemoCem struct {
 	cem *cem.CemImpl
 
-	emobilityScenario, gridScenario, inverterBatteryVisScenario, inverterPVVisScenario scenarios.ScenariosI
+	emobilityScenario, gridScenario, inverterBatteryVisScenario, inverterPVVisScenario api.SolutionInterface
 }
 
-func NewDemoCem(configuration *api.Configuration) *DemoCem {
+func NewDemoCem(configuration *eebusapi.Configuration) *DemoCem {
 	demo := &DemoCem{}
 
 	demo.cem = cem.NewCEM(configuration, demo, demo)
@@ -42,7 +42,7 @@ func (d *DemoCem) Setup() error {
 		return err
 	}
 
-	d.emobilityScenario = emobility.NewEMobilityScenario(d.cem.Service, d.cem.Currency, emobility.EmobilityConfiguration{
+	d.emobilityScenario = emobility.NewEMobilitySolution(d.cem.Service, d.cem.Currency, emobility.EmobilityConfiguration{
 		CoordinatedChargingEnabled: true,
 	})
 	d.emobilityScenario.AddFeatures()
@@ -66,17 +66,17 @@ func (d *DemoCem) Setup() error {
 }
 
 // report the Ship ID of a newly trusted connection
-func (d *DemoCem) RemoteServiceShipIDReported(service api.EEBUSService, ski string, shipID string) {
+func (d *DemoCem) RemoteServiceShipIDReported(service eebusapi.ServiceInterface, ski string, shipID string) {
 	// we should associated the Ship ID with the SKI and store it
 	// so the next connection can start trusted
 	logging.Log().Info("SKI", ski, "has Ship ID:", shipID)
 }
 
-func (d *DemoCem) RemoteSKIConnected(service api.EEBUSService, ski string) {}
+func (d *DemoCem) RemoteSKIConnected(service eebusapi.ServiceInterface, ski string) {}
 
-func (d *DemoCem) RemoteSKIDisconnected(service api.EEBUSService, ski string) {}
+func (d *DemoCem) RemoteSKIDisconnected(service eebusapi.ServiceInterface, ski string) {}
 
-func (d *DemoCem) VisibleRemoteServicesUpdated(service api.EEBUSService, entries []shipapi.RemoteService) {
+func (d *DemoCem) VisibleRemoteServicesUpdated(service eebusapi.ServiceInterface, entries []shipapi.RemoteService) {
 }
 
 func (h *DemoCem) ServiceShipIDUpdate(ski string, shipdID string) {}
@@ -154,7 +154,7 @@ func main() {
 		fmt.Println("Using certificate file", *crt, "and key file", *key)
 	}
 
-	configuration, err := api.NewConfiguration(
+	configuration, err := eebusapi.NewConfiguration(
 		"Demo",
 		"Demo",
 		"HEMS",

@@ -14,7 +14,7 @@ import (
 //
 // this includes all required features and
 // minimal data being available
-func (e *EMobilityImpl) EVConnected() bool {
+func (e *EMobility) EVConnected() bool {
 	// To report an EV as being connected, also consider all required
 	// features to be available and assigned
 	if e.evEntity == nil ||
@@ -52,7 +52,7 @@ func (e *EMobilityImpl) EVConnected() bool {
 }
 
 // return the current charge state of the EV
-func (e *EMobilityImpl) EVCurrentChargeState() (EVChargeStateType, error) {
+func (e *EMobility) EVCurrentChargeState() (EVChargeStateType, error) {
 	if e.evEntity == nil || e.evDeviceDiagnosis == nil {
 		return EVChargeStateTypeUnplugged, nil
 	}
@@ -82,7 +82,7 @@ func (e *EMobilityImpl) EVCurrentChargeState() (EVChargeStateType, error) {
 }
 
 // return the number of ac connected phases of the EV or 0 if it is unknown
-func (e *EMobilityImpl) EVConnectedPhases() (uint, error) {
+func (e *EMobility) EVConnectedPhases() (uint, error) {
 	if e.evEntity == nil || e.evElectricalConnection == nil {
 		return 0, ErrEVDisconnected
 	}
@@ -111,7 +111,7 @@ func (e *EMobilityImpl) EVConnectedPhases() (uint, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *EMobilityImpl) EVChargedEnergy() (float64, error) {
+func (e *EMobility) EVChargedEnergy() (float64, error) {
 	if e.evEntity == nil || e.evMeasurement == nil {
 		return 0, ErrEVDisconnected
 	}
@@ -138,7 +138,7 @@ func (e *EMobilityImpl) EVChargedEnergy() (float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *EMobilityImpl) EVPowerPerPhase() ([]float64, error) {
+func (e *EMobility) EVPowerPerPhase() ([]float64, error) {
 	if e.evEntity == nil || e.evMeasurement == nil {
 		return nil, ErrEVDisconnected
 	}
@@ -192,7 +192,7 @@ func (e *EMobilityImpl) EVPowerPerPhase() ([]float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *EMobilityImpl) EVCurrentsPerPhase() ([]float64, error) {
+func (e *EMobility) EVCurrentsPerPhase() ([]float64, error) {
 	if e.evEntity == nil || e.evElectricalConnection == nil {
 		return nil, ErrEVDisconnected
 	}
@@ -245,7 +245,7 @@ func (e *EMobilityImpl) EVCurrentsPerPhase() ([]float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *EMobilityImpl) EVCurrentLimits() ([]float64, []float64, []float64, error) {
+func (e *EMobility) EVCurrentLimits() ([]float64, []float64, []float64, error) {
 	if e.evEntity == nil || e.evElectricalConnection == nil {
 		return nil, nil, nil, ErrEVDisconnected
 	}
@@ -284,7 +284,7 @@ func (e *EMobilityImpl) EVCurrentLimits() ([]float64, []float64, []float64, erro
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *EMobilityImpl) EVLoadControlObligationLimits() ([]float64, error) {
+func (e *EMobility) EVLoadControlObligationLimits() ([]float64, error) {
 	if e.evEntity == nil || e.evElectricalConnection == nil || e.evLoadControl == nil {
 		return nil, ErrEVDisconnected
 	}
@@ -373,7 +373,7 @@ func (e *EMobilityImpl) EVLoadControlObligationLimits() ([]float64, error) {
 //   - In ISO15118-2 the usecase is only supported via VAS extensions which are vendor specific and needs to have specific EVSE support for the specific EV brand.
 //   - In ISO15118-20 this is a standard feature which does not need special support on the EVSE.
 //   - Min power data is only provided via IEC61851 or using VAS in ISO15118-2.
-func (e *EMobilityImpl) EVWriteLoadControlLimits(limits []EVLoadLimits) error {
+func (e *EMobility) EVWriteLoadControlLimits(limits []EVLoadLimits) error {
 	if e.evEntity == nil {
 		return ErrEVDisconnected
 	}
@@ -459,7 +459,7 @@ func (e *EMobilityImpl) EVWriteLoadControlLimits(limits []EVLoadLimits) error {
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - ErrNotSupported if getting the communication standard is not supported
 //   - and others
-func (e *EMobilityImpl) EVCommunicationStandard() (EVCommunicationStandardType, error) {
+func (e *EMobility) EVCommunicationStandard() (EVCommunicationStandardType, error) {
 	if e.evEntity == nil || e.evDeviceConfiguration == nil {
 		return EVCommunicationStandardTypeUnknown, ErrEVDisconnected
 	}
@@ -488,7 +488,7 @@ func (e *EMobilityImpl) EVCommunicationStandard() (EVCommunicationStandardType, 
 // possible errors:
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
-func (e *EMobilityImpl) EVIdentification() (string, error) {
+func (e *EMobility) EVIdentification() (string, error) {
 	if e.evEntity == nil {
 		return "", ErrEVDisconnected
 	}
@@ -518,7 +518,7 @@ func (e *EMobilityImpl) EVIdentification() (string, error) {
 // possible errors:
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
-func (e *EMobilityImpl) EVOptimizationOfSelfConsumptionSupported() (bool, error) {
+func (e *EMobility) EVOptimizationOfSelfConsumptionSupported() (bool, error) {
 	if e.evEntity == nil || e.evLoadControl == nil {
 		return false, ErrEVDisconnected
 	}
@@ -550,7 +550,7 @@ func (e *EMobilityImpl) EVOptimizationOfSelfConsumptionSupported() (bool, error)
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *EMobilityImpl) EVSoCSupported() (bool, error) {
+func (e *EMobility) EVSoCSupported() (bool, error) {
 	if e.evEntity == nil || e.evMeasurement == nil {
 		return false, ErrEVDisconnected
 	}
@@ -587,7 +587,7 @@ func (e *EMobilityImpl) EVSoCSupported() (bool, error) {
 //   - ErrNotSupported if support for SoC is not possible
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *EMobilityImpl) EVSoC() (float64, error) {
+func (e *EMobility) EVSoC() (float64, error) {
 	if e.evEntity == nil || e.evMeasurement == nil {
 		return 0, ErrEVDisconnected
 	}
@@ -617,7 +617,7 @@ func (e *EMobilityImpl) EVSoC() (float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
-func (e *EMobilityImpl) EVCoordinatedChargingSupported() (bool, error) {
+func (e *EMobility) EVCoordinatedChargingSupported() (bool, error) {
 	if e.evEntity == nil {
 		return false, ErrEVDisconnected
 	}
@@ -636,7 +636,7 @@ func (e *EMobilityImpl) EVCoordinatedChargingSupported() (bool, error) {
 }
 
 // returns the current charging strategy
-func (e *EMobilityImpl) EVChargeStrategy() EVChargeStrategyType {
+func (e *EMobility) EVChargeStrategy() EVChargeStrategyType {
 	if e.evEntity == nil || e.evTimeSeries == nil {
 		return EVChargeStrategyTypeUnknown
 	}
@@ -696,7 +696,7 @@ func (e *EMobilityImpl) EVChargeStrategy() EVChargeStrategyType {
 }
 
 // returns the current energy demand in Wh and the duration
-func (e *EMobilityImpl) EVEnergyDemand() (EVDemand, error) {
+func (e *EMobility) EVEnergyDemand() (EVDemand, error) {
 	demand := EVDemand{}
 
 	if e.evEntity == nil {
@@ -759,7 +759,7 @@ func (e *EMobilityImpl) EVEnergyDemand() (EVDemand, error) {
 	return demand, nil
 }
 
-func (e *EMobilityImpl) EVChargePlanConstraints() ([]EVDurationSlotValue, error) {
+func (e *EMobility) EVChargePlanConstraints() ([]EVDurationSlotValue, error) {
 	constraints := []EVDurationSlotValue{}
 
 	if e.evEntity == nil {
@@ -813,7 +813,7 @@ func (e *EMobilityImpl) EVChargePlanConstraints() ([]EVDurationSlotValue, error)
 	return constraints, nil
 }
 
-func (e *EMobilityImpl) EVChargePlan() (EVChargePlan, error) {
+func (e *EMobility) EVChargePlan() (EVChargePlan, error) {
 	plan := EVChargePlan{}
 
 	if e.evEntity == nil {
@@ -894,7 +894,7 @@ func (e *EMobilityImpl) EVChargePlan() (EVChargePlan, error) {
 }
 
 // returns the constraints for the time slots
-func (e *EMobilityImpl) EVTimeSlotConstraints() (EVTimeSlotConstraints, error) {
+func (e *EMobility) EVTimeSlotConstraints() (EVTimeSlotConstraints, error) {
 	result := EVTimeSlotConstraints{}
 
 	if e.evEntity == nil || e.evTimeSeries == nil {
@@ -935,7 +935,7 @@ func (e *EMobilityImpl) EVTimeSlotConstraints() (EVTimeSlotConstraints, error) {
 }
 
 // send power limits to the EV
-func (e *EMobilityImpl) EVWritePowerLimits(data []EVDurationSlotValue) error {
+func (e *EMobility) EVWritePowerLimits(data []EVDurationSlotValue) error {
 	if e.evEntity == nil || e.evTimeSeries == nil {
 		return ErrNotSupported
 	}
@@ -1000,7 +1000,7 @@ func (e *EMobilityImpl) EVWritePowerLimits(data []EVDurationSlotValue) error {
 }
 
 // returns the minimum and maximum number of incentive slots allowed
-func (e *EMobilityImpl) EVIncentiveConstraints() (EVIncentiveSlotConstraints, error) {
+func (e *EMobility) EVIncentiveConstraints() (EVIncentiveSlotConstraints, error) {
 	result := EVIncentiveSlotConstraints{}
 
 	if e.evEntity == nil || e.evIncentiveTable == nil {
@@ -1026,7 +1026,7 @@ func (e *EMobilityImpl) EVIncentiveConstraints() (EVIncentiveSlotConstraints, er
 }
 
 // send incentives to the EV
-func (e *EMobilityImpl) EVWriteIncentives(data []EVDurationSlotValue) error {
+func (e *EMobility) EVWriteIncentives(data []EVDurationSlotValue) error {
 	if e.evEntity == nil || e.evIncentiveTable == nil {
 		return features.ErrDataNotAvailable
 	}

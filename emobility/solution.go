@@ -3,18 +3,18 @@ package emobility
 import (
 	"sync"
 
-	"github.com/enbility/cemd/scenarios"
-	"github.com/enbility/eebus-go/api"
+	"github.com/enbility/cemd/api"
+	eebusapi "github.com/enbility/eebus-go/api"
 	"github.com/enbility/eebus-go/util"
 	shipapi "github.com/enbility/ship-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
 
-type EmobilityScenarioImpl struct {
-	*scenarios.ScenarioImpl
+type EmobilitySolution struct {
+	*api.Solution
 
-	remoteDevices map[string]*EMobilityImpl
+	remoteDevices map[string]*EMobility
 
 	mux sync.Mutex
 
@@ -22,19 +22,22 @@ type EmobilityScenarioImpl struct {
 	configuration EmobilityConfiguration
 }
 
-var _ scenarios.ScenariosI = (*EmobilityScenarioImpl)(nil)
+var _ api.SolutionInterface = (*EmobilitySolution)(nil)
 
-func NewEMobilityScenario(service api.EEBUSService, currency model.CurrencyType, configuration EmobilityConfiguration) *EmobilityScenarioImpl {
-	return &EmobilityScenarioImpl{
-		ScenarioImpl:  scenarios.NewScenarioImpl(service),
-		remoteDevices: make(map[string]*EMobilityImpl),
+func NewEMobilitySolution(
+	service eebusapi.ServiceInterface,
+	currency model.CurrencyType,
+	configuration EmobilityConfiguration) *EmobilitySolution {
+	return &EmobilitySolution{
+		Solution:      api.NewSolution(service),
+		remoteDevices: make(map[string]*EMobility),
 		currency:      currency,
 		configuration: configuration,
 	}
 }
 
 // adds all the supported features to the local entity
-func (e *EmobilityScenarioImpl) AddFeatures() {
+func (e *EmobilitySolution) AddFeatures() {
 	localEntity := e.Service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	// server features
@@ -74,7 +77,7 @@ func (e *EmobilityScenarioImpl) AddFeatures() {
 }
 
 // add supported e-mobility usecases
-func (e *EmobilityScenarioImpl) AddUseCases() {
+func (e *EmobilitySolution) AddUseCases() {
 	localEntity := e.Service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	localEntity.AddUseCaseSupport(
@@ -136,7 +139,7 @@ func (e *EmobilityScenarioImpl) AddUseCases() {
 	}
 }
 
-func (e *EmobilityScenarioImpl) RegisterRemoteDevice(details *shipapi.ServiceDetails, dataProvider any) any {
+func (e *EmobilitySolution) RegisterRemoteDevice(details *shipapi.ServiceDetails, dataProvider any) any {
 	// TODO: emobility should be stored per remote SKI and
 	// only be set for the SKI if the device supports it
 	e.mux.Lock()
@@ -155,7 +158,7 @@ func (e *EmobilityScenarioImpl) RegisterRemoteDevice(details *shipapi.ServiceDet
 	return emobility
 }
 
-func (e *EmobilityScenarioImpl) UnRegisterRemoteDevice(remoteDeviceSki string) {
+func (e *EmobilitySolution) UnRegisterRemoteDevice(remoteDeviceSki string) {
 	e.mux.Lock()
 	defer e.mux.Unlock()
 
@@ -164,7 +167,7 @@ func (e *EmobilityScenarioImpl) UnRegisterRemoteDevice(remoteDeviceSki string) {
 	e.Service.RegisterRemoteSKI(remoteDeviceSki, false)
 }
 
-func (e *EmobilityScenarioImpl) HandleResult(errorMsg spineapi.ResultMessage) {
+func (e *EmobilitySolution) HandleResult(errorMsg spineapi.ResultMessage) {
 	e.mux.Lock()
 	defer e.mux.Unlock()
 

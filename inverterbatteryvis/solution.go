@@ -3,27 +3,27 @@ package inverterbatteryvis
 import (
 	"sync"
 
-	"github.com/enbility/cemd/scenarios"
-	"github.com/enbility/eebus-go/api"
+	"github.com/enbility/cemd/api"
+	eebusapi "github.com/enbility/eebus-go/api"
 	shipapi "github.com/enbility/ship-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
 
 type InverterBatteryVisScenarioImpl struct {
-	*scenarios.ScenarioImpl
+	*api.Solution
 
-	remoteDevices map[string]*InverterBatteryVisImpl
+	remoteDevices map[string]*InverterBatteryVis
 
 	mux sync.Mutex
 }
 
-var _ scenarios.ScenariosI = (*InverterBatteryVisScenarioImpl)(nil)
+var _ api.SolutionInterface = (*InverterBatteryVisScenarioImpl)(nil)
 
-func NewInverterVisScenario(service api.EEBUSService) *InverterBatteryVisScenarioImpl {
+func NewInverterVisScenario(service eebusapi.ServiceInterface) *InverterBatteryVisScenarioImpl {
 	return &InverterBatteryVisScenarioImpl{
-		ScenarioImpl:  scenarios.NewScenarioImpl(service),
-		remoteDevices: make(map[string]*InverterBatteryVisImpl),
+		Solution:      api.NewSolution(service),
+		remoteDevices: make(map[string]*InverterBatteryVis),
 	}
 }
 

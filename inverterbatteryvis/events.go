@@ -8,7 +8,7 @@ import (
 )
 
 // Internal EventHandler Interface for the CEM
-func (i *InverterBatteryVisImpl) HandleEvent(payload api.EventPayload) {
+func (i *InverterBatteryVis) HandleEvent(payload api.EventPayload) {
 	// we only care about the registered SKI
 	if payload.Ski != i.ski {
 		return
@@ -79,7 +79,7 @@ func (i *InverterBatteryVisImpl) HandleEvent(payload api.EventPayload) {
 }
 
 // process required steps when a battery device entity is connected
-func (i *InverterBatteryVisImpl) inverterConnected(ski string, entity api.EntityRemote) {
+func (i *InverterBatteryVis) inverterConnected(ski string, entity api.EntityRemoteInterface) {
 	i.inverterEntity = entity
 	localDevice := i.service.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
@@ -124,7 +124,7 @@ func (i *InverterBatteryVisImpl) inverterConnected(ski string, entity api.Entity
 }
 
 // a battery device entity was disconnected
-func (i *InverterBatteryVisImpl) inverterDisconnected() {
+func (i *InverterBatteryVis) inverterDisconnected() {
 	i.inverterEntity = nil
 
 	i.inverterElectricalConnection = nil

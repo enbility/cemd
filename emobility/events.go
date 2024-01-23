@@ -11,7 +11,7 @@ import (
 )
 
 // Internal EventHandler Interface for the CEM
-func (e *EMobilityImpl) HandleEvent(payload api.EventPayload) {
+func (e *EMobility) HandleEvent(payload api.EventPayload) {
 	// only care about the registered SKI
 	if payload.Ski != e.ski {
 		return
@@ -214,7 +214,7 @@ func (e *EMobilityImpl) HandleEvent(payload api.EventPayload) {
 	e.dataProvider.EVProvidedChargeStrategy(chargeStrategy)
 }
 
-func (e *EMobilityImpl) evWriteDefaultIncentives() {
+func (e *EMobility) evWriteDefaultIncentives() {
 	// send default incentives for the maximum timeframe
 	// to fullfill spec, as there is no data provided
 	logging.Log().Info("Fallback sending default incentives")
@@ -224,7 +224,7 @@ func (e *EMobilityImpl) evWriteDefaultIncentives() {
 	_ = e.EVWriteIncentives(data)
 }
 
-func (e *EMobilityImpl) evWriteDefaultPowerLimits() {
+func (e *EMobility) evWriteDefaultPowerLimits() {
 	// send default power limits for the maximum timeframe
 	// to fullfill spec, as there is no data provided
 	logging.Log().Info("Fallback sending default power limits")
@@ -253,7 +253,7 @@ func (e *EMobilityImpl) evWriteDefaultPowerLimits() {
 }
 
 // request time series values
-func (e *EMobilityImpl) evRequestTimeSeriesValues() {
+func (e *EMobility) evRequestTimeSeriesValues() {
 	if e.evTimeSeries == nil {
 		return
 	}
@@ -264,7 +264,7 @@ func (e *EMobilityImpl) evRequestTimeSeriesValues() {
 }
 
 // send the ev provided charge plan to the CEM
-func (e *EMobilityImpl) evForwardChargePlanIfProvided() {
+func (e *EMobility) evForwardChargePlanIfProvided() {
 	if e.dataProvider == nil {
 		return
 	}
@@ -279,7 +279,7 @@ func (e *EMobilityImpl) evForwardChargePlanIfProvided() {
 }
 
 // request incentive table values
-func (e *EMobilityImpl) evRequestIncentiveValues() {
+func (e *EMobility) evRequestIncentiveValues() {
 	if e.evIncentiveTable == nil {
 		return
 	}
@@ -290,7 +290,7 @@ func (e *EMobilityImpl) evRequestIncentiveValues() {
 }
 
 // process required steps when an evse is connected
-func (e *EMobilityImpl) evseConnected(ski string, entity api.EntityRemote) {
+func (e *EMobility) evseConnected(ski string, entity api.EntityRemoteInterface) {
 	e.evseEntity = entity
 	localDevice := e.service.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
@@ -312,7 +312,7 @@ func (e *EMobilityImpl) evseConnected(ski string, entity api.EntityRemote) {
 }
 
 // an EV was disconnected
-func (e *EMobilityImpl) evseDisconnected() {
+func (e *EMobility) evseDisconnected() {
 	e.evseEntity = nil
 
 	e.evseDeviceClassification = nil
@@ -322,7 +322,7 @@ func (e *EMobilityImpl) evseDisconnected() {
 }
 
 // an EV was disconnected, trigger required cleanup
-func (e *EMobilityImpl) evDisconnected() {
+func (e *EMobility) evDisconnected() {
 	if e.evEntity == nil {
 		return
 	}
@@ -345,7 +345,7 @@ func (e *EMobilityImpl) evDisconnected() {
 }
 
 // an EV was connected, trigger required communication
-func (e *EMobilityImpl) evConnected(entity api.EntityRemote) {
+func (e *EMobility) evConnected(entity api.EntityRemoteInterface) {
 	e.evEntity = entity
 	localDevice := e.service.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
@@ -514,7 +514,7 @@ func (e *EMobilityImpl) evConnected(entity api.EntityRemote) {
 // inform the EVSE about used currency and boundary units
 //
 // # SPINE UC CoordinatedEVCharging 2.4.3
-func (e *EMobilityImpl) evWriteIncentiveTableDescriptions() {
+func (e *EMobility) evWriteIncentiveTableDescriptions() {
 	if e.evIncentiveTable == nil {
 		return
 	}
@@ -577,7 +577,7 @@ func (e *EMobilityImpl) evWriteIncentiveTableDescriptions() {
 
 // check timeSeries descriptions if constraints element has updateRequired set to true
 // as this triggers the CEM to send power tables within 20s
-func (e *EMobilityImpl) evCheckTimeSeriesDescriptionConstraintsUpdateRequired() bool {
+func (e *EMobility) evCheckTimeSeriesDescriptionConstraintsUpdateRequired() bool {
 	if e.evTimeSeries == nil {
 		return false
 	}
@@ -596,7 +596,7 @@ func (e *EMobilityImpl) evCheckTimeSeriesDescriptionConstraintsUpdateRequired() 
 
 // check incentibeTable descriptions if the tariff description has updateRequired set to true
 // as this triggers the CEM to send incentive tables within 20s
-func (e *EMobilityImpl) evCheckIncentiveTableDescriptionUpdateRequired() bool {
+func (e *EMobility) evCheckIncentiveTableDescriptionUpdateRequired() bool {
 	if e.evIncentiveTable == nil {
 		return false
 	}

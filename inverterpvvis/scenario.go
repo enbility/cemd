@@ -3,27 +3,27 @@ package inverterpvvis
 import (
 	"sync"
 
-	"github.com/enbility/cemd/scenarios"
-	"github.com/enbility/eebus-go/api"
+	"github.com/enbility/cemd/api"
+	eebusapi "github.com/enbility/eebus-go/api"
 	shipapi "github.com/enbility/ship-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
 
 type InverterPVVisScenarioImpl struct {
-	*scenarios.ScenarioImpl
+	*api.Solution
 
-	remoteDevices map[string]*InverterPVVisImpl
+	remoteDevices map[string]*InverterPVVis
 
 	mux sync.Mutex
 }
 
-var _ scenarios.ScenariosI = (*InverterPVVisScenarioImpl)(nil)
+var _ api.SolutionInterface = (*InverterPVVisScenarioImpl)(nil)
 
-func NewInverterVisScenario(service api.EEBUSService) *InverterPVVisScenarioImpl {
+func NewInverterVisScenario(service eebusapi.ServiceInterface) *InverterPVVisScenarioImpl {
 	return &InverterPVVisScenarioImpl{
-		ScenarioImpl:  scenarios.NewScenarioImpl(service),
-		remoteDevices: make(map[string]*InverterPVVisImpl),
+		Solution:      api.NewSolution(service),
+		remoteDevices: make(map[string]*InverterPVVis),
 	}
 }
 

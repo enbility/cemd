@@ -26,9 +26,9 @@ type WriteMessageHandler struct {
 	mux sync.Mutex
 }
 
-var _ shipapi.SpineDataConnection = (*WriteMessageHandler)(nil)
+var _ shipapi.ShipConnectionDataWriterInterface = (*WriteMessageHandler)(nil)
 
-func (t *WriteMessageHandler) WriteSpineMessage(message []byte) {
+func (t *WriteMessageHandler) WriteShipMessageWithPayload(message []byte) {
 	t.mux.Lock()
 	defer t.mux.Unlock()
 
@@ -101,11 +101,11 @@ func (t *WriteMessageHandler) ResultWithReference(msgCounterReference *model.Msg
 const remoteSki string = "testremoteski"
 
 // we don't want to handle events in these tests for now, so we don't use NewEMobility(...)
-func NewTestEMobility(service api.EEBUSService, details *shipapi.ServiceDetails) *EMobilityImpl {
+func NewTestEMobility(service api.ServiceInterface, details *shipapi.ServiceDetails) *EMobility {
 	ski := util.NormalizeSKI(details.SKI())
 
 	localEntity := service.LocalDevice().Entity([]model.AddressEntityType{1})
-	emobility := &EMobilityImpl{
+	emobility := &EMobility{
 		service: service,
 		entity:  localEntity,
 		ski:     ski,
@@ -116,7 +116,7 @@ func NewTestEMobility(service api.EEBUSService, details *shipapi.ServiceDetails)
 	return emobility
 }
 
-func setupEmobility(t *testing.T) (*EMobilityImpl, api.EEBUSService) {
+func setupEmobility(t *testing.T) (*EMobility, api.ServiceInterface) {
 	cert, _ := cert.CreateCertificate("test", "test", "DE", "test")
 	configuration, _ := api.NewConfiguration(
 		"test", "test", "test", "test",
@@ -124,40 +124,46 @@ func setupEmobility(t *testing.T) (*EMobilityImpl, api.EEBUSService) {
 		[]model.EntityTypeType{model.EntityTypeTypeCEM},
 		9999, cert, 230.0, time.Second*4)
 
-	serviceHandler := mocks.NewEEBUSServiceHandler(t)
+	serviceHandler := mocks.NewServiceReaderInterface(t)
 	serviceHandler.EXPECT().ServicePairingDetailUpdate(mock.Anything, mock.Anything).Return().Maybe()
 
-	eebusService := service.NewEEBUSService(configuration, serviceHandler)
+	eebusService := service.NewService(configuration, serviceHandler)
 	_ = eebusService.Setup()
 	details := shipapi.NewServiceDetails(remoteSki)
 	emobility := NewTestEMobility(eebusService, details)
 	return emobility, eebusService
 }
 
-func setupDevices(eebusService api.EEBUSService) (spineapi.DeviceLocal, spineapi.EntityLocal, spineapi.DeviceRemote, []spineapi.EntityRemote, *WriteMessageHandler) {
+func setupDevices(
+	eebusService api.ServiceInterface) (
+	spineapi.DeviceLocalInterface,
+	spineapi.EntityLocalInterface,
+	spineapi.DeviceRemoteInterface,
+	[]spineapi.EntityRemoteInterface,
+	*WriteMessageHandler) {
 	localDevice := eebusService.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
 
-	f := spine.NewFeatureLocalImpl(1, localEntity, model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient)
+	f := spine.NewFeatureLocal(1, localEntity, model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient)
 	localEntity.AddFeature(f)
-	f = spine.NewFeatureLocalImpl(2, localEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient)
+	f = spine.NewFeatureLocal(2, localEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient)
 	localEntity.AddFeature(f)
-	f = spine.NewFeatureLocalImpl(3, localEntity, model.FeatureTypeTypeMeasurement, model.RoleTypeClient)
+	f = spine.NewFeatureLocal(3, localEntity, model.FeatureTypeTypeMeasurement, model.RoleTypeClient)
 	localEntity.AddFeature(f)
-	f = spine.NewFeatureLocalImpl(4, localEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeClient)
+	f = spine.NewFeatureLocal(4, localEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeClient)
 	localEntity.AddFeature(f)
-	f = spine.NewFeatureLocalImpl(5, localEntity, model.FeatureTypeTypeIdentification, model.RoleTypeClient)
+	f = spine.NewFeatureLocal(5, localEntity, model.FeatureTypeTypeIdentification, model.RoleTypeClient)
 	localEntity.AddFeature(f)
-	f = spine.NewFeatureLocalImpl(6, localEntity, model.FeatureTypeTypeLoadControl, model.RoleTypeClient)
+	f = spine.NewFeatureLocal(6, localEntity, model.FeatureTypeTypeLoadControl, model.RoleTypeClient)
 	localEntity.AddFeature(f)
-	f = spine.NewFeatureLocalImpl(6, localEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeClient)
+	f = spine.NewFeatureLocal(6, localEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeClient)
 	localEntity.AddFeature(f)
-	f = spine.NewFeatureLocalImpl(6, localEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeClient)
+	f = spine.NewFeatureLocal(6, localEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeClient)
 	localEntity.AddFeature(f)
 
 	writeHandler := &WriteMessageHandler{}
 	sender := spine.NewSender(writeHandler)
-	remoteDevice := spine.NewDeviceRemoteImpl(localDevice, remoteSki, sender)
+	remoteDevice := spine.NewDeviceRemote(localDevice, remoteSki, sender)
 
 	var clientRemoteFeatures = []struct {
 		featureType   model.FeatureTypeType
@@ -285,7 +291,13 @@ func setupDevices(eebusService api.EEBUSService) (spineapi.DeviceLocal, spineapi
 	return localDevice, localEntity, remoteDevice, entities, writeHandler
 }
 
-func datagramForEntityAndFeatures(notify bool, localDevice spineapi.DeviceLocal, localEntity spineapi.EntityLocal, remoteEntity spineapi.EntityRemote, featureType model.FeatureTypeType, remoteRole, localRole model.RoleType) model.DatagramType {
+func datagramForEntityAndFeatures(
+	notify bool,
+	localDevice spineapi.DeviceLocalInterface,
+	localEntity spineapi.EntityLocalInterface,
+	remoteEntity spineapi.EntityRemoteInterface,
+	featureType model.FeatureTypeType,
+	remoteRole, localRole model.RoleType) model.DatagramType {
 	var addressSource, addressDestination *model.FeatureAddressType
 	if remoteEntity == nil {
 		// NodeManagement
@@ -324,7 +336,10 @@ func datagramForEntityAndFeatures(notify bool, localDevice spineapi.DeviceLocal,
 	return datagram
 }
 
-func featureOfTypeAndRole(entity spineapi.EntityRemote, featureType model.FeatureTypeType, role model.RoleType) spineapi.FeatureRemote {
+func featureOfTypeAndRole(
+	entity spineapi.EntityRemoteInterface,
+	featureType model.FeatureTypeType,
+	role model.RoleType) spineapi.FeatureRemoteInterface {
 	for _, f := range entity.Features() {
 		if f.Type() == featureType && f.Role() == role {
 			return f
@@ -333,7 +348,9 @@ func featureOfTypeAndRole(entity spineapi.EntityRemote, featureType model.Featur
 	return nil
 }
 
-func deviceDiagnosis(localEntity spineapi.EntityLocal, entity spineapi.EntityRemote) *features.DeviceDiagnosis {
+func deviceDiagnosis(
+	localEntity spineapi.EntityLocalInterface,
+	entity spineapi.EntityRemoteInterface) *features.DeviceDiagnosis {
 	feature, err := features.NewDeviceDiagnosis(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -341,7 +358,9 @@ func deviceDiagnosis(localEntity spineapi.EntityLocal, entity spineapi.EntityRem
 	return feature
 }
 
-func electricalConnection(localEntity spineapi.EntityLocal, entity spineapi.EntityRemote) *features.ElectricalConnection {
+func electricalConnection(
+	localEntity spineapi.EntityLocalInterface,
+	entity spineapi.EntityRemoteInterface) *features.ElectricalConnection {
 	feature, err := features.NewElectricalConnection(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -349,7 +368,9 @@ func electricalConnection(localEntity spineapi.EntityLocal, entity spineapi.Enti
 	return feature
 }
 
-func measurement(localEntity spineapi.EntityLocal, entity spineapi.EntityRemote) *features.Measurement {
+func measurement(
+	localEntity spineapi.EntityLocalInterface,
+	entity spineapi.EntityRemoteInterface) *features.Measurement {
 	feature, err := features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -357,7 +378,9 @@ func measurement(localEntity spineapi.EntityLocal, entity spineapi.EntityRemote)
 	return feature
 }
 
-func deviceConfiguration(localEntity spineapi.EntityLocal, entity spineapi.EntityRemote) *features.DeviceConfiguration {
+func deviceConfiguration(
+	localEntity spineapi.EntityLocalInterface,
+	entity spineapi.EntityRemoteInterface) *features.DeviceConfiguration {
 	feature, err := features.NewDeviceConfiguration(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -365,7 +388,9 @@ func deviceConfiguration(localEntity spineapi.EntityLocal, entity spineapi.Entit
 	return feature
 }
 
-func identificationConfiguration(localEntity spineapi.EntityLocal, entity spineapi.EntityRemote) *features.Identification {
+func identificationConfiguration(
+	localEntity spineapi.EntityLocalInterface,
+	entity spineapi.EntityRemoteInterface) *features.Identification {
 	feature, err := features.NewIdentification(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -373,7 +398,9 @@ func identificationConfiguration(localEntity spineapi.EntityLocal, entity spinea
 	return feature
 }
 
-func loadcontrol(localEntity spineapi.EntityLocal, entity spineapi.EntityRemote) *features.LoadControl {
+func loadcontrol(
+	localEntity spineapi.EntityLocalInterface,
+	entity spineapi.EntityRemoteInterface) *features.LoadControl {
 	feature, err := features.NewLoadControl(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -381,7 +408,9 @@ func loadcontrol(localEntity spineapi.EntityLocal, entity spineapi.EntityRemote)
 	return feature
 }
 
-func timeSeriesConfiguration(localEntity spineapi.EntityLocal, entity spineapi.EntityRemote) *features.TimeSeries {
+func timeSeriesConfiguration(
+	localEntity spineapi.EntityLocalInterface,
+	entity spineapi.EntityRemoteInterface) *features.TimeSeries {
 	feature, err := features.NewTimeSeries(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		fmt.Println(err)
@@ -389,7 +418,9 @@ func timeSeriesConfiguration(localEntity spineapi.EntityLocal, entity spineapi.E
 	return feature
 }
 
-func incentiveTableConfiguration(localEntity spineapi.EntityLocal, entity spineapi.EntityRemote) *features.IncentiveTable {
+func incentiveTableConfiguration(
+	localEntity spineapi.EntityLocalInterface,
+	entity spineapi.EntityRemoteInterface) *features.IncentiveTable {
 	feature, err := features.NewIncentiveTable(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
 	if err != nil {
 		fmt.Println(err)

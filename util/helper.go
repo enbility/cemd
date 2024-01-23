@@ -10,7 +10,10 @@ import (
 var PhaseNameMapping = []model.ElectricalConnectionPhaseNameType{model.ElectricalConnectionPhaseNameTypeA, model.ElectricalConnectionPhaseNameTypeB, model.ElectricalConnectionPhaseNameTypeC}
 
 // check if the given usecase, actor is supported by the remote device
-func IsUsecaseSupported(usecase model.UseCaseNameType, actor model.UseCaseActorType, remoteDevice spineapi.DeviceRemote) bool {
+func IsUsecaseSupported(
+	usecase model.UseCaseNameType,
+	actor model.UseCaseActorType,
+	remoteDevice spineapi.DeviceRemoteInterface) bool {
 	uci := remoteDevice.UseCases()
 
 	for _, element := range uci {
@@ -28,7 +31,10 @@ func IsUsecaseSupported(usecase model.UseCaseNameType, actor model.UseCaseActorT
 }
 
 // return the remote entity of a given type and device ski
-func EntityOfTypeForSki(service api.EEBUSService, entityType model.EntityTypeType, ski string) (spineapi.EntityRemote, error) {
+func EntityOfTypeForSki(
+	service api.ServiceInterface,
+	entityType model.EntityTypeType,
+	ski string) (spineapi.EntityRemoteInterface, error) {
 	rDevice := service.LocalDevice().RemoteDeviceForSki(ski)
 
 	if rDevice == nil {

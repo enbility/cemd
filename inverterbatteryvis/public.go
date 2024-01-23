@@ -14,7 +14,7 @@ import (
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (i *InverterBatteryVisImpl) CurrentDisChargePower() (float64, error) {
+func (i *InverterBatteryVis) CurrentDisChargePower() (float64, error) {
 	measurement := model.MeasurementTypeTypePower
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACPowerTotal
@@ -39,7 +39,7 @@ func (i *InverterBatteryVisImpl) CurrentDisChargePower() (float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (i *InverterBatteryVisImpl) TotalChargeEnergy() (float64, error) {
+func (i *InverterBatteryVis) TotalChargeEnergy() (float64, error) {
 	measurement := model.MeasurementTypeTypeEnergy
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeCharge
@@ -62,7 +62,7 @@ func (i *InverterBatteryVisImpl) TotalChargeEnergy() (float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (i *InverterBatteryVisImpl) TotalDischargeEnergy() (float64, error) {
+func (i *InverterBatteryVis) TotalDischargeEnergy() (float64, error) {
 	measurement := model.MeasurementTypeTypeEnergy
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeDischarge
@@ -85,7 +85,7 @@ func (i *InverterBatteryVisImpl) TotalDischargeEnergy() (float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (i *InverterBatteryVisImpl) CurrentStateOfCharge() (float64, error) {
+func (i *InverterBatteryVis) CurrentStateOfCharge() (float64, error) {
 	measurement := model.MeasurementTypeTypePercentage
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeStateOfCharge
@@ -105,7 +105,7 @@ func (i *InverterBatteryVisImpl) CurrentStateOfCharge() (float64, error) {
 
 // helper
 
-func (i *InverterBatteryVisImpl) getValuesForTypeCommodityScope(measurement model.MeasurementTypeType, commodity model.CommodityTypeType, scope model.ScopeTypeType) ([]model.MeasurementDataType, error) {
+func (i *InverterBatteryVis) getValuesForTypeCommodityScope(measurement model.MeasurementTypeType, commodity model.CommodityTypeType, scope model.ScopeTypeType) ([]model.MeasurementDataType, error) {
 	if i.inverterEntity == nil {
 		return nil, util.ErrDeviceDisconnected
 	}

@@ -4,5 +4,5 @@ import (
 	"github.com/enbility/spine-go/api"
 )
 
-func (i *InverterBatteryVisImpl) HandleResult(errorMsg api.ResultMessage) {
+func (i *InverterBatteryVis) HandleResult(errorMsg api.ResultMessage) {
 }

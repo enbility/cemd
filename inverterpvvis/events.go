@@ -8,7 +8,7 @@ import (
 )
 
 // Internal EventHandler Interface for the CEM
-func (i *InverterPVVisImpl) HandleEvent(payload api.EventPayload) {
+func (i *InverterPVVis) HandleEvent(payload api.EventPayload) {
 	// we only care about the registered SKI
 	if payload.Ski != i.ski {
 		return
@@ -89,7 +89,7 @@ func (i *InverterPVVisImpl) HandleEvent(payload api.EventPayload) {
 }
 
 // process required steps when a pv device entity is connected
-func (e *InverterPVVisImpl) inverterConnected(ski string, entity api.EntityRemote) {
+func (e *InverterPVVis) inverterConnected(ski string, entity api.EntityRemoteInterface) {
 	e.inverterEntity = entity
 	localDevice := e.service.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
@@ -148,7 +148,7 @@ func (e *InverterPVVisImpl) inverterConnected(ski string, entity api.EntityRemot
 }
 
 // a pv device entity was disconnected
-func (e *InverterPVVisImpl) inverterDisconnected() {
+func (e *InverterPVVis) inverterDisconnected() {
 	e.inverterMeasurement = nil
 
 	e.inverterElectricalConnection = nil

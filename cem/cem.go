@@ -9,14 +9,14 @@ import (
 
 // Generic CEM implementation
 type CemImpl struct {
-	Service api.EEBUSService
+	Service api.ServiceInterface
 
 	Currency model.CurrencyType
 }
 
-func NewCEM(serviceDescription *api.Configuration, serviceHandler api.EEBUSServiceHandler, log logging.Logging) *CemImpl {
+func NewCEM(serviceDescription *api.Configuration, serviceHandler api.ServiceReaderInterface, log logging.LoggingInterface) *CemImpl {
 	cem := &CemImpl{
-		Service:  service.NewEEBUSService(serviceDescription, serviceHandler),
+		Service:  service.NewService(serviceDescription, serviceHandler),
 		Currency: model.CurrencyTypeEur,
 	}
 

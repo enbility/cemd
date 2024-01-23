@@ -1,7 +1,7 @@
 package inverterpvvis
 
 import (
-	"github.com/enbility/eebus-go/api"
+	eebusapi "github.com/enbility/eebus-go/api"
 	"github.com/enbility/eebus-go/features"
 	shipapi "github.com/enbility/ship-go/api"
 	"github.com/enbility/ship-go/util"
@@ -10,18 +10,12 @@ import (
 	"github.com/enbility/spine-go/spine"
 )
 
-type InverterPVVisI interface {
-	CurrentProductionPower() (float64, error)
-	NominalPeakPower() (float64, error)
-	TotalPVYield() (float64, error)
-}
+type InverterPVVis struct {
+	entity spineapi.EntityLocalInterface
 
-type InverterPVVisImpl struct {
-	entity spineapi.EntityLocal
+	service eebusapi.ServiceInterface
 
-	service api.EEBUSService
-
-	inverterEntity               spineapi.EntityRemote
+	inverterEntity               spineapi.EntityRemoteInterface
 	inverterDeviceConfiguration  *features.DeviceConfiguration
 	inverterElectricalConnection *features.ElectricalConnection
 	inverterMeasurement          *features.Measurement
@@ -29,15 +23,15 @@ type InverterPVVisImpl struct {
 	ski string
 }
 
-var _ InverterPVVisI = (*InverterPVVisImpl)(nil)
+var _ InverterPVVisInterface = (*InverterPVVis)(nil)
 
 // Add InverterPVVis support
-func NewInverterPVVis(service api.EEBUSService, details *shipapi.ServiceDetails) *InverterPVVisImpl {
+func NewInverterPVVis(service eebusapi.ServiceInterface, details *shipapi.ServiceDetails) *InverterPVVis {
 	ski := util.NormalizeSKI(details.SKI())
 
 	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
-	inverter := &InverterPVVisImpl{
+	inverter := &InverterPVVis{
 		service: service,
 		entity:  localEntity,
 		ski:     ski,

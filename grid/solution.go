@@ -3,32 +3,32 @@ package grid
 import (
 	"sync"
 
-	"github.com/enbility/cemd/scenarios"
-	"github.com/enbility/eebus-go/api"
+	"github.com/enbility/cemd/api"
+	eebusapi "github.com/enbility/eebus-go/api"
 	shipapi "github.com/enbility/ship-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
 
-type GridScenarioImpl struct {
-	*scenarios.ScenarioImpl
+type GridSolution struct {
+	*api.Solution
 
-	remoteDevices map[string]*GridImpl
+	remoteDevices map[string]*Grid
 
 	mux sync.Mutex
 }
 
-var _ scenarios.ScenariosI = (*GridScenarioImpl)(nil)
+var _ api.SolutionInterface = (*GridSolution)(nil)
 
-func NewGridScenario(service api.EEBUSService) *GridScenarioImpl {
-	return &GridScenarioImpl{
-		ScenarioImpl:  scenarios.NewScenarioImpl(service),
-		remoteDevices: make(map[string]*GridImpl),
+func NewGridScenario(service eebusapi.ServiceInterface) *GridSolution {
+	return &GridSolution{
+		Solution:      api.NewSolution(service),
+		remoteDevices: make(map[string]*Grid),
 	}
 }
 
 // adds all the supported features to the local entity
-func (e *GridScenarioImpl) AddFeatures() {
+func (e *GridSolution) AddFeatures() {
 	localEntity := e.Service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	// client features
@@ -44,7 +44,7 @@ func (e *GridScenarioImpl) AddFeatures() {
 }
 
 // add supported grid usecases
-func (e *GridScenarioImpl) AddUseCases() {
+func (e *GridSolution) AddUseCases() {
 	localEntity := e.Service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	localEntity.AddUseCaseSupport(
@@ -56,7 +56,7 @@ func (e *GridScenarioImpl) AddUseCases() {
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7})
 }
 
-func (e *GridScenarioImpl) RegisterRemoteDevice(details *shipapi.ServiceDetails, dataProvider any) any {
+func (e *GridSolution) RegisterRemoteDevice(details *shipapi.ServiceDetails, dataProvider any) any {
 	// TODO: grid should be stored per remote SKI and
 	// only be set for the SKI if the device supports it
 	e.mux.Lock()
@@ -71,7 +71,7 @@ func (e *GridScenarioImpl) RegisterRemoteDevice(details *shipapi.ServiceDetails,
 	return grid
 }
 
-func (e *GridScenarioImpl) UnRegisterRemoteDevice(remoteDeviceSki string) {
+func (e *GridSolution) UnRegisterRemoteDevice(remoteDeviceSki string) {
 	e.mux.Lock()
 	defer e.mux.Unlock()
 
@@ -80,7 +80,7 @@ func (e *GridScenarioImpl) UnRegisterRemoteDevice(remoteDeviceSki string) {
 	e.Service.RegisterRemoteSKI(remoteDeviceSki, false)
 }
 
-func (e *GridScenarioImpl) HandleResult(errorMsg spineapi.ResultMessage) {
+func (e *GridSolution) HandleResult(errorMsg spineapi.ResultMessage) {
 	e.mux.Lock()
 	defer e.mux.Unlock()
 

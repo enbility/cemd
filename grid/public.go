@@ -12,7 +12,7 @@ import (
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - ErrNotSupported if getting the communication standard is not supported
 //   - and others
-func (g *GridImpl) PowerLimitationFactor() (float64, error) {
+func (g *Grid) PowerLimitationFactor() (float64, error) {
 	if g.gridEntity == nil {
 		return 0, util.ErrDeviceDisconnected
 	}
@@ -47,7 +47,7 @@ func (g *GridImpl) PowerLimitationFactor() (float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (g *GridImpl) MomentaryPowerConsumptionOrProduction() (float64, error) {
+func (g *Grid) MomentaryPowerConsumptionOrProduction() (float64, error) {
 	measurement := model.MeasurementTypeTypePower
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACPowerTotal
@@ -84,7 +84,7 @@ func (g *GridImpl) MomentaryPowerConsumptionOrProduction() (float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (g *GridImpl) TotalFeedInEnergy() (float64, error) {
+func (g *Grid) TotalFeedInEnergy() (float64, error) {
 	measurement := model.MeasurementTypeTypeEnergy
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeGridFeedIn
@@ -107,7 +107,7 @@ func (g *GridImpl) TotalFeedInEnergy() (float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (g *GridImpl) TotalConsumedEnergy() (float64, error) {
+func (g *Grid) TotalConsumedEnergy() (float64, error) {
 	measurement := model.MeasurementTypeTypeEnergy
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeGridConsumption
@@ -130,7 +130,7 @@ func (g *GridImpl) TotalConsumedEnergy() (float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (g *GridImpl) MomentaryCurrentConsumptionOrProduction() ([]float64, error) {
+func (g *Grid) MomentaryCurrentConsumptionOrProduction() ([]float64, error) {
 	measurement := model.MeasurementTypeTypeCurrent
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACCurrent
@@ -181,7 +181,7 @@ func (g *GridImpl) MomentaryCurrentConsumptionOrProduction() ([]float64, error) 
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (g *GridImpl) Voltage() ([]float64, error) {
+func (g *Grid) Voltage() ([]float64, error) {
 	measurement := model.MeasurementTypeTypeVoltage
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACVoltage
@@ -222,7 +222,7 @@ func (g *GridImpl) Voltage() ([]float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (g *GridImpl) Frequency() (float64, error) {
+func (g *Grid) Frequency() (float64, error) {
 	measurement := model.MeasurementTypeTypeFrequency
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACFrequency
@@ -242,7 +242,7 @@ func (g *GridImpl) Frequency() (float64, error) {
 
 // helper
 
-func (g *GridImpl) getValuesForTypeCommodityScope(measurement model.MeasurementTypeType, commodity model.CommodityTypeType, scope model.ScopeTypeType) ([]model.MeasurementDataType, error) {
+func (g *Grid) getValuesForTypeCommodityScope(measurement model.MeasurementTypeType, commodity model.CommodityTypeType, scope model.ScopeTypeType) ([]model.MeasurementDataType, error) {
 	if g.gridEntity == nil {
 		return nil, util.ErrDeviceDisconnected
 	}

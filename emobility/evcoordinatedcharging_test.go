@@ -276,7 +276,11 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func setupTimeSeries(t *testing.T, datagram model.DatagramType, localDevice api.DeviceLocal, remoteDevice api.DeviceRemote) {
+func setupTimeSeries(
+	t *testing.T,
+	datagram model.DatagramType,
+	localDevice api.DeviceLocalInterface,
+	remoteDevice api.DeviceRemoteInterface) {
 	cmd := []model.CmdType{{
 		TimeSeriesConstraintsListData: &model.TimeSeriesConstraintsListDataType{
 			TimeSeriesConstraintsData: []model.TimeSeriesConstraintsDataType{
@@ -325,7 +329,11 @@ func setupTimeSeries(t *testing.T, datagram model.DatagramType, localDevice api.
 	assert.Nil(t, err)
 }
 
-func setupIncentiveTable(t *testing.T, datagram model.DatagramType, localDevice api.DeviceLocal, remoteDevice api.DeviceRemote) {
+func setupIncentiveTable(
+	t *testing.T,
+	datagram model.DatagramType,
+	localDevice api.DeviceLocalInterface,
+	remoteDevice api.DeviceRemoteInterface) {
 	cmd := []model.CmdType{{
 		IncentiveTableDescriptionData: &model.IncentiveTableDescriptionDataType{
 			IncentiveTableDescription: []model.IncentiveTableDescriptionType{

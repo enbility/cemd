@@ -11,7 +11,7 @@ import (
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (i *InverterPVVisImpl) CurrentProductionPower() (float64, error) {
+func (i *InverterPVVis) CurrentProductionPower() (float64, error) {
 	measurement := model.MeasurementTypeTypePower
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACPowerTotal
@@ -36,7 +36,7 @@ func (i *InverterPVVisImpl) CurrentProductionPower() (float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (i *InverterPVVisImpl) NominalPeakPower() (float64, error) {
+func (i *InverterPVVis) NominalPeakPower() (float64, error) {
 	if i.inverterEntity == nil {
 		return 0, util.ErrDeviceDisconnected
 	}
@@ -73,7 +73,7 @@ func (i *InverterPVVisImpl) NominalPeakPower() (float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (i *InverterPVVisImpl) TotalPVYield() (float64, error) {
+func (i *InverterPVVis) TotalPVYield() (float64, error) {
 	measurement := model.MeasurementTypeTypeEnergy
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACYieldTotal
@@ -93,7 +93,7 @@ func (i *InverterPVVisImpl) TotalPVYield() (float64, error) {
 
 // helper
 
-func (i *InverterPVVisImpl) getValuesForTypeCommodityScope(measurement model.MeasurementTypeType, commodity model.CommodityTypeType, scope model.ScopeTypeType) ([]model.MeasurementDataType, error) {
+func (i *InverterPVVis) getValuesForTypeCommodityScope(measurement model.MeasurementTypeType, commodity model.CommodityTypeType, scope model.ScopeTypeType) ([]model.MeasurementDataType, error) {
 	if i.inverterEntity == nil {
 		return nil, util.ErrDeviceDisconnected
 	}

@@ -10,22 +10,12 @@ import (
 	"github.com/enbility/spine-go/spine"
 )
 
-type GridI interface {
-	PowerLimitationFactor() (float64, error)
-	MomentaryPowerConsumptionOrProduction() (float64, error)
-	TotalFeedInEnergy() (float64, error)
-	TotalConsumedEnergy() (float64, error)
-	MomentaryCurrentConsumptionOrProduction() ([]float64, error)
-	Voltage() ([]float64, error)
-	Frequency() (float64, error)
-}
+type Grid struct {
+	entity spineapi.EntityLocalInterface
 
-type GridImpl struct {
-	entity spineapi.EntityLocal
+	service api.ServiceInterface
 
-	service api.EEBUSService
-
-	gridEntity spineapi.EntityRemote
+	gridEntity spineapi.EntityRemoteInterface
 
 	gridDeviceConfiguration  *features.DeviceConfiguration
 	gridElectricalConnection *features.ElectricalConnection
@@ -34,15 +24,15 @@ type GridImpl struct {
 	ski string
 }
 
-var _ GridI = (*GridImpl)(nil)
+var _ GridInterface = (*Grid)(nil)
 
 // Add Grid support
-func NewGrid(service api.EEBUSService, details *shipapi.ServiceDetails) *GridImpl {
+func NewGrid(service api.ServiceInterface, details *shipapi.ServiceDetails) *Grid {
 	ski := util.NormalizeSKI(details.SKI())
 
 	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
-	grid := &GridImpl{
+	grid := &Grid{
 		service: service,
 		entity:  localEntity,
 		ski:     ski,

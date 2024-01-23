@@ -10,34 +10,27 @@ import (
 	"github.com/enbility/spine-go/spine"
 )
 
-type InverterBatteryVisI interface {
-	CurrentDisChargePower() (float64, error)
-	TotalChargeEnergy() (float64, error)
-	TotalDischargeEnergy() (float64, error)
-	CurrentStateOfCharge() (float64, error)
-}
+type InverterBatteryVis struct {
+	entity spineapi.EntityLocalInterface
 
-type InverterBatteryVisImpl struct {
-	entity spineapi.EntityLocal
+	service api.ServiceInterface
 
-	service api.EEBUSService
-
-	inverterEntity               spineapi.EntityRemote
+	inverterEntity               spineapi.EntityRemoteInterface
 	inverterElectricalConnection *features.ElectricalConnection
 	inverterMeasurement          *features.Measurement
 
 	ski string
 }
 
-var _ InverterBatteryVisI = (*InverterBatteryVisImpl)(nil)
+var _ InverterBatteryVisInterface = (*InverterBatteryVis)(nil)
 
 // Add InverterBatteryVis support
-func NewInverterBatteryVis(service api.EEBUSService, details *shipapi.ServiceDetails) *InverterBatteryVisImpl {
+func NewInverterBatteryVis(service api.ServiceInterface, details *shipapi.ServiceDetails) *InverterBatteryVis {
 	ski := util.NormalizeSKI(details.SKI())
 
 	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
-	inverter := &InverterBatteryVisImpl{
+	inverter := &InverterBatteryVis{
 		service: service,
 		entity:  localEntity,
 		ski:     ski,

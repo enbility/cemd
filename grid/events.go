@@ -8,7 +8,7 @@ import (
 )
 
 // Internal EventHandler Interface for the CEM
-func (e *GridImpl) HandleEvent(payload api.EventPayload) {
+func (e *Grid) HandleEvent(payload api.EventPayload) {
 	// we only care about the registered SKI
 	if payload.Ski != e.ski {
 		return
@@ -64,7 +64,7 @@ func (e *GridImpl) HandleEvent(payload api.EventPayload) {
 }
 
 // process required steps when a grid device is connected
-func (e *GridImpl) gridConnected(ski string, entity api.EntityRemote) {
+func (e *Grid) gridConnected(ski string, entity api.EntityRemoteInterface) {
 	e.gridEntity = entity
 	localDevice := e.service.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
@@ -131,7 +131,7 @@ func (e *GridImpl) gridConnected(ski string, entity api.EntityRemote) {
 }
 
 // a grid device was disconnected
-func (e *GridImpl) gridDisconnected() {
+func (e *Grid) gridDisconnected() {
 	e.gridEntity = nil
 
 	e.gridDeviceConfiguration = nil
