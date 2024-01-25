@@ -4,14 +4,21 @@ import (
 	"testing"
 
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func Test_EVSoC(t *testing.T) {
 	emobilty, eebusService := setupEmobility(t)
 
-	data, err := emobilty.EVSoC()
+	mockRemoteDevice := mocks.NewDeviceRemoteInterface(t)
+	mockRemoteEntity := mocks.NewEntityRemoteInterface(t)
+	mockRemoteFeature := mocks.NewFeatureRemoteInterface(t)
+	mockRemoteDevice.EXPECT().FeatureByEntityTypeAndRole(mock.Anything, mock.Anything, mock.Anything).Return(mockRemoteFeature)
+	mockRemoteEntity.EXPECT().Device().Return(mockRemoteDevice)
+	data, err := emobilty.EVSoC(mockRemoteEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
@@ -19,13 +26,11 @@ func Test_EVSoC(t *testing.T) {
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	data, err = emobilty.EVSoC()
+	data, err = emobilty.EVSoC(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
-	emobilty.evMeasurement = measurement(localEntity, emobilty.evEntity)
-
-	data, err = emobilty.EVSoC()
+	data, err = emobilty.EVSoC(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
@@ -51,7 +56,7 @@ func Test_EVSoC(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVSoC()
+	data, err = emobilty.EVSoC(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
@@ -73,7 +78,7 @@ func Test_EVSoC(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVSoC()
+	data, err = emobilty.EVSoC(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
@@ -92,7 +97,7 @@ func Test_EVSoC(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVSoC()
+	data, err = emobilty.EVSoC(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
@@ -112,7 +117,7 @@ func Test_EVSoC(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVSoC()
+	data, err = emobilty.EVSoC(emobilty.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, 80.0, data)
 }

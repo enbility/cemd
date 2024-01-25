@@ -4,14 +4,21 @@ import (
 	"testing"
 
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func Test_EVCommunicationStandard(t *testing.T) {
 	emobilty, eebusService := setupEmobility(t)
 
-	data, err := emobilty.EVCommunicationStandard()
+	mockRemoteDevice := mocks.NewDeviceRemoteInterface(t)
+	mockRemoteEntity := mocks.NewEntityRemoteInterface(t)
+	mockRemoteFeature := mocks.NewFeatureRemoteInterface(t)
+	mockRemoteDevice.EXPECT().FeatureByEntityTypeAndRole(mock.Anything, mock.Anything, mock.Anything).Return(mockRemoteFeature)
+	mockRemoteEntity.EXPECT().Device().Return(mockRemoteDevice)
+	data, err := emobilty.EVCommunicationStandard(mockRemoteEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, EVCommunicationStandardTypeUnknown, data)
 
@@ -19,13 +26,11 @@ func Test_EVCommunicationStandard(t *testing.T) {
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	data, err = emobilty.EVCommunicationStandard()
+	data, err = emobilty.EVCommunicationStandard(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, EVCommunicationStandardTypeUnknown, data)
 
-	emobilty.evDeviceConfiguration = deviceConfiguration(localEntity, emobilty.evEntity)
-
-	data, err = emobilty.EVCommunicationStandard()
+	data, err = emobilty.EVCommunicationStandard(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, EVCommunicationStandardTypeUnknown, data)
 
@@ -45,7 +50,7 @@ func Test_EVCommunicationStandard(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVCommunicationStandard()
+	data, err = emobilty.EVCommunicationStandard(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, EVCommunicationStandardTypeUnknown, data)
 
@@ -63,7 +68,7 @@ func Test_EVCommunicationStandard(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVCommunicationStandard()
+	data, err = emobilty.EVCommunicationStandard(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, EVCommunicationStandardTypeUnknown, data)
 
@@ -83,7 +88,7 @@ func Test_EVCommunicationStandard(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVCommunicationStandard()
+	data, err = emobilty.EVCommunicationStandard(emobilty.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, EVCommunicationStandardTypeISO151182ED1, data)
 }

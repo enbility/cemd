@@ -4,14 +4,21 @@ import (
 	"testing"
 
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func Test_EVCurrentLimits(t *testing.T) {
 	emobilty, eebusService := setupEmobility(t)
 
-	minData, maxData, defaultData, err := emobilty.EVCurrentLimits()
+	mockRemoteDevice := mocks.NewDeviceRemoteInterface(t)
+	mockRemoteEntity := mocks.NewEntityRemoteInterface(t)
+	mockRemoteFeature := mocks.NewFeatureRemoteInterface(t)
+	mockRemoteDevice.EXPECT().FeatureByEntityTypeAndRole(mock.Anything, mock.Anything, mock.Anything).Return(mockRemoteFeature)
+	mockRemoteEntity.EXPECT().Device().Return(mockRemoteDevice)
+	minData, maxData, defaultData, err := emobilty.EVCurrentLimits(mockRemoteEntity)
 	assert.NotNil(t, err)
 	assert.Nil(t, minData)
 	assert.Nil(t, maxData)
@@ -21,15 +28,13 @@ func Test_EVCurrentLimits(t *testing.T) {
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	minData, maxData, defaultData, err = emobilty.EVCurrentLimits()
+	minData, maxData, defaultData, err = emobilty.EVCurrentLimits(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Nil(t, minData)
 	assert.Nil(t, maxData)
 	assert.Nil(t, defaultData)
 
-	emobilty.evElectricalConnection = electricalConnection(localEntity, emobilty.evEntity)
-
-	minData, maxData, defaultData, err = emobilty.EVCurrentLimits()
+	minData, maxData, defaultData, err = emobilty.EVCurrentLimits(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Nil(t, minData)
 	assert.Nil(t, maxData)
@@ -66,7 +71,7 @@ func Test_EVCurrentLimits(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	minData, maxData, defaultData, err = emobilty.EVCurrentLimits()
+	minData, maxData, defaultData, err = emobilty.EVCurrentLimits(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Nil(t, minData)
 	assert.Nil(t, maxData)
@@ -162,7 +167,7 @@ func Test_EVCurrentLimits(t *testing.T) {
 			err = localDevice.ProcessCmd(datagram, remoteDevice)
 			assert.Nil(t, err)
 
-			minData, maxData, defaultData, err = emobilty.EVCurrentLimits()
+			minData, maxData, defaultData, err = emobilty.EVCurrentLimits(emobilty.evEntity)
 			assert.Nil(t, err)
 
 			assert.Nil(t, err)

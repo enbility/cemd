@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
 	gomock "go.uber.org/mock/gomock"
@@ -12,7 +13,8 @@ import (
 func Test_EVChargePlan(t *testing.T) {
 	emobilty, eebusService := setupEmobility(t)
 
-	_, err := emobilty.EVChargePlan()
+	mockRemoteEntity := mocks.NewEntityRemoteInterface(t)
+	_, err := emobilty.EVChargePlan(mockRemoteEntity)
 	assert.NotNil(t, err)
 
 	localDevice, localEntity, remoteDevice, entites, _ := setupDevices(eebusService)
@@ -24,12 +26,10 @@ func Test_EVChargePlan(t *testing.T) {
 	dataProviderMock := NewMockEmobilityDataProvider(ctrl)
 	emobilty.dataProvider = dataProviderMock
 
-	_, err = emobilty.EVChargePlan()
+	_, err = emobilty.EVChargePlan(emobilty.evEntity)
 	assert.NotNil(t, err)
 
-	emobilty.evTimeSeries = timeSeriesConfiguration(localEntity, emobilty.evEntity)
-
-	_, err = emobilty.EVChargePlan()
+	_, err = emobilty.EVChargePlan(emobilty.evEntity)
 	assert.NotNil(t, err)
 
 	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer, model.RoleTypeClient)
@@ -64,7 +64,7 @@ func Test_EVChargePlan(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	_, err = emobilty.EVChargePlan()
+	_, err = emobilty.EVChargePlan(emobilty.evEntity)
 	assert.NotNil(t, err)
 
 	cmd = []model.CmdType{{
@@ -96,6 +96,6 @@ func Test_EVChargePlan(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	_, err = emobilty.EVChargePlan()
+	_, err = emobilty.EVChargePlan(emobilty.evEntity)
 	assert.Nil(t, err)
 }

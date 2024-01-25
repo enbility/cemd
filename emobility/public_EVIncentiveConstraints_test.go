@@ -4,14 +4,21 @@ import (
 	"testing"
 
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func Test_EVGetIncentiveConstraints(t *testing.T) {
 	emobilty, eebusService := setupEmobility(t)
 
-	constraints, err := emobilty.EVIncentiveConstraints()
+	mockRemoteDevice := mocks.NewDeviceRemoteInterface(t)
+	mockRemoteEntity := mocks.NewEntityRemoteInterface(t)
+	mockRemoteFeature := mocks.NewFeatureRemoteInterface(t)
+	mockRemoteDevice.EXPECT().FeatureByEntityTypeAndRole(mock.Anything, mock.Anything, mock.Anything).Return(mockRemoteFeature)
+	mockRemoteEntity.EXPECT().Device().Return(mockRemoteDevice)
+	constraints, err := emobilty.EVIncentiveConstraints(mockRemoteEntity)
 	assert.Equal(t, uint(0), constraints.MinSlots)
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 	assert.NotEqual(t, err, nil)
@@ -20,14 +27,12 @@ func Test_EVGetIncentiveConstraints(t *testing.T) {
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	constraints, err = emobilty.EVIncentiveConstraints()
+	constraints, err = emobilty.EVIncentiveConstraints(emobilty.evEntity)
 	assert.Equal(t, uint(0), constraints.MinSlots)
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 	assert.NotEqual(t, err, nil)
 
-	emobilty.evIncentiveTable = incentiveTableConfiguration(localEntity, emobilty.evEntity)
-
-	constraints, err = emobilty.EVIncentiveConstraints()
+	constraints, err = emobilty.EVIncentiveConstraints(emobilty.evEntity)
 	assert.Equal(t, uint(0), constraints.MinSlots)
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 	assert.NotEqual(t, err, nil)
@@ -51,7 +56,7 @@ func Test_EVGetIncentiveConstraints(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	constraints, err = emobilty.EVIncentiveConstraints()
+	constraints, err = emobilty.EVIncentiveConstraints(emobilty.evEntity)
 	assert.Equal(t, uint(1), constraints.MinSlots)
 	assert.Equal(t, uint(10), constraints.MaxSlots)
 	assert.Equal(t, err, nil)
@@ -72,7 +77,7 @@ func Test_EVGetIncentiveConstraints(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	constraints, err = emobilty.EVIncentiveConstraints()
+	constraints, err = emobilty.EVIncentiveConstraints(emobilty.evEntity)
 	assert.Equal(t, uint(1), constraints.MinSlots)
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 	assert.Equal(t, err, nil)

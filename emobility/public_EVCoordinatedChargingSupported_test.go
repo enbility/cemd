@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
 )
@@ -11,7 +12,8 @@ import (
 func Test_EVCoordinatedChargingSupported(t *testing.T) {
 	emobilty, eebusService := setupEmobility(t)
 
-	data, err := emobilty.EVCoordinatedChargingSupported()
+	mockRemoteEntity := mocks.NewEntityRemoteInterface(t)
+	data, err := emobilty.EVCoordinatedChargingSupported(mockRemoteEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, false, data)
 
@@ -19,7 +21,7 @@ func Test_EVCoordinatedChargingSupported(t *testing.T) {
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	data, err = emobilty.EVCoordinatedChargingSupported()
+	data, err = emobilty.EVCoordinatedChargingSupported(emobilty.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, false, data)
 
@@ -45,7 +47,7 @@ func Test_EVCoordinatedChargingSupported(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVCoordinatedChargingSupported()
+	data, err = emobilty.EVCoordinatedChargingSupported(emobilty.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, true, data)
 }

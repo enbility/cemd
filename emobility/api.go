@@ -1,5 +1,7 @@
 package emobility
 
+import "github.com/enbility/spine-go/api"
+
 //go:generate mockgen -source emobility.go -destination mock_emobility_test.go -package emobility
 
 // used by emobility and implemented by the CEM
@@ -43,48 +45,48 @@ type EmobilityDataProvider interface {
 // used by the CEM and implemented by emobility
 type EMobilityInterface interface {
 	// return if an EV is connected
-	EVConnected() bool
+	EVConnected(remoteEntity api.EntityRemoteInterface) bool
 
 	// return the current charge state of the EV
-	EVCurrentChargeState() (EVChargeStateType, error)
+	EVCurrentChargeState(remoteEntity api.EntityRemoteInterface) (EVChargeStateType, error)
 
 	// return the number of ac connected phases of the EV or 0 if it is unknown
-	EVConnectedPhases() (uint, error)
+	EVConnectedPhases(remoteEntity api.EntityRemoteInterface) (uint, error)
 
 	// return the charged energy measurement in Wh of the connected EV
 	//
 	// possible errors:
 	//   - ErrDataNotAvailable if no such measurement is (yet) available
 	//   - and others
-	EVChargedEnergy() (float64, error)
+	EVChargedEnergy(remoteEntity api.EntityRemoteInterface) (float64, error)
 
 	// return the last power measurement for each phase of the connected EV
 	//
 	// possible errors:
 	//   - ErrDataNotAvailable if no such measurement is (yet) available
 	//   - and others
-	EVPowerPerPhase() ([]float64, error)
+	EVPowerPerPhase(remoteEntity api.EntityRemoteInterface) ([]float64, error)
 
 	// return the last current measurement for each phase of the connected EV
 	//
 	// possible errors:
 	//   - ErrDataNotAvailable if no such measurement is (yet) available
 	//   - and others
-	EVCurrentsPerPhase() ([]float64, error)
+	EVCurrentsPerPhase(remoteEntity api.EntityRemoteInterface) ([]float64, error)
 
 	// return the min, max, default limits for each phase of the connected EV
 	//
 	// possible errors:
 	//   - ErrDataNotAvailable if no such measurement is (yet) available
 	//   - and others
-	EVCurrentLimits() ([]float64, []float64, []float64, error)
+	EVCurrentLimits(remoteEntity api.EntityRemoteInterface) ([]float64, []float64, []float64, error)
 
 	// return the current loadcontrol obligation limits
 	//
 	// possible errors:
 	//   - ErrDataNotAvailable if no such measurement is (yet) available
 	//   - and others
-	EVLoadControlObligationLimits() ([]float64, error)
+	EVLoadControlObligationLimits(remoteEntity api.EntityRemoteInterface) ([]float64, error)
 
 	// send new LoadControlLimits to the remote EV
 	//
@@ -113,7 +115,7 @@ type EMobilityInterface interface {
 	// In ISO15118-2 the usecase is only supported via VAS extensions which are vendor specific
 	// and needs to have specific EVSE support for the specific EV brand.
 	// In ISO15118-20 this is a standard feature which does not need special support on the EVSE.
-	EVWriteLoadControlLimits(limits []EVLoadLimits) error
+	EVWriteLoadControlLimits(remoteEntity api.EntityRemoteInterface, limits []EVLoadLimits) error
 
 	// return the current communication standard type used to communicate between EVSE and EV
 	//
@@ -130,21 +132,21 @@ type EMobilityInterface interface {
 	//   - ErrDataNotAvailable if that information is not (yet) available
 	//   - ErrNotSupported if getting the communication standard is not supported
 	//   - and others
-	EVCommunicationStandard() (EVCommunicationStandardType, error)
+	EVCommunicationStandard(remoteEntity api.EntityRemoteInterface) (EVCommunicationStandardType, error)
 
 	// returns the identification of the currently connected EV or nil if not available
 	//
 	// possible errors:
 	//   - ErrDataNotAvailable if that information is not (yet) available
 	//   - and others
-	EVIdentification() (string, error)
+	EVIdentification(remoteEntity api.EntityRemoteInterface) (string, error)
 
 	// returns if the EVSE and EV combination support optimzation of self consumption
 	//
 	// possible errors:
 	//   - ErrDataNotAvailable if that information is not (yet) available
 	//   - and others
-	EVOptimizationOfSelfConsumptionSupported() (bool, error)
+	EVOptimizationOfSelfConsumptionSupported(remoteEntity api.EntityRemoteInterface) (bool, error)
 
 	// return if the EVSE and EV combination support providing an SoC
 	//
@@ -155,7 +157,7 @@ type EMobilityInterface interface {
 	// possible errors:
 	//   - ErrDataNotAvailable if no such measurement is (yet) available
 	//   - and others
-	EVSoCSupported() (bool, error)
+	EVSoCSupported(remoteEntity api.EntityRemoteInterface) (bool, error)
 
 	// return the last known SoC of the connected EV
 	//
@@ -167,38 +169,38 @@ type EMobilityInterface interface {
 	//   - ErrNotSupported if support for SoC is not possible
 	//   - ErrDataNotAvailable if no such measurement is (yet) available
 	//   - and others
-	EVSoC() (float64, error)
+	EVSoC(remoteEntity api.EntityRemoteInterface) (float64, error)
 
 	// returns if the EVSE and EV combination support coordinated charging
 	//
 	// possible errors:
 	//   - ErrDataNotAvailable if that information is not (yet) available
 	//   - and others
-	EVCoordinatedChargingSupported() (bool, error)
+	EVCoordinatedChargingSupported(remoteEntity api.EntityRemoteInterface) (bool, error)
 
 	// returns the current charging stratey
 	//
 	// returns EVChargeStrategyTypeUnknown if it could not be determined, e.g.
 	// if the vehicle communication is via IEC61851 or the EV doesn't provide
 	// any information about its charging mode or plan
-	EVChargeStrategy() EVChargeStrategyType
+	EVChargeStrategy(remoteEntity api.EntityRemoteInterface) EVChargeStrategyType
 
 	// returns the current energy demand
 	//   - EVDemand: details about the actual demands from the EV
 	//   - error: if no data is available
 	//
 	// if duration is 0, direct charging is active, otherwise timed charging is active
-	EVEnergyDemand() (EVDemand, error)
+	EVEnergyDemand(remoteEntity api.EntityRemoteInterface) (EVDemand, error)
 
 	// returns the current charge plan
 	//   - EVChargePlan: details about the actual charge plan provided by the EV
 	//   - error: if no data is available
-	EVChargePlan() (EVChargePlan, error)
+	EVChargePlan(remoteEntity api.EntityRemoteInterface) (EVChargePlan, error)
 
 	// returns the constraints for the time slots
 	//   - EVTimeSlotConstraints: details about the time slot constraints
 	//   - error: if no data is available
-	EVTimeSlotConstraints() (EVTimeSlotConstraints, error)
+	EVTimeSlotConstraints(remoteEntity api.EntityRemoteInterface) (EVTimeSlotConstraints, error)
 
 	// send power limits data to the EV
 	//
@@ -206,12 +208,12 @@ type EMobilityInterface interface {
 	//
 	// this needs to be invoked either <55s, idealy <15s, of receiving a call to EVRequestPowerLimits
 	// or if the CEM requires the EV to change its charge plan
-	EVWritePowerLimits(data []EVDurationSlotValue) error
+	EVWritePowerLimits(remoteEntity api.EntityRemoteInterface, data []EVDurationSlotValue) error
 
 	// returns the constraints for incentive slots
 	//   - EVIncentiveConstraints: details about the incentive slot constraints
 	//   - error: if no data is available
-	EVIncentiveConstraints() (EVIncentiveSlotConstraints, error)
+	EVIncentiveConstraints(remoteEntity api.EntityRemoteInterface) (EVIncentiveSlotConstraints, error)
 
 	// send price slots data to the EV
 	//
@@ -219,5 +221,5 @@ type EMobilityInterface interface {
 	//
 	// this needs to be invoked either within 20s of receiving a call to EVRequestIncentives
 	// or if the CEM requires the EV to change its charge plan
-	EVWriteIncentives(data []EVDurationSlotValue) error
+	EVWriteIncentives(remoteEntity api.EntityRemoteInterface, data []EVDurationSlotValue) error
 }

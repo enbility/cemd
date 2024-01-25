@@ -4,14 +4,21 @@ import (
 	"testing"
 
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func Test_EVCurrentsPerPhase(t *testing.T) {
 	emobilty, eebusService := setupEmobility(t)
 
-	data, err := emobilty.EVCurrentsPerPhase()
+	mockRemoteDevice := mocks.NewDeviceRemoteInterface(t)
+	mockRemoteEntity := mocks.NewEntityRemoteInterface(t)
+	mockRemoteFeature := mocks.NewFeatureRemoteInterface(t)
+	mockRemoteDevice.EXPECT().FeatureByEntityTypeAndRole(mock.Anything, mock.Anything, mock.Anything).Return(mockRemoteFeature)
+	mockRemoteEntity.EXPECT().Device().Return(mockRemoteDevice)
+	data, err := emobilty.EVCurrentsPerPhase(mockRemoteEntity)
 	assert.NotNil(t, err)
 	assert.Nil(t, data)
 
@@ -19,14 +26,11 @@ func Test_EVCurrentsPerPhase(t *testing.T) {
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	data, err = emobilty.EVCurrentsPerPhase()
+	data, err = emobilty.EVCurrentsPerPhase(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Nil(t, data)
 
-	emobilty.evElectricalConnection = electricalConnection(localEntity, emobilty.evEntity)
-	emobilty.evMeasurement = measurement(localEntity, emobilty.evEntity)
-
-	data, err = emobilty.EVCurrentsPerPhase()
+	data, err = emobilty.EVCurrentsPerPhase(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Nil(t, data)
 
@@ -50,7 +54,7 @@ func Test_EVCurrentsPerPhase(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVPowerPerPhase()
+	data, err = emobilty.EVPowerPerPhase(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Nil(t, data)
 
@@ -73,7 +77,7 @@ func Test_EVCurrentsPerPhase(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVCurrentsPerPhase()
+	data, err = emobilty.EVCurrentsPerPhase(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Nil(t, data)
 
@@ -91,7 +95,7 @@ func Test_EVCurrentsPerPhase(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVCurrentsPerPhase()
+	data, err = emobilty.EVCurrentsPerPhase(emobilty.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, 10.0, data[0])
 }

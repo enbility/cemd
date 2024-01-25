@@ -4,14 +4,21 @@ import (
 	"testing"
 
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func Test_EVOptimizationOfSelfConsumptionSupported(t *testing.T) {
 	emobilty, eebusService := setupEmobility(t)
 
-	data, err := emobilty.EVOptimizationOfSelfConsumptionSupported()
+	mockRemoteDevice := mocks.NewDeviceRemoteInterface(t)
+	mockRemoteEntity := mocks.NewEntityRemoteInterface(t)
+	mockRemoteFeature := mocks.NewFeatureRemoteInterface(t)
+	mockRemoteDevice.EXPECT().FeatureByEntityTypeAndRole(mock.Anything, mock.Anything, mock.Anything).Return(mockRemoteFeature)
+	mockRemoteEntity.EXPECT().Device().Return(mockRemoteDevice)
+	data, err := emobilty.EVOptimizationOfSelfConsumptionSupported(mockRemoteEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, false, data)
 
@@ -19,13 +26,7 @@ func Test_EVOptimizationOfSelfConsumptionSupported(t *testing.T) {
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	data, err = emobilty.EVOptimizationOfSelfConsumptionSupported()
-	assert.NotNil(t, err)
-	assert.Equal(t, false, data)
-
-	emobilty.evLoadControl = loadcontrol(localEntity, emobilty.evEntity)
-
-	data, err = emobilty.EVOptimizationOfSelfConsumptionSupported()
+	data, err = emobilty.EVOptimizationOfSelfConsumptionSupported(emobilty.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, false, data)
 
@@ -51,7 +52,7 @@ func Test_EVOptimizationOfSelfConsumptionSupported(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVOptimizationOfSelfConsumptionSupported()
+	data, err = emobilty.EVOptimizationOfSelfConsumptionSupported(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, false, data)
 
@@ -71,7 +72,7 @@ func Test_EVOptimizationOfSelfConsumptionSupported(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVOptimizationOfSelfConsumptionSupported()
+	data, err = emobilty.EVOptimizationOfSelfConsumptionSupported(emobilty.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, true, data)
 }

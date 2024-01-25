@@ -4,14 +4,21 @@ import (
 	"testing"
 
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func Test_EVCurrentChargeState(t *testing.T) {
 	emobilty, eebusService := setupEmobility(t)
 
-	data, err := emobilty.EVCurrentChargeState()
+	mockRemoteDevice := mocks.NewDeviceRemoteInterface(t)
+	mockRemoteEntity := mocks.NewEntityRemoteInterface(t)
+	mockRemoteFeature := mocks.NewFeatureRemoteInterface(t)
+	mockRemoteDevice.EXPECT().FeatureByEntityTypeAndRole(mock.Anything, mock.Anything, mock.Anything).Return(mockRemoteFeature)
+	mockRemoteEntity.EXPECT().Device().Return(mockRemoteDevice)
+	data, err := emobilty.EVCurrentChargeState(mockRemoteEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, EVChargeStateTypeUnplugged, data)
 
@@ -19,13 +26,7 @@ func Test_EVCurrentChargeState(t *testing.T) {
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	data, err = emobilty.EVCurrentChargeState()
-	assert.Nil(t, err)
-	assert.Equal(t, EVChargeStateTypeUnplugged, data)
-
-	emobilty.evDeviceDiagnosis = deviceDiagnosis(localEntity, emobilty.evEntity)
-
-	data, err = emobilty.EVCurrentChargeState()
+	data, err = emobilty.EVCurrentChargeState(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, EVChargeStateTypeUnknown, data)
 
@@ -40,7 +41,7 @@ func Test_EVCurrentChargeState(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVCurrentChargeState()
+	data, err = emobilty.EVCurrentChargeState(emobilty.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, EVChargeStateTypeActive, data)
 
@@ -53,7 +54,7 @@ func Test_EVCurrentChargeState(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVCurrentChargeState()
+	data, err = emobilty.EVCurrentChargeState(emobilty.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, EVChargeStateTypePaused, data)
 
@@ -66,7 +67,7 @@ func Test_EVCurrentChargeState(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVCurrentChargeState()
+	data, err = emobilty.EVCurrentChargeState(emobilty.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, EVChargeStateTypeError, data)
 
@@ -79,7 +80,7 @@ func Test_EVCurrentChargeState(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVCurrentChargeState()
+	data, err = emobilty.EVCurrentChargeState(emobilty.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, EVChargeStateTypeFinished, data)
 
@@ -92,7 +93,7 @@ func Test_EVCurrentChargeState(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data, err = emobilty.EVCurrentChargeState()
+	data, err = emobilty.EVCurrentChargeState(emobilty.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, EVChargeStateTypeUnknown, data)
 }

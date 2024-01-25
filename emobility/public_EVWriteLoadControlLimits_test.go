@@ -6,6 +6,7 @@ import (
 
 	"github.com/enbility/cemd/util"
 	eebusUtil "github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/exp/slices"
@@ -16,20 +17,18 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 
 	loadLimits := []EVLoadLimits{}
 
-	err := emobilty.EVWriteLoadControlLimits(loadLimits)
+	mockRemoteEntity := mocks.NewEntityRemoteInterface(t)
+	err := emobilty.EVWriteLoadControlLimits(mockRemoteEntity, loadLimits)
 	assert.NotNil(t, err)
 
 	localDevice, localEntity, remoteDevice, entites, writeHandler := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	err = emobilty.EVWriteLoadControlLimits(loadLimits)
+	err = emobilty.EVWriteLoadControlLimits(emobilty.evEntity, loadLimits)
 	assert.NotNil(t, err)
 
-	emobilty.evElectricalConnection = electricalConnection(localEntity, emobilty.evEntity)
-	emobilty.evLoadControl = loadcontrol(localEntity, emobilty.evEntity)
-
-	err = emobilty.EVWriteLoadControlLimits(loadLimits)
+	err = emobilty.EVWriteLoadControlLimits(emobilty.evEntity, loadLimits)
 	assert.NotNil(t, err)
 
 	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer, model.RoleTypeClient)
@@ -62,7 +61,7 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	err = emobilty.EVWriteLoadControlLimits(loadLimits)
+	err = emobilty.EVWriteLoadControlLimits(emobilty.evEntity, loadLimits)
 	assert.NotNil(t, err)
 
 	type dataStruct struct {
@@ -164,7 +163,7 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 				err = localDevice.ProcessCmd(datagram, remoteDevice)
 				assert.Nil(t, err)
 
-				err = emobilty.EVWriteLoadControlLimits(loadLimits)
+				err = emobilty.EVWriteLoadControlLimits(emobilty.evEntity, loadLimits)
 				assert.NotNil(t, err)
 
 				datagram = datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeLoadControl, model.RoleTypeServer, model.RoleTypeClient)
@@ -202,7 +201,7 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 				err = localDevice.ProcessCmd(datagram, remoteDevice)
 				assert.Nil(t, err)
 
-				err = emobilty.EVWriteLoadControlLimits(loadLimits)
+				err = emobilty.EVWriteLoadControlLimits(emobilty.evEntity, loadLimits)
 				assert.NotNil(t, err)
 
 				limitData := []model.LoadControlLimitDataType{}
@@ -224,7 +223,7 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 				err = localDevice.ProcessCmd(datagram, remoteDevice)
 				assert.Nil(t, err)
 
-				err = emobilty.EVWriteLoadControlLimits(loadLimits)
+				err = emobilty.EVWriteLoadControlLimits(emobilty.evEntity, loadLimits)
 				assert.NotNil(t, err)
 
 				obligations := []EVLoadLimitsPhase{}
@@ -246,7 +245,7 @@ func Test_EVWriteLoadControlLimits(t *testing.T) {
 					})
 				}
 
-				err = emobilty.EVWriteLoadControlLimits([]EVLoadLimits{
+				err = emobilty.EVWriteLoadControlLimits(emobilty.evEntity, []EVLoadLimits{
 					{Category: model.LoadControlCategoryTypeObligation, PhaseData: obligations},
 					{Category: model.LoadControlCategoryTypeRecommendation, PhaseData: recommendations},
 				})

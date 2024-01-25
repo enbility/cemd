@@ -5,14 +5,21 @@ import (
 	"time"
 
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func Test_EVGetTimeSlotConstraints(t *testing.T) {
 	emobilty, eebusService := setupEmobility(t)
 
-	constraints, err := emobilty.EVTimeSlotConstraints()
+	mockRemoteDevice := mocks.NewDeviceRemoteInterface(t)
+	mockRemoteEntity := mocks.NewEntityRemoteInterface(t)
+	mockRemoteFeature := mocks.NewFeatureRemoteInterface(t)
+	mockRemoteDevice.EXPECT().FeatureByEntityTypeAndRole(mock.Anything, mock.Anything, mock.Anything).Return(mockRemoteFeature)
+	mockRemoteEntity.EXPECT().Device().Return(mockRemoteDevice)
+	constraints, err := emobilty.EVTimeSlotConstraints(mockRemoteEntity)
 	assert.Equal(t, uint(0), constraints.MinSlots)
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 	assert.Equal(t, time.Duration(0), constraints.MinSlotDuration)
@@ -24,7 +31,7 @@ func Test_EVGetTimeSlotConstraints(t *testing.T) {
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	constraints, err = emobilty.EVTimeSlotConstraints()
+	constraints, err = emobilty.EVTimeSlotConstraints(emobilty.evEntity)
 	assert.Equal(t, uint(0), constraints.MinSlots)
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 	assert.Equal(t, time.Duration(0), constraints.MinSlotDuration)
@@ -32,9 +39,7 @@ func Test_EVGetTimeSlotConstraints(t *testing.T) {
 	assert.Equal(t, time.Duration(0), constraints.SlotDurationStepSize)
 	assert.NotEqual(t, err, nil)
 
-	emobilty.evTimeSeries = timeSeriesConfiguration(localEntity, emobilty.evEntity)
-
-	constraints, err = emobilty.EVTimeSlotConstraints()
+	constraints, err = emobilty.EVTimeSlotConstraints(emobilty.evEntity)
 	assert.Equal(t, uint(0), constraints.MinSlots)
 	assert.Equal(t, uint(0), constraints.MaxSlots)
 	assert.Equal(t, time.Duration(0), constraints.MinSlotDuration)
@@ -63,7 +68,7 @@ func Test_EVGetTimeSlotConstraints(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	constraints, err = emobilty.EVTimeSlotConstraints()
+	constraints, err = emobilty.EVTimeSlotConstraints(emobilty.evEntity)
 	assert.Equal(t, uint(1), constraints.MinSlots)
 	assert.Equal(t, uint(10), constraints.MaxSlots)
 	assert.Equal(t, time.Duration(1*time.Minute), constraints.MinSlotDuration)

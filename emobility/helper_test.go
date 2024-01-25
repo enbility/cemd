@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/enbility/eebus-go/api"
-	"github.com/enbility/eebus-go/features"
 	"github.com/enbility/eebus-go/mocks"
 	"github.com/enbility/eebus-go/service"
 	shipapi "github.com/enbility/ship-go/api"
@@ -346,84 +345,4 @@ func featureOfTypeAndRole(
 		}
 	}
 	return nil
-}
-
-func deviceDiagnosis(
-	localEntity spineapi.EntityLocalInterface,
-	entity spineapi.EntityRemoteInterface) *features.DeviceDiagnosis {
-	feature, err := features.NewDeviceDiagnosis(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return feature
-}
-
-func electricalConnection(
-	localEntity spineapi.EntityLocalInterface,
-	entity spineapi.EntityRemoteInterface) *features.ElectricalConnection {
-	feature, err := features.NewElectricalConnection(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return feature
-}
-
-func measurement(
-	localEntity spineapi.EntityLocalInterface,
-	entity spineapi.EntityRemoteInterface) *features.Measurement {
-	feature, err := features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return feature
-}
-
-func deviceConfiguration(
-	localEntity spineapi.EntityLocalInterface,
-	entity spineapi.EntityRemoteInterface) *features.DeviceConfiguration {
-	feature, err := features.NewDeviceConfiguration(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return feature
-}
-
-func identificationConfiguration(
-	localEntity spineapi.EntityLocalInterface,
-	entity spineapi.EntityRemoteInterface) *features.Identification {
-	feature, err := features.NewIdentification(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return feature
-}
-
-func loadcontrol(
-	localEntity spineapi.EntityLocalInterface,
-	entity spineapi.EntityRemoteInterface) *features.LoadControl {
-	feature, err := features.NewLoadControl(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return feature
-}
-
-func timeSeriesConfiguration(
-	localEntity spineapi.EntityLocalInterface,
-	entity spineapi.EntityRemoteInterface) *features.TimeSeries {
-	feature, err := features.NewTimeSeries(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return feature
-}
-
-func incentiveTableConfiguration(
-	localEntity spineapi.EntityLocalInterface,
-	entity spineapi.EntityRemoteInterface) *features.IncentiveTable {
-	feature, err := features.NewIncentiveTable(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return feature
 }

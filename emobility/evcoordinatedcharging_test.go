@@ -6,15 +6,22 @@ import (
 
 	"github.com/enbility/eebus-go/util"
 	"github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	gomock "go.uber.org/mock/gomock"
 )
 
 func Test_CoordinatedChargingScenarios(t *testing.T) {
 	emobility, eebusService := setupEmobility(t)
 
-	data, err := emobility.EVChargedEnergy()
+	mockRemoteDevice := mocks.NewDeviceRemoteInterface(t)
+	mockRemoteEntity := mocks.NewEntityRemoteInterface(t)
+	mockRemoteFeature := mocks.NewFeatureRemoteInterface(t)
+	mockRemoteDevice.EXPECT().FeatureByEntityTypeAndRole(mock.Anything, mock.Anything, mock.Anything).Return(mockRemoteFeature)
+	mockRemoteEntity.EXPECT().Device().Return(mockRemoteDevice)
+	data, err := emobility.EVChargedEnergy(mockRemoteEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, data)
 
@@ -26,9 +33,6 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 
 	dataProviderMock := NewMockEmobilityDataProvider(ctrl)
 	emobility.dataProvider = dataProviderMock
-
-	emobility.evTimeSeries = timeSeriesConfiguration(localEntity, emobility.evEntity)
-	emobility.evIncentiveTable = incentiveTableConfiguration(localEntity, emobility.evEntity)
 
 	datagramtt := datagramForEntityAndFeatures(false, localDevice, localEntity, emobility.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer, model.RoleTypeClient)
 	datagramit := datagramForEntityAndFeatures(false, localDevice, localEntity, emobility.evEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeServer, model.RoleTypeClient)
@@ -63,7 +67,7 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 	err = localDevice.ProcessCmd(datagramtt, remoteDevice)
 	assert.Nil(t, err)
 
-	demand, err := emobility.EVEnergyDemand()
+	demand, err := emobility.EVEnergyDemand(emobility.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, 0.0, demand.MinDemand)
 	assert.Equal(t, 0.0, demand.OptDemand)
@@ -141,7 +145,7 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 	err = localDevice.ProcessCmd(datagramtt, remoteDevice)
 	assert.Nil(t, err)
 
-	demand, err = emobility.EVEnergyDemand()
+	demand, err = emobility.EVEnergyDemand(emobility.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, 0.0, demand.MinDemand)
 	assert.Equal(t, 53400.0, demand.OptDemand)
@@ -235,7 +239,7 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 	err = localDevice.ProcessCmd(datagramtt, remoteDevice)
 	assert.Nil(t, err)
 
-	demand, err = emobility.EVEnergyDemand()
+	demand, err = emobility.EVEnergyDemand(emobility.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, 600.0, demand.MinDemand)
 	assert.Equal(t, 600.0, demand.OptDemand)

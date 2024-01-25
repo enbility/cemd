@@ -2,7 +2,6 @@ package emobility
 
 import (
 	"github.com/enbility/eebus-go/api"
-	"github.com/enbility/eebus-go/features"
 	shipapi "github.com/enbility/ship-go/api"
 	"github.com/enbility/ship-go/util"
 	spineapi "github.com/enbility/spine-go/api"
@@ -17,19 +16,6 @@ type EMobility struct {
 
 	evseEntity spineapi.EntityRemoteInterface
 	evEntity   spineapi.EntityRemoteInterface
-
-	evseDeviceClassification *features.DeviceClassification
-	evseDeviceDiagnosis      *features.DeviceDiagnosis
-
-	evDeviceClassification *features.DeviceClassification
-	evDeviceDiagnosis      *features.DeviceDiagnosis
-	evDeviceConfiguration  *features.DeviceConfiguration
-	evElectricalConnection *features.ElectricalConnection
-	evMeasurement          *features.Measurement
-	evIdentification       *features.Identification
-	evLoadControl          *features.LoadControl
-	evTimeSeries           *features.TimeSeries
-	evIncentiveTable       *features.IncentiveTable
 
 	evCurrentChargeStrategy EVChargeStrategyType
 

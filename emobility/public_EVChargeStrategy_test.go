@@ -5,26 +5,31 @@ import (
 	"time"
 
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func Test_EVChargeStrategy(t *testing.T) {
 	emobilty, eebusService := setupEmobility(t)
 
-	data := emobilty.EVChargeStrategy()
+	mockRemoteDevice := mocks.NewDeviceRemoteInterface(t)
+	mockRemoteEntity := mocks.NewEntityRemoteInterface(t)
+	mockRemoteFeature := mocks.NewFeatureRemoteInterface(t)
+	mockRemoteDevice.EXPECT().FeatureByEntityTypeAndRole(mock.Anything, mock.Anything, mock.Anything).Return(mockRemoteFeature)
+	mockRemoteEntity.EXPECT().Device().Return(mockRemoteDevice)
+	data := emobilty.EVChargeStrategy(mockRemoteEntity)
 	assert.Equal(t, EVChargeStrategyTypeUnknown, data)
 
 	localDevice, localEntity, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	data = emobilty.EVChargeStrategy()
+	data = emobilty.EVChargeStrategy(emobilty.evEntity)
 	assert.Equal(t, EVChargeStrategyTypeUnknown, data)
 
-	emobilty.evDeviceConfiguration = deviceConfiguration(localEntity, emobilty.evEntity)
-
-	data = emobilty.EVChargeStrategy()
+	data = emobilty.EVChargeStrategy(emobilty.evEntity)
 	assert.Equal(t, EVChargeStrategyTypeUnknown, data)
 
 	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer, model.RoleTypeClient)
@@ -43,7 +48,7 @@ func Test_EVChargeStrategy(t *testing.T) {
 	err := localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data = emobilty.EVChargeStrategy()
+	data = emobilty.EVChargeStrategy(emobilty.evEntity)
 	assert.Equal(t, EVChargeStrategyTypeUnknown, data)
 
 	cmd = []model.CmdType{{
@@ -62,12 +67,10 @@ func Test_EVChargeStrategy(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data = emobilty.EVChargeStrategy()
+	data = emobilty.EVChargeStrategy(emobilty.evEntity)
 	assert.Equal(t, EVChargeStrategyTypeUnknown, data)
 
-	emobilty.evTimeSeries = timeSeriesConfiguration(localEntity, emobilty.evEntity)
-
-	data = emobilty.EVChargeStrategy()
+	data = emobilty.EVChargeStrategy(emobilty.evEntity)
 	assert.Equal(t, EVChargeStrategyTypeUnknown, data)
 
 	datagram = datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer, model.RoleTypeClient)
@@ -101,7 +104,7 @@ func Test_EVChargeStrategy(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data = emobilty.EVChargeStrategy()
+	data = emobilty.EVChargeStrategy(emobilty.evEntity)
 	assert.Equal(t, EVChargeStrategyTypeUnknown, data)
 
 	cmd = []model.CmdType{{
@@ -123,7 +126,7 @@ func Test_EVChargeStrategy(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data = emobilty.EVChargeStrategy()
+	data = emobilty.EVChargeStrategy(emobilty.evEntity)
 	assert.Equal(t, EVChargeStrategyTypeNoDemand, data)
 
 	cmd = []model.CmdType{{
@@ -147,7 +150,7 @@ func Test_EVChargeStrategy(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data = emobilty.EVChargeStrategy()
+	data = emobilty.EVChargeStrategy(emobilty.evEntity)
 	assert.Equal(t, EVChargeStrategyTypeNoDemand, data)
 
 	cmd = []model.CmdType{{
@@ -170,7 +173,7 @@ func Test_EVChargeStrategy(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data = emobilty.EVChargeStrategy()
+	data = emobilty.EVChargeStrategy(emobilty.evEntity)
 	assert.Equal(t, EVChargeStrategyTypeDirectCharging, data)
 
 	cmd = []model.CmdType{{
@@ -194,6 +197,6 @@ func Test_EVChargeStrategy(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	data = emobilty.EVChargeStrategy()
+	data = emobilty.EVChargeStrategy(emobilty.evEntity)
 	assert.Equal(t, EVChargeStrategyTypeTimedCharging, data)
 }

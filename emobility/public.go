@@ -7,6 +7,7 @@ import (
 	"github.com/enbility/cemd/util"
 	"github.com/enbility/eebus-go/features"
 	eebusUtil "github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
 
@@ -14,36 +15,31 @@ import (
 //
 // this includes all required features and
 // minimal data being available
-func (e *EMobility) EVConnected() bool {
+func (e *EMobility) EVConnected(remoteEntity api.EntityRemoteInterface) bool {
 	// To report an EV as being connected, also consider all required
 	// features to be available and assigned
-	if e.evEntity == nil ||
-		e.evDeviceDiagnosis == nil ||
-		e.evElectricalConnection == nil ||
-		e.evMeasurement == nil ||
-		e.evLoadControl == nil ||
-		e.evDeviceConfiguration == nil {
+	if e.evEntity == nil {
 		return false
 	}
 
 	// getting current charge state should work
-	if _, err := e.EVCurrentChargeState(); err != nil {
+	if _, err := e.EVCurrentChargeState(remoteEntity); err != nil {
 		return false
 	}
 
 	// the communication standard needs to be available
-	if _, err := e.EVCommunicationStandard(); err != nil {
+	if _, err := e.EVCommunicationStandard(remoteEntity); err != nil {
 		return false
 	}
 
 	// getting currents measurements should work
-	if _, err := e.EVCurrentsPerPhase(); err != nil && err != features.ErrDataNotAvailable {
+	if _, err := e.EVCurrentsPerPhase(remoteEntity); err != nil && err != features.ErrDataNotAvailable {
 		// features.ErrDataNotAvailable check in case of measurements not being provided but the feature works
 		return false
 	}
 
 	// getting limits should work
-	if _, err := e.EVLoadControlObligationLimits(); err != nil && err != features.ErrDataNotAvailable {
+	if _, err := e.EVLoadControlObligationLimits(remoteEntity); err != nil && err != features.ErrDataNotAvailable {
 		// features.ErrDataNotAvailable check in case of load control limits not being provided but the feature works
 		return false
 	}
@@ -52,12 +48,14 @@ func (e *EMobility) EVConnected() bool {
 }
 
 // return the current charge state of the EV
-func (e *EMobility) EVCurrentChargeState() (EVChargeStateType, error) {
-	if e.evEntity == nil || e.evDeviceDiagnosis == nil {
+func (e *EMobility) EVCurrentChargeState(remoteEntity api.EntityRemoteInterface) (EVChargeStateType, error) {
+	evDeviceDiagnosis, err := e.deviceDiagnosis(remoteEntity)
+
+	if e.evEntity == nil || err != nil {
 		return EVChargeStateTypeUnplugged, nil
 	}
 
-	diagnosisState, err := e.evDeviceDiagnosis.GetState()
+	diagnosisState, err := evDeviceDiagnosis.GetState()
 	if err != nil {
 		return EVChargeStateTypeUnknown, err
 	}
@@ -82,12 +80,14 @@ func (e *EMobility) EVCurrentChargeState() (EVChargeStateType, error) {
 }
 
 // return the number of ac connected phases of the EV or 0 if it is unknown
-func (e *EMobility) EVConnectedPhases() (uint, error) {
-	if e.evEntity == nil || e.evElectricalConnection == nil {
+func (e *EMobility) EVConnectedPhases(remoteEntity api.EntityRemoteInterface) (uint, error) {
+	evElectricalConnection, err := e.electricalConnection(remoteEntity)
+
+	if e.evEntity == nil || err != nil {
 		return 0, ErrEVDisconnected
 	}
 
-	data, err := e.evElectricalConnection.GetDescriptions()
+	data, err := evElectricalConnection.GetDescriptions()
 	if err != nil {
 		return 0, features.ErrDataNotAvailable
 	}
@@ -111,15 +111,17 @@ func (e *EMobility) EVConnectedPhases() (uint, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *EMobility) EVChargedEnergy() (float64, error) {
-	if e.evEntity == nil || e.evMeasurement == nil {
+func (e *EMobility) EVChargedEnergy(remoteEntity api.EntityRemoteInterface) (float64, error) {
+	evMeasurement, err := e.measurement(remoteEntity)
+
+	if e.evEntity == nil || err != nil {
 		return 0, ErrEVDisconnected
 	}
 
 	measurement := model.MeasurementTypeTypeEnergy
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeCharge
-	data, err := e.evMeasurement.GetValuesForTypeCommodityScope(measurement, commodity, scope)
+	data, err := evMeasurement.GetValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return 0, err
 	}
@@ -138,8 +140,11 @@ func (e *EMobility) EVChargedEnergy() (float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *EMobility) EVPowerPerPhase() ([]float64, error) {
-	if e.evEntity == nil || e.evMeasurement == nil {
+func (e *EMobility) EVPowerPerPhase(remoteEntity api.EntityRemoteInterface) ([]float64, error) {
+	evMeasurement, err := e.measurement(remoteEntity)
+	evElectricalConnection, err2 := e.electricalConnection(remoteEntity)
+
+	if e.evEntity == nil || err != nil || err2 != nil {
 		return nil, ErrEVDisconnected
 	}
 
@@ -149,14 +154,14 @@ func (e *EMobility) EVPowerPerPhase() ([]float64, error) {
 	measurement := model.MeasurementTypeTypePower
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACPower
-	data, err := e.evMeasurement.GetValuesForTypeCommodityScope(measurement, commodity, scope)
+	data, err = evMeasurement.GetValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil || len(data) == 0 {
 		powerAvailable = false
 
 		// If power is not provided, fall back to power calculations via currents
 		measurement = model.MeasurementTypeTypeCurrent
 		scope = model.ScopeTypeTypeACCurrent
-		data, err = e.evMeasurement.GetValuesForTypeCommodityScope(measurement, commodity, scope)
+		data, err = evMeasurement.GetValuesForTypeCommodityScope(measurement, commodity, scope)
 		if err != nil {
 			return nil, err
 		}
@@ -170,7 +175,7 @@ func (e *EMobility) EVPowerPerPhase() ([]float64, error) {
 				continue
 			}
 
-			elParam, err := e.evElectricalConnection.GetParameterDescriptionForMeasurementId(*item.MeasurementId)
+			elParam, err := evElectricalConnection.GetParameterDescriptionForMeasurementId(*item.MeasurementId)
 			if err != nil || elParam.AcMeasuredPhases == nil || *elParam.AcMeasuredPhases != phase {
 				continue
 			}
@@ -192,15 +197,18 @@ func (e *EMobility) EVPowerPerPhase() ([]float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *EMobility) EVCurrentsPerPhase() ([]float64, error) {
-	if e.evEntity == nil || e.evElectricalConnection == nil {
+func (e *EMobility) EVCurrentsPerPhase(remoteEntity api.EntityRemoteInterface) ([]float64, error) {
+	evMeasurement, err := e.measurement(remoteEntity)
+	evElectricalConnection, err2 := e.electricalConnection(remoteEntity)
+
+	if e.evEntity == nil || err != nil || err2 != nil {
 		return nil, ErrEVDisconnected
 	}
 
 	measurement := model.MeasurementTypeTypeCurrent
 	commodity := model.CommodityTypeTypeElectricity
 	scope := model.ScopeTypeTypeACCurrent
-	data, err := e.evMeasurement.GetValuesForTypeCommodityScope(measurement, commodity, scope)
+	data, err := evMeasurement.GetValuesForTypeCommodityScope(measurement, commodity, scope)
 	if err != nil {
 		return nil, err
 	}
@@ -215,7 +223,7 @@ func (e *EMobility) EVCurrentsPerPhase() ([]float64, error) {
 				continue
 			}
 
-			elParam, err := e.evElectricalConnection.GetParameterDescriptionForMeasurementId(*item.MeasurementId)
+			elParam, err := evElectricalConnection.GetParameterDescriptionForMeasurementId(*item.MeasurementId)
 			if err != nil || elParam.AcMeasuredPhases == nil || *elParam.AcMeasuredPhases != phase {
 				continue
 			}
@@ -234,7 +242,7 @@ func (e *EMobility) EVCurrentsPerPhase() ([]float64, error) {
 	// if there was no timestamp provided or the time for the last value
 	// is older than 1 minute, send a read request
 	if refetch {
-		_, _ = e.evMeasurement.RequestValues()
+		_, _ = evMeasurement.RequestValues()
 	}
 
 	return result, nil
@@ -245,8 +253,10 @@ func (e *EMobility) EVCurrentsPerPhase() ([]float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *EMobility) EVCurrentLimits() ([]float64, []float64, []float64, error) {
-	if e.evEntity == nil || e.evElectricalConnection == nil {
+func (e *EMobility) EVCurrentLimits(remoteEntity api.EntityRemoteInterface) ([]float64, []float64, []float64, error) {
+	evElectricalConnection, err := e.electricalConnection(remoteEntity)
+
+	if e.evEntity == nil || err != nil {
 		return nil, nil, nil, ErrEVDisconnected
 	}
 
@@ -254,12 +264,12 @@ func (e *EMobility) EVCurrentLimits() ([]float64, []float64, []float64, error) {
 
 	for _, phaseName := range util.PhaseNameMapping {
 		// electricalParameterDescription contains the measured phase for each measurementId
-		elParamDesc, err := e.evElectricalConnection.GetParameterDescriptionForMeasuredPhase(phaseName)
+		elParamDesc, err := evElectricalConnection.GetParameterDescriptionForMeasuredPhase(phaseName)
 		if err != nil || elParamDesc.ParameterId == nil {
 			continue
 		}
 
-		dataMin, dataMax, dataDefault, err := e.evElectricalConnection.GetLimitsForParameterId(*elParamDesc.ParameterId)
+		dataMin, dataMax, dataDefault, err := evElectricalConnection.GetLimitsForParameterId(*elParamDesc.ParameterId)
 		if err != nil {
 			continue
 		}
@@ -284,14 +294,17 @@ func (e *EMobility) EVCurrentLimits() ([]float64, []float64, []float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *EMobility) EVLoadControlObligationLimits() ([]float64, error) {
-	if e.evEntity == nil || e.evElectricalConnection == nil || e.evLoadControl == nil {
+func (e *EMobility) EVLoadControlObligationLimits(remoteEntity api.EntityRemoteInterface) ([]float64, error) {
+	evLoadControl, err := e.loadControl(remoteEntity)
+	evElectricalConnection, err2 := e.electricalConnection(remoteEntity)
+
+	if e.evEntity == nil || err != nil || err2 != nil {
 		return nil, ErrEVDisconnected
 	}
 
 	// find out the appropriate limitId for each phase value
 	// limitDescription contains the measurementId for each limitId
-	limitDescriptions, err := e.evLoadControl.GetLimitDescriptionsForCategory(model.LoadControlCategoryTypeObligation)
+	limitDescriptions, err := evLoadControl.GetLimitDescriptionsForCategory(model.LoadControlCategoryTypeObligation)
 	if err != nil {
 		return nil, features.ErrDataNotAvailable
 	}
@@ -302,7 +315,7 @@ func (e *EMobility) EVLoadControlObligationLimits() ([]float64, error) {
 		phaseName := util.PhaseNameMapping[i]
 
 		// electricalParameterDescription contains the measured phase for each measurementId
-		elParamDesc, err := e.evElectricalConnection.GetParameterDescriptionForMeasuredPhase(phaseName)
+		elParamDesc, err := evElectricalConnection.GetParameterDescriptionForMeasuredPhase(phaseName)
 		if err != nil || elParamDesc.MeasurementId == nil {
 			// there is no data for this phase, the phase may not exit
 			result = append(result, 0)
@@ -324,7 +337,7 @@ func (e *EMobility) EVLoadControlObligationLimits() ([]float64, error) {
 			return nil, features.ErrDataNotAvailable
 		}
 
-		limitIdData, err := e.evLoadControl.GetLimitValueForLimitId(*limitDesc.LimitId)
+		limitIdData, err := evLoadControl.GetLimitValueForLimitId(*limitDesc.LimitId)
 		if err != nil {
 			return nil, features.ErrDataNotAvailable
 		}
@@ -332,7 +345,7 @@ func (e *EMobility) EVLoadControlObligationLimits() ([]float64, error) {
 		var limitValue float64
 		if limitIdData.Value == nil || (limitIdData.IsLimitActive != nil && !*limitIdData.IsLimitActive) {
 			// report maximum possible if no limit is available or the limit is not active
-			_, dataMax, _, err := e.evElectricalConnection.GetLimitsForParameterId(*elParamDesc.ParameterId)
+			_, dataMax, _, err := evElectricalConnection.GetLimitsForParameterId(*elParamDesc.ParameterId)
 			if err != nil {
 				return nil, features.ErrDataNotAvailable
 			}
@@ -373,12 +386,15 @@ func (e *EMobility) EVLoadControlObligationLimits() ([]float64, error) {
 //   - In ISO15118-2 the usecase is only supported via VAS extensions which are vendor specific and needs to have specific EVSE support for the specific EV brand.
 //   - In ISO15118-20 this is a standard feature which does not need special support on the EVSE.
 //   - Min power data is only provided via IEC61851 or using VAS in ISO15118-2.
-func (e *EMobility) EVWriteLoadControlLimits(limits []EVLoadLimits) error {
+func (e *EMobility) EVWriteLoadControlLimits(remoteEntity api.EntityRemoteInterface, limits []EVLoadLimits) error {
 	if e.evEntity == nil {
 		return ErrEVDisconnected
 	}
 
-	if e.evElectricalConnection == nil || e.evLoadControl == nil {
+	evLoadControl, err := e.loadControl(remoteEntity)
+	evElectricalConnection, err2 := e.electricalConnection(remoteEntity)
+
+	if err != nil || err2 != nil {
 		return features.ErrDataNotAvailable
 	}
 
@@ -390,13 +406,13 @@ func (e *EMobility) EVWriteLoadControlLimits(limits []EVLoadLimits) error {
 		for _, phaseLimit := range scope.PhaseData {
 			// find out the appropriate limitId for each phase value
 			// limitDescription contains the measurementId for each limitId
-			limitDescriptions, err := e.evLoadControl.GetLimitDescriptionsForCategory(category)
+			limitDescriptions, err := evLoadControl.GetLimitDescriptionsForCategory(category)
 			if err != nil {
 				continue
 			}
 
 			// electricalParameterDescription contains the measured phase for each measurementId
-			elParamDesc, err := e.evElectricalConnection.GetParameterDescriptionForMeasuredPhase(phaseLimit.Phase)
+			elParamDesc, err := evElectricalConnection.GetParameterDescriptionForMeasuredPhase(phaseLimit.Phase)
 			if err != nil || elParamDesc.MeasurementId == nil {
 				continue
 			}
@@ -416,7 +432,7 @@ func (e *EMobility) EVWriteLoadControlLimits(limits []EVLoadLimits) error {
 				continue
 			}
 
-			limitIdData, err := e.evLoadControl.GetLimitValueForLimitId(*limitDesc.LimitId)
+			limitIdData, err := evLoadControl.GetLimitValueForLimitId(*limitDesc.LimitId)
 			if err != nil {
 				continue
 			}
@@ -428,7 +444,7 @@ func (e *EMobility) EVWriteLoadControlLimits(limits []EVLoadLimits) error {
 			}
 
 			// electricalPermittedValueSet contains the allowed min, max and the default values per phase
-			limit := e.evElectricalConnection.AdjustValueToBeWithinPermittedValuesForParameter(phaseLimit.Value, *elParamDesc.ParameterId)
+			limit := evElectricalConnection.AdjustValueToBeWithinPermittedValuesForParameter(phaseLimit.Value, *elParamDesc.ParameterId)
 
 			newLimit := model.LoadControlLimitDataType{
 				LimitId:       limitDesc.LimitId,
@@ -439,7 +455,7 @@ func (e *EMobility) EVWriteLoadControlLimits(limits []EVLoadLimits) error {
 		}
 	}
 
-	_, err := e.evLoadControl.WriteLimitValues(limitData)
+	_, err = evLoadControl.WriteLimitValues(limitData)
 
 	return err
 }
@@ -459,18 +475,20 @@ func (e *EMobility) EVWriteLoadControlLimits(limits []EVLoadLimits) error {
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - ErrNotSupported if getting the communication standard is not supported
 //   - and others
-func (e *EMobility) EVCommunicationStandard() (EVCommunicationStandardType, error) {
-	if e.evEntity == nil || e.evDeviceConfiguration == nil {
+func (e *EMobility) EVCommunicationStandard(remoteEntity api.EntityRemoteInterface) (EVCommunicationStandardType, error) {
+	evDeviceConfiguration, err := e.deviceConfiguration(remoteEntity)
+
+	if e.evEntity == nil || err != nil {
 		return EVCommunicationStandardTypeUnknown, ErrEVDisconnected
 	}
 
 	// check if device configuration descriptions has an communication standard key name
-	_, err := e.evDeviceConfiguration.GetDescriptionForKeyName(model.DeviceConfigurationKeyNameTypeCommunicationsStandard)
+	_, err = evDeviceConfiguration.GetDescriptionForKeyName(model.DeviceConfigurationKeyNameTypeCommunicationsStandard)
 	if err != nil {
 		return EVCommunicationStandardTypeUnknown, err
 	}
 
-	data, err := e.evDeviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypeCommunicationsStandard, model.DeviceConfigurationKeyValueTypeTypeString)
+	data, err := evDeviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypeCommunicationsStandard, model.DeviceConfigurationKeyValueTypeTypeString)
 	if err != nil {
 		return EVCommunicationStandardTypeUnknown, err
 	}
@@ -488,16 +506,18 @@ func (e *EMobility) EVCommunicationStandard() (EVCommunicationStandardType, erro
 // possible errors:
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
-func (e *EMobility) EVIdentification() (string, error) {
+func (e *EMobility) EVIdentification(remoteEntity api.EntityRemoteInterface) (string, error) {
 	if e.evEntity == nil {
 		return "", ErrEVDisconnected
 	}
 
-	if e.evIdentification == nil {
+	evIdentification, err := e.identification(remoteEntity)
+
+	if err != nil {
 		return "", features.ErrDataNotAvailable
 	}
 
-	identifications, err := e.evIdentification.GetValues()
+	identifications, err := evIdentification.GetValues()
 	if err != nil {
 		return "", err
 	}
@@ -518,8 +538,10 @@ func (e *EMobility) EVIdentification() (string, error) {
 // possible errors:
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
-func (e *EMobility) EVOptimizationOfSelfConsumptionSupported() (bool, error) {
-	if e.evEntity == nil || e.evLoadControl == nil {
+func (e *EMobility) EVOptimizationOfSelfConsumptionSupported(remoteEntity api.EntityRemoteInterface) (bool, error) {
+	evLoadControl, err := e.loadControl(remoteEntity)
+
+	if e.evEntity == nil || err != nil {
 		return false, ErrEVDisconnected
 	}
 
@@ -534,7 +556,7 @@ func (e *EMobility) EVOptimizationOfSelfConsumptionSupported() (bool, error) {
 	}
 
 	// check if loadcontrol limit descriptions contains a recommendation category
-	if _, err = e.evLoadControl.GetLimitDescriptionsForCategory(model.LoadControlCategoryTypeRecommendation); err != nil {
+	if _, err = evLoadControl.GetLimitDescriptionsForCategory(model.LoadControlCategoryTypeRecommendation); err != nil {
 		return false, err
 	}
 
@@ -550,8 +572,10 @@ func (e *EMobility) EVOptimizationOfSelfConsumptionSupported() (bool, error) {
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *EMobility) EVSoCSupported() (bool, error) {
-	if e.evEntity == nil || e.evMeasurement == nil {
+func (e *EMobility) EVSoCSupported(remoteEntity api.EntityRemoteInterface) (bool, error) {
+	evMeasurement, err := e.measurement(remoteEntity)
+
+	if e.evEntity == nil || err != nil {
 		return false, ErrEVDisconnected
 	}
 
@@ -566,7 +590,7 @@ func (e *EMobility) EVSoCSupported() (bool, error) {
 	}
 
 	// check if measurement descriptions has an SoC scope type
-	desc, err := e.evMeasurement.GetDescriptionsForScope(model.ScopeTypeTypeStateOfCharge)
+	desc, err := evMeasurement.GetDescriptionsForScope(model.ScopeTypeTypeStateOfCharge)
 	if err != nil {
 		return false, err
 	}
@@ -587,13 +611,15 @@ func (e *EMobility) EVSoCSupported() (bool, error) {
 //   - ErrNotSupported if support for SoC is not possible
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *EMobility) EVSoC() (float64, error) {
-	if e.evEntity == nil || e.evMeasurement == nil {
+func (e *EMobility) EVSoC(remoteEntity api.EntityRemoteInterface) (float64, error) {
+	evMeasurement, err := e.measurement(remoteEntity)
+
+	if e.evEntity == nil || err != nil {
 		return 0, ErrEVDisconnected
 	}
 
 	// check if the SoC is supported
-	support, err := e.EVSoCSupported()
+	support, err := e.EVSoCSupported(remoteEntity)
 	if err != nil {
 		return 0, err
 	}
@@ -601,7 +627,7 @@ func (e *EMobility) EVSoC() (float64, error) {
 		return 0, features.ErrNotSupported
 	}
 
-	data, err := e.evMeasurement.GetValuesForTypeCommodityScope(model.MeasurementTypeTypePercentage, model.CommodityTypeTypeElectricity, model.ScopeTypeTypeStateOfCharge)
+	data, err := evMeasurement.GetValuesForTypeCommodityScope(model.MeasurementTypeTypePercentage, model.CommodityTypeTypeElectricity, model.ScopeTypeTypeStateOfCharge)
 	if err != nil {
 		return 0, err
 	}
@@ -617,7 +643,7 @@ func (e *EMobility) EVSoC() (float64, error) {
 // possible errors:
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
-func (e *EMobility) EVCoordinatedChargingSupported() (bool, error) {
+func (e *EMobility) EVCoordinatedChargingSupported(remoteEntity api.EntityRemoteInterface) (bool, error) {
 	if e.evEntity == nil {
 		return false, ErrEVDisconnected
 	}
@@ -636,19 +662,21 @@ func (e *EMobility) EVCoordinatedChargingSupported() (bool, error) {
 }
 
 // returns the current charging strategy
-func (e *EMobility) EVChargeStrategy() EVChargeStrategyType {
-	if e.evEntity == nil || e.evTimeSeries == nil {
+func (e *EMobility) EVChargeStrategy(remoteEntity api.EntityRemoteInterface) EVChargeStrategyType {
+	evTimeSeries, err := e.timeSeries(remoteEntity)
+
+	if e.evEntity == nil || err != nil {
 		return EVChargeStrategyTypeUnknown
 	}
 
 	// only ISO communication can provide a charging strategy information
-	com, err := e.EVCommunicationStandard()
+	com, err := e.EVCommunicationStandard(remoteEntity)
 	if err != nil || com == EVCommunicationStandardTypeUnknown || com == EVCommunicationStandardTypeIEC61851 {
 		return EVChargeStrategyTypeUnknown
 	}
 
 	// only the time series data for singledemand is relevant for detecting the charging strategy
-	data, err := e.evTimeSeries.GetValueForType(model.TimeSeriesTypeTypeSingleDemand)
+	data, err := evTimeSeries.GetValueForType(model.TimeSeriesTypeTypeSingleDemand)
 	if err != nil {
 		return EVChargeStrategyTypeUnknown
 	}
@@ -696,18 +724,20 @@ func (e *EMobility) EVChargeStrategy() EVChargeStrategyType {
 }
 
 // returns the current energy demand in Wh and the duration
-func (e *EMobility) EVEnergyDemand() (EVDemand, error) {
+func (e *EMobility) EVEnergyDemand(remoteEntity api.EntityRemoteInterface) (EVDemand, error) {
 	demand := EVDemand{}
 
 	if e.evEntity == nil {
 		return demand, ErrEVDisconnected
 	}
 
-	if e.evTimeSeries == nil {
+	evTimeSeries, err := e.timeSeries(remoteEntity)
+
+	if err != nil {
 		return demand, features.ErrDataNotAvailable
 	}
 
-	data, err := e.evTimeSeries.GetValueForType(model.TimeSeriesTypeTypeSingleDemand)
+	data, err := evTimeSeries.GetValueForType(model.TimeSeriesTypeTypeSingleDemand)
 	if err != nil {
 		return demand, features.ErrDataNotAvailable
 	}
@@ -759,18 +789,20 @@ func (e *EMobility) EVEnergyDemand() (EVDemand, error) {
 	return demand, nil
 }
 
-func (e *EMobility) EVChargePlanConstraints() ([]EVDurationSlotValue, error) {
+func (e *EMobility) EVChargePlanConstraints(remoteEntity api.EntityRemoteInterface) ([]EVDurationSlotValue, error) {
 	constraints := []EVDurationSlotValue{}
 
 	if e.evEntity == nil {
 		return constraints, ErrEVDisconnected
 	}
 
-	if e.evTimeSeries == nil {
+	evTimeSeries, err := e.timeSeries(remoteEntity)
+
+	if err != nil {
 		return constraints, features.ErrDataNotAvailable
 	}
 
-	data, err := e.evTimeSeries.GetValueForType(model.TimeSeriesTypeTypeConstraints)
+	data, err := evTimeSeries.GetValueForType(model.TimeSeriesTypeTypeConstraints)
 	if err != nil {
 		return constraints, features.ErrDataNotAvailable
 	}
@@ -813,18 +845,20 @@ func (e *EMobility) EVChargePlanConstraints() ([]EVDurationSlotValue, error) {
 	return constraints, nil
 }
 
-func (e *EMobility) EVChargePlan() (EVChargePlan, error) {
+func (e *EMobility) EVChargePlan(remoteEntity api.EntityRemoteInterface) (EVChargePlan, error) {
 	plan := EVChargePlan{}
 
 	if e.evEntity == nil {
 		return plan, ErrEVDisconnected
 	}
 
-	if e.evTimeSeries == nil {
+	evTimeSeries, err := e.timeSeries(remoteEntity)
+
+	if err != nil {
 		return plan, features.ErrDataNotAvailable
 	}
 
-	data, err := e.evTimeSeries.GetValueForType(model.TimeSeriesTypeTypePlan)
+	data, err := evTimeSeries.GetValueForType(model.TimeSeriesTypeTypePlan)
 	if err != nil {
 		return plan, features.ErrDataNotAvailable
 	}
@@ -894,14 +928,16 @@ func (e *EMobility) EVChargePlan() (EVChargePlan, error) {
 }
 
 // returns the constraints for the time slots
-func (e *EMobility) EVTimeSlotConstraints() (EVTimeSlotConstraints, error) {
+func (e *EMobility) EVTimeSlotConstraints(remoteEntity api.EntityRemoteInterface) (EVTimeSlotConstraints, error) {
 	result := EVTimeSlotConstraints{}
 
-	if e.evEntity == nil || e.evTimeSeries == nil {
+	evTimeSeries, err := e.timeSeries(remoteEntity)
+
+	if e.evEntity == nil || err != nil {
 		return result, features.ErrDataNotAvailable
 	}
 
-	constraints, err := e.evTimeSeries.GetConstraints()
+	constraints, err := evTimeSeries.GetConstraints()
 	if err != nil {
 		return result, err
 	}
@@ -935,8 +971,10 @@ func (e *EMobility) EVTimeSlotConstraints() (EVTimeSlotConstraints, error) {
 }
 
 // send power limits to the EV
-func (e *EMobility) EVWritePowerLimits(data []EVDurationSlotValue) error {
-	if e.evEntity == nil || e.evTimeSeries == nil {
+func (e *EMobility) EVWritePowerLimits(remoteEntity api.EntityRemoteInterface, data []EVDurationSlotValue) error {
+	evTimeSeries, err := e.timeSeries(remoteEntity)
+
+	if e.evEntity == nil || err != nil {
 		return ErrNotSupported
 	}
 
@@ -944,7 +982,7 @@ func (e *EMobility) EVWritePowerLimits(data []EVDurationSlotValue) error {
 		return errors.New("missing power limit data")
 	}
 
-	constraints, err := e.EVTimeSlotConstraints()
+	constraints, err := e.EVTimeSlotConstraints(remoteEntity)
 	if err != nil {
 		return err
 	}
@@ -957,7 +995,7 @@ func (e *EMobility) EVWritePowerLimits(data []EVDurationSlotValue) error {
 		return errors.New("too many charge slots provided")
 	}
 
-	desc, err := e.evTimeSeries.GetDescriptionForType(model.TimeSeriesTypeTypeConstraints)
+	desc, err := evTimeSeries.GetDescriptionForType(model.TimeSeriesTypeTypeConstraints)
 	if err != nil {
 		return ErrNotSupported
 	}
@@ -994,20 +1032,21 @@ func (e *EMobility) EVWritePowerLimits(data []EVDurationSlotValue) error {
 		TimeSeriesSlot: timeSeriesSlots,
 	}
 
-	_, err = e.evTimeSeries.WriteValues([]model.TimeSeriesDataType{timeSeriesData})
+	_, err = evTimeSeries.WriteValues([]model.TimeSeriesDataType{timeSeriesData})
 
 	return err
 }
 
 // returns the minimum and maximum number of incentive slots allowed
-func (e *EMobility) EVIncentiveConstraints() (EVIncentiveSlotConstraints, error) {
+func (e *EMobility) EVIncentiveConstraints(remoteEntity api.EntityRemoteInterface) (EVIncentiveSlotConstraints, error) {
 	result := EVIncentiveSlotConstraints{}
 
-	if e.evEntity == nil || e.evIncentiveTable == nil {
+	evIncentiveTable, err := e.incentiveTable(remoteEntity)
+	if e.evEntity == nil || err != nil {
 		return result, features.ErrDataNotAvailable
 	}
 
-	constraints, err := e.evIncentiveTable.GetConstraints()
+	constraints, err := evIncentiveTable.GetConstraints()
 	if err != nil {
 		return result, err
 	}
@@ -1026,8 +1065,10 @@ func (e *EMobility) EVIncentiveConstraints() (EVIncentiveSlotConstraints, error)
 }
 
 // send incentives to the EV
-func (e *EMobility) EVWriteIncentives(data []EVDurationSlotValue) error {
-	if e.evEntity == nil || e.evIncentiveTable == nil {
+func (e *EMobility) EVWriteIncentives(remoteEntity api.EntityRemoteInterface, data []EVDurationSlotValue) error {
+	evIncentiveTable, err := e.incentiveTable(remoteEntity)
+
+	if e.evEntity == nil || err != nil {
 		return features.ErrDataNotAvailable
 	}
 
@@ -1035,7 +1076,7 @@ func (e *EMobility) EVWriteIncentives(data []EVDurationSlotValue) error {
 		return errors.New("missing incentive data")
 	}
 
-	constraints, err := e.EVIncentiveConstraints()
+	constraints, err := e.EVIncentiveConstraints(remoteEntity)
 	if err != nil {
 		return err
 	}
@@ -1101,7 +1142,7 @@ func (e *EMobility) EVWriteIncentives(data []EVDurationSlotValue) error {
 		IncentiveSlot: incentiveSlots,
 	}
 
-	_, err = e.evIncentiveTable.WriteValues([]model.IncentiveTableType{incentiveData})
+	_, err = evIncentiveTable.WriteValues([]model.IncentiveTableType{incentiveData})
 
 	return err
 }

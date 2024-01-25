@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
 )
@@ -12,7 +13,8 @@ import (
 func Test_EVEnergySingleDemand(t *testing.T) {
 	emobilty, eebusService := setupEmobility(t)
 
-	demand, err := emobilty.EVEnergyDemand()
+	mockRemoteEntity := mocks.NewEntityRemoteInterface(t)
+	demand, err := emobilty.EVEnergyDemand(mockRemoteEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, demand.MinDemand)
 	assert.Equal(t, 0.0, demand.OptDemand)
@@ -24,7 +26,7 @@ func Test_EVEnergySingleDemand(t *testing.T) {
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	demand, err = emobilty.EVEnergyDemand()
+	demand, err = emobilty.EVEnergyDemand(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, demand.MinDemand)
 	assert.Equal(t, 0.0, demand.OptDemand)
@@ -32,9 +34,7 @@ func Test_EVEnergySingleDemand(t *testing.T) {
 	assert.Equal(t, 0.0, demand.DurationUntilStart)
 	assert.Equal(t, 0.0, demand.DurationUntilEnd)
 
-	emobilty.evDeviceConfiguration = deviceConfiguration(localEntity, emobilty.evEntity)
-
-	demand, err = emobilty.EVEnergyDemand()
+	demand, err = emobilty.EVEnergyDemand(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, demand.MinDemand)
 	assert.Equal(t, 0.0, demand.OptDemand)
@@ -58,7 +58,7 @@ func Test_EVEnergySingleDemand(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	demand, err = emobilty.EVEnergyDemand()
+	demand, err = emobilty.EVEnergyDemand(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, demand.MinDemand)
 	assert.Equal(t, 0.0, demand.OptDemand)
@@ -82,7 +82,7 @@ func Test_EVEnergySingleDemand(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	demand, err = emobilty.EVEnergyDemand()
+	demand, err = emobilty.EVEnergyDemand(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, demand.MinDemand)
 	assert.Equal(t, 0.0, demand.OptDemand)
@@ -90,9 +90,7 @@ func Test_EVEnergySingleDemand(t *testing.T) {
 	assert.Equal(t, 0.0, demand.DurationUntilStart)
 	assert.Equal(t, 0.0, demand.DurationUntilEnd)
 
-	emobilty.evTimeSeries = timeSeriesConfiguration(localEntity, emobilty.evEntity)
-
-	demand, err = emobilty.EVEnergyDemand()
+	demand, err = emobilty.EVEnergyDemand(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, demand.MinDemand)
 	assert.Equal(t, 0.0, demand.OptDemand)
@@ -131,7 +129,7 @@ func Test_EVEnergySingleDemand(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	demand, err = emobilty.EVEnergyDemand()
+	demand, err = emobilty.EVEnergyDemand(emobilty.evEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, 0.0, demand.MinDemand)
 	assert.Equal(t, 0.0, demand.OptDemand)
@@ -161,7 +159,7 @@ func Test_EVEnergySingleDemand(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	demand, err = emobilty.EVEnergyDemand()
+	demand, err = emobilty.EVEnergyDemand(emobilty.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, 0.0, demand.MinDemand)
 	assert.Equal(t, 0.0, demand.OptDemand)
@@ -194,7 +192,7 @@ func Test_EVEnergySingleDemand(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	demand, err = emobilty.EVEnergyDemand()
+	demand, err = emobilty.EVEnergyDemand(emobilty.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, 1000.0, demand.MinDemand)
 	assert.Equal(t, 10000.0, demand.OptDemand)
@@ -226,7 +224,7 @@ func Test_EVEnergySingleDemand(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	demand, err = emobilty.EVEnergyDemand()
+	demand, err = emobilty.EVEnergyDemand(emobilty.evEntity)
 	assert.Nil(t, err)
 	assert.Equal(t, 0.0, demand.MinDemand)
 	assert.Equal(t, 10000.0, demand.OptDemand)

@@ -6,8 +6,10 @@ import (
 	"time"
 
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func Test_EVWriteIncentives(t *testing.T) {
@@ -15,19 +17,22 @@ func Test_EVWriteIncentives(t *testing.T) {
 
 	data := []EVDurationSlotValue{}
 
-	err := emobilty.EVWriteIncentives(data)
+	mockRemoteDevice := mocks.NewDeviceRemoteInterface(t)
+	mockRemoteEntity := mocks.NewEntityRemoteInterface(t)
+	mockRemoteFeature := mocks.NewFeatureRemoteInterface(t)
+	mockRemoteDevice.EXPECT().FeatureByEntityTypeAndRole(mock.Anything, mock.Anything, mock.Anything).Return(mockRemoteFeature)
+	mockRemoteEntity.EXPECT().Device().Return(mockRemoteDevice)
+	err := emobilty.EVWriteIncentives(mockRemoteEntity, data)
 	assert.NotNil(t, err)
 
 	localDevice, localEntity, remoteDevice, entites, writeHandler := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	err = emobilty.EVWriteIncentives(data)
+	err = emobilty.EVWriteIncentives(emobilty.evEntity, data)
 	assert.NotNil(t, err)
 
-	emobilty.evIncentiveTable = incentiveTableConfiguration(localEntity, emobilty.evEntity)
-
-	err = emobilty.EVWriteIncentives(data)
+	err = emobilty.EVWriteIncentives(emobilty.evEntity, data)
 	assert.NotNil(t, err)
 
 	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeServer, model.RoleTypeClient)
@@ -48,7 +53,7 @@ func Test_EVWriteIncentives(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	err = emobilty.EVWriteIncentives(data)
+	err = emobilty.EVWriteIncentives(emobilty.evEntity, data)
 	assert.NotNil(t, err)
 
 	type dataStruct struct {
@@ -129,7 +134,7 @@ func Test_EVWriteIncentives(t *testing.T) {
 				err = localDevice.ProcessCmd(datagram, remoteDevice)
 				assert.Nil(t, err)
 
-				err = emobilty.EVWriteIncentives(data.slots)
+				err = emobilty.EVWriteIncentives(emobilty.evEntity, data.slots)
 				if data.error {
 					assert.NotNil(t, err)
 					continue

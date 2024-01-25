@@ -6,8 +6,10 @@ import (
 	"time"
 
 	"github.com/enbility/eebus-go/util"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func Test_EVWritePowerLimits(t *testing.T) {
@@ -15,19 +17,22 @@ func Test_EVWritePowerLimits(t *testing.T) {
 
 	data := []EVDurationSlotValue{}
 
-	err := emobilty.EVWritePowerLimits(data)
+	mockRemoteDevice := mocks.NewDeviceRemoteInterface(t)
+	mockRemoteEntity := mocks.NewEntityRemoteInterface(t)
+	mockRemoteFeature := mocks.NewFeatureRemoteInterface(t)
+	mockRemoteDevice.EXPECT().FeatureByEntityTypeAndRole(mock.Anything, mock.Anything, mock.Anything).Return(mockRemoteFeature)
+	mockRemoteEntity.EXPECT().Device().Return(mockRemoteDevice)
+	err := emobilty.EVWritePowerLimits(mockRemoteEntity, data)
 	assert.NotNil(t, err)
 
 	localDevice, localEntity, remoteDevice, entites, writeHandler := setupDevices(eebusService)
 	emobilty.evseEntity = entites[0]
 	emobilty.evEntity = entites[1]
 
-	err = emobilty.EVWritePowerLimits(data)
+	err = emobilty.EVWritePowerLimits(emobilty.evEntity, data)
 	assert.NotNil(t, err)
 
-	emobilty.evTimeSeries = timeSeriesConfiguration(localEntity, emobilty.evEntity)
-
-	err = emobilty.EVWritePowerLimits(data)
+	err = emobilty.EVWritePowerLimits(emobilty.evEntity, data)
 	assert.NotNil(t, err)
 
 	datagram := datagramForEntityAndFeatures(false, localDevice, localEntity, emobilty.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer, model.RoleTypeClient)
@@ -46,7 +51,7 @@ func Test_EVWritePowerLimits(t *testing.T) {
 	err = localDevice.ProcessCmd(datagram, remoteDevice)
 	assert.Nil(t, err)
 
-	err = emobilty.EVWritePowerLimits(data)
+	err = emobilty.EVWritePowerLimits(emobilty.evEntity, data)
 	assert.NotNil(t, err)
 
 	type dataStruct struct {
@@ -126,7 +131,7 @@ func Test_EVWritePowerLimits(t *testing.T) {
 				err = localDevice.ProcessCmd(datagram, remoteDevice)
 				assert.Nil(t, err)
 
-				err = emobilty.EVWritePowerLimits(data.slots)
+				err = emobilty.EVWritePowerLimits(emobilty.evEntity, data.slots)
 				if data.error {
 					assert.NotNil(t, err)
 					continue
