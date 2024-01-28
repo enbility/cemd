@@ -361,7 +361,7 @@ func (e *EMobility) evConnected(entity api.EntityRemoteInterface) {
 
 	// initialise features, e.g. subscriptions, bindings
 	if evDeviceClassification, err := e.deviceClassification(entity); err == nil {
-		if err := evDeviceClassification.SubscribeForEntity(); err != nil {
+		if err := evDeviceClassification.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
 
@@ -372,7 +372,7 @@ func (e *EMobility) evConnected(entity api.EntityRemoteInterface) {
 	}
 
 	if evDeviceConfiguration, err := e.deviceConfiguration(entity); err == nil {
-		if err := evDeviceConfiguration.SubscribeForEntity(); err != nil {
+		if err := evDeviceConfiguration.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
 		// get ev configuration data
@@ -382,7 +382,7 @@ func (e *EMobility) evConnected(entity api.EntityRemoteInterface) {
 	}
 
 	if evDeviceDiagnosis, err := e.deviceDiagnosis(entity); err == nil {
-		if err := evDeviceDiagnosis.SubscribeForEntity(); err != nil {
+		if err := evDeviceDiagnosis.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
 
@@ -393,7 +393,7 @@ func (e *EMobility) evConnected(entity api.EntityRemoteInterface) {
 	}
 
 	if evElectricalConnection, err := e.electricalConnection(entity); err == nil {
-		if err := evElectricalConnection.SubscribeForEntity(); err != nil {
+		if err := evElectricalConnection.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
 
@@ -409,7 +409,7 @@ func (e *EMobility) evConnected(entity api.EntityRemoteInterface) {
 	}
 
 	if evMeasurement, err := e.measurement(entity); err == nil {
-		if err := evMeasurement.SubscribeForEntity(); err != nil {
+		if err := evMeasurement.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
 
@@ -421,7 +421,7 @@ func (e *EMobility) evConnected(entity api.EntityRemoteInterface) {
 	}
 
 	if evLoadControl, err := e.loadControl(entity); err == nil {
-		if err := evLoadControl.SubscribeForEntity(); err != nil {
+		if err := evLoadControl.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
 
@@ -437,7 +437,7 @@ func (e *EMobility) evConnected(entity api.EntityRemoteInterface) {
 	}
 
 	if evIdentification, err := e.identification(entity); err == nil {
-		if err := evIdentification.SubscribeForEntity(); err != nil {
+		if err := evIdentification.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
 
@@ -449,7 +449,7 @@ func (e *EMobility) evConnected(entity api.EntityRemoteInterface) {
 
 	if e.configuration.CoordinatedChargingEnabled {
 		if evTimeSeries, err := e.timeSeries(entity); err == nil {
-			if err := evTimeSeries.SubscribeForEntity(); err != nil {
+			if err := evTimeSeries.Subscribe(); err != nil {
 				logging.Log().Debug(err)
 			}
 
@@ -465,7 +465,7 @@ func (e *EMobility) evConnected(entity api.EntityRemoteInterface) {
 		}
 
 		if evIncentiveTable, err := e.incentiveTable(entity); err == nil {
-			if err := evIncentiveTable.SubscribeForEntity(); err != nil {
+			if err := evIncentiveTable.Subscribe(); err != nil {
 				logging.Log().Debug(err)
 			}
 

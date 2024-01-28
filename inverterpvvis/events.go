@@ -113,13 +113,13 @@ func (e *InverterPVVis) inverterConnected(ski string, entity api.EntityRemoteInt
 	e.inverterDeviceConfiguration = f3
 
 	// subscribe
-	if err := e.inverterDeviceConfiguration.SubscribeForEntity(); err != nil {
+	if err := e.inverterDeviceConfiguration.Subscribe(); err != nil {
 		logging.Log().Error(err)
 	}
-	if err := e.inverterElectricalConnection.SubscribeForEntity(); err != nil {
+	if err := e.inverterElectricalConnection.Subscribe(); err != nil {
 		logging.Log().Error(err)
 	}
-	if err := e.inverterMeasurement.SubscribeForEntity(); err != nil {
+	if err := e.inverterMeasurement.Subscribe(); err != nil {
 		logging.Log().Error(err)
 	}
 

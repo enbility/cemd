@@ -97,10 +97,10 @@ func (i *InverterBatteryVis) inverterConnected(ski string, entity api.EntityRemo
 	i.inverterMeasurement = f2
 
 	// subscribe
-	if err := i.inverterElectricalConnection.SubscribeForEntity(); err != nil {
+	if err := i.inverterElectricalConnection.Subscribe(); err != nil {
 		logging.Log().Error(err)
 	}
-	if err := i.inverterMeasurement.SubscribeForEntity(); err != nil {
+	if err := i.inverterMeasurement.Subscribe(); err != nil {
 		logging.Log().Error(err)
 	}
 
