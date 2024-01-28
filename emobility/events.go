@@ -208,7 +208,7 @@ func (e *EMobility) HandleEvent(payload api.EventPayload) {
 		}
 	}
 
-	if e.dataProvider == nil {
+	if e.dataProvider == nil || payload.Entity == nil {
 		return
 	}
 
