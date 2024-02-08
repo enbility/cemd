@@ -1,6 +1,8 @@
 package emobility
 
 import (
+	"fmt"
+
 	"github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
@@ -35,6 +37,10 @@ func (e *EMobility) handleResultDeviceDiagnosis(resultMsg api.ResultMessage) {
 	if len(datagram.Payload.Cmd) > 0 &&
 		datagram.Payload.Cmd[0].DeviceDiagnosisHeartbeatData != nil {
 		// something is horribly wrong, disconnect and hope a new connection will fix it
-		e.service.DisconnectSKI(resultMsg.DeviceRemote.Ski(), string(*resultMsg.Result.Description))
+		errorText := fmt.Sprintf("Error Code: %d", resultMsg.Result.ErrorNumber)
+		if resultMsg.Result.Description != nil {
+			errorText = fmt.Sprintf("%s - %s", errorText, string(*resultMsg.Result.Description))
+		}
+		e.service.DisconnectSKI(resultMsg.DeviceRemote.Ski(), errorText)
 	}
 }
