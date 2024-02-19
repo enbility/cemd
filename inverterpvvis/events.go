@@ -73,7 +73,7 @@ func (i *InverterPVVis) HandleEvent(payload api.EventPayload) {
 			if i.inverterElectricalConnection == nil {
 				break
 			}
-			if err := i.inverterElectricalConnection.RequestDescriptions(); err != nil {
+			if _, err := i.inverterElectricalConnection.RequestDescriptions(); err != nil {
 				logging.Log().Error("Error getting electrical permitted values:", err)
 			}
 
@@ -113,27 +113,27 @@ func (e *InverterPVVis) inverterConnected(ski string, entity api.EntityRemoteInt
 	e.inverterDeviceConfiguration = f3
 
 	// subscribe
-	if err := e.inverterDeviceConfiguration.Subscribe(); err != nil {
+	if _, err := e.inverterDeviceConfiguration.Subscribe(); err != nil {
 		logging.Log().Error(err)
 	}
-	if err := e.inverterElectricalConnection.Subscribe(); err != nil {
+	if _, err := e.inverterElectricalConnection.Subscribe(); err != nil {
 		logging.Log().Error(err)
 	}
-	if err := e.inverterMeasurement.Subscribe(); err != nil {
+	if _, err := e.inverterMeasurement.Subscribe(); err != nil {
 		logging.Log().Error(err)
 	}
 
 	// get device configuration data
-	if err := e.inverterDeviceConfiguration.RequestDescriptions(); err != nil {
+	if _, err := e.inverterDeviceConfiguration.RequestDescriptions(); err != nil {
 		logging.Log().Error(err)
 	}
 
 	// get electrical connection parameter
-	if err := e.inverterElectricalConnection.RequestDescriptions(); err != nil {
+	if _, err := e.inverterElectricalConnection.RequestDescriptions(); err != nil {
 		logging.Log().Error(err)
 	}
 
-	if err := e.inverterElectricalConnection.RequestParameterDescriptions(); err != nil {
+	if _, err := e.inverterElectricalConnection.RequestParameterDescriptions(); err != nil {
 		logging.Log().Error(err)
 	}
 

@@ -37,7 +37,7 @@ type UCEvCCInterface interface {
 
 	// the manufacturer data of an EVSE
 	// returns deviceName, serialNumber, error
-	EVManufacturerData(ski string, entity spineapi.EntityRemoteInterface) (string, string, error)
+	EVManufacturerData(entity spineapi.EntityRemoteInterface) (string, string, error)
 
 	// Scenario 6
 
@@ -50,7 +50,7 @@ type UCEvCCInterface interface {
 	// Scenario 7
 
 	// is the EV in sleep mode
-	EVInSleepMode(ski string, entity spineapi.EntityRemoteInterface) (bool, error)
+	EVInSleepMode(entity spineapi.EntityRemoteInterface) (bool, error)
 }
 
 // EV identification
@@ -61,6 +61,10 @@ type IdentificationItem struct {
 	// the type of the identification value, e.g.
 	ValueType model.IdentificationTypeType
 }
+
+const (
+	UcEVCCUnknownCommunicationStandard string = "unknown"
+)
 
 const (
 	// An EV was connected
@@ -75,6 +79,9 @@ const (
 	// EV manufacturer data was updated
 	UCEvCCEventManufacturerUpdate api.UseCaseEventType = "ucEvManufacturerUpdate"
 
-	// EV charging power limits updated
-	UCEvCCEventChargingPowerLimitsUpdate api.UseCaseEventType = "ucEvPowerLimitsUpdate"
+	// EV electrical connection data was updated (number of phases of the EVSE)
+	UCEvCCEventElectricalConnectionUpdate api.UseCaseEventType = "ucEvElectricalConnectionUpdate"
+
+	// EV permitted power limits updated
+	UCEvCCEventPermittedLimitsUpdate api.UseCaseEventType = "ucEvPermittedLimitsUpdate"
 )

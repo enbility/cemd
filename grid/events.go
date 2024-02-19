@@ -88,32 +88,32 @@ func (e *Grid) gridConnected(ski string, entity api.EntityRemoteInterface) {
 	e.gridMeasurement = f3
 
 	// subscribe
-	if err := e.gridDeviceConfiguration.Subscribe(); err != nil {
+	if _, err := e.gridDeviceConfiguration.Subscribe(); err != nil {
 		logging.Log().Error(err)
 		return
 	}
-	if err := e.gridElectricalConnection.Subscribe(); err != nil {
+	if _, err := e.gridElectricalConnection.Subscribe(); err != nil {
 		logging.Log().Error(err)
 		return
 	}
-	if err := e.gridMeasurement.Subscribe(); err != nil {
+	if _, err := e.gridMeasurement.Subscribe(); err != nil {
 		logging.Log().Error(err)
 		return
 	}
 
 	// get configuration data
-	if err := e.gridDeviceConfiguration.RequestDescriptions(); err != nil {
+	if _, err := e.gridDeviceConfiguration.RequestDescriptions(); err != nil {
 		logging.Log().Error(err)
 		return
 	}
 
 	// get electrical connection parameter
-	if err := e.gridElectricalConnection.RequestDescriptions(); err != nil {
+	if _, err := e.gridElectricalConnection.RequestDescriptions(); err != nil {
 		logging.Log().Error(err)
 		return
 	}
 
-	if err := e.gridElectricalConnection.RequestParameterDescriptions(); err != nil {
+	if _, err := e.gridElectricalConnection.RequestParameterDescriptions(); err != nil {
 		logging.Log().Error(err)
 		return
 	}

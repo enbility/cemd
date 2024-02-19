@@ -63,7 +63,7 @@ func (i *InverterBatteryVis) HandleEvent(payload api.EventPayload) {
 			if i.inverterElectricalConnection == nil {
 				break
 			}
-			if err := i.inverterElectricalConnection.RequestDescriptions(); err != nil {
+			if _, err := i.inverterElectricalConnection.RequestDescriptions(); err != nil {
 				logging.Log().Error("Error getting electrical permitted values:", err)
 			}
 
@@ -97,19 +97,19 @@ func (i *InverterBatteryVis) inverterConnected(ski string, entity api.EntityRemo
 	i.inverterMeasurement = f2
 
 	// subscribe
-	if err := i.inverterElectricalConnection.Subscribe(); err != nil {
+	if _, err := i.inverterElectricalConnection.Subscribe(); err != nil {
 		logging.Log().Error(err)
 	}
-	if err := i.inverterMeasurement.Subscribe(); err != nil {
+	if _, err := i.inverterMeasurement.Subscribe(); err != nil {
 		logging.Log().Error(err)
 	}
 
 	// get electrical connection parameter
-	if err := i.inverterElectricalConnection.RequestDescriptions(); err != nil {
+	if _, err := i.inverterElectricalConnection.RequestDescriptions(); err != nil {
 		logging.Log().Error(err)
 	}
 
-	if err := i.inverterElectricalConnection.RequestParameterDescriptions(); err != nil {
+	if _, err := i.inverterElectricalConnection.RequestParameterDescriptions(); err != nil {
 		logging.Log().Error(err)
 	}
 

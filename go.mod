@@ -31,3 +31,9 @@ require (
 	golang.org/x/tools v0.17.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/enbility/eebus-go => ../eebus-go
+
+replace github.com/enbility/ship-go => ../ship-go
+
+replace github.com/enbility/spine-go => ../spine-go

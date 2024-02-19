@@ -16,7 +16,7 @@ type UCEvCC struct {
 
 var _ UCEvCCInterface = (*UCEvCC)(nil)
 
-func NewUCEvseCC(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.UseCaseEventReaderInterface) *UCEvCC {
+func NewUCEvCC(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.UseCaseEventReaderInterface) *UCEvCC {
 	uc := &UCEvCC{
 		service: service,
 		reader:  reader,

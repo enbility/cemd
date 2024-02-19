@@ -73,7 +73,7 @@ func (e *UCEvCC) deviceConfigurationValueForKeyName(
 //   - ErrNotSupported if getting the communication standard is not supported
 //   - and others
 func (e *UCEvCC) EVCommunicationStandard(entity spineapi.EntityRemoteInterface) (string, error) {
-	unknown := "unknown"
+	unknown := UcEVCCUnknownCommunicationStandard
 
 	data, err := e.deviceConfigurationValueForKeyName(entity, model.DeviceConfigurationKeyNameTypeCommunicationsStandard, model.DeviceConfigurationKeyValueTypeTypeString)
 	if err != nil {
@@ -151,7 +151,6 @@ func (e *UCEvCC) EVIdentifications(entity spineapi.EntityRemoteInterface) ([]Ide
 // the manufacturer data of an EVSE
 // returns deviceName, serialNumber, error
 func (e *UCEvCC) EVManufacturerData(
-	ski string,
 	entity spineapi.EntityRemoteInterface,
 ) (
 	string,
@@ -260,10 +259,9 @@ func (e *UCEvCC) EVCurrentLimits(entity spineapi.EntityRemoteInterface) ([]float
 // is the EV in sleep mode
 // returns operatingState, lastErrorCode, error
 func (e *UCEvCC) EVInSleepMode(
-	ski string,
 	entity spineapi.EntityRemoteInterface,
 ) (bool, error) {
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEVSE {
+	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
 		return false, api.ErrNoEvseEntity
 	}
 

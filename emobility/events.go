@@ -184,7 +184,7 @@ func (e *EMobility) HandleEvent(payload api.EventPayload) {
 
 				switch *payload.CmdClassifier {
 				case model.CmdClassifierTypeReply:
-					if err := evIncentiveTable.RequestConstraints(); err == nil {
+					if _, err := evIncentiveTable.RequestConstraints(); err == nil {
 						break
 					}
 
@@ -361,7 +361,7 @@ func (e *EMobility) evConnected(entity api.EntityRemoteInterface) {
 
 	// initialise features, e.g. subscriptions, bindings
 	if evDeviceClassification, err := e.deviceClassification(entity); err == nil {
-		if err := evDeviceClassification.Subscribe(); err != nil {
+		if _, err := evDeviceClassification.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
 
@@ -372,17 +372,17 @@ func (e *EMobility) evConnected(entity api.EntityRemoteInterface) {
 	}
 
 	if evDeviceConfiguration, err := e.deviceConfiguration(entity); err == nil {
-		if err := evDeviceConfiguration.Subscribe(); err != nil {
+		if _, err := evDeviceConfiguration.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
 		// get ev configuration data
-		if err := evDeviceConfiguration.RequestDescriptions(); err != nil {
+		if _, err := evDeviceConfiguration.RequestDescriptions(); err != nil {
 			logging.Log().Debug(err)
 		}
 	}
 
 	if evDeviceDiagnosis, err := e.deviceDiagnosis(entity); err == nil {
-		if err := evDeviceDiagnosis.Subscribe(); err != nil {
+		if _, err := evDeviceDiagnosis.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
 
@@ -393,23 +393,23 @@ func (e *EMobility) evConnected(entity api.EntityRemoteInterface) {
 	}
 
 	if evElectricalConnection, err := e.electricalConnection(entity); err == nil {
-		if err := evElectricalConnection.Subscribe(); err != nil {
+		if _, err := evElectricalConnection.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
 
 		// get electrical connection parameter
-		if err := evElectricalConnection.RequestDescriptions(); err != nil {
+		if _, err := evElectricalConnection.RequestDescriptions(); err != nil {
 			logging.Log().Debug(err)
 		}
 
-		if err := evElectricalConnection.RequestParameterDescriptions(); err != nil {
+		if _, err := evElectricalConnection.RequestParameterDescriptions(); err != nil {
 			logging.Log().Debug(err)
 		}
 
 	}
 
 	if evMeasurement, err := e.measurement(entity); err == nil {
-		if err := evMeasurement.Subscribe(); err != nil {
+		if _, err := evMeasurement.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
 
@@ -421,23 +421,23 @@ func (e *EMobility) evConnected(entity api.EntityRemoteInterface) {
 	}
 
 	if evLoadControl, err := e.loadControl(entity); err == nil {
-		if err := evLoadControl.Subscribe(); err != nil {
+		if _, err := evLoadControl.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
 
-		if err := evLoadControl.Bind(); err != nil {
+		if _, err := evLoadControl.Bind(); err != nil {
 			logging.Log().Debug(err)
 		}
 
 		// get loadlimit parameter
-		if err := evLoadControl.RequestLimitDescriptions(); err != nil {
+		if _, err := evLoadControl.RequestLimitDescriptions(); err != nil {
 			logging.Log().Debug(err)
 		}
 
 	}
 
 	if evIdentification, err := e.identification(entity); err == nil {
-		if err := evIdentification.Subscribe(); err != nil {
+		if _, err := evIdentification.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
 
@@ -449,11 +449,11 @@ func (e *EMobility) evConnected(entity api.EntityRemoteInterface) {
 
 	if e.configuration.CoordinatedChargingEnabled {
 		if evTimeSeries, err := e.timeSeries(entity); err == nil {
-			if err := evTimeSeries.Subscribe(); err != nil {
+			if _, err := evTimeSeries.Subscribe(); err != nil {
 				logging.Log().Debug(err)
 			}
 
-			if err := evTimeSeries.Bind(); err != nil {
+			if _, err := evTimeSeries.Bind(); err != nil {
 				logging.Log().Debug(err)
 			}
 
@@ -465,16 +465,16 @@ func (e *EMobility) evConnected(entity api.EntityRemoteInterface) {
 		}
 
 		if evIncentiveTable, err := e.incentiveTable(entity); err == nil {
-			if err := evIncentiveTable.Subscribe(); err != nil {
+			if _, err := evIncentiveTable.Subscribe(); err != nil {
 				logging.Log().Debug(err)
 			}
 
-			if err := evIncentiveTable.Bind(); err != nil {
+			if _, err := evIncentiveTable.Bind(); err != nil {
 				logging.Log().Debug(err)
 			}
 
 			// get incentive table parameter
-			if err := evIncentiveTable.RequestDescriptions(); err != nil {
+			if _, err := evIncentiveTable.RequestDescriptions(); err != nil {
 				logging.Log().Debug(err)
 			}
 

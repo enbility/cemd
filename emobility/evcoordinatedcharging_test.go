@@ -21,9 +21,6 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 	mockRemoteFeature := mocks.NewFeatureRemoteInterface(t)
 	mockRemoteDevice.EXPECT().FeatureByEntityTypeAndRole(mock.Anything, mock.Anything, mock.Anything).Return(mockRemoteFeature)
 	mockRemoteEntity.EXPECT().Device().Return(mockRemoteDevice)
-	data, err := emobility.EVChargedEnergy(mockRemoteEntity)
-	assert.NotNil(t, err)
-	assert.Equal(t, 0.0, data)
 
 	localDevice, localEntity, remoteDevice, entites, _ := setupDevices(eebusService)
 	emobility.evseEntity = entites[0]
@@ -64,7 +61,7 @@ func Test_CoordinatedChargingScenarios(t *testing.T) {
 
 	datagramtt.Payload.Cmd = cmd
 
-	err = localDevice.ProcessCmd(datagramtt, remoteDevice)
+	err := localDevice.ProcessCmd(datagramtt, remoteDevice)
 	assert.Nil(t, err)
 
 	demand, err := emobility.EVEnergyDemand(emobility.evEntity)

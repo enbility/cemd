@@ -10,7 +10,6 @@ import (
 // the manufacturer data of an EVSE
 // returns deviceName, serialNumber, error
 func (e *UCEvseCC) EVSEManufacturerData(
-	ski string,
 	entity spineapi.EntityRemoteInterface,
 ) (
 	string,
@@ -20,7 +19,7 @@ func (e *UCEvseCC) EVSEManufacturerData(
 	deviceName := ""
 	serialNumber := ""
 
-	if entity.EntityType() != model.EntityTypeTypeEVSE {
+	if entity == nil || entity.EntityType() != model.EntityTypeTypeEVSE {
 		return deviceName, serialNumber, api.ErrNoEvseEntity
 	}
 
@@ -48,7 +47,6 @@ func (e *UCEvseCC) EVSEManufacturerData(
 // the operating state data of an EVSE
 // returns operatingState, lastErrorCode, error
 func (e *UCEvseCC) EVSEOperatingState(
-	ski string,
 	entity spineapi.EntityRemoteInterface,
 ) (
 	model.DeviceDiagnosisOperatingStateType, string, error,
@@ -56,7 +54,7 @@ func (e *UCEvseCC) EVSEOperatingState(
 	operatingState := model.DeviceDiagnosisOperatingStateTypeNormalOperation
 	lastErrorCode := ""
 
-	if entity.EntityType() != model.EntityTypeTypeEVSE {
+	if entity == nil || entity.EntityType() != model.EntityTypeTypeEVSE {
 		return operatingState, lastErrorCode, api.ErrNoEvseEntity
 	}
 

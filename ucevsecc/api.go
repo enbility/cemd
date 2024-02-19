@@ -14,11 +14,11 @@ type UCEvseCCInterface interface {
 
 	// the manufacturer data of an EVSE
 	// returns deviceName, serialNumber, error
-	EVSEManufacturerData(ski string, entity spineapi.EntityRemoteInterface) (string, string, error)
+	EVSEManufacturerData(entity spineapi.EntityRemoteInterface) (string, string, error)
 
 	// the operating state data of an EVSE
 	// returns operatingState, lastErrorCode, error
-	EVSEOperatingState(ski string, entity spineapi.EntityRemoteInterface) (model.DeviceDiagnosisOperatingStateType, string, error)
+	EVSEOperatingState(entity spineapi.EntityRemoteInterface) (model.DeviceDiagnosisOperatingStateType, string, error)
 }
 
 const (

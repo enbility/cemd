@@ -44,3 +44,9 @@ func Identification(service eebusapi.ServiceInterface, remoteEntity api.EntityRe
 
 	return features.NewIdentification(model.RoleTypeClient, model.RoleTypeServer, localEntity, remoteEntity)
 }
+
+func Measurement(service eebusapi.ServiceInterface, remoteEntity api.EntityRemoteInterface) (*features.Measurement, error) {
+	localEntity := localCemEntity(service)
+
+	return features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localEntity, remoteEntity)
+}

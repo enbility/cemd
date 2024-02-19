@@ -50,37 +50,6 @@ type EMobilityInterface interface {
 	// return the current charge state of the EV
 	EVCurrentChargeState(remoteEntity api.EntityRemoteInterface) (EVChargeStateType, error)
 
-	// return the number of ac connected phases of the EV or 0 if it is unknown
-	EVConnectedPhases(remoteEntity api.EntityRemoteInterface) (uint, error)
-
-	// return the charged energy measurement in Wh of the connected EV
-	//
-	// possible errors:
-	//   - ErrDataNotAvailable if no such measurement is (yet) available
-	//   - and others
-	EVChargedEnergy(remoteEntity api.EntityRemoteInterface) (float64, error)
-
-	// return the last power measurement for each phase of the connected EV
-	//
-	// possible errors:
-	//   - ErrDataNotAvailable if no such measurement is (yet) available
-	//   - and others
-	EVPowerPerPhase(remoteEntity api.EntityRemoteInterface) ([]float64, error)
-
-	// return the last current measurement for each phase of the connected EV
-	//
-	// possible errors:
-	//   - ErrDataNotAvailable if no such measurement is (yet) available
-	//   - and others
-	EVCurrentsPerPhase(remoteEntity api.EntityRemoteInterface) ([]float64, error)
-
-	// return the min, max, default limits for each phase of the connected EV
-	//
-	// possible errors:
-	//   - ErrDataNotAvailable if no such measurement is (yet) available
-	//   - and others
-	EVCurrentLimits(remoteEntity api.EntityRemoteInterface) ([]float64, []float64, []float64, error)
-
 	// return the current loadcontrol obligation limits
 	//
 	// possible errors:
@@ -116,30 +85,6 @@ type EMobilityInterface interface {
 	// and needs to have specific EVSE support for the specific EV brand.
 	// In ISO15118-20 this is a standard feature which does not need special support on the EVSE.
 	EVWriteLoadControlLimits(remoteEntity api.EntityRemoteInterface, limits []EVLoadLimits) error
-
-	// return the current communication standard type used to communicate between EVSE and EV
-	//
-	// if an EV is connected via IEC61851, no ISO15118 specific data can be provided!
-	// sometimes the connection starts with IEC61851 before it switches
-	// to ISO15118, and sometimes it falls back again. so the error return is
-	// never absolut for the whole connection time, except if the use case
-	// is not supported
-	//
-	// the values are not constant and can change due to communication problems, bugs, and
-	// sometimes communication starts with IEC61851 before it switches to ISO
-	//
-	// possible errors:
-	//   - ErrDataNotAvailable if that information is not (yet) available
-	//   - ErrNotSupported if getting the communication standard is not supported
-	//   - and others
-	EVCommunicationStandard(remoteEntity api.EntityRemoteInterface) (EVCommunicationStandardType, error)
-
-	// returns the identification of the currently connected EV or nil if not available
-	//
-	// possible errors:
-	//   - ErrDataNotAvailable if that information is not (yet) available
-	//   - and others
-	EVIdentification(remoteEntity api.EntityRemoteInterface) (string, error)
 
 	// returns if the EVSE and EV combination support optimzation of self consumption
 	//
