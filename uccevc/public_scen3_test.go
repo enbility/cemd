@@ -85,7 +85,7 @@ func (s *UCCEVCSuite) Test_EVWriteIncentives() {
 	assert.Nil(s.T(), fErr)
 
 	err = s.sut.WriteIncentives(s.evEntity, data)
-	assert.NotNil(s.T(), err)
+	assert.Nil(s.T(), err)
 
 	type dataStruct struct {
 		error              bool

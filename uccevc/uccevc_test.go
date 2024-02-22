@@ -21,9 +21,9 @@ func (s *UCCEVCSuite) Test_IsUseCaseSupported() {
 				Actor: eebusutil.Ptr(model.UseCaseActorTypeEV),
 				UseCaseSupport: []model.UseCaseSupportType{
 					{
-						UseCaseName:      eebusutil.Ptr(model.UseCaseNameTypeOptimizationOfSelfConsumptionDuringEVCharging),
+						UseCaseName:      eebusutil.Ptr(model.UseCaseNameTypeCoordinatedEVCharging),
 						UseCaseAvailable: eebusutil.Ptr(true),
-						ScenarioSupport:  []model.UseCaseScenarioSupportType{1, 2, 3},
+						ScenarioSupport:  []model.UseCaseScenarioSupportType{2, 3, 4, 5, 6, 7, 8},
 					},
 				},
 			},
@@ -39,17 +39,36 @@ func (s *UCCEVCSuite) Test_IsUseCaseSupported() {
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), false, data)
 
-	descData := &model.LoadControlLimitDescriptionListDataType{
-		LoadControlLimitDescriptionData: []model.LoadControlLimitDescriptionDataType{
+	timeDescData := &model.TimeSeriesDescriptionListDataType{
+		TimeSeriesDescriptionData: []model.TimeSeriesDescriptionDataType{
 			{
-				LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(0)),
-				LimitCategory: eebusutil.Ptr(model.LoadControlCategoryTypeRecommendation),
+				TimeSeriesId:   eebusutil.Ptr(model.TimeSeriesIdType(0)),
+				TimeSeriesType: eebusutil.Ptr(model.TimeSeriesTypeTypeConstraints),
 			},
 		},
 	}
 
-	rFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.evEntity, model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
-	fErr = rFeature.UpdateData(model.FunctionTypeLoadControlLimitDescriptionListData, descData, nil, nil)
+	rFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer)
+	fErr = rFeature.UpdateData(model.FunctionTypeTimeSeriesDescriptionListData, timeDescData, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	data, err = s.sut.IsUseCaseSupported(s.evEntity)
+	assert.NotNil(s.T(), err)
+	assert.Equal(s.T(), false, data)
+
+	descData := &model.IncentiveTableDescriptionDataType{
+		IncentiveTableDescription: []model.IncentiveTableDescriptionType{
+			{
+				TariffDescription: &model.TariffDescriptionDataType{
+					TariffId:  eebusutil.Ptr(model.TariffIdType(0)),
+					ScopeType: eebusutil.Ptr(model.ScopeTypeTypeSimpleIncentiveTable),
+				},
+			},
+		},
+	}
+
+	rFeature = s.remoteDevice.FeatureByEntityTypeAndRole(s.evEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeServer)
+	fErr = rFeature.UpdateData(model.FunctionTypeIncentiveTableDescriptionData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
 	data, err = s.sut.IsUseCaseSupported(s.evEntity)
