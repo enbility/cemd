@@ -8,7 +8,7 @@ import (
 )
 
 // handle SPINE events
-func (e *UCOSCEV) HandleEvent(payload api.EventPayload) {
+func (e *UCOSCEV) HandleEvent(payload spineapi.EventPayload) {
 	// most of the events are identical to OPEV, and OPEV is required to be used,
 	// we don't handle the same events in here
 
@@ -36,7 +36,7 @@ func (e *UCOSCEV) evLoadControlLimitDataUpdate(ski string, entity spineapi.Entit
 		return
 	}
 
-	data, err := evLoadControl.GetLimitDescriptionsForCategory(model.LoadControlCategoryTypeObligation)
+	data, err := evLoadControl.GetLimitDescriptionsForCategory(model.LoadControlCategoryTypeRecommendation)
 	if err != nil {
 		return
 	}

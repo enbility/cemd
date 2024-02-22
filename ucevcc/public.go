@@ -225,32 +225,6 @@ func (e *UCEVCC) ManufacturerData(
 	return deviceName, serialNumber, nil
 }
 
-// return the number of ac connected phases of the EV or 0 if it is unknown
-func (e *UCEVCC) ConnectedPhases(entity spineapi.EntityRemoteInterface) (uint, error) {
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return 0, api.ErrNoEvEntity
-	}
-
-	evElectricalConnection, err := util.ElectricalConnection(e.service, entity)
-	if err != nil {
-		return 0, features.ErrDataNotAvailable
-	}
-
-	data, err := evElectricalConnection.GetDescriptions()
-	if err != nil {
-		return 0, features.ErrDataNotAvailable
-	}
-
-	for _, item := range data {
-		if item.ElectricalConnectionId != nil && item.AcConnectedPhases != nil {
-			return *item.AcConnectedPhases, nil
-		}
-	}
-
-	// default to 0 if the value is not available
-	return 0, nil
-}
-
 // return the min, max, default limits for each phase of the connected EV
 //
 // possible errors:
