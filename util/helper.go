@@ -66,37 +66,37 @@ func IsDeviceDisconnected(payload spineapi.EventPayload) bool {
 }
 
 func IsEvseConnected(payload spineapi.EventPayload) bool {
-	if payload.EventType != spineapi.EventTypeEntityChange &&
-		payload.ChangeType != spineapi.ElementChangeAdd {
-		return false
+	if payload.EventType == spineapi.EventTypeEntityChange &&
+		payload.ChangeType == spineapi.ElementChangeAdd {
+		return IsPayloadForEntityType(payload, model.EntityTypeTypeEVSE)
 	}
 
-	return IsPayloadForEntityType(payload, model.EntityTypeTypeEVSE)
+	return false
 }
 
 func IsEvseDisconnected(payload spineapi.EventPayload) bool {
-	if payload.EventType != spineapi.EventTypeEntityChange &&
-		payload.ChangeType != spineapi.ElementChangeRemove {
-		return false
+	if payload.EventType == spineapi.EventTypeEntityChange &&
+		payload.ChangeType == spineapi.ElementChangeRemove {
+		return IsPayloadForEntityType(payload, model.EntityTypeTypeEVSE)
 	}
 
-	return IsPayloadForEntityType(payload, model.EntityTypeTypeEVSE)
+	return false
 }
 
 func IsEvConnected(payload spineapi.EventPayload) bool {
-	if payload.EventType != spineapi.EventTypeEntityChange &&
-		payload.ChangeType != spineapi.ElementChangeAdd {
-		return false
+	if payload.EventType == spineapi.EventTypeEntityChange &&
+		payload.ChangeType == spineapi.ElementChangeAdd {
+		return IsPayloadForEntityType(payload, model.EntityTypeTypeEV)
 	}
 
-	return IsPayloadForEntityType(payload, model.EntityTypeTypeEV)
+	return false
 }
 
 func IsEvDisconnected(payload spineapi.EventPayload) bool {
-	if payload.EventType != spineapi.EventTypeEntityChange &&
-		payload.ChangeType != spineapi.ElementChangeAdd {
-		return false
+	if payload.EventType == spineapi.EventTypeEntityChange &&
+		payload.ChangeType == spineapi.ElementChangeAdd {
+		return IsPayloadForEntityType(payload, model.EntityTypeTypeEV)
 	}
 
-	return IsPayloadForEntityType(payload, model.EntityTypeTypeEV)
+	return false
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (s *UCCEVCSuite) Test_EVGetTimeSlotConstraints() {
+func (s *UCCEVCSuite) Test_TimeSlotConstraints() {
 	constraints, err := s.sut.TimeSlotConstraints(s.mockRemoteEntity)
 	assert.Equal(s.T(), uint(0), constraints.MinSlots)
 	assert.Equal(s.T(), uint(0), constraints.MaxSlots)
@@ -54,11 +54,67 @@ func (s *UCCEVCSuite) Test_EVGetTimeSlotConstraints() {
 	assert.Equal(s.T(), err, nil)
 }
 
-func (s *UCCEVCSuite) Test_EVWritePowerLimits() {
+func (s *UCCEVCSuite) Test_WritePowerLimits() {
 	data := []api.DurationSlotValue{}
 
 	err := s.sut.WritePowerLimits(s.mockRemoteEntity, data)
 	assert.NotNil(s.T(), err)
+
+	err = s.sut.WritePowerLimits(s.evEntity, data)
+	assert.NotNil(s.T(), err)
+
+	elParamDesc := &model.ElectricalConnectionParameterDescriptionListDataType{
+		ElectricalConnectionParameterDescriptionData: []model.ElectricalConnectionParameterDescriptionDataType{
+			{
+				ElectricalConnectionId: util.Ptr(model.ElectricalConnectionIdType(0)),
+				ParameterId:            util.Ptr(model.ElectricalConnectionParameterIdType(0)),
+				ScopeType:              util.Ptr(model.ScopeTypeTypeACPower),
+			},
+		},
+	}
+
+	rFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.evEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer)
+	fErr := rFeature.UpdateData(model.FunctionTypeElectricalConnectionParameterDescriptionListData, elParamDesc, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	err = s.sut.WritePowerLimits(s.evEntity, data)
+	assert.NotNil(s.T(), err)
+
+	elPermDesc := &model.ElectricalConnectionPermittedValueSetListDataType{
+		ElectricalConnectionPermittedValueSetData: []model.ElectricalConnectionPermittedValueSetDataType{
+			{
+				ElectricalConnectionId: util.Ptr(model.ElectricalConnectionIdType(0)),
+				ParameterId:            util.Ptr(model.ElectricalConnectionParameterIdType(0)),
+			},
+		},
+	}
+
+	fErr = rFeature.UpdateData(model.FunctionTypeElectricalConnectionPermittedValueSetListData, elPermDesc, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	err = s.sut.WritePowerLimits(s.evEntity, data)
+	assert.NotNil(s.T(), err)
+
+	elPermDesc = &model.ElectricalConnectionPermittedValueSetListDataType{
+		ElectricalConnectionPermittedValueSetData: []model.ElectricalConnectionPermittedValueSetDataType{
+			{
+				ElectricalConnectionId: util.Ptr(model.ElectricalConnectionIdType(0)),
+				ParameterId:            util.Ptr(model.ElectricalConnectionParameterIdType(0)),
+				PermittedValueSet: []model.ScaledNumberSetType{
+					{
+						Range: []model.ScaledNumberRangeType{
+							{
+								Max: model.NewScaledNumberType(16),
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	fErr = rFeature.UpdateData(model.FunctionTypeElectricalConnectionPermittedValueSetListData, elPermDesc, nil, nil)
+	assert.Nil(s.T(), fErr)
 
 	err = s.sut.WritePowerLimits(s.evEntity, data)
 	assert.NotNil(s.T(), err)
@@ -72,8 +128,8 @@ func (s *UCCEVCSuite) Test_EVWritePowerLimits() {
 		},
 	}
 
-	rFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer)
-	fErr := rFeature.UpdateData(model.FunctionTypeTimeSeriesDescriptionListData, descData, nil, nil)
+	rFeature = s.remoteDevice.FeatureByEntityTypeAndRole(s.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer)
+	fErr = rFeature.UpdateData(model.FunctionTypeTimeSeriesDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
 	err = s.sut.WritePowerLimits(s.evEntity, data)

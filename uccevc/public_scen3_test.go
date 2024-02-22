@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (s *UCCEVCSuite) Test_EVGetIncentiveConstraints() {
+func (s *UCCEVCSuite) Test_IncentiveConstraints() {
 	constraints, err := s.sut.IncentiveConstraints(s.mockRemoteEntity)
 	assert.Equal(s.T(), uint(0), constraints.MinSlots)
 	assert.Equal(s.T(), uint(0), constraints.MaxSlots)
@@ -60,7 +60,63 @@ func (s *UCCEVCSuite) Test_EVGetIncentiveConstraints() {
 	assert.Equal(s.T(), err, nil)
 }
 
-func (s *UCCEVCSuite) Test_EVWriteIncentives() {
+func (s *UCCEVCSuite) Test_WriteIncentiveTableDescriptions() {
+	data := []api.IncentiveTariffDescription{}
+
+	err := s.sut.WriteIncentiveTableDescriptions(s.mockRemoteEntity, data)
+	assert.NotNil(s.T(), err)
+
+	err = s.sut.WriteIncentiveTableDescriptions(s.evEntity, data)
+	assert.NotNil(s.T(), err)
+
+	descData := &model.IncentiveTableDescriptionDataType{
+		IncentiveTableDescription: []model.IncentiveTableDescriptionType{
+			{
+				TariffDescription: &model.TariffDescriptionDataType{
+					TariffId:  util.Ptr(model.TariffIdType(0)),
+					ScopeType: util.Ptr(model.ScopeTypeTypeSimpleIncentiveTable),
+				},
+			},
+		},
+	}
+
+	rFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.evEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeServer)
+	fErr := rFeature.UpdateData(model.FunctionTypeIncentiveTableDescriptionData, descData, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	err = s.sut.WriteIncentiveTableDescriptions(s.evEntity, data)
+	assert.Nil(s.T(), err)
+
+	data = []api.IncentiveTariffDescription{
+		{
+			Tiers: []api.IncentiveTableDescriptionTier{
+				{
+					Id:   0,
+					Type: model.TierTypeTypeDynamicCost,
+					Boundaries: []api.TierBoundaryDescription{
+						{
+							Id:   0,
+							Type: model.TierBoundaryTypeTypePowerBoundary,
+							Unit: model.UnitOfMeasurementTypeW,
+						},
+					},
+					Incentives: []api.IncentiveDescription{
+						{
+							Id:       0,
+							Type:     model.IncentiveTypeTypeAbsoluteCost,
+							Currency: model.CurrencyTypeEur,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	err = s.sut.WriteIncentiveTableDescriptions(s.evEntity, data)
+	assert.Nil(s.T(), err)
+}
+
+func (s *UCCEVCSuite) Test_WriteIncentives() {
 	data := []api.DurationSlotValue{}
 
 	err := s.sut.WriteIncentives(s.mockRemoteEntity, data)

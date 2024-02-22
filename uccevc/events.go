@@ -21,25 +21,26 @@ func (e *UCCEVC) HandleEvent(payload spineapi.EventPayload) {
 		return
 	}
 
-	switch payload.EventType {
-	case spineapi.EventTypeDataChange:
-		if payload.ChangeType != spineapi.ElementChangeUpdate {
-			return
-		}
+	if payload.EventType != spineapi.EventTypeDataChange {
+		return
+	}
 
-		switch payload.Data.(type) {
-		case *model.TimeSeriesDescriptionListDataType:
-			e.evTimeSeriesDescriptionDataUpdate(payload.Ski, payload.Entity)
+	if payload.ChangeType != spineapi.ElementChangeUpdate {
+		return
+	}
 
-		case *model.TimeSeriesListDataType:
-			e.evTimeSeriesDataUpdate(payload.Ski, payload.Entity)
+	switch payload.Data.(type) {
+	case *model.TimeSeriesDescriptionListDataType:
+		e.evTimeSeriesDescriptionDataUpdate(payload.Ski, payload.Entity)
 
-		case *model.IncentiveTableDescriptionDataType:
-			e.evIncentiveTableDescriptionDataUpdate(payload.Ski, payload.Entity)
+	case *model.TimeSeriesListDataType:
+		e.evTimeSeriesDataUpdate(payload.Ski, payload.Entity)
 
-		case *model.IncentiveDataType:
-			e.evIncentiveTableDataUpdate(payload.Ski, payload.Entity)
-		}
+	case *model.IncentiveTableDescriptionDataType:
+		e.evIncentiveTableDescriptionDataUpdate(payload.Ski, payload.Entity)
+
+	case *model.IncentiveDataType:
+		e.evIncentiveTableDataUpdate(payload.Ski, payload.Entity)
 	}
 }
 
@@ -194,13 +195,13 @@ func (e *UCCEVC) evCheckIncentiveTableDescriptionUpdateRequired(entity spineapi.
 	}
 
 	data, err := evIncentiveTable.GetDescriptionsForScope(model.ScopeTypeTypeSimpleIncentiveTable)
-	if err != nil {
+	if err != nil || len(data) == 0 {
 		return false
 	}
 
 	// only use the first description and therein the first tariff
 	item := data[0].TariffDescription
-	if item.UpdateRequired != nil {
+	if item != nil && item.UpdateRequired != nil {
 		return *item.UpdateRequired
 	}
 

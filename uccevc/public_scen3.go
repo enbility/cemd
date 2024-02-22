@@ -48,6 +48,10 @@ func (e *UCCEVC) IncentiveConstraints(entity spineapi.EntityRemoteInterface) (ap
 //
 // SPINE UC CoordinatedEVCharging 2.4.3
 func (e *UCCEVC) WriteIncentiveTableDescriptions(entity spineapi.EntityRemoteInterface, data []api.IncentiveTariffDescription) error {
+	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
+		return api.ErrEVDisconnected
+	}
+
 	evIncentiveTable, err := util.IncentiveTable(e.service, entity)
 	if err != nil {
 		logging.Log().Error("incentivetable feature not found")
@@ -106,8 +110,9 @@ func (e *UCCEVC) WriteIncentiveTableDescriptions(entity spineapi.EntityRemoteInt
 		},
 	}
 
-	if data != nil {
-		descData = []model.IncentiveTableDescriptionType{}
+	if len(data) > 0 && len(data[0].Tiers) > 0 {
+		newDescData := []model.IncentiveTableDescriptionType{}
+		allDataPresent := false
 
 		for index, tariff := range data {
 			tariffDesc := descriptions[0].TariffDescription
@@ -152,12 +157,20 @@ func (e *UCCEVC) WriteIncentiveTableDescriptions(entity spineapi.EntityRemoteInt
 				}
 				newTier.IncentiveDescription = incentiveDescription
 
+				if len(newTier.BoundaryDescription) > 0 &&
+					len(newTier.IncentiveDescription) > 0 {
+					allDataPresent = true
+				}
 				tierData = append(tierData, newTier)
 			}
 
 			newTariff.Tier = tierData
 
-			descData = append(descData, newTariff)
+			newDescData = append(newDescData, newTariff)
+		}
+
+		if allDataPresent {
+			descData = newDescData
 		}
 	}
 

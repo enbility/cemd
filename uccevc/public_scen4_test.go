@@ -7,7 +7,81 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (s *UCCEVCSuite) Test_EVChargePlan() {
+func (s *UCCEVCSuite) Test_ChargePlanConstaints() {
+	_, err := s.sut.ChargePlanConstraints(s.mockRemoteEntity)
+	assert.NotNil(s.T(), err)
+
+	_, err = s.sut.ChargePlanConstraints(s.evEntity)
+	assert.NotNil(s.T(), err)
+
+	descData := &model.TimeSeriesDescriptionListDataType{
+		TimeSeriesDescriptionData: []model.TimeSeriesDescriptionDataType{
+			{
+				TimeSeriesId:   util.Ptr(model.TimeSeriesIdType(1)),
+				TimeSeriesType: util.Ptr(model.TimeSeriesTypeTypeConstraints),
+			},
+		},
+	}
+
+	rFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer)
+	fErr := rFeature.UpdateData(model.FunctionTypeTimeSeriesDescriptionListData, descData, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	_, err = s.sut.ChargePlanConstraints(s.evEntity)
+	assert.NotNil(s.T(), err)
+
+	data := &model.TimeSeriesListDataType{
+		TimeSeriesData: []model.TimeSeriesDataType{
+			{
+				TimeSeriesId: util.Ptr(model.TimeSeriesIdType(1)),
+				TimePeriod: &model.TimePeriodType{
+					StartTime: model.NewAbsoluteOrRelativeTimeType("PT0S"),
+				},
+			},
+		},
+	}
+
+	fErr = rFeature.UpdateData(model.FunctionTypeTimeSeriesListData, data, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	_, err = s.sut.ChargePlanConstraints(s.evEntity)
+	assert.NotNil(s.T(), err)
+
+	data = &model.TimeSeriesListDataType{
+		TimeSeriesData: []model.TimeSeriesDataType{
+			{
+				TimeSeriesId: util.Ptr(model.TimeSeriesIdType(1)),
+				TimePeriod: &model.TimePeriodType{
+					StartTime: model.NewAbsoluteOrRelativeTimeType("PT0S"),
+				},
+				TimeSeriesSlot: []model.TimeSeriesSlotType{
+					{
+						TimeSeriesSlotId: eebusutil.Ptr(model.TimeSeriesSlotIdType(0)),
+						Duration:         eebusutil.Ptr(model.DurationType("PT5M36S")),
+						MaxValue:         model.NewScaledNumberType(4201),
+					},
+					{
+						TimeSeriesSlotId: eebusutil.Ptr(model.TimeSeriesSlotIdType(1)),
+						TimePeriod: &model.TimePeriodType{
+							StartTime: model.NewAbsoluteOrRelativeTimeType("PT30S"),
+							EndTime:   model.NewAbsoluteOrRelativeTimeType("PT1M"),
+						},
+						MaxValue: model.NewScaledNumberType(4201),
+					},
+				},
+			},
+		},
+	}
+
+	fErr = rFeature.UpdateData(model.FunctionTypeTimeSeriesListData, data, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	_, err = s.sut.ChargePlanConstraints(s.evEntity)
+	assert.Nil(s.T(), err)
+
+}
+
+func (s *UCCEVCSuite) Test_ChargePlan() {
 	_, err := s.sut.ChargePlan(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 
@@ -48,6 +122,27 @@ func (s *UCCEVCSuite) Test_EVChargePlan() {
 	timeData := &model.TimeSeriesListDataType{
 		TimeSeriesData: []model.TimeSeriesDataType{
 			{
+				TimeSeriesId: eebusutil.Ptr(model.TimeSeriesIdType(1)),
+				TimePeriod:   &model.TimePeriodType{},
+				TimeSeriesSlot: []model.TimeSeriesSlotType{
+					{
+						TimeSeriesSlotId: eebusutil.Ptr(model.TimeSeriesSlotIdType(0)),
+						Duration:         eebusutil.Ptr(model.DurationType("PT5M36S")),
+						MaxValue:         model.NewScaledNumberType(4201),
+					},
+					{
+						TimeSeriesSlotId: eebusutil.Ptr(model.TimeSeriesSlotIdType(1)),
+						TimePeriod: &model.TimePeriodType{
+							StartTime: model.NewAbsoluteOrRelativeTimeType("PT30S"),
+							EndTime:   model.NewAbsoluteOrRelativeTimeType("PT1M"),
+						},
+						Value:    model.NewScaledNumberType(5),
+						MinValue: model.NewScaledNumberType(0),
+						MaxValue: model.NewScaledNumberType(10),
+					},
+				},
+			},
+			{
 				TimeSeriesId: eebusutil.Ptr(model.TimeSeriesIdType(2)),
 				TimePeriod: &model.TimePeriodType{
 					StartTime: model.NewAbsoluteOrRelativeTimeType("PT0S"),
@@ -60,8 +155,13 @@ func (s *UCCEVCSuite) Test_EVChargePlan() {
 					},
 					{
 						TimeSeriesSlotId: eebusutil.Ptr(model.TimeSeriesSlotIdType(1)),
-						Duration:         eebusutil.Ptr(model.DurationType("P1D")),
-						MaxValue:         model.NewScaledNumberType(0),
+						TimePeriod: &model.TimePeriodType{
+							StartTime: model.NewAbsoluteOrRelativeTimeType("PT30S"),
+							EndTime:   model.NewAbsoluteOrRelativeTimeType("PT1M"),
+						},
+						Value:    model.NewScaledNumberType(5),
+						MinValue: model.NewScaledNumberType(0),
+						MaxValue: model.NewScaledNumberType(10),
 					},
 				},
 			},

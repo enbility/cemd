@@ -62,6 +62,9 @@ func (s *UCCEVCSuite) BeforeTest(suiteName, testName string) {
 	s.mockRemoteEntity.EXPECT().EntityType().Return(mock.Anything).Maybe()
 	entityAddress := &model.EntityAddressType{}
 	s.mockRemoteEntity.EXPECT().Address().Return(entityAddress).Maybe()
+	ops := map[model.FunctionType]spineapi.OperationsInterface{}
+	mockRemoteFeature.EXPECT().Operations().Return(ops).Maybe()
+	mockRemoteFeature.EXPECT().DataCopy(mock.Anything).Return(mock.Anything).Maybe()
 
 	var entities []spineapi.EntityRemoteInterface
 
@@ -86,6 +89,8 @@ func setupDevices(
 	f = spine.NewFeatureLocal(2, localEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeClient)
 	localEntity.AddFeature(f)
 	f = spine.NewFeatureLocal(3, localEntity, model.FeatureTypeTypeIncentiveTable, model.RoleTypeClient)
+	localEntity.AddFeature(f)
+	f = spine.NewFeatureLocal(4, localEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient)
 	localEntity.AddFeature(f)
 
 	writeHandler := shipmocks.NewShipConnectionDataWriterInterface(t)
@@ -119,6 +124,13 @@ func setupDevices(
 				model.FunctionTypeIncentiveTableConstraintsData,
 				model.FunctionTypeIncentiveTableDescriptionData,
 				model.FunctionTypeIncentiveTableData,
+			},
+		},
+		{model.FeatureTypeTypeElectricalConnection,
+			model.RoleTypeServer,
+			[]model.FunctionType{
+				model.FunctionTypeElectricalConnectionParameterDescriptionListData,
+				model.FunctionTypeElectricalConnectionPermittedValueSetListData,
 			},
 		},
 	}

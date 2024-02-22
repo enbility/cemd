@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (s *UCCEVCSuite) Test_EVChargeStrategy() {
+func (s *UCCEVCSuite) Test_ChargeStrategy() {
 	data := s.sut.ChargeStrategy(s.mockRemoteEntity)
 	assert.Equal(s.T(), api.EVChargeStrategyTypeUnknown, data)
 
@@ -158,7 +158,7 @@ func (s *UCCEVCSuite) Test_EVChargeStrategy() {
 	assert.Equal(s.T(), api.EVChargeStrategyTypeTimedCharging, data)
 }
 
-func (s *UCCEVCSuite) Test_EVEnergySingleDemand() {
+func (s *UCCEVCSuite) Test_EnergySingleDemand() {
 	demand, err := s.sut.EnergyDemand(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, demand.MinDemand)
@@ -166,49 +166,6 @@ func (s *UCCEVCSuite) Test_EVEnergySingleDemand() {
 	assert.Equal(s.T(), 0.0, demand.MaxDemand)
 	assert.Equal(s.T(), 0.0, demand.DurationUntilStart)
 	assert.Equal(s.T(), 0.0, demand.DurationUntilEnd)
-
-	demand, err = s.sut.EnergyDemand(s.evEntity)
-	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), 0.0, demand.MinDemand)
-	assert.Equal(s.T(), 0.0, demand.OptDemand)
-	assert.Equal(s.T(), 0.0, demand.MaxDemand)
-	assert.Equal(s.T(), 0.0, demand.DurationUntilStart)
-	assert.Equal(s.T(), 0.0, demand.DurationUntilEnd)
-
-	descData := &model.DeviceConfigurationKeyValueDescriptionListDataType{
-		DeviceConfigurationKeyValueDescriptionData: []model.DeviceConfigurationKeyValueDescriptionDataType{
-			{
-				KeyId:   eebusutil.Ptr(model.DeviceConfigurationKeyIdType(0)),
-				KeyName: eebusutil.Ptr(model.DeviceConfigurationKeyNameTypeCommunicationsStandard),
-			},
-		},
-	}
-
-	rFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.evEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer)
-	fErr := rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, descData, nil, nil)
-	assert.Nil(s.T(), fErr)
-
-	demand, err = s.sut.EnergyDemand(s.evEntity)
-	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), 0.0, demand.MinDemand)
-	assert.Equal(s.T(), 0.0, demand.OptDemand)
-	assert.Equal(s.T(), 0.0, demand.MaxDemand)
-	assert.Equal(s.T(), 0.0, demand.DurationUntilStart)
-	assert.Equal(s.T(), 0.0, demand.DurationUntilEnd)
-
-	keyData := &model.DeviceConfigurationKeyValueListDataType{
-		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{
-			{
-				KeyId: eebusutil.Ptr(model.DeviceConfigurationKeyIdType(0)),
-				Value: &model.DeviceConfigurationKeyValueValueType{
-					String: eebusutil.Ptr(model.DeviceConfigurationKeyValueStringTypeISO151182ED2),
-				},
-			},
-		},
-	}
-
-	fErr = rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueListData, keyData, nil, nil)
-	assert.Nil(s.T(), fErr)
 
 	demand, err = s.sut.EnergyDemand(s.evEntity)
 	assert.NotNil(s.T(), err)
@@ -228,7 +185,7 @@ func (s *UCCEVCSuite) Test_EVEnergySingleDemand() {
 	}
 
 	rTimeFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.evEntity, model.FeatureTypeTypeTimeSeries, model.RoleTypeServer)
-	fErr = rTimeFeature.UpdateData(model.FunctionTypeTimeSeriesDescriptionListData, timeDescData, nil, nil)
+	fErr := rTimeFeature.UpdateData(model.FunctionTypeTimeSeriesDescriptionListData, timeDescData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
 	timeData := &model.TimeSeriesListDataType{
