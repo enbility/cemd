@@ -1,40 +1,37 @@
 package ucevsecc
 
 import (
+	"github.com/enbility/cemd/api"
+	"github.com/enbility/cemd/util"
 	"github.com/enbility/eebus-go/features"
-	"github.com/enbility/spine-go/api"
+	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
 
 // handle SPINE events
-func (e *UCEvseCC) HandleEvent(payload api.EventPayload) {
+func (e *UCEVSECC) HandleEvent(payload spineapi.EventPayload) {
 	// only about events from an EVSE entity or device changes for this remote device
 
-	if payload.Entity == nil {
+	if util.IsDeviceDisconnected(payload) {
+		e.evseDisconnected(payload.Ski, payload.Entity)
 		return
 	}
 
-	entityType := payload.Entity.EntityType()
-	if entityType != model.EntityTypeTypeEVSE {
+	if !util.IsPayloadForEntityType(payload, model.EntityTypeTypeEVSE) {
+		return
+	}
+
+	if util.IsEvseConnected(payload) {
+		e.evseConnected(payload.Ski, payload.Entity)
+		return
+	} else if util.IsEvseDisconnected(payload) {
+		e.evseDisconnected(payload.Ski, payload.Entity)
 		return
 	}
 
 	switch payload.EventType {
-	case api.EventTypeDeviceChange:
-		if payload.ChangeType == api.ElementChangeRemove {
-			e.evseDisconnected(payload.Ski, payload.Entity)
-		}
-
-	case api.EventTypeEntityChange:
-		switch payload.ChangeType {
-		case api.ElementChangeAdd:
-			e.evseConnected(payload.Ski, payload.Entity)
-		case api.ElementChangeRemove:
-			e.evseDisconnected(payload.Ski, payload.Entity)
-		}
-
-	case api.EventTypeDataChange:
-		if payload.ChangeType != api.ElementChangeUpdate {
+	case spineapi.EventTypeDataChange:
+		if payload.ChangeType != spineapi.ElementChangeUpdate {
 			return
 		}
 
@@ -48,7 +45,7 @@ func (e *UCEvseCC) HandleEvent(payload api.EventPayload) {
 }
 
 // an EVSE was connected
-func (e *UCEvseCC) evseConnected(ski string, entity api.EntityRemoteInterface) {
+func (e *UCEVSECC) evseConnected(ski string, entity spineapi.EntityRemoteInterface) {
 	localDevice := e.service.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
 
@@ -60,20 +57,20 @@ func (e *UCEvseCC) evseConnected(ski string, entity api.EntityRemoteInterface) {
 		_, _ = evseDeviceDiagnosis.RequestState()
 	}
 
-	e.reader.SpineEvent(ski, entity, UCEvseCCEventConnected)
+	e.reader.SpineEvent(ski, entity, api.UCEVSECCEventConnected)
 }
 
 // an EVSE was disconnected
-func (e *UCEvseCC) evseDisconnected(ski string, entity api.EntityRemoteInterface) {
-	e.reader.SpineEvent(ski, entity, UCEvseCCEventDisconnected)
+func (e *UCEVSECC) evseDisconnected(ski string, entity spineapi.EntityRemoteInterface) {
+	e.reader.SpineEvent(ski, entity, api.UCEVSECCEventDisconnected)
 }
 
 // the manufacturer Data of an EVSE was updated
-func (e *UCEvseCC) evseManufacturerDataUpdate(ski string, entity api.EntityRemoteInterface) {
-	e.reader.SpineEvent(ski, entity, UCEvseCCEventManufacturerUpdate)
+func (e *UCEVSECC) evseManufacturerDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
+	e.reader.SpineEvent(ski, entity, api.UCEVSECCEventManufacturerUpdate)
 }
 
 // the operating State of an EVSE was updated
-func (e *UCEvseCC) evseStateUpdate(ski string, entity api.EntityRemoteInterface) {
-	e.reader.SpineEvent(ski, entity, UCEvseCCEventOperationStateUpdate)
+func (e *UCEVSECC) evseStateUpdate(ski string, entity spineapi.EntityRemoteInterface) {
+	e.reader.SpineEvent(ski, entity, api.UCEVSECCEventOperationStateUpdate)
 }

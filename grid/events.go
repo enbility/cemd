@@ -119,12 +119,12 @@ func (e *Grid) gridConnected(ski string, entity api.EntityRemoteInterface) {
 	}
 
 	// get measurement parameters
-	if err := e.gridMeasurement.RequestDescriptions(); err != nil {
+	if _, err := e.gridMeasurement.RequestDescriptions(); err != nil {
 		logging.Log().Error(err)
 		return
 	}
 
-	if err := e.gridMeasurement.RequestConstraints(); err != nil {
+	if _, err := e.gridMeasurement.RequestConstraints(); err != nil {
 		logging.Log().Error(err)
 		return
 	}

@@ -50,3 +50,53 @@ func EntityOfTypeForSki(
 
 	return nil, features.ErrEntityNotFound
 }
+
+func IsPayloadForEntityType(payload spineapi.EventPayload, entityType model.EntityTypeType) bool {
+	if payload.Entity == nil {
+		return false
+	}
+
+	theEntityType := payload.Entity.EntityType()
+	return theEntityType == entityType
+}
+
+func IsDeviceDisconnected(payload spineapi.EventPayload) bool {
+	return (payload.EventType == spineapi.EventTypeDeviceChange &&
+		payload.ChangeType == spineapi.ElementChangeRemove)
+}
+
+func IsEvseConnected(payload spineapi.EventPayload) bool {
+	if payload.EventType != spineapi.EventTypeEntityChange &&
+		payload.ChangeType != spineapi.ElementChangeAdd {
+		return false
+	}
+
+	return IsPayloadForEntityType(payload, model.EntityTypeTypeEVSE)
+}
+
+func IsEvseDisconnected(payload spineapi.EventPayload) bool {
+	if payload.EventType != spineapi.EventTypeEntityChange &&
+		payload.ChangeType != spineapi.ElementChangeRemove {
+		return false
+	}
+
+	return IsPayloadForEntityType(payload, model.EntityTypeTypeEVSE)
+}
+
+func IsEvConnected(payload spineapi.EventPayload) bool {
+	if payload.EventType != spineapi.EventTypeEntityChange &&
+		payload.ChangeType != spineapi.ElementChangeAdd {
+		return false
+	}
+
+	return IsPayloadForEntityType(payload, model.EntityTypeTypeEV)
+}
+
+func IsEvDisconnected(payload spineapi.EventPayload) bool {
+	if payload.EventType != spineapi.EventTypeEntityChange &&
+		payload.ChangeType != spineapi.ElementChangeAdd {
+		return false
+	}
+
+	return IsPayloadForEntityType(payload, model.EntityTypeTypeEV)
+}

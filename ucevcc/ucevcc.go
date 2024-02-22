@@ -4,20 +4,21 @@ import (
 	"github.com/enbility/cemd/api"
 	serviceapi "github.com/enbility/eebus-go/api"
 	shipapi "github.com/enbility/ship-go/api"
+	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
 )
 
-type UCEvCC struct {
+type UCEVCC struct {
 	service serviceapi.ServiceInterface
 
 	reader api.UseCaseEventReaderInterface
 }
 
-var _ UCEvCCInterface = (*UCEvCC)(nil)
+var _ UCEVCCInterface = (*UCEVCC)(nil)
 
-func NewUCEvCC(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.UseCaseEventReaderInterface) *UCEvCC {
-	uc := &UCEvCC{
+func NewUCEVCC(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.UseCaseEventReaderInterface) *UCEVCC {
+	uc := &UCEVCC{
 		service: service,
 		reader:  reader,
 	}
@@ -27,11 +28,11 @@ func NewUCEvCC(service serviceapi.ServiceInterface, details *shipapi.ServiceDeta
 	return uc
 }
 
-func (c *UCEvCC) UseCaseName() model.UseCaseNameType {
+func (c *UCEVCC) UseCaseName() model.UseCaseNameType {
 	return model.UseCaseNameTypeEVCommissioningAndConfiguration
 }
 
-func (e *UCEvCC) AddFeatures() {
+func (e *UCEVCC) AddFeatures() {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	// client features
@@ -40,8 +41,7 @@ func (e *UCEvCC) AddFeatures() {
 		model.FeatureTypeTypeIdentification,
 		model.FeatureTypeTypeDeviceClassification,
 		model.FeatureTypeTypeElectricalConnection,
-		model.FeatureTypeTypeMeasurement,
-		model.FeatureTypeTypeLoadControl,
+		model.FeatureTypeTypeDeviceDiagnosis,
 	}
 
 	for _, feature := range clientFeatures {
@@ -50,7 +50,7 @@ func (e *UCEvCC) AddFeatures() {
 	}
 }
 
-func (e *UCEvCC) AddUseCase() {
+func (e *UCEVCC) AddUseCase() {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	localEntity.AddUseCaseSupport(
@@ -60,4 +60,28 @@ func (e *UCEvCC) AddUseCase() {
 		"",
 		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5, 6, 7, 8})
+}
+
+// returns if the entity supports the usecase
+//
+// possible errors:
+//   - ErrDataNotAvailable if that information is not (yet) available
+//   - and others
+func (e *UCEVCC) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool, error) {
+	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
+		return false, api.ErrNoEvEntity
+	}
+
+	// check if the usecase and mandatory scenarios are supported and
+	// if the required server features are available
+	if !entity.Device().VerifyUseCaseScenariosAndFeaturesSupport(
+		model.UseCaseActorTypeEV,
+		e.UseCaseName(),
+		[]model.UseCaseScenarioSupportType{1, 2, 3, 8},
+		[]model.FeatureTypeType{model.FeatureTypeTypeDeviceConfiguration},
+	) {
+		return false, nil
+	}
+
+	return true, nil
 }

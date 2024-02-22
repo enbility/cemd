@@ -1,40 +1,37 @@
 package ucevcem
 
 import (
+	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
 	"github.com/enbility/ship-go/logging"
-	"github.com/enbility/spine-go/api"
+	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
 
 // handle SPINE events
-func (e *UCEvCEM) HandleEvent(payload api.EventPayload) {
-	// only about events from an EVSE entity or device changes for this remote device
+func (e *UCEVCEM) HandleEvent(payload spineapi.EventPayload) {
+	// only about events from an EV entity or device changes for this remote device
 
-	if payload.Entity == nil {
+	if !util.IsPayloadForEntityType(payload, model.EntityTypeTypeEV) {
 		return
 	}
 
-	entityType := payload.Entity.EntityType()
-	if entityType != model.EntityTypeTypeEV {
+	if util.IsEvConnected(payload) {
+		e.evConnected(payload.Entity)
 		return
 	}
 
 	switch payload.EventType {
-	case api.EventTypeEntityChange:
-		switch payload.ChangeType {
-		case api.ElementChangeAdd:
-			e.evConnected(payload.Ski, payload.Entity)
-		}
-
-	case api.EventTypeDataChange:
-		if payload.ChangeType != api.ElementChangeUpdate {
+	case spineapi.EventTypeDataChange:
+		if payload.ChangeType != spineapi.ElementChangeUpdate {
 			return
 		}
 
 		switch payload.Data.(type) {
+		case *model.ElectricalConnectionDescriptionListDataType:
+			e.evElectricalConnectionDescriptionDataUpdate(payload.Ski, payload.Entity)
 		case *model.MeasurementDescriptionListDataType:
-			e.evMeasurementDescriptionDataUpdate(payload.Ski, payload.Entity)
+			e.evMeasurementDescriptionDataUpdate(payload.Entity)
 		case *model.MeasurementListDataType:
 			e.evMeasurementDataUpdate(payload.Ski, payload.Entity)
 		}
@@ -42,7 +39,7 @@ func (e *UCEvCEM) HandleEvent(payload api.EventPayload) {
 }
 
 // an EV was connected
-func (e *UCEvCEM) evConnected(ski string, entity api.EntityRemoteInterface) {
+func (e *UCEVCEM) evConnected(entity spineapi.EntityRemoteInterface) {
 	// initialise features, e.g. subscriptions, descriptions
 	if evMeasurement, err := util.Measurement(e.service, entity); err == nil {
 		if _, err := evMeasurement.Subscribe(); err != nil {
@@ -50,19 +47,28 @@ func (e *UCEvCEM) evConnected(ski string, entity api.EntityRemoteInterface) {
 		}
 
 		// get measurement descriptions
-		if err := evMeasurement.RequestDescriptions(); err != nil {
+		if _, err := evMeasurement.RequestDescriptions(); err != nil {
 			logging.Log().Debug(err)
 		}
 
 		// get measurement constraints
-		if err := evMeasurement.RequestConstraints(); err != nil {
+		if _, err := evMeasurement.RequestConstraints(); err != nil {
 			logging.Log().Debug(err)
 		}
 	}
 }
 
+// the electrical connection description data of an EV was updated
+func (e *UCEVCEM) evElectricalConnectionDescriptionDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
+	if _, err := e.ConnectedPhases(entity); err != nil {
+		return
+	}
+
+	e.reader.SpineEvent(ski, entity, api.UCEVCEMNumberOfConnectedPhasesDataUpdate)
+}
+
 // the measurement description data of an EV was updated
-func (e *UCEvCEM) evMeasurementDescriptionDataUpdate(ski string, entity api.EntityRemoteInterface) {
+func (e *UCEVCEM) evMeasurementDescriptionDataUpdate(entity spineapi.EntityRemoteInterface) {
 	if evMeasurement, err := util.Measurement(e.service, entity); err == nil {
 		// get measurement values
 		if _, err := evMeasurement.RequestValues(); err != nil {
@@ -72,6 +78,19 @@ func (e *UCEvCEM) evMeasurementDescriptionDataUpdate(ski string, entity api.Enti
 }
 
 // the measurement data of an EV was updated
-func (e *UCEvCEM) evMeasurementDataUpdate(ski string, entity api.EntityRemoteInterface) {
-	e.reader.SpineEvent(ski, entity, UCEvCEMMeasurementDataUpdate)
+func (e *UCEVCEM) evMeasurementDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
+	// Scenario 1
+	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACCurrent); err == nil {
+		e.reader.SpineEvent(ski, entity, api.UCEVCEMCurrentMeasurementDataUpdate)
+	}
+
+	// Scenario 2
+	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACPower); err == nil {
+		e.reader.SpineEvent(ski, entity, api.UCEVCEMPowerMeasurementDataUpdate)
+	}
+
+	// Scenario 3
+	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeCharge); err == nil {
+		e.reader.SpineEvent(ski, entity, api.UCEVCEMChargingEnergyMeasurementDataUpdate)
+	}
 }

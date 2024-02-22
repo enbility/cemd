@@ -4,5 +4,5 @@ import (
 	"github.com/enbility/spine-go/api"
 )
 
-func (e *UCEvseCC) HandleResult(errorMsg api.ResultMessage) {
+func (e *UCEVSECC) HandleResult(errorMsg api.ResultMessage) {
 }

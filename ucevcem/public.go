@@ -10,13 +10,39 @@ import (
 	"github.com/enbility/spine-go/model"
 )
 
+// return the number of ac connected phases of the EV or 0 if it is unknown
+func (e *UCEVCEM) ConnectedPhases(entity spineapi.EntityRemoteInterface) (uint, error) {
+	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
+		return 0, api.ErrNoEvEntity
+	}
+
+	evElectricalConnection, err := util.ElectricalConnection(e.service, entity)
+	if err != nil {
+		return 0, features.ErrDataNotAvailable
+	}
+
+	data, err := evElectricalConnection.GetDescriptions()
+	if err != nil {
+		return 0, features.ErrDataNotAvailable
+	}
+
+	for _, item := range data {
+		if item.ElectricalConnectionId != nil && item.AcConnectedPhases != nil {
+			return *item.AcConnectedPhases, nil
+		}
+	}
+
+	// default to 0 if the value is not available
+	return 0, nil
+}
+
 // return the last current measurement for each phase of the connected EV
 //
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *UCEvCEM) EVCurrentsPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error) {
-	if entity.EntityType() != model.EntityTypeTypeEV {
+func (e *UCEVCEM) CurrentsPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error) {
+	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
 		return nil, api.ErrNoEvseEntity
 	}
 
@@ -74,7 +100,7 @@ func (e *UCEvCEM) EVCurrentsPerPhase(entity spineapi.EntityRemoteInterface) ([]f
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *UCEvCEM) EVPowerPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error) {
+func (e *UCEVCEM) PowerPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error) {
 	if entity.EntityType() != model.EntityTypeTypeEV {
 		return nil, api.ErrNoEvseEntity
 	}
@@ -134,7 +160,7 @@ func (e *UCEvCEM) EVPowerPerPhase(entity spineapi.EntityRemoteInterface) ([]floa
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *UCEvCEM) EVChargedEnergy(entity spineapi.EntityRemoteInterface) (float64, error) {
+func (e *UCEVCEM) ChargedEnergy(entity spineapi.EntityRemoteInterface) (float64, error) {
 	if entity.EntityType() != model.EntityTypeTypeEV {
 		return 0, api.ErrNoEvseEntity
 	}

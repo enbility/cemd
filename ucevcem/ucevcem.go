@@ -4,20 +4,21 @@ import (
 	"github.com/enbility/cemd/api"
 	serviceapi "github.com/enbility/eebus-go/api"
 	shipapi "github.com/enbility/ship-go/api"
+	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
 )
 
-type UCEvCEM struct {
+type UCEVCEM struct {
 	service serviceapi.ServiceInterface
 
 	reader api.UseCaseEventReaderInterface
 }
 
-var _ UCEvCEMInterface = (*UCEvCEM)(nil)
+var _ UCEVCEMInterface = (*UCEVCEM)(nil)
 
-func NewUCEvCEM(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.UseCaseEventReaderInterface) *UCEvCEM {
-	uc := &UCEvCEM{
+func NewUCEVCEM(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.UseCaseEventReaderInterface) *UCEVCEM {
+	uc := &UCEVCEM{
 		service: service,
 		reader:  reader,
 	}
@@ -27,11 +28,11 @@ func NewUCEvCEM(service serviceapi.ServiceInterface, details *shipapi.ServiceDet
 	return uc
 }
 
-func (c *UCEvCEM) UseCaseName() model.UseCaseNameType {
+func (c *UCEVCEM) UseCaseName() model.UseCaseNameType {
 	return model.UseCaseNameTypeMeasurementOfElectricityDuringEVCharging
 }
 
-func (e *UCEvCEM) AddFeatures() {
+func (e *UCEVCEM) AddFeatures() {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	// client features
@@ -39,7 +40,7 @@ func (e *UCEvCEM) AddFeatures() {
 	f.AddResultHandler(e)
 }
 
-func (e *UCEvCEM) AddUseCase() {
+func (e *UCEVCEM) AddUseCase() {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	localEntity.AddUseCaseSupport(
@@ -49,4 +50,28 @@ func (e *UCEvCEM) AddUseCase() {
 		"",
 		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3})
+}
+
+// returns if the entity supports the usecase
+//
+// possible errors:
+//   - ErrDataNotAvailable if that information is not (yet) available
+//   - and others
+func (e *UCEVCEM) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool, error) {
+	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
+		return false, api.ErrNoEvEntity
+	}
+
+	// check if the usecase and mandatory scenarios are supported and
+	// if the required server features are available
+	if !entity.Device().VerifyUseCaseScenariosAndFeaturesSupport(
+		model.UseCaseActorTypeEV,
+		e.UseCaseName(),
+		nil,
+		[]model.FeatureTypeType{model.FeatureTypeTypeDeviceDiagnosis},
+	) {
+		return false, nil
+	}
+
+	return true, nil
 }

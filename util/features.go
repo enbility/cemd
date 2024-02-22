@@ -33,6 +33,12 @@ func DeviceDiagnosis(service eebusapi.ServiceInterface, remoteEntity api.EntityR
 	return features.NewDeviceDiagnosis(model.RoleTypeClient, model.RoleTypeServer, localEntity, remoteEntity)
 }
 
+func DeviceDiagnosisServer(service eebusapi.ServiceInterface, remoteEntity api.EntityRemoteInterface) (*features.DeviceDiagnosis, error) {
+	localEntity := localCemEntity(service)
+
+	return features.NewDeviceDiagnosis(model.RoleTypeServer, model.RoleTypeClient, localEntity, remoteEntity)
+}
+
 func ElectricalConnection(service eebusapi.ServiceInterface, remoteEntity api.EntityRemoteInterface) (*features.ElectricalConnection, error) {
 	localEntity := localCemEntity(service)
 
@@ -49,4 +55,22 @@ func Measurement(service eebusapi.ServiceInterface, remoteEntity api.EntityRemot
 	localEntity := localCemEntity(service)
 
 	return features.NewMeasurement(model.RoleTypeClient, model.RoleTypeServer, localEntity, remoteEntity)
+}
+
+func LoadControl(service eebusapi.ServiceInterface, remoteEntity api.EntityRemoteInterface) (*features.LoadControl, error) {
+	localEntity := localCemEntity(service)
+
+	return features.NewLoadControl(model.RoleTypeClient, model.RoleTypeServer, localEntity, remoteEntity)
+}
+
+func TimeSeries(service eebusapi.ServiceInterface, remoteEntity api.EntityRemoteInterface) (*features.TimeSeries, error) {
+	localEntity := localCemEntity(service)
+
+	return features.NewTimeSeries(model.RoleTypeClient, model.RoleTypeServer, localEntity, remoteEntity)
+}
+
+func IncentiveTable(service eebusapi.ServiceInterface, remoteEntity api.EntityRemoteInterface) (*features.IncentiveTable, error) {
+	localEntity := localCemEntity(service)
+
+	return features.NewIncentiveTable(model.RoleTypeClient, model.RoleTypeServer, localEntity, remoteEntity)
 }

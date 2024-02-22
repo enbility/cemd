@@ -23,7 +23,7 @@ func (d *DemoCem) Setup() error {
 		return err
 	}
 
-	evsecc := ucevsecc.NewUCEvseCC(d.cem.Service, d.cem.Service.LocalService(), d)
+	evsecc := ucevsecc.NewUCEVSECC(d.cem.Service, d.cem.Service.LocalService(), d)
 	d.cem.AddUseCase(evsecc)
 
 	d.cem.Start()

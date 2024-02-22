@@ -1,61 +1,59 @@
 package ucevcc
 
 import (
+	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
 	"github.com/enbility/ship-go/logging"
-	"github.com/enbility/spine-go/api"
+	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
 
 // handle SPINE events
-func (e *UCEvCC) HandleEvent(payload api.EventPayload) {
-	// only about events from an EVSE entity or device changes for this remote device
+func (e *UCEVCC) HandleEvent(payload spineapi.EventPayload) {
+	// only about events from an EV entity or device changes for this remote device
 
-	if payload.Entity == nil {
+	if util.IsDeviceDisconnected(payload) {
+		e.evDisconnected(payload.Ski, payload.Entity)
 		return
 	}
 
-	entityType := payload.Entity.EntityType()
-	if entityType != model.EntityTypeTypeEV {
+	if !util.IsPayloadForEntityType(payload, model.EntityTypeTypeEV) {
+		return
+	}
+
+	if util.IsEvConnected(payload) {
+		e.evConnected(payload.Ski, payload.Entity)
+		return
+	} else if util.IsEvDisconnected(payload) {
+		e.evDisconnected(payload.Ski, payload.Entity)
 		return
 	}
 
 	switch payload.EventType {
-	case api.EventTypeDeviceChange:
-		if payload.ChangeType == api.ElementChangeRemove {
-			e.evDisconnected(payload.Ski, payload.Entity)
-		}
-
-	case api.EventTypeEntityChange:
-		switch payload.ChangeType {
-		case api.ElementChangeAdd:
-			e.evConnected(payload.Ski, payload.Entity)
-		case api.ElementChangeRemove:
-			e.evDisconnected(payload.Ski, payload.Entity)
-		}
-
-	case api.EventTypeDataChange:
-		if payload.ChangeType != api.ElementChangeUpdate {
+	case spineapi.EventTypeDataChange:
+		if payload.ChangeType != spineapi.ElementChangeUpdate {
 			return
 		}
 
 		switch payload.Data.(type) {
 		case *model.DeviceConfigurationKeyValueDescriptionListDataType:
+			e.evConfigurationDescriptionDataUpdate(payload.Ski, payload.Entity)
+		case *model.DeviceConfigurationKeyValueListDataType:
 			e.evConfigurationDataUpdate(payload.Ski, payload.Entity)
 		case *model.DeviceClassificationManufacturerDataType:
 			e.evManufacturerDataUpdate(payload.Ski, payload.Entity)
-		case *model.ElectricalConnectionDescriptionListDataType:
-			e.evElectricalDescriptionUpdate(payload.Ski, payload.Entity)
 		case *model.ElectricalConnectionParameterDescriptionListDataType:
 			e.evElectricalParamerDescriptionUpdate(payload.Ski, payload.Entity)
 		case *model.ElectricalConnectionPermittedValueSetListDataType:
 			e.evElectricalPermittedValuesUpdate(payload.Ski, payload.Entity)
+		case *model.IdentificationListDataType:
+			e.evIdentificationDataUpdate(payload.Ski, payload.Entity)
 		}
 	}
 }
 
 // an EV was connected
-func (e *UCEvCC) evConnected(ski string, entity api.EntityRemoteInterface) {
+func (e *UCEVCC) evConnected(ski string, entity spineapi.EntityRemoteInterface) {
 	// initialise features, e.g. subscriptions, descriptions
 	if evDeviceClassification, err := util.DeviceClassification(e.service, entity); err == nil {
 		if _, err := evDeviceClassification.Subscribe(); err != nil {
@@ -94,13 +92,13 @@ func (e *UCEvCC) evConnected(ski string, entity api.EntityRemoteInterface) {
 			logging.Log().Debug(err)
 		}
 
-		// get electrical connection descriptions
-		if _, err := evElectricalConnection.RequestDescriptions(); err != nil {
+		// get electrical connection parameter descriptions
+		if _, err := evElectricalConnection.RequestParameterDescriptions(); err != nil {
 			logging.Log().Debug(err)
 		}
 
-		// get electrical connection parameter descriptions
-		if _, err := evElectricalConnection.RequestParameterDescriptions(); err != nil {
+		// get electrical permitted values descriptions
+		if _, err := evElectricalConnection.RequestPermittedValueSets(); err != nil {
 			logging.Log().Debug(err)
 		}
 	}
@@ -116,18 +114,16 @@ func (e *UCEvCC) evConnected(ski string, entity api.EntityRemoteInterface) {
 		}
 	}
 
-	e.reader.SpineEvent(ski, entity, UCEvCCEventConnected)
+	e.reader.SpineEvent(ski, entity, api.UCEVCCEventConnected)
 }
 
 // an EV was disconnected
-func (e *UCEvCC) evDisconnected(ski string, entity api.EntityRemoteInterface) {
-	e.reader.SpineEvent(ski, entity, UCEvCCEventDisconnected)
+func (e *UCEVCC) evDisconnected(ski string, entity spineapi.EntityRemoteInterface) {
+	e.reader.SpineEvent(ski, entity, api.UCEVCCEventDisconnected)
 }
 
-// the configuration key Data of an EV was updated
-func (e *UCEvCC) evConfigurationDataUpdate(ski string, entity api.EntityRemoteInterface) {
-	e.reader.SpineEvent(ski, entity, UCEvCCEventConfigurationUdpate)
-
+// the configuration key description data of an EV was updated
+func (e *UCEVCC) evConfigurationDescriptionDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
 	if evDeviceConfiguration, err := util.DeviceConfiguration(e.service, entity); err == nil {
 		// key value descriptions received, now get the data
 		if _, err := evDeviceConfiguration.RequestKeyValues(); err != nil {
@@ -136,18 +132,52 @@ func (e *UCEvCC) evConfigurationDataUpdate(ski string, entity api.EntityRemoteIn
 	}
 }
 
-// the manufacturer Data of an EV was updated
-func (e *UCEvCC) evManufacturerDataUpdate(ski string, entity api.EntityRemoteInterface) {
-	e.reader.SpineEvent(ski, entity, UCEvCCEventManufacturerUpdate)
+// the configuration key data of an EV was updated
+func (e *UCEVCC) evConfigurationDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
+	evDeviceConfiguration, err := util.DeviceConfiguration(e.service, entity)
+	if err != nil {
+		return
+	}
+
+	// Scenario 2
+	if _, err := evDeviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypeCommunicationsStandard, model.DeviceConfigurationKeyValueTypeTypeString); err == nil {
+		e.reader.SpineEvent(ski, entity, api.UCEVCCCommunicationStandardDataUpdate)
+	}
+
+	// Scenario 3
+	if _, err := evDeviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypeAsymmetricChargingSupported, model.DeviceConfigurationKeyValueTypeTypeString); err == nil {
+		e.reader.SpineEvent(ski, entity, api.UCEVCCAsymmetricChargingDataUpdate)
+	}
 }
 
-// the electrical connection description data of an EV was updated
-func (e *UCEvCC) evElectricalDescriptionUpdate(ski string, entity api.EntityRemoteInterface) {
-	e.reader.SpineEvent(ski, entity, UCEvCCEventElectricalConnectionUpdate)
+// the identification data of an EV was updated
+func (e *UCEVCC) evIdentificationDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
+	evIdentification, err := util.Identification(e.service, entity)
+	if err != nil {
+		return
+	}
+
+	// Scenario 4
+	if values, err := evIdentification.GetValues(); err == nil {
+		for _, item := range values {
+			if item.IdentificationId == nil || item.IdentificationValue == nil {
+				continue
+			}
+
+			e.reader.SpineEvent(ski, entity, api.UCEVCCIdentificationDataUpdate)
+			return
+		}
+	}
+}
+
+// the manufacturer data of an EV was updated
+func (e *UCEVCC) evManufacturerDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
+	// Scenario 5
+	e.reader.SpineEvent(ski, entity, api.UCEVCCManufacturerDataUpdate)
 }
 
 // the electrical connection parameter description data of an EV was updated
-func (e *UCEvCC) evElectricalParamerDescriptionUpdate(ski string, entity api.EntityRemoteInterface) {
+func (e *UCEVCC) evElectricalParamerDescriptionUpdate(ski string, entity spineapi.EntityRemoteInterface) {
 	if evElectricalConnection, err := util.ElectricalConnection(e.service, entity); err == nil {
 		if _, err := evElectricalConnection.RequestPermittedValueSets(); err != nil {
 			logging.Log().Error("Error getting electrical permitted values:", err)
@@ -156,6 +186,22 @@ func (e *UCEvCC) evElectricalParamerDescriptionUpdate(ski string, entity api.Ent
 }
 
 // the electrical connection permitted value sets data of an EV was updated
-func (e *UCEvCC) evElectricalPermittedValuesUpdate(ski string, entity api.EntityRemoteInterface) {
-	e.reader.SpineEvent(ski, entity, UCEvCCEventPermittedLimitsUpdate)
+func (e *UCEVCC) evElectricalPermittedValuesUpdate(ski string, entity spineapi.EntityRemoteInterface) {
+	evElectricalConnection, err := util.ElectricalConnection(e.service, entity)
+	if err != nil {
+		return
+	}
+
+	data, err := evElectricalConnection.GetParameterDescriptionForScopeType(model.ScopeTypeTypeACPower)
+	if err != nil || data.ParameterId == nil {
+		return
+	}
+
+	values, err := evElectricalConnection.GetPermittedValueSetForParameterId(*data.ParameterId)
+	if err != nil || values == nil {
+		return
+	}
+
+	// Scenario 6
+	e.reader.SpineEvent(ski, entity, api.UCEVCCChargingPowerLimitsDataUpdate)
 }

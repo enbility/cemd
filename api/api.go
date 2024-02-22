@@ -1,8 +1,6 @@
 package api
 
 import (
-	"errors"
-
 	shipapi "github.com/enbility/ship-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
@@ -35,6 +33,13 @@ type UseCaseInterface interface {
 
 	// add the usecase
 	AddUseCase()
+
+	// returns if the entity supports the usecase
+	//
+	// possible errors:
+	//   - ErrDataNotAvailable if that information is not (yet) available
+	//   - and others
+	IsUseCaseSupported(remoteEntity spineapi.EntityRemoteInterface) (bool, error)
 }
 
 // interface for informing the cem about specific events
@@ -48,12 +53,6 @@ type UseCaseEventReaderInterface interface {
 	// Inform about a new usecase specific event
 	SpineEvent(ski string, entity spineapi.EntityRemoteInterface, event UseCaseEventType)
 }
-
-// type for usecase specfic event names
-type UseCaseEventType string
-
-var ErrNoEvseEntity = errors.New("entity is not an EVSE")
-var ErrNoEvEntity = errors.New("entity is not an EV")
 
 // Implemented by *Solutions, used by Cem
 type SolutionInterface interface {

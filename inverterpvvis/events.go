@@ -138,11 +138,11 @@ func (e *InverterPVVis) inverterConnected(ski string, entity api.EntityRemoteInt
 	}
 
 	// get measurement parameters
-	if err := e.inverterMeasurement.RequestDescriptions(); err != nil {
+	if _, err := e.inverterMeasurement.RequestDescriptions(); err != nil {
 		logging.Log().Error(err)
 	}
 
-	if err := e.inverterMeasurement.RequestConstraints(); err != nil {
+	if _, err := e.inverterMeasurement.RequestConstraints(); err != nil {
 		logging.Log().Error(err)
 	}
 }
