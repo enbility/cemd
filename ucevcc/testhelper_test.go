@@ -11,7 +11,6 @@ import (
 	"github.com/enbility/eebus-go/service"
 	eebusutil "github.com/enbility/eebus-go/util"
 	"github.com/enbility/ship-go/cert"
-	shipmocks "github.com/enbility/ship-go/mocks"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
@@ -21,10 +20,10 @@ import (
 )
 
 func TestEVCCSuite(t *testing.T) {
-	suite.Run(t, new(EVCCSuite))
+	suite.Run(t, new(UCEVCCSuite))
 }
 
-type EVCCSuite struct {
+type UCEVCCSuite struct {
 	suite.Suite
 
 	sut *UCEVCC
@@ -32,14 +31,15 @@ type EVCCSuite struct {
 	service eebusapi.ServiceInterface
 
 	remoteDevice     spineapi.DeviceRemoteInterface
+	mockSender       *mocks.SenderInterface
 	mockRemoteEntity *mocks.EntityRemoteInterface
 	evEntity         spineapi.EntityRemoteInterface
 }
 
-func (s *EVCCSuite) SpineEvent(ski string, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
+func (s *UCEVCCSuite) SpineEvent(ski string, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
 }
 
-func (s *EVCCSuite) BeforeTest(suiteName, testName string) {
+func (s *UCEVCCSuite) BeforeTest(suiteName, testName string) {
 	cert, _ := cert.CreateCertificate("test", "test", "DE", "test")
 	configuration, _ := eebusapi.NewConfiguration(
 		"test", "test", "test", "test",
@@ -62,10 +62,11 @@ func (s *EVCCSuite) BeforeTest(suiteName, testName string) {
 	s.mockRemoteEntity.EXPECT().EntityType().Return(mock.Anything).Maybe()
 	entityAddress := &model.EntityAddressType{}
 	s.mockRemoteEntity.EXPECT().Address().Return(entityAddress).Maybe()
+	mockRemoteFeature.EXPECT().DataCopy(mock.Anything).Return(mock.Anything).Maybe()
 
 	var entities []spineapi.EntityRemoteInterface
 
-	s.remoteDevice, entities = setupDevices(s.service, s.T())
+	s.remoteDevice, s.mockSender, entities = setupDevices(s.service, s.T())
 	s.sut = NewUCEVCC(s.service, s.service.LocalService(), s)
 	s.sut.AddFeatures()
 	s.sut.AddUseCase()
@@ -77,6 +78,7 @@ const remoteSki string = "testremoteski"
 func setupDevices(
 	eebusService eebusapi.ServiceInterface, t *testing.T) (
 	spineapi.DeviceRemoteInterface,
+	*mocks.SenderInterface,
 	[]spineapi.EntityRemoteInterface) {
 	localDevice := eebusService.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
@@ -92,10 +94,17 @@ func setupDevices(
 	f = spine.NewFeatureLocal(5, localEntity, model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient)
 	localEntity.AddFeature(f)
 
-	writeHandler := shipmocks.NewShipConnectionDataWriterInterface(t)
-	writeHandler.EXPECT().WriteShipMessageWithPayload(mock.Anything).Return().Maybe()
-	sender := spine.NewSender(writeHandler)
-	remoteDevice := spine.NewDeviceRemote(localDevice, remoteSki, sender)
+	// writeHandler := shipmocks.NewShipConnectionDataWriterInterface(t)
+	// writeHandler.EXPECT().WriteShipMessageWithPayload(mock.Anything).Return().Maybe()
+	// sender := spine.NewSender(writeHandler)
+	mockSender := mocks.NewSenderInterface(t)
+	defaultMsgCounter := model.MsgCounterType(100)
+	mockSender.
+		EXPECT().
+		Request(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(&defaultMsgCounter, nil).
+		Maybe()
+	remoteDevice := spine.NewDeviceRemote(localDevice, remoteSki, mockSender)
 
 	var clientRemoteFeatures = []struct {
 		featureType   model.FeatureTypeType
@@ -120,6 +129,8 @@ func setupDevices(
 		{model.FeatureTypeTypeElectricalConnection,
 			[]model.FunctionType{
 				model.FunctionTypeElectricalConnectionDescriptionListData,
+				model.FunctionTypeElectricalConnectionParameterDescriptionListData,
+				model.FunctionTypeElectricalConnectionPermittedValueSetListData,
 			},
 		},
 		{model.FeatureTypeTypeDeviceDiagnosis,
@@ -197,5 +208,5 @@ func setupDevices(
 
 	localDevice.AddRemoteDeviceForSki(remoteSki, remoteDevice)
 
-	return remoteDevice, entities
+	return remoteDevice, mockSender, entities
 }

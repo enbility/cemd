@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (s *EVCCSuite) Test_EVCurrentChargeState() {
+func (s *UCEVCCSuite) Test_EVCurrentChargeState() {
 	data, err := s.sut.CurrentChargeState(s.mockRemoteEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), api.EVChargeStateTypeUnplugged, data)
@@ -76,7 +76,7 @@ func (s *EVCCSuite) Test_EVCurrentChargeState() {
 	assert.Equal(s.T(), api.EVChargeStateTypeUnknown, data)
 }
 
-func (s *EVCCSuite) Test_EVConnected() {
+func (s *UCEVCCSuite) Test_EVConnected() {
 	data := s.sut.EVConnected(nil)
 	assert.Equal(s.T(), false, data)
 
@@ -98,7 +98,7 @@ func (s *EVCCSuite) Test_EVConnected() {
 	assert.Equal(s.T(), true, data)
 }
 
-func (s *EVCCSuite) Test_EVCommunicationStandard() {
+func (s *UCEVCCSuite) Test_EVCommunicationStandard() {
 	data, err := s.sut.CommunicationStandard(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), api.UCEVCCCommunicationStandardUnknown, data)
@@ -159,7 +159,7 @@ func (s *EVCCSuite) Test_EVCommunicationStandard() {
 	assert.Equal(s.T(), string(model.DeviceConfigurationKeyValueStringTypeISO151182ED2), data)
 }
 
-func (s *EVCCSuite) Test_EVAsymmetricChargingSupported() {
+func (s *UCEVCCSuite) Test_EVAsymmetricChargingSupported() {
 	data, err := s.sut.AsymmetricChargingSupported(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), false, data)
@@ -220,18 +220,18 @@ func (s *EVCCSuite) Test_EVAsymmetricChargingSupported() {
 	assert.Equal(s.T(), true, data)
 }
 
-func (s *EVCCSuite) Test_EVIdentification() {
+func (s *UCEVCCSuite) Test_EVIdentification() {
 	data, err := s.sut.Identifications(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), []IdentificationItem(nil), data)
+	assert.Equal(s.T(), []api.IdentificationItem(nil), data)
 
 	data, err = s.sut.Identifications(s.evEntity)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), []IdentificationItem(nil), data)
+	assert.Equal(s.T(), []api.IdentificationItem(nil), data)
 
 	data, err = s.sut.Identifications(s.evEntity)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), []IdentificationItem(nil), data)
+	assert.Equal(s.T(), []api.IdentificationItem(nil), data)
 
 	idData := &model.IdentificationListDataType{
 		IdentificationData: []model.IdentificationDataType{
@@ -249,11 +249,11 @@ func (s *EVCCSuite) Test_EVIdentification() {
 
 	data, err = s.sut.Identifications(s.evEntity)
 	assert.Nil(s.T(), err)
-	resultData := []IdentificationItem{{Value: "test", ValueType: model.IdentificationTypeTypeEui64}}
+	resultData := []api.IdentificationItem{{Value: "test", ValueType: model.IdentificationTypeTypeEui64}}
 	assert.Equal(s.T(), resultData, data)
 }
 
-func (s *EVCCSuite) Test_EVManufacturerData() {
+func (s *UCEVCCSuite) Test_EVManufacturerData() {
 	device, serial, err := s.sut.ManufacturerData(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), "", device)
@@ -294,7 +294,7 @@ func (s *EVCCSuite) Test_EVManufacturerData() {
 	assert.Equal(s.T(), "12345", serial)
 }
 
-func (s *EVCCSuite) Test_EVCurrentLimits() {
+func (s *UCEVCCSuite) Test_EVCurrentLimits() {
 	minData, maxData, defaultData, err := s.sut.CurrentLimits(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), minData)
@@ -450,7 +450,7 @@ func (s *EVCCSuite) Test_EVCurrentLimits() {
 	}
 }
 
-func (s *EVCCSuite) Test_EVInSleepMode() {
+func (s *UCEVCCSuite) Test_EVInSleepMode() {
 	data, err := s.sut.EVInSleepMode(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), false, data)

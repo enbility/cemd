@@ -26,6 +26,15 @@ type LoadLimitsPhase struct {
 	Value    float64
 }
 
+// identification
+type IdentificationItem struct {
+	// the identification value
+	Value string
+
+	// the type of the identification value, e.g.
+	ValueType model.IdentificationTypeType
+}
+
 type EVChargeStrategyType string
 
 const (

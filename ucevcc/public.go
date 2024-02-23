@@ -153,7 +153,7 @@ func (e *UCEVCC) AsymmetricChargingSupported(entity spineapi.EntityRemoteInterfa
 // possible errors:
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
-func (e *UCEVCC) Identifications(entity spineapi.EntityRemoteInterface) ([]IdentificationItem, error) {
+func (e *UCEVCC) Identifications(entity spineapi.EntityRemoteInterface) ([]api.IdentificationItem, error) {
 	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
 		return nil, api.ErrNoEvEntity
 	}
@@ -168,9 +168,9 @@ func (e *UCEVCC) Identifications(entity spineapi.EntityRemoteInterface) ([]Ident
 		return nil, err
 	}
 
-	var ids []IdentificationItem
+	var ids []api.IdentificationItem
 	for _, identification := range identifications {
-		item := IdentificationItem{}
+		item := api.IdentificationItem{}
 
 		typ := identification.IdentificationType
 		if typ != nil {

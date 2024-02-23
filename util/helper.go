@@ -94,7 +94,7 @@ func IsEvConnected(payload spineapi.EventPayload) bool {
 
 func IsEvDisconnected(payload spineapi.EventPayload) bool {
 	if payload.EventType == spineapi.EventTypeEntityChange &&
-		payload.ChangeType == spineapi.ElementChangeAdd {
+		payload.ChangeType == spineapi.ElementChangeRemove {
 		return IsPayloadForEntityType(payload, model.EntityTypeTypeEV)
 	}
 

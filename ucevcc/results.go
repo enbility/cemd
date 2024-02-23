@@ -16,8 +16,7 @@ func (e *UCEVCC) HandleResult(errorMsg api.ResultMessage) {
 	}
 
 	// handle errors coming from the remote EVSE entity
-	switch errorMsg.FeatureLocal.Type() {
-	case model.FeatureTypeTypeDeviceDiagnosis:
+	if errorMsg.FeatureLocal.Type() == model.FeatureTypeTypeDeviceDiagnosis {
 		e.handleResultDeviceDiagnosis(errorMsg)
 	}
 }
@@ -25,7 +24,10 @@ func (e *UCEVCC) HandleResult(errorMsg api.ResultMessage) {
 // Handle DeviceDiagnosis Results
 func (e *UCEVCC) handleResultDeviceDiagnosis(resultMsg api.ResultMessage) {
 	// is this an error for a heartbeat message?
-	if *resultMsg.Result.ErrorNumber == model.ErrorNumberTypeNoError {
+	if resultMsg.DeviceRemote == nil ||
+		resultMsg.Result == nil ||
+		resultMsg.Result.ErrorNumber == nil ||
+		*resultMsg.Result.ErrorNumber == model.ErrorNumberTypeNoError {
 		return
 	}
 

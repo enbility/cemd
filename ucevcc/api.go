@@ -3,7 +3,6 @@ package ucevcc
 import (
 	"github.com/enbility/cemd/api"
 	spineapi "github.com/enbility/spine-go/api"
-	"github.com/enbility/spine-go/model"
 )
 
 //go:generate mockery
@@ -34,7 +33,7 @@ type UCEVCCInterface interface {
 
 	// return the identifications of the currently connected EV or nil if not available
 	// these can be multiple, e.g. PCID, Mac Address, RFID
-	Identifications(entity spineapi.EntityRemoteInterface) ([]IdentificationItem, error)
+	Identifications(entity spineapi.EntityRemoteInterface) ([]api.IdentificationItem, error)
 
 	// Scenario 5
 
@@ -51,13 +50,4 @@ type UCEVCCInterface interface {
 
 	// is the EV in sleep mode
 	EVInSleepMode(entity spineapi.EntityRemoteInterface) (bool, error)
-}
-
-// EV identification
-type IdentificationItem struct {
-	// the identification value
-	Value string
-
-	// the type of the identification value, e.g.
-	ValueType model.IdentificationTypeType
 }

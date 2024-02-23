@@ -172,8 +172,16 @@ func (e *UCEVCC) evIdentificationDataUpdate(ski string, entity spineapi.EntityRe
 
 // the manufacturer data of an EV was updated
 func (e *UCEVCC) evManufacturerDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
+	evDeviceClassification, err := util.DeviceClassification(e.service, entity)
+	if err != nil {
+		return
+	}
+
 	// Scenario 5
-	e.reader.SpineEvent(ski, entity, api.UCEVCCManufacturerDataUpdate)
+	if _, err := evDeviceClassification.GetManufacturerDetails(); err == nil {
+		e.reader.SpineEvent(ski, entity, api.UCEVCCManufacturerDataUpdate)
+	}
+
 }
 
 // the electrical connection parameter description data of an EV was updated
