@@ -14,15 +14,19 @@ import (
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func LoadControlLimits(service eebusapi.ServiceInterface, entity spineapi.EntityRemoteInterface, category model.LoadControlCategoryType) ([]float64, error) {
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return nil, api.ErrNoEvEntity
+func LoadControlLimits(
+	service eebusapi.ServiceInterface,
+	entity spineapi.EntityRemoteInterface,
+	entityType model.EntityTypeType,
+	category model.LoadControlCategoryType) ([]float64, error) {
+	if entity == nil || entity.EntityType() != entityType {
+		return nil, api.ErrNoCompatibleEntity
 	}
 
 	evLoadControl, err := LoadControl(service, entity)
 	evElectricalConnection, err2 := ElectricalConnection(service, entity)
 	if err != nil || err2 != nil {
-		return nil, api.ErrNoEvEntity
+		return nil, api.ErrNoCompatibleEntity
 	}
 
 	// find out the appropriate limitId for each phase value
@@ -110,15 +114,20 @@ func LoadControlLimits(service eebusapi.ServiceInterface, entity spineapi.Entity
 //   - In ISO15118-2 the usecase is only supported via VAS extensions which are vendor specific and needs to have specific EVSE support for the specific EV brand.
 //   - In ISO15118-20 this is a standard feature which does not need special support on the EVSE.
 //   - Min power data is only provided via IEC61851 or using VAS in ISO15118-2.
-func WriteLoadControlLimits(service eebusapi.ServiceInterface, entity spineapi.EntityRemoteInterface, category model.LoadControlCategoryType, limits []api.LoadLimitsPhase) (*model.MsgCounterType, error) {
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return nil, api.ErrNoEvEntity
+func WriteLoadControlLimits(
+	service eebusapi.ServiceInterface,
+	entity spineapi.EntityRemoteInterface,
+	entityType model.EntityTypeType,
+	category model.LoadControlCategoryType,
+	limits []api.LoadLimitsPhase) (*model.MsgCounterType, error) {
+	if entity == nil || entity.EntityType() != entityType {
+		return nil, api.ErrNoCompatibleEntity
 	}
 
 	evLoadControl, err := LoadControl(service, entity)
 	evElectricalConnection, err2 := ElectricalConnection(service, entity)
 	if err != nil || err2 != nil {
-		return nil, api.ErrNoEvseEntity
+		return nil, api.ErrNoCompatibleEntity
 	}
 
 	var limitData []model.LoadControlLimitDataType

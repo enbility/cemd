@@ -13,8 +13,8 @@ import (
 func (e *UCCEVC) ChargePlanConstraints(entity spineapi.EntityRemoteInterface) ([]api.DurationSlotValue, error) {
 	constraints := []api.DurationSlotValue{}
 
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return constraints, api.ErrEVDisconnected
+	if !e.isCompatibleEntity(entity) {
+		return constraints, api.ErrNoCompatibleEntity
 	}
 
 	evTimeSeries, err := util.TimeSeries(e.service, entity)
@@ -68,8 +68,8 @@ func (e *UCCEVC) ChargePlanConstraints(entity spineapi.EntityRemoteInterface) ([
 func (e *UCCEVC) ChargePlan(entity spineapi.EntityRemoteInterface) (api.ChargePlan, error) {
 	plan := api.ChargePlan{}
 
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return plan, api.ErrEVDisconnected
+	if !e.isCompatibleEntity(entity) {
+		return plan, api.ErrNoCompatibleEntity
 	}
 
 	evTimeSeries, err := util.TimeSeries(e.service, entity)

@@ -70,8 +70,8 @@ func (e *UCEVCC) deviceConfigurationValueForKeyName(
 	entity spineapi.EntityRemoteInterface,
 	keyname model.DeviceConfigurationKeyNameType,
 	valueType model.DeviceConfigurationKeyValueTypeType) (any, error) {
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return nil, api.ErrNoEvEntity
+	if !e.isCompatibleEntity(entity) {
+		return nil, api.ErrNoCompatibleEntity
 	}
 
 	evDeviceConfiguration, err := util.DeviceConfiguration(e.service, entity)
@@ -115,6 +115,10 @@ func (e *UCEVCC) deviceConfigurationValueForKeyName(
 func (e *UCEVCC) CommunicationStandard(entity spineapi.EntityRemoteInterface) (string, error) {
 	unknown := api.UCEVCCCommunicationStandardUnknown
 
+	if !e.isCompatibleEntity(entity) {
+		return unknown, api.ErrNoCompatibleEntity
+	}
+
 	data, err := e.deviceConfigurationValueForKeyName(entity, model.DeviceConfigurationKeyNameTypeCommunicationsStandard, model.DeviceConfigurationKeyValueTypeTypeString)
 	if err != nil {
 		return unknown, err
@@ -134,6 +138,10 @@ func (e *UCEVCC) CommunicationStandard(entity spineapi.EntityRemoteInterface) (s
 // possible errors:
 //   - ErrDataNotAvailable if that information is not (yet) available
 func (e *UCEVCC) AsymmetricChargingSupported(entity spineapi.EntityRemoteInterface) (bool, error) {
+	if !e.isCompatibleEntity(entity) {
+		return false, api.ErrNoCompatibleEntity
+	}
+
 	data, err := e.deviceConfigurationValueForKeyName(entity, model.DeviceConfigurationKeyNameTypeAsymmetricChargingSupported, model.DeviceConfigurationKeyValueTypeTypeBoolean)
 	if err != nil {
 		return false, err
@@ -154,8 +162,8 @@ func (e *UCEVCC) AsymmetricChargingSupported(entity spineapi.EntityRemoteInterfa
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
 func (e *UCEVCC) Identifications(entity spineapi.EntityRemoteInterface) ([]api.IdentificationItem, error) {
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return nil, api.ErrNoEvEntity
+	if !e.isCompatibleEntity(entity) {
+		return nil, api.ErrNoCompatibleEntity
 	}
 
 	evIdentification, err := util.Identification(e.service, entity)
@@ -200,8 +208,8 @@ func (e *UCEVCC) ManufacturerData(
 	deviceName := ""
 	serialNumber := ""
 
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return deviceName, serialNumber, api.ErrNoEvEntity
+	if !e.isCompatibleEntity(entity) {
+		return deviceName, serialNumber, api.ErrNoCompatibleEntity
 	}
 
 	evDeviceClassification, err := util.DeviceClassification(e.service, entity)
@@ -231,8 +239,8 @@ func (e *UCEVCC) ManufacturerData(
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *UCEVCC) CurrentLimits(entity spineapi.EntityRemoteInterface) ([]float64, []float64, []float64, error) {
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return nil, nil, nil, api.ErrNoEvEntity
+	if !e.isCompatibleEntity(entity) {
+		return nil, nil, nil, api.ErrNoCompatibleEntity
 	}
 
 	evElectricalConnection, err := util.ElectricalConnection(e.service, entity)
@@ -275,8 +283,8 @@ func (e *UCEVCC) CurrentLimits(entity spineapi.EntityRemoteInterface) ([]float64
 func (e *UCEVCC) EVInSleepMode(
 	entity spineapi.EntityRemoteInterface,
 ) (bool, error) {
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return false, api.ErrNoEvseEntity
+	if !e.isCompatibleEntity(entity) {
+		return false, api.ErrNoCompatibleEntity
 	}
 
 	evseDeviceDiagnosis, err := util.DeviceDiagnosis(e.service, entity)
@@ -295,4 +303,14 @@ func (e *UCEVCC) EVInSleepMode(
 	}
 
 	return false, nil
+}
+
+// helper
+
+func (e *UCEVCC) isCompatibleEntity(entity spineapi.EntityRemoteInterface) bool {
+	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
+		return false
+	}
+
+	return true
 }

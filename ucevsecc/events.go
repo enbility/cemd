@@ -17,14 +17,15 @@ func (e *UCEVSECC) HandleEvent(payload spineapi.EventPayload) {
 		return
 	}
 
-	if !util.IsPayloadForEntityType(payload, model.EntityTypeTypeEVSE) {
+	entityType := model.EntityTypeTypeEVSE
+	if !util.IsPayloadForEntityType(payload, entityType) {
 		return
 	}
 
-	if util.IsEvseConnected(payload) {
+	if util.IsEntityTypeConnected(payload, entityType) {
 		e.evseConnected(payload.Ski, payload.Entity)
 		return
-	} else if util.IsEvseDisconnected(payload) {
+	} else if util.IsEntityTypeDisconnected(payload, entityType) {
 		e.evseDisconnected(payload.Ski, payload.Entity)
 		return
 	}

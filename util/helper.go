@@ -21,37 +21,19 @@ func IsDeviceDisconnected(payload spineapi.EventPayload) bool {
 		payload.ChangeType == spineapi.ElementChangeRemove)
 }
 
-func IsEvseConnected(payload spineapi.EventPayload) bool {
+func IsEntityTypeConnected(payload spineapi.EventPayload, entityType model.EntityTypeType) bool {
 	if payload.EventType == spineapi.EventTypeEntityChange &&
 		payload.ChangeType == spineapi.ElementChangeAdd {
-		return IsPayloadForEntityType(payload, model.EntityTypeTypeEVSE)
+		return IsPayloadForEntityType(payload, entityType)
 	}
 
 	return false
 }
 
-func IsEvseDisconnected(payload spineapi.EventPayload) bool {
+func IsEntityTypeDisconnected(payload spineapi.EventPayload, entityType model.EntityTypeType) bool {
 	if payload.EventType == spineapi.EventTypeEntityChange &&
 		payload.ChangeType == spineapi.ElementChangeRemove {
-		return IsPayloadForEntityType(payload, model.EntityTypeTypeEVSE)
-	}
-
-	return false
-}
-
-func IsEvConnected(payload spineapi.EventPayload) bool {
-	if payload.EventType == spineapi.EventTypeEntityChange &&
-		payload.ChangeType == spineapi.ElementChangeAdd {
-		return IsPayloadForEntityType(payload, model.EntityTypeTypeEV)
-	}
-
-	return false
-}
-
-func IsEvDisconnected(payload spineapi.EventPayload) bool {
-	if payload.EventType == spineapi.EventTypeEntityChange &&
-		payload.ChangeType == spineapi.ElementChangeRemove {
-		return IsPayloadForEntityType(payload, model.EntityTypeTypeEV)
+		return IsPayloadForEntityType(payload, entityType)
 	}
 
 	return false

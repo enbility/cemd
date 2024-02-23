@@ -37,9 +37,9 @@ func (s *UtilSuite) Test_IsDeviceDisconnected() {
 	assert.Equal(s.T(), true, result)
 }
 
-func (s *UtilSuite) Test_IsEvseConnected() {
+func (s *UtilSuite) Test_IsEntityTypeConnected() {
 	payload := spineapi.EventPayload{}
-	result := IsEvseConnected(payload)
+	result := IsEntityTypeConnected(payload, model.EntityTypeTypeEVSE)
 	assert.Equal(s.T(), false, result)
 
 	payload = spineapi.EventPayload{
@@ -47,13 +47,13 @@ func (s *UtilSuite) Test_IsEvseConnected() {
 		EventType:  spineapi.EventTypeEntityChange,
 		ChangeType: spineapi.ElementChangeAdd,
 	}
-	result = IsEvseConnected(payload)
+	result = IsEntityTypeConnected(payload, model.EntityTypeTypeEVSE)
 	assert.Equal(s.T(), true, result)
 }
 
-func (s *UtilSuite) Test_IsEvseDisconnected() {
+func (s *UtilSuite) Test_IsEntityTypeDisconnected() {
 	payload := spineapi.EventPayload{}
-	result := IsEvseDisconnected(payload)
+	result := IsEntityTypeDisconnected(payload, model.EntityTypeTypeEVSE)
 	assert.Equal(s.T(), false, result)
 
 	payload = spineapi.EventPayload{
@@ -61,34 +61,6 @@ func (s *UtilSuite) Test_IsEvseDisconnected() {
 		EventType:  spineapi.EventTypeEntityChange,
 		ChangeType: spineapi.ElementChangeRemove,
 	}
-	result = IsEvseDisconnected(payload)
-	assert.Equal(s.T(), true, result)
-}
-
-func (s *UtilSuite) Test_IsEvConnected() {
-	payload := spineapi.EventPayload{}
-	result := IsEvConnected(payload)
-	assert.Equal(s.T(), false, result)
-
-	payload = spineapi.EventPayload{
-		Entity:     s.evEntity,
-		EventType:  spineapi.EventTypeEntityChange,
-		ChangeType: spineapi.ElementChangeAdd,
-	}
-	result = IsEvConnected(payload)
-	assert.Equal(s.T(), true, result)
-}
-
-func (s *UtilSuite) Test_IsEvDisconnected() {
-	payload := spineapi.EventPayload{}
-	result := IsEvDisconnected(payload)
-	assert.Equal(s.T(), false, result)
-
-	payload = spineapi.EventPayload{
-		Entity:     s.evEntity,
-		EventType:  spineapi.EventTypeEntityChange,
-		ChangeType: spineapi.ElementChangeRemove,
-	}
-	result = IsEvDisconnected(payload)
+	result = IsEntityTypeDisconnected(payload, model.EntityTypeTypeEVSE)
 	assert.Equal(s.T(), true, result)
 }

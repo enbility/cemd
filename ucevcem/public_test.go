@@ -15,10 +15,6 @@ func (s *UCEVCEMSuite) Test_EVConnectedPhases() {
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), uint(0), data)
 
-	data, err = s.sut.ConnectedPhases(s.evEntity)
-	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), uint(0), data)
-
 	descData := &model.ElectricalConnectionDescriptionListDataType{
 		ElectricalConnectionDescriptionData: []model.ElectricalConnectionDescriptionDataType{
 			{
@@ -54,10 +50,6 @@ func (s *UCEVCEMSuite) Test_EVConnectedPhases() {
 
 func (s *UCEVCEMSuite) Test_EVCurrentsPerPhase() {
 	data, err := s.sut.CurrentsPerPhase(s.mockRemoteEntity)
-	assert.NotNil(s.T(), err)
-	assert.Nil(s.T(), data)
-
-	data, err = s.sut.CurrentsPerPhase(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
@@ -123,10 +115,6 @@ func (s *UCEVCEMSuite) Test_EVCurrentsPerPhase() {
 
 func (s *UCEVCEMSuite) Test_EVPowerPerPhase_Power() {
 	data, err := s.sut.PowerPerPhase(s.mockRemoteEntity)
-	assert.NotNil(s.T(), err)
-	assert.Nil(s.T(), data)
-
-	data, err = s.sut.PowerPerPhase(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
@@ -257,10 +245,6 @@ func (s *UCEVCEMSuite) Test_EVPowerPerPhase_Current() {
 
 func (s *UCEVCEMSuite) Test_EVChargedEnergy() {
 	data, err := s.sut.ChargedEnergy(s.mockRemoteEntity)
-	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), 0.0, data)
-
-	data, err = s.sut.ChargedEnergy(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 

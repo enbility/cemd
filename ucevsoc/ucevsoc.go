@@ -64,7 +64,7 @@ func (e *UCEVSOC) AddUseCase() {
 //   - and others
 func (e *UCEVSOC) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool, error) {
 	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return false, api.ErrNoEvEntity
+		return false, api.ErrNoCompatibleEntity
 	}
 
 	// check if the usecase and mandatory scenarios are supported and

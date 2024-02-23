@@ -12,7 +12,7 @@ import (
 
 // returns the current charging strategy
 func (e *UCCEVC) ChargeStrategy(entity spineapi.EntityRemoteInterface) api.EVChargeStrategyType {
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
+	if !e.isCompatibleEntity(entity) {
 		return api.EVChargeStrategyTypeUnknown
 	}
 
@@ -73,8 +73,8 @@ func (e *UCCEVC) ChargeStrategy(entity spineapi.EntityRemoteInterface) api.EVCha
 func (e *UCCEVC) EnergyDemand(entity spineapi.EntityRemoteInterface) (api.Demand, error) {
 	demand := api.Demand{}
 
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return demand, api.ErrEVDisconnected
+	if !e.isCompatibleEntity(entity) {
+		return demand, api.ErrNoCompatibleEntity
 	}
 
 	evTimeSeries, err := util.TimeSeries(e.service, entity)

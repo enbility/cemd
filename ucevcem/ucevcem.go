@@ -58,8 +58,8 @@ func (e *UCEVCEM) AddUseCase() {
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
 func (e *UCEVCEM) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool, error) {
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return false, api.ErrNoEvEntity
+	if !e.isCompatibleEntity(entity) {
+		return false, api.ErrNoCompatibleEntity
 	}
 
 	// check if the usecase and mandatory scenarios are supported and

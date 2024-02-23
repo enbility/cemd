@@ -16,7 +16,8 @@ func (e *UCEVCEM) HandleEvent(payload spineapi.EventPayload) {
 		return
 	}
 
-	if util.IsEvConnected(payload) {
+	entityType := model.EntityTypeTypeEV
+	if util.IsEntityTypeConnected(payload, entityType) {
 		e.evConnected(payload.Entity)
 		return
 	}

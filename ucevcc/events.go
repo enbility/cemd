@@ -17,14 +17,15 @@ func (e *UCEVCC) HandleEvent(payload spineapi.EventPayload) {
 		return
 	}
 
-	if !util.IsPayloadForEntityType(payload, model.EntityTypeTypeEV) {
+	entityType := model.EntityTypeTypeEV
+	if !util.IsPayloadForEntityType(payload, entityType) {
 		return
 	}
 
-	if util.IsEvConnected(payload) {
+	if util.IsEntityTypeConnected(payload, entityType) {
 		e.evConnected(payload.Ski, payload.Entity)
 		return
-	} else if util.IsEvDisconnected(payload) {
+	} else if util.IsEntityTypeDisconnected(payload, entityType) {
 		e.evDisconnected(payload.Ski, payload.Entity)
 		return
 	}
@@ -36,7 +37,7 @@ func (e *UCEVCC) HandleEvent(payload spineapi.EventPayload) {
 
 	switch payload.Data.(type) {
 	case *model.DeviceConfigurationKeyValueDescriptionListDataType:
-		e.evConfigurationDescriptionDataUpdate(payload.Ski, payload.Entity)
+		e.evConfigurationDescriptionDataUpdate(payload.Entity)
 	case *model.DeviceConfigurationKeyValueListDataType:
 		e.evConfigurationDataUpdate(payload.Ski, payload.Entity)
 	case *model.DeviceClassificationManufacturerDataType:
@@ -121,7 +122,7 @@ func (e *UCEVCC) evDisconnected(ski string, entity spineapi.EntityRemoteInterfac
 }
 
 // the configuration key description data of an EV was updated
-func (e *UCEVCC) evConfigurationDescriptionDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
+func (e *UCEVCC) evConfigurationDescriptionDataUpdate(entity spineapi.EntityRemoteInterface) {
 	if evDeviceConfiguration, err := util.DeviceConfiguration(e.service, entity); err == nil {
 		// key value descriptions received, now get the data
 		if _, err := evDeviceConfiguration.RequestKeyValues(); err != nil {

@@ -299,8 +299,7 @@ const (
 	UCOSCEVLoadControlLimitDataUpdate UseCaseEventType = "ucOSCEVLoadControlLimitDataUpdate"
 )
 
-var ErrNoEvseEntity = errors.New("entity is not an EVSE")
-var ErrNoEvEntity = errors.New("entity is not an EV")
+var ErrNoCompatibleEntity = errors.New("entity is not an compatible entity")
 var ErrEVDisconnected = errors.New("ev is disconnected")
 var ErrNotSupported = errors.New("function is not supported")
 

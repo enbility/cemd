@@ -18,7 +18,7 @@ import (
 //   - and others
 func (e *UCEVSOC) StateOfCharge(entity spineapi.EntityRemoteInterface) (float64, error) {
 	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return 0, api.ErrNoEvEntity
+		return 0, api.ErrNoCompatibleEntity
 	}
 
 	evMeasurement, err := util.Measurement(e.service, entity)
