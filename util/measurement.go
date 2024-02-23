@@ -20,8 +20,8 @@ func MeasurementValueForScope(service eebusapi.ServiceInterface, entity spineapi
 				continue
 			}
 
-			if _, err := evMeasurement.GetValueForMeasurementId(*item.MeasurementId); err != nil {
-				continue
+			if value, err := evMeasurement.GetValueForMeasurementId(*item.MeasurementId); err == nil {
+				return value, nil
 			}
 
 		}

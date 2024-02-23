@@ -68,7 +68,7 @@ func (e *UCEVCEM) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (boo
 		model.UseCaseActorTypeEV,
 		e.UseCaseName(),
 		nil,
-		[]model.FeatureTypeType{model.FeatureTypeTypeDeviceDiagnosis},
+		nil,
 	) {
 		return false, nil
 	}

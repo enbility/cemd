@@ -21,20 +21,17 @@ func (e *UCEVCEM) HandleEvent(payload spineapi.EventPayload) {
 		return
 	}
 
-	switch payload.EventType {
-	case spineapi.EventTypeDataChange:
-		if payload.ChangeType != spineapi.ElementChangeUpdate {
-			return
-		}
-
-		switch payload.Data.(type) {
-		case *model.ElectricalConnectionDescriptionListDataType:
-			e.evElectricalConnectionDescriptionDataUpdate(payload.Ski, payload.Entity)
-		case *model.MeasurementDescriptionListDataType:
-			e.evMeasurementDescriptionDataUpdate(payload.Entity)
-		case *model.MeasurementListDataType:
-			e.evMeasurementDataUpdate(payload.Ski, payload.Entity)
-		}
+	if payload.EventType != spineapi.EventTypeDataChange ||
+		payload.ChangeType != spineapi.ElementChangeUpdate {
+		return
+	}
+	switch payload.Data.(type) {
+	case *model.ElectricalConnectionDescriptionListDataType:
+		e.evElectricalConnectionDescriptionDataUpdate(payload.Ski, payload.Entity)
+	case *model.MeasurementDescriptionListDataType:
+		e.evMeasurementDescriptionDataUpdate(payload.Entity)
+	case *model.MeasurementListDataType:
+		e.evMeasurementDataUpdate(payload.Ski, payload.Entity)
 	}
 }
 

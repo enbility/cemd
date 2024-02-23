@@ -21,10 +21,10 @@ import (
 )
 
 func TestEVCEMSuite(t *testing.T) {
-	suite.Run(t, new(EVCEMSuite))
+	suite.Run(t, new(UCEVCEMSuite))
 }
 
-type EVCEMSuite struct {
+type UCEVCEMSuite struct {
 	suite.Suite
 
 	sut *UCEVCEM
@@ -36,10 +36,10 @@ type EVCEMSuite struct {
 	evEntity         spineapi.EntityRemoteInterface
 }
 
-func (s *EVCEMSuite) SpineEvent(ski string, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
+func (s *UCEVCEMSuite) SpineEvent(ski string, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
 }
 
-func (s *EVCEMSuite) BeforeTest(suiteName, testName string) {
+func (s *UCEVCEMSuite) BeforeTest(suiteName, testName string) {
 	cert, _ := cert.CreateCertificate("test", "test", "DE", "test")
 	configuration, _ := eebusapi.NewConfiguration(
 		"test", "test", "test", "test",
@@ -59,6 +59,7 @@ func (s *EVCEMSuite) BeforeTest(suiteName, testName string) {
 	mockRemoteDevice.EXPECT().FeatureByEntityTypeAndRole(mock.Anything, mock.Anything, mock.Anything).Return(mockRemoteFeature).Maybe()
 	s.mockRemoteEntity.EXPECT().Device().Return(mockRemoteDevice).Maybe()
 	s.mockRemoteEntity.EXPECT().EntityType().Return(mock.Anything).Maybe()
+	mockRemoteFeature.EXPECT().DataCopy(mock.Anything).Return(mock.Anything).Maybe()
 
 	var entities []spineapi.EntityRemoteInterface
 
