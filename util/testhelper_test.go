@@ -20,24 +20,25 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-func TestLoadControlSuite(t *testing.T) {
-	suite.Run(t, new(LoadControlSuite))
+func TestUtilSuite(t *testing.T) {
+	suite.Run(t, new(UtilSuite))
 }
 
-type LoadControlSuite struct {
+type UtilSuite struct {
 	suite.Suite
 
 	service eebusapi.ServiceInterface
 
 	remoteDevice     spineapi.DeviceRemoteInterface
 	mockRemoteEntity *mocks.EntityRemoteInterface
+	evseEntity       spineapi.EntityRemoteInterface
 	evEntity         spineapi.EntityRemoteInterface
 }
 
-func (s *LoadControlSuite) SpineEvent(ski string, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
+func (s *UtilSuite) SpineEvent(ski string, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
 }
 
-func (s *LoadControlSuite) BeforeTest(suiteName, testName string) {
+func (s *UtilSuite) BeforeTest(suiteName, testName string) {
 	cert, _ := cert.CreateCertificate("test", "test", "DE", "test")
 	configuration, _ := eebusapi.NewConfiguration(
 		"test", "test", "test", "test",
@@ -60,10 +61,12 @@ func (s *LoadControlSuite) BeforeTest(suiteName, testName string) {
 	s.mockRemoteEntity.EXPECT().EntityType().Return(mock.Anything).Maybe()
 	entityAddress := &model.EntityAddressType{}
 	s.mockRemoteEntity.EXPECT().Address().Return(entityAddress).Maybe()
+	mockRemoteFeature.EXPECT().DataCopy(mock.Anything).Return(mock.Anything).Maybe()
 
 	var entities []spineapi.EntityRemoteInterface
 
 	s.remoteDevice, entities = setupDevices(s.service, s.T())
+	s.evseEntity = entities[0]
 	s.evEntity = entities[1]
 }
 
@@ -78,9 +81,9 @@ func setupDevices(
 
 	f := spine.NewFeatureLocal(1, localEntity, model.FeatureTypeTypeLoadControl, model.RoleTypeClient)
 	localEntity.AddFeature(f)
-	f = spine.NewFeatureLocal(2, localEntity, model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
+	f = spine.NewFeatureLocal(2, localEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient)
 	localEntity.AddFeature(f)
-	f = spine.NewFeatureLocal(3, localEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient)
+	f = spine.NewFeatureLocal(3, localEntity, model.FeatureTypeTypeMeasurement, model.RoleTypeClient)
 	localEntity.AddFeature(f)
 
 	writeHandler := shipmocks.NewShipConnectionDataWriterInterface(t)
@@ -108,10 +111,11 @@ func setupDevices(
 				model.FunctionTypeElectricalConnectionPermittedValueSetListData,
 			},
 		},
-		{model.FeatureTypeTypeDeviceDiagnosis,
-			model.RoleTypeClient,
+		{model.FeatureTypeTypeMeasurement,
+			model.RoleTypeServer,
 			[]model.FunctionType{
-				model.FunctionTypeDeviceDiagnosisStateData,
+				model.FunctionTypeMeasurementDescriptionListData,
+				model.FunctionTypeMeasurementListData,
 			},
 		},
 	}

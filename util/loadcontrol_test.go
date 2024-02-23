@@ -9,7 +9,132 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (s *LoadControlSuite) Test_EVWriteLoadControlLimits() {
+func (s *UtilSuite) Test_LoadControlLimits() {
+	var data []float64
+	var err error
+	category := model.LoadControlCategoryTypeObligation
+
+	data, err = LoadControlLimits(s.service, s.mockRemoteEntity, category)
+	assert.NotNil(s.T(), err)
+	assert.Nil(s.T(), data)
+
+	data, err = LoadControlLimits(s.service, s.evEntity, category)
+	assert.NotNil(s.T(), err)
+	assert.Nil(s.T(), data)
+
+	descData := &model.LoadControlLimitDescriptionListDataType{
+		LoadControlLimitDescriptionData: []model.LoadControlLimitDescriptionDataType{
+			{
+				LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(0)),
+				LimitCategory: eebusutil.Ptr(category),
+				MeasurementId: eebusutil.Ptr(model.MeasurementIdType(0)),
+			},
+			{
+				LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(1)),
+				LimitCategory: eebusutil.Ptr(category),
+				MeasurementId: eebusutil.Ptr(model.MeasurementIdType(1)),
+			},
+			{
+				LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(2)),
+				LimitCategory: eebusutil.Ptr(category),
+				MeasurementId: eebusutil.Ptr(model.MeasurementIdType(2)),
+			},
+		},
+	}
+
+	rFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.evEntity, model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
+	fErr := rFeature.UpdateData(model.FunctionTypeLoadControlLimitDescriptionListData, descData, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	data, err = LoadControlLimits(s.service, s.evEntity, category)
+	assert.Nil(s.T(), err)
+	assert.Equal(s.T(), []float64{0.0, 0.0, 0.0}, data)
+
+	paramData := &model.ElectricalConnectionParameterDescriptionListDataType{
+		ElectricalConnectionParameterDescriptionData: []model.ElectricalConnectionParameterDescriptionDataType{
+			{
+				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
+				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(0)),
+				MeasurementId:          eebusutil.Ptr(model.MeasurementIdType(0)),
+				AcMeasuredPhases:       eebusutil.Ptr(model.ElectricalConnectionPhaseNameTypeA),
+			},
+			{
+				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
+				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(1)),
+				MeasurementId:          eebusutil.Ptr(model.MeasurementIdType(1)),
+				AcMeasuredPhases:       eebusutil.Ptr(model.ElectricalConnectionPhaseNameTypeB),
+			},
+			{
+				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
+				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(2)),
+				MeasurementId:          eebusutil.Ptr(model.MeasurementIdType(2)),
+				AcMeasuredPhases:       eebusutil.Ptr(model.ElectricalConnectionPhaseNameTypeC),
+			},
+		},
+	}
+
+	rElFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.evEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer)
+	fErr = rElFeature.UpdateData(model.FunctionTypeElectricalConnectionParameterDescriptionListData, paramData, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	data, err = LoadControlLimits(s.service, s.evEntity, category)
+	assert.NotNil(s.T(), err)
+	assert.Nil(s.T(), data)
+
+	limitData := &model.LoadControlLimitListDataType{
+		LoadControlLimitData: []model.LoadControlLimitDataType{
+			{
+				LimitId: eebusutil.Ptr(model.LoadControlLimitIdType(0)),
+				Value:   model.NewScaledNumberType(16),
+			},
+			{
+				LimitId: eebusutil.Ptr(model.LoadControlLimitIdType(1)),
+				Value:   model.NewScaledNumberType(16),
+			},
+			{
+				LimitId: eebusutil.Ptr(model.LoadControlLimitIdType(2)),
+			},
+		},
+	}
+
+	fErr = rFeature.UpdateData(model.FunctionTypeLoadControlLimitListData, limitData, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	data, err = LoadControlLimits(s.service, s.evEntity, category)
+	assert.NotNil(s.T(), err)
+	assert.Nil(s.T(), data)
+
+	permData := &model.ElectricalConnectionPermittedValueSetListDataType{
+		ElectricalConnectionPermittedValueSetData: []model.ElectricalConnectionPermittedValueSetDataType{
+			{
+				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
+				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(2)),
+				PermittedValueSet: []model.ScaledNumberSetType{
+					{
+						Value: []model.ScaledNumberType{
+							*model.NewScaledNumberType(0),
+						},
+						Range: []model.ScaledNumberRangeType{
+							{
+								Min: model.NewScaledNumberType(6),
+								Max: model.NewScaledNumberType(16),
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	fErr = rElFeature.UpdateData(model.FunctionTypeElectricalConnectionPermittedValueSetListData, permData, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	data, err = LoadControlLimits(s.service, s.evEntity, category)
+	assert.Nil(s.T(), err)
+	assert.Equal(s.T(), []float64{16.0, 16.0, 16.0}, data)
+}
+
+func (s *UtilSuite) Test_WriteLoadControlLimits() {
 	loadLimits := []api.LoadLimitsPhase{}
 
 	msgCounter, err := WriteLoadControlLimits(s.service, s.mockRemoteEntity, model.LoadControlCategoryTypeObligation, loadLimits)
