@@ -21,10 +21,10 @@ import (
 )
 
 func TestEVSECCSuite(t *testing.T) {
-	suite.Run(t, new(EVSECCSuite))
+	suite.Run(t, new(UCEVSECCSuite))
 }
 
-type EVSECCSuite struct {
+type UCEVSECCSuite struct {
 	suite.Suite
 
 	sut *UCEVSECC
@@ -36,10 +36,10 @@ type EVSECCSuite struct {
 	evseEntity       spineapi.EntityRemoteInterface
 }
 
-func (s *EVSECCSuite) SpineEvent(ski string, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
+func (s *UCEVSECCSuite) SpineEvent(ski string, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
 }
 
-func (s *EVSECCSuite) BeforeTest(suiteName, testName string) {
+func (s *UCEVSECCSuite) BeforeTest(suiteName, testName string) {
 	cert, _ := cert.CreateCertificate("test", "test", "DE", "test")
 	configuration, _ := eebusapi.NewConfiguration(
 		"test", "test", "test", "test",
@@ -62,6 +62,7 @@ func (s *EVSECCSuite) BeforeTest(suiteName, testName string) {
 	s.mockRemoteEntity.EXPECT().EntityType().Return(mock.Anything).Maybe()
 	entityAddress := &model.EntityAddressType{}
 	s.mockRemoteEntity.EXPECT().Address().Return(entityAddress).Maybe()
+	mockRemoteFeature.EXPECT().DataCopy(mock.Anything).Return(mock.Anything).Maybe()
 
 	var entities []spineapi.EntityRemoteInterface
 

@@ -29,18 +29,16 @@ func (e *UCEVSECC) HandleEvent(payload spineapi.EventPayload) {
 		return
 	}
 
-	switch payload.EventType {
-	case spineapi.EventTypeDataChange:
-		if payload.ChangeType != spineapi.ElementChangeUpdate {
-			return
-		}
+	if payload.EventType != spineapi.EventTypeDataChange ||
+		payload.ChangeType != spineapi.ElementChangeUpdate {
+		return
+	}
 
-		switch payload.Data.(type) {
-		case *model.DeviceClassificationManufacturerDataType:
-			e.evseManufacturerDataUpdate(payload.Ski, payload.Entity)
-		case *model.DeviceDiagnosisStateDataType:
-			e.evseStateUpdate(payload.Ski, payload.Entity)
-		}
+	switch payload.Data.(type) {
+	case *model.DeviceClassificationManufacturerDataType:
+		e.evseManufacturerDataUpdate(payload.Ski, payload.Entity)
+	case *model.DeviceDiagnosisStateDataType:
+		e.evseStateUpdate(payload.Ski, payload.Entity)
 	}
 }
 
@@ -67,10 +65,24 @@ func (e *UCEVSECC) evseDisconnected(ski string, entity spineapi.EntityRemoteInte
 
 // the manufacturer Data of an EVSE was updated
 func (e *UCEVSECC) evseManufacturerDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	e.reader.SpineEvent(ski, entity, api.UCEVSECCEventManufacturerUpdate)
+	evDeviceClassification, err := util.DeviceClassification(e.service, entity)
+	if err != nil {
+		return
+	}
+
+	if _, err := evDeviceClassification.GetManufacturerDetails(); err == nil {
+		e.reader.SpineEvent(ski, entity, api.UCEVSECCEventManufacturerUpdate)
+	}
 }
 
 // the operating State of an EVSE was updated
 func (e *UCEVSECC) evseStateUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	e.reader.SpineEvent(ski, entity, api.UCEVSECCEventOperationStateUpdate)
+	evDeviceDiagnosis, err := util.DeviceDiagnosis(e.service, entity)
+	if err != nil {
+		return
+	}
+
+	if _, err := evDeviceDiagnosis.GetState(); err == nil {
+		e.reader.SpineEvent(ski, entity, api.UCEVSECCEventOperationStateUpdate)
+	}
 }
