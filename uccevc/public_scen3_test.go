@@ -222,10 +222,9 @@ func (s *UCCEVCSuite) Test_WriteIncentives() {
 				if data.error {
 					assert.NotNil(t, err)
 					continue
-				} else {
-					assert.Nil(t, err)
 				}
 
+				assert.Nil(t, err)
 			}
 		})
 	}

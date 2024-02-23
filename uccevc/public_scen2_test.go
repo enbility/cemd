@@ -212,9 +212,9 @@ func (s *UCCEVCSuite) Test_WritePowerLimits() {
 				if data.error {
 					assert.NotNil(t, err)
 					continue
-				} else {
-					assert.Nil(t, err)
 				}
+
+				assert.Nil(t, err)
 			}
 		})
 	}

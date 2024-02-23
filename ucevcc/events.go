@@ -29,26 +29,24 @@ func (e *UCEVCC) HandleEvent(payload spineapi.EventPayload) {
 		return
 	}
 
-	switch payload.EventType {
-	case spineapi.EventTypeDataChange:
-		if payload.ChangeType != spineapi.ElementChangeUpdate {
-			return
-		}
+	if payload.EventType != spineapi.EventTypeDataChange ||
+		payload.ChangeType != spineapi.ElementChangeUpdate {
+		return
+	}
 
-		switch payload.Data.(type) {
-		case *model.DeviceConfigurationKeyValueDescriptionListDataType:
-			e.evConfigurationDescriptionDataUpdate(payload.Ski, payload.Entity)
-		case *model.DeviceConfigurationKeyValueListDataType:
-			e.evConfigurationDataUpdate(payload.Ski, payload.Entity)
-		case *model.DeviceClassificationManufacturerDataType:
-			e.evManufacturerDataUpdate(payload.Ski, payload.Entity)
-		case *model.ElectricalConnectionParameterDescriptionListDataType:
-			e.evElectricalParamerDescriptionUpdate(payload.Ski, payload.Entity)
-		case *model.ElectricalConnectionPermittedValueSetListDataType:
-			e.evElectricalPermittedValuesUpdate(payload.Ski, payload.Entity)
-		case *model.IdentificationListDataType:
-			e.evIdentificationDataUpdate(payload.Ski, payload.Entity)
-		}
+	switch payload.Data.(type) {
+	case *model.DeviceConfigurationKeyValueDescriptionListDataType:
+		e.evConfigurationDescriptionDataUpdate(payload.Ski, payload.Entity)
+	case *model.DeviceConfigurationKeyValueListDataType:
+		e.evConfigurationDataUpdate(payload.Ski, payload.Entity)
+	case *model.DeviceClassificationManufacturerDataType:
+		e.evManufacturerDataUpdate(payload.Ski, payload.Entity)
+	case *model.ElectricalConnectionParameterDescriptionListDataType:
+		e.evElectricalParamerDescriptionUpdate(payload.Ski, payload.Entity)
+	case *model.ElectricalConnectionPermittedValueSetListDataType:
+		e.evElectricalPermittedValuesUpdate(payload.Ski, payload.Entity)
+	case *model.IdentificationListDataType:
+		e.evIdentificationDataUpdate(payload.Ski, payload.Entity)
 	}
 }
 
