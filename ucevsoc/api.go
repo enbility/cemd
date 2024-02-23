@@ -2,6 +2,7 @@ package ucevsoc
 
 import (
 	"github.com/enbility/cemd/api"
+	spineapi "github.com/enbility/spine-go/api"
 )
 
 //go:generate mockery
@@ -12,14 +13,8 @@ type UCEVSOCInterface interface {
 
 	// Scenario 1
 
-	// Scenario 2
+	// return the EVscurrent state of charge of the EV or an error it is unknown
+	StateOfCharge(entity spineapi.EntityRemoteInterface) (float64, error)
 
-	// this is automatically covered by the SPINE implementation
-
-	// Scenario 3
-
-	// this is covered by the central CEM interface implementation
-	// use that one to set the CEM's operation state which will inform all remote devices
-
-	// Scenario 4
+	// Scenario 2 to 4 are not supported, as there is no EV supporting this as of today
 }

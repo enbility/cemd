@@ -43,11 +43,6 @@ func (e *UCEVSOC) AddFeatures() {
 	f.AddFunctionType(model.FunctionTypeMeasurementConstraintsListData, false, false)
 	f.AddFunctionType(model.FunctionTypeMeasurementListData, false, false)
 	f.AddResultHandler(e)
-
-	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient)
-	f.AddFunctionType(model.FunctionTypeElectricalConnectionCharacteristicListData, false, false)
-
-	f.AddResultHandler(e)
 }
 
 func (e *UCEVSOC) AddUseCase() {
@@ -56,10 +51,10 @@ func (e *UCEVSOC) AddUseCase() {
 	localEntity.AddUseCaseSupport(
 		model.UseCaseActorTypeCEM,
 		e.UseCaseName(),
-		model.SpecificationVersionType("1.0.1"),
-		"RC2",
+		model.SpecificationVersionType("1.0.0"),
+		"RC1",
 		true,
-		[]model.UseCaseScenarioSupportType{1, 2, 3, 4})
+		[]model.UseCaseScenarioSupportType{1})
 }
 
 // returns if the entity supports the usecase

@@ -6,12 +6,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (s *EVSOCSuite) Test_EVSOC() {
-	data, err := s.sut.EVSoC(s.mockRemoteEntity)
+func (s *UCEVSOCSuite) Test_StateOfCharge() {
+	data, err := s.sut.StateOfCharge(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
-	data, err = s.sut.EVSoC(s.evEntity)
+	data, err = s.sut.StateOfCharge(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -35,7 +35,7 @@ func (s *EVSOCSuite) Test_EVSOC() {
 	fErr := nodeFeature.UpdateData(model.FunctionTypeNodeManagementUseCaseData, ucData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.EVSoC(s.evEntity)
+	data, err = s.sut.StateOfCharge(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -54,7 +54,7 @@ func (s *EVSOCSuite) Test_EVSOC() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, measDesc, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.EVSoC(s.evEntity)
+	data, err = s.sut.StateOfCharge(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -69,7 +69,7 @@ func (s *EVSOCSuite) Test_EVSOC() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, measData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.EVSoC(s.evEntity)
+	data, err = s.sut.StateOfCharge(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -85,7 +85,7 @@ func (s *EVSOCSuite) Test_EVSOC() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, measData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.EVSoC(s.evEntity)
+	data, err = s.sut.StateOfCharge(s.evEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 80.0, data)
 }

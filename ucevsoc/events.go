@@ -21,18 +21,16 @@ func (e *UCEVSOC) HandleEvent(payload spineapi.EventPayload) {
 		return
 	}
 
-	switch payload.EventType {
-	case spineapi.EventTypeDataChange:
-		if payload.ChangeType != spineapi.ElementChangeUpdate {
-			return
-		}
+	if payload.EventType != spineapi.EventTypeDataChange ||
+		payload.ChangeType != spineapi.ElementChangeUpdate {
+		return
+	}
 
-		switch payload.Data.(type) {
-		case *model.MeasurementListDataType:
-			e.evMeasurementDataUpdate(payload.Ski, payload.Entity)
-		case *model.ElectricalConnectionCharacteristicListDataType:
-			e.evElectricalConnectionCharacteristicsDataUpdate(payload.Ski, payload.Entity)
-		}
+	// the codefactor warning is invalid, as .(type) check can not be replaced with if then
+	//revive:disable-next-line
+	switch payload.Data.(type) {
+	case *model.MeasurementListDataType:
+		e.evMeasurementDataUpdate(payload.Ski, payload.Entity)
 	}
 }
 
@@ -54,16 +52,6 @@ func (e *UCEVSOC) evConnected(entity spineapi.EntityRemoteInterface) {
 			logging.Log().Debug(err)
 		}
 	}
-
-	if evElectricalConnection, err := util.ElectricalConnection(e.service, entity); err == nil {
-		if _, err := evElectricalConnection.Subscribe(); err != nil {
-			logging.Log().Debug(err)
-		}
-
-		if _, err := evElectricalConnection.RequestCharacteristics(); err != nil {
-			logging.Log().Debug(err)
-		}
-	}
 }
 
 // the measurement data of an EV was updated
@@ -82,29 +70,4 @@ func (e *UCEVSOC) evMeasurementDataUpdate(ski string, entity spineapi.EntityRemo
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeTravelRange); err == nil {
 		e.reader.SpineEvent(ski, entity, api.UCEVSOCActualRangeDataUpdate)
 	}
-}
-
-// the elecrical connection characteristic data of an EV was updated
-func (e *UCEVSOC) evElectricalConnectionCharacteristicsDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	evElectricalConnection, err := util.ElectricalConnection(e.service, entity)
-	if err != nil {
-		return
-	}
-
-	data, err := evElectricalConnection.GetCharacteristics()
-	if err != nil {
-		return
-	}
-
-	for _, item := range data {
-		if item.CharacteristicType == nil || item.Value == nil {
-			continue
-		}
-
-		if *item.CharacteristicType == model.ElectricalConnectionCharacteristicTypeTypeEnergyCapacityNominalMax {
-			e.reader.SpineEvent(ski, entity, api.UCEVSOCNominalCapacityDataUpdate)
-			return
-		}
-	}
-
 }

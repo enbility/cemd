@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (s *EVSOCSuite) Test_IsUseCaseSupported() {
+func (s *UCEVSOCSuite) Test_IsUseCaseSupported() {
 	data, err := s.sut.IsUseCaseSupported(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), false, data)

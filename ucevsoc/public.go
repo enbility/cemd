@@ -16,7 +16,7 @@ import (
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *UCEVSOC) EVSoC(entity spineapi.EntityRemoteInterface) (float64, error) {
+func (e *UCEVSOC) StateOfCharge(entity spineapi.EntityRemoteInterface) (float64, error) {
 	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
 		return 0, api.ErrNoEvEntity
 	}
