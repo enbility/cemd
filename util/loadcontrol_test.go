@@ -12,11 +12,11 @@ import (
 func (s *LoadControlSuite) Test_EVWriteLoadControlLimits() {
 	loadLimits := []api.LoadLimitsPhase{}
 
-	msgCounter, err := EVWriteLoadControlLimits(s.service, s.mockRemoteEntity, model.LoadControlCategoryTypeObligation, loadLimits)
+	msgCounter, err := WriteLoadControlLimits(s.service, s.mockRemoteEntity, model.LoadControlCategoryTypeObligation, loadLimits)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), msgCounter)
 
-	msgCounter, err = EVWriteLoadControlLimits(s.service, s.evEntity, model.LoadControlCategoryTypeObligation, loadLimits)
+	msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, model.LoadControlCategoryTypeObligation, loadLimits)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), msgCounter)
 
@@ -47,7 +47,7 @@ func (s *LoadControlSuite) Test_EVWriteLoadControlLimits() {
 	fErr := rFeature.UpdateData(model.FunctionTypeElectricalConnectionParameterDescriptionListData, paramData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	msgCounter, err = EVWriteLoadControlLimits(s.service, s.evEntity, model.LoadControlCategoryTypeObligation, loadLimits)
+	msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, model.LoadControlCategoryTypeObligation, loadLimits)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), msgCounter)
 
@@ -145,7 +145,7 @@ func (s *LoadControlSuite) Test_EVWriteLoadControlLimits() {
 				fErr = rFeature.UpdateData(model.FunctionTypeElectricalConnectionPermittedValueSetListData, permData, nil, nil)
 				assert.Nil(s.T(), fErr)
 
-				msgCounter, err := EVWriteLoadControlLimits(s.service, s.evEntity, model.LoadControlCategoryTypeObligation, loadLimits)
+				msgCounter, err := WriteLoadControlLimits(s.service, s.evEntity, model.LoadControlCategoryTypeObligation, loadLimits)
 				assert.NotNil(t, err)
 				assert.Nil(t, msgCounter)
 
@@ -178,7 +178,7 @@ func (s *LoadControlSuite) Test_EVWriteLoadControlLimits() {
 				fErr = rFeature.UpdateData(model.FunctionTypeLoadControlLimitDescriptionListData, descData, nil, nil)
 				assert.Nil(s.T(), fErr)
 
-				msgCounter, err = EVWriteLoadControlLimits(s.service, s.evEntity, model.LoadControlCategoryTypeObligation, loadLimits)
+				msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, model.LoadControlCategoryTypeObligation, loadLimits)
 				assert.NotNil(t, err)
 				assert.Nil(t, msgCounter)
 
@@ -200,7 +200,7 @@ func (s *LoadControlSuite) Test_EVWriteLoadControlLimits() {
 				fErr = rFeature.UpdateData(model.FunctionTypeLoadControlLimitListData, limitListData, nil, nil)
 				assert.Nil(s.T(), fErr)
 
-				msgCounter, err = EVWriteLoadControlLimits(s.service, s.evEntity, model.LoadControlCategoryTypeObligation, loadLimits)
+				msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, model.LoadControlCategoryTypeObligation, loadLimits)
 				assert.NotNil(t, err)
 				assert.Nil(t, msgCounter)
 
@@ -214,11 +214,11 @@ func (s *LoadControlSuite) Test_EVWriteLoadControlLimits() {
 					})
 
 				}
-				msgCounter, err = EVWriteLoadControlLimits(s.service, s.evEntity, model.LoadControlCategoryTypeObligation, phaseLimitValues)
+				msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, model.LoadControlCategoryTypeObligation, phaseLimitValues)
 				assert.Nil(t, err)
 				assert.NotNil(t, msgCounter)
 
-				msgCounter, err = EVWriteLoadControlLimits(s.service, s.evEntity, model.LoadControlCategoryTypeRecommendation, phaseLimitValues)
+				msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, model.LoadControlCategoryTypeRecommendation, phaseLimitValues)
 				assert.Nil(t, err)
 				assert.NotNil(t, msgCounter)
 			}

@@ -19,7 +19,7 @@ type UCOPEVInterface interface {
 	// possible errors:
 	//   - ErrDataNotAvailable if no such limit is (yet) available
 	//   - and others
-	EVLoadControlLimits(entity spineapi.EntityRemoteInterface) ([]float64, error)
+	LoadControlLimits(entity spineapi.EntityRemoteInterface) ([]float64, error)
 
 	// send new LoadControlLimits to the remote EV
 	//
@@ -39,7 +39,7 @@ type UCOPEVInterface interface {
 	// In ISO15118-2 the usecase is only supported via VAS extensions which are vendor specific
 	// and needs to have specific EVSE support for the specific EV brand.
 	// In ISO15118-20 this is a standard feature which does not need special support on the EVSE.
-	EVWriteLoadControlLimits(entity spineapi.EntityRemoteInterface, limits []api.LoadLimitsPhase) (*model.MsgCounterType, error)
+	WriteLoadControlLimits(entity spineapi.EntityRemoteInterface, limits []api.LoadLimitsPhase) (*model.MsgCounterType, error)
 
 	// Scenario 2
 

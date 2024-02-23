@@ -21,18 +21,16 @@ func (e *UCOPEV) HandleEvent(payload spineapi.EventPayload) {
 		return
 	}
 
-	switch payload.EventType {
-	case spineapi.EventTypeDataChange:
-		if payload.ChangeType != spineapi.ElementChangeUpdate {
-			return
-		}
+	if payload.EventType != spineapi.EventTypeDataChange ||
+		payload.ChangeType != spineapi.ElementChangeUpdate {
+		return
+	}
 
-		switch payload.Data.(type) {
-		case *model.LoadControlLimitDescriptionListDataType:
-			e.evLoadControlLimitDescriptionDataUpdate(payload.Entity)
-		case *model.LoadControlLimitListDataType:
-			e.evLoadControlLimitDataUpdate(payload.Ski, payload.Entity)
-		}
+	switch payload.Data.(type) {
+	case *model.LoadControlLimitDescriptionListDataType:
+		e.evLoadControlLimitDescriptionDataUpdate(payload.Entity)
+	case *model.LoadControlLimitListDataType:
+		e.evLoadControlLimitDataUpdate(payload.Ski, payload.Entity)
 	}
 }
 

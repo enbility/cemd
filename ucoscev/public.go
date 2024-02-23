@@ -13,7 +13,7 @@ import (
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *UCOSCEV) EVLoadControlLimits(entity spineapi.EntityRemoteInterface) ([]float64, error) {
-	return util.EVLoadControlLimits(e.service, entity, model.LoadControlCategoryTypeRecommendation)
+	return util.LoadControlLimits(e.service, entity, model.LoadControlCategoryTypeRecommendation)
 }
 
 // send new LoadControlLimits to the remote EV
@@ -28,5 +28,5 @@ func (e *UCOSCEV) EVLoadControlLimits(entity spineapi.EntityRemoteInterface) ([]
 // the EVSE needs to be able map the recommendations into oligation limits which then
 // works for all EVs communication either via IEC61851 or ISO15118.
 func (e *UCOSCEV) EVWriteLoadControlLimits(entity spineapi.EntityRemoteInterface, limits []api.LoadLimitsPhase) (*model.MsgCounterType, error) {
-	return util.EVWriteLoadControlLimits(e.service, entity, model.LoadControlCategoryTypeRecommendation, limits)
+	return util.WriteLoadControlLimits(e.service, entity, model.LoadControlCategoryTypeRecommendation, limits)
 }
