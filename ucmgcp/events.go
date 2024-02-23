@@ -18,7 +18,7 @@ func (e *UCMGCP) HandleEvent(payload spineapi.EventPayload) {
 	}
 
 	if util.IsEntityTypeConnected(payload, entityType) {
-		e.gridConnected(payload.Ski, payload.Entity)
+		e.gridConnected(payload.Entity)
 		return
 	}
 
@@ -38,7 +38,7 @@ func (e *UCMGCP) HandleEvent(payload spineapi.EventPayload) {
 }
 
 // process required steps when a grid device is connected
-func (e *UCMGCP) gridConnected(ski string, entity spineapi.EntityRemoteInterface) {
+func (e *UCMGCP) gridConnected(entity spineapi.EntityRemoteInterface) {
 	if deviceConfiguration, err := util.DeviceConfiguration(e.service, entity); err == nil {
 		if _, err := deviceConfiguration.Subscribe(); err != nil {
 			logging.Log().Error(err)
