@@ -20,11 +20,11 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-func TestOSCEVSuite(t *testing.T) {
-	suite.Run(t, new(OSCEVSuite))
+func TestUCOSCEVSuite(t *testing.T) {
+	suite.Run(t, new(UCOSCEVSuite))
 }
 
-type OSCEVSuite struct {
+type UCOSCEVSuite struct {
 	suite.Suite
 
 	sut *UCOSCEV
@@ -36,10 +36,10 @@ type OSCEVSuite struct {
 	evEntity         spineapi.EntityRemoteInterface
 }
 
-func (s *OSCEVSuite) SpineEvent(ski string, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
+func (s *UCOSCEVSuite) SpineEvent(ski string, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
 }
 
-func (s *OSCEVSuite) BeforeTest(suiteName, testName string) {
+func (s *UCOSCEVSuite) BeforeTest(suiteName, testName string) {
 	cert, _ := cert.CreateCertificate("test", "test", "DE", "test")
 	configuration, _ := eebusapi.NewConfiguration(
 		"test", "test", "test", "test",
@@ -62,6 +62,7 @@ func (s *OSCEVSuite) BeforeTest(suiteName, testName string) {
 	s.mockRemoteEntity.EXPECT().EntityType().Return(mock.Anything).Maybe()
 	entityAddress := &model.EntityAddressType{}
 	s.mockRemoteEntity.EXPECT().Address().Return(entityAddress).Maybe()
+	mockRemoteFeature.EXPECT().DataCopy(mock.Anything).Return(mock.Anything).Maybe()
 
 	var entities []spineapi.EntityRemoteInterface
 

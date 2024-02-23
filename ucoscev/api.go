@@ -19,7 +19,7 @@ type UCOSCEVInterface interface {
 	// possible errors:
 	//   - ErrDataNotAvailable if no such limit is (yet) available
 	//   - and others
-	EVLoadControlLimits(entity spineapi.EntityRemoteInterface) ([]float64, error)
+	LoadControlLimits(entity spineapi.EntityRemoteInterface) ([]float64, error)
 
 	// send new LoadControlLimits to the remote EV
 	//
@@ -32,7 +32,7 @@ type UCOSCEVInterface interface {
 	// The EV either needs to support the Optimization of Self Consumption usecase or
 	// the EVSE needs to be able map the recommendations into oligation limits which then
 	// works for all EVs communication either via IEC61851 or ISO15118.
-	EVWriteLoadControlLimits(entity spineapi.EntityRemoteInterface, limits []api.LoadLimitsPhase) (*model.MsgCounterType, error)
+	WriteLoadControlLimits(entity spineapi.EntityRemoteInterface, limits []api.LoadLimitsPhase) (*model.MsgCounterType, error)
 
 	// Scenario 2
 

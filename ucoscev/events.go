@@ -16,16 +16,16 @@ func (e *UCOSCEV) HandleEvent(payload spineapi.EventPayload) {
 		return
 	}
 
-	switch payload.EventType {
-	case spineapi.EventTypeDataChange:
-		if payload.ChangeType != spineapi.ElementChangeUpdate {
-			return
-		}
+	if payload.EventType != spineapi.EventTypeDataChange ||
+		payload.ChangeType != spineapi.ElementChangeUpdate {
+		return
+	}
 
-		switch payload.Data.(type) {
-		case *model.LoadControlLimitListDataType:
-			e.evLoadControlLimitDataUpdate(payload.Ski, payload.Entity)
-		}
+	// the codefactor warning is invalid, as .(type) check can not be replaced with if then
+	//revive:disable-next-line
+	switch payload.Data.(type) {
+	case *model.LoadControlLimitListDataType:
+		e.evLoadControlLimitDataUpdate(payload.Ski, payload.Entity)
 	}
 }
 
