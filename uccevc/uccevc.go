@@ -41,6 +41,7 @@ func (e *UCCEVC) AddFeatures() {
 	f := localEntity.GetOrAddFeature(model.FeatureTypeTypeLoadControl, model.RoleTypeClient)
 	f.AddResultHandler(e)
 
+	// server features
 	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
 	f.AddResultHandler(e)
 }
