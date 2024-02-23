@@ -329,6 +329,27 @@ const (
 	//
 	// Note: the referred data may be updated together with UCOPEVLoadControlLimitDataUpdate
 	UCOSCEVLoadControlLimitDataUpdate UseCaseEventType = "ucOSCEVLoadControlLimitDataUpdate"
+
+	// UCVAPD
+
+	// PV System total power data updated
+	//
+	// Use Case VAPD, Scenario 1
+	//
+	// Note: the referred data may be updated together with UCVAPDYieldTotalMeasurementDataUpdate
+	UCVAPDPowerTotalMeasurementDataUpdate UseCaseEventType = "ucVAPDPowerTotalMeasurementDataUpdate"
+
+	// PV System nominal peak power data updated
+	//
+	// Use Case VAPD, Scenario 2
+	UCVAPDPeakPowerDataUpdate UseCaseEventType = "ucVAPDPeakPowerDataUpdate"
+
+	// PV System total yield data updated
+	//
+	// Use Case VAPD, Scenario 3
+	//
+	// Note: the referred data may be updated together with UCVAPDPowerTotalMeasurementDataUpdate
+	UCVAPDYieldTotalMeasurementDataUpdate UseCaseEventType = "ucVAPDYieldTotalMeasurementDataUpdate"
 )
 
 var ErrNoCompatibleEntity = errors.New("entity is not an compatible entity")
