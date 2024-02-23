@@ -282,6 +282,38 @@ const (
 	// Use Case EVSOC, Scenario 4
 	UCEVSOCActualRangeDataUpdate UseCaseEventType = "ucEVSOCActualRangeDataUpdate"
 
+	// MGCP
+
+	// Grid momentary power consumption/production data updated
+	//
+	// Use Case MGCP, Scenario 2
+	UCMGCPPowerTotalMeasurementDataUpdate UseCaseEventType = "ucMGCPPowerTotalMeasurementDataUpdate"
+
+	// MTotal grid feed in energy data updated
+	//
+	// Use Case MGCP, Scenario 3
+	UCMGCPGridFeedInMeasurementDataUpdate UseCaseEventType = "ucMGCPGridFeedInMeasurementDataUpdate"
+
+	// Total grid consumed energy data updated
+	//
+	// Use Case MGCP, Scenario 4
+	UCMGCPGridConsumptionMeasurementDataUpdate UseCaseEventType = "ucMGCPGridConsumptionMeasurementDataUpdate"
+
+	// Grid momentary current consumption/production phase detail data updated
+	//
+	// Use Case MGCP, Scenario 5
+	UCMGCPCurrentMeasurementDataUpdate UseCaseEventType = "ucMGCPCurrentMeasurementDataUpdate"
+
+	// Grid voltage phase detail data updated
+	//
+	// Use Case MGCP, Scenario 6
+	UCMGCPVoltageMeasurementDataUpdate UseCaseEventType = "ucMGCPVoltageMeasurementDataUpdate"
+
+	// Grid frequency data updated
+	//
+	// Use Case MGCP, Scenario 7
+	UCMGCPFrequencyMeasurementDataUpdate UseCaseEventType = "ucMGCPFrequencyMeasurementDataUpdate"
+
 	// UCOPEV
 
 	// EV load control obligation limit data updated
