@@ -340,6 +340,57 @@ const (
 	// Note: the referred data may be updated together with all other measurement items of this use case
 	UCMGCPFrequencyMeasurementDataUpdate UseCaseEventType = "ucMGCPFrequencyMeasurementDataUpdate"
 
+	// UCMPC
+
+	// Total momentary active power consumption or production
+	//
+	// Use Case MCP, Scenario 1
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
+	UCMPCPowerTotalMeasurementDataUpdate UseCaseEventType = "ucMPCPowerTotalMeasurementDataUpdate"
+
+	// Phase specific momentary active power consumption or production
+	//
+	// Use Case MCP, Scenario 1
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
+	UCMPCPowerPerPhaseMeasurementDataUpdate UseCaseEventType = "ucMPCPowerPerPhaseMeasurementDataUpdate"
+
+	// Total energy consumed
+	//
+	// Use Case MCP, Scenario 2
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
+	UCMPCEnergyConsumedMeasurementDataUpdate UseCaseEventType = "ucMPCEnergyConsumedMeasurementDataUpdate"
+
+	// Total energy produced
+	//
+	// Use Case MCP, Scenario 2
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
+	UCMPCEnergyProcudedMeasurementDataUpdate UseCaseEventType = "ucMPCEnergyProcudedMeasurementDataUpdate"
+
+	// Phase specific momentary current consumption or production
+	//
+	// Use Case MCP, Scenario 3
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
+	UCMPCCurrentsMeasurementDataUpdate UseCaseEventType = "ucMPCCurrentsMeasurementDataUpdate"
+
+	// Phase specific voltage
+	//
+	// Use Case MCP, Scenario 3
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
+	UCMPCVoltagesMeasurementDataUpdate UseCaseEventType = "ucMPCVoltagesMeasurementDataUpdate"
+
+	// Power network frequency data updated
+	//
+	// Use Case MCP, Scenario 3
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
+	UCMPCFrequencyMeasurementDataUpdate UseCaseEventType = "ucMPCFrequencyMeasurementDataUpdate"
+
 	// UCOPEV
 
 	// EV load control obligation limit data updated
