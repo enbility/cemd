@@ -1,19 +1,20 @@
 package util
 
 import (
+	"slices"
+
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
 
 var PhaseNameMapping = []model.ElectricalConnectionPhaseNameType{model.ElectricalConnectionPhaseNameTypeA, model.ElectricalConnectionPhaseNameTypeB, model.ElectricalConnectionPhaseNameTypeC}
 
-func IsPayloadForEntityType(payload spineapi.EventPayload, entityType model.EntityTypeType) bool {
-	if payload.Entity == nil {
+func IsCompatibleEntity(entity spineapi.EntityRemoteInterface, entityTypes []model.EntityTypeType) bool {
+	if entity == nil {
 		return false
 	}
 
-	theEntityType := payload.Entity.EntityType()
-	return theEntityType == entityType
+	return slices.Contains(entityTypes, entity.EntityType())
 }
 
 func IsDeviceDisconnected(payload spineapi.EventPayload) bool {
@@ -21,19 +22,19 @@ func IsDeviceDisconnected(payload spineapi.EventPayload) bool {
 		payload.ChangeType == spineapi.ElementChangeRemove)
 }
 
-func IsEntityTypeConnected(payload spineapi.EventPayload, entityType model.EntityTypeType) bool {
+func IsEntityConnected(payload spineapi.EventPayload) bool {
 	if payload.EventType == spineapi.EventTypeEntityChange &&
 		payload.ChangeType == spineapi.ElementChangeAdd {
-		return IsPayloadForEntityType(payload, entityType)
+		return true
 	}
 
 	return false
 }
 
-func IsEntityTypeDisconnected(payload spineapi.EventPayload, entityType model.EntityTypeType) bool {
+func IsEntityDisconnected(payload spineapi.EventPayload) bool {
 	if payload.EventType == spineapi.EventTypeEntityChange &&
 		payload.ChangeType == spineapi.ElementChangeRemove {
-		return IsPayloadForEntityType(payload, entityType)
+		return true
 	}
 
 	return false

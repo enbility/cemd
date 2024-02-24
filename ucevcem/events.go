@@ -12,12 +12,11 @@ import (
 func (e *UCEVCEM) HandleEvent(payload spineapi.EventPayload) {
 	// only about events from an EV entity or device changes for this remote device
 
-	if !util.IsPayloadForEntityType(payload, model.EntityTypeTypeEV) {
+	if !util.IsCompatibleEntity(payload.Entity, e.validEntityTypes) {
 		return
 	}
 
-	entityType := model.EntityTypeTypeEV
-	if util.IsEntityTypeConnected(payload, entityType) {
+	if util.IsEntityConnected(payload) {
 		e.evConnected(payload.Entity)
 		return
 	}

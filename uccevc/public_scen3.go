@@ -17,7 +17,7 @@ import (
 func (e *UCCEVC) IncentiveConstraints(entity spineapi.EntityRemoteInterface) (api.IncentiveSlotConstraints, error) {
 	result := api.IncentiveSlotConstraints{}
 
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return result, api.ErrNoCompatibleEntity
 	}
 
@@ -48,7 +48,7 @@ func (e *UCCEVC) IncentiveConstraints(entity spineapi.EntityRemoteInterface) (ap
 //
 // SPINE UC CoordinatedEVCharging 2.4.3
 func (e *UCCEVC) WriteIncentiveTableDescriptions(entity spineapi.EntityRemoteInterface, data []api.IncentiveTariffDescription) error {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return api.ErrNoCompatibleEntity
 	}
 
@@ -186,7 +186,7 @@ func (e *UCCEVC) WriteIncentiveTableDescriptions(entity spineapi.EntityRemoteInt
 // send incentives to the EV
 // if no data is provided, default incentives with the same price for 7 days will be sent
 func (e *UCCEVC) WriteIncentives(entity spineapi.EntityRemoteInterface, data []api.DurationSlotValue) error {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return api.ErrNoCompatibleEntity
 	}
 

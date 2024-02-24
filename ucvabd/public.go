@@ -17,7 +17,7 @@ import (
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *UCVABD) CurrentChargePower(entity spineapi.EntityRemoteInterface) (float64, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}
 
@@ -46,7 +46,7 @@ func (e *UCVABD) CurrentChargePower(entity spineapi.EntityRemoteInterface) (floa
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *UCVABD) TotalChargeEnergy(entity spineapi.EntityRemoteInterface) (float64, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}
 
@@ -73,7 +73,7 @@ func (e *UCVABD) TotalChargeEnergy(entity spineapi.EntityRemoteInterface) (float
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *UCVABD) TotalDischargeEnergy(entity spineapi.EntityRemoteInterface) (float64, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}
 
@@ -100,7 +100,7 @@ func (e *UCVABD) TotalDischargeEnergy(entity spineapi.EntityRemoteInterface) (fl
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *UCVABD) CurrentStateOfCharge(entity spineapi.EntityRemoteInterface) (float64, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}
 
@@ -122,15 +122,6 @@ func (e *UCVABD) CurrentStateOfCharge(entity spineapi.EntityRemoteInterface) (fl
 }
 
 // helper
-
-func (e *UCVABD) isCompatibleEntity(entity spineapi.EntityRemoteInterface) bool {
-	if entity == nil ||
-		(entity.EntityType() != model.EntityTypeTypeElectricityStorageSystem) {
-		return false
-	}
-
-	return true
-}
 
 func (e *UCVABD) getValuesForTypeCommodityScope(
 	entity spineapi.EntityRemoteInterface,

@@ -12,7 +12,7 @@ func (e *UCOSCEV) HandleEvent(payload spineapi.EventPayload) {
 	// most of the events are identical to OPEV, and OPEV is required to be used,
 	// we don't handle the same events in here
 
-	if !util.IsPayloadForEntityType(payload, model.EntityTypeTypeEV) {
+	if !util.IsCompatibleEntity(payload.Entity, e.validEntityTypes) {
 		return
 	}
 

@@ -17,9 +17,9 @@ import (
 func LoadControlLimits(
 	service eebusapi.ServiceInterface,
 	entity spineapi.EntityRemoteInterface,
-	entityType model.EntityTypeType,
+	entityTypes []model.EntityTypeType,
 	category model.LoadControlCategoryType) ([]float64, error) {
-	if entity == nil || entity.EntityType() != entityType {
+	if entity == nil || !IsCompatibleEntity(entity, entityTypes) {
 		return nil, api.ErrNoCompatibleEntity
 	}
 
@@ -117,10 +117,10 @@ func LoadControlLimits(
 func WriteLoadControlLimits(
 	service eebusapi.ServiceInterface,
 	entity spineapi.EntityRemoteInterface,
-	entityType model.EntityTypeType,
+	entityTypes []model.EntityTypeType,
 	category model.LoadControlCategoryType,
 	limits []api.LoadLimitsPhase) (*model.MsgCounterType, error) {
-	if entity == nil || entity.EntityType() != entityType {
+	if entity == nil || !IsCompatibleEntity(entity, entityTypes) {
 		return nil, api.ErrNoCompatibleEntity
 	}
 

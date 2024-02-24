@@ -15,6 +15,8 @@ type UCVAPD struct {
 	service serviceapi.ServiceInterface
 
 	reader api.UseCaseEventReaderInterface
+
+	validEntityTypes []model.EntityTypeType
 }
 
 var _ UCVAPDInterface = (*UCVAPD)(nil)
@@ -25,6 +27,9 @@ func NewUCVAPD(service serviceapi.ServiceInterface, details *shipapi.ServiceDeta
 		reader:  reader,
 	}
 
+	uc.validEntityTypes = []model.EntityTypeType{
+		model.EntityTypeTypePVSystem,
+	}
 	_ = spine.Events.Subscribe(uc)
 
 	return uc
@@ -68,7 +73,7 @@ func (e *UCVAPD) AddUseCase() {
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
 func (e *UCVAPD) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return false, api.ErrNoCompatibleEntity
 	}
 

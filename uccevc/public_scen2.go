@@ -17,7 +17,7 @@ import (
 func (e *UCCEVC) TimeSlotConstraints(entity spineapi.EntityRemoteInterface) (api.TimeSlotConstraints, error) {
 	result := api.TimeSlotConstraints{}
 
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return result, api.ErrNoCompatibleEntity
 	}
 
@@ -62,7 +62,7 @@ func (e *UCCEVC) TimeSlotConstraints(entity spineapi.EntityRemoteInterface) (api
 // send power limits to the EV
 // if no data is provided, default power limits with the max possible value for 7 days will be sent
 func (e *UCCEVC) WritePowerLimits(entity spineapi.EntityRemoteInterface, data []api.DurationSlotValue) error {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return api.ErrNoCompatibleEntity
 	}
 

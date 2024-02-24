@@ -319,19 +319,19 @@ const (
 	// Note: the referred data may be updated together with all other measurement items of this use case
 	UCMGCPGridConsumptionMeasurementDataUpdate UseCaseEventType = "ucMGCPGridConsumptionMeasurementDataUpdate"
 
-	// Grid momentary current consumption/production phase detail data updated
+	// Phase specific momentary current consumption/production phase detail data updated
 	//
 	// Use Case MGCP, Scenario 5
 	//
 	// Note: the referred data may be updated together with all other measurement items of this use case
-	UCMGCPCurrentMeasurementDataUpdate UseCaseEventType = "ucMGCPCurrentMeasurementDataUpdate"
+	UCMGCPCurrentsMeasurementDataUpdate UseCaseEventType = "ucMGCPCurrentsMeasurementDataUpdate"
 
-	// Grid voltage phase detail data updated
+	// Phase specific voltage at the grid connection point
 	//
 	// Use Case MGCP, Scenario 6
 	//
 	// Note: the referred data may be updated together with all other measurement items of this use case
-	UCMGCPVoltageMeasurementDataUpdate UseCaseEventType = "ucMGCPVoltageMeasurementDataUpdate"
+	UCMGCPVoltagesMeasurementDataUpdate UseCaseEventType = "ucMGCPVoltagesMeasurementDataUpdate"
 
 	// Grid frequency data updated
 	//

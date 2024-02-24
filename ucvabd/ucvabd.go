@@ -15,6 +15,8 @@ type UCVABD struct {
 	service serviceapi.ServiceInterface
 
 	reader api.UseCaseEventReaderInterface
+
+	validEntityTypes []model.EntityTypeType
 }
 
 var _ UCVABDInterface = (*UCVABD)(nil)
@@ -23,6 +25,10 @@ func NewUCVABD(service serviceapi.ServiceInterface, details *shipapi.ServiceDeta
 	uc := &UCVABD{
 		service: service,
 		reader:  reader,
+	}
+
+	uc.validEntityTypes = []model.EntityTypeType{
+		model.EntityTypeTypeElectricityStorageSystem,
 	}
 
 	_ = spine.Events.Subscribe(uc)
@@ -67,7 +73,7 @@ func (e *UCVABD) AddUseCase() {
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
 func (e *UCVABD) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return false, api.ErrNoCompatibleEntity
 	}
 

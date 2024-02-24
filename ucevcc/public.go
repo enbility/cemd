@@ -70,7 +70,7 @@ func (e *UCEVCC) deviceConfigurationValueForKeyName(
 	entity spineapi.EntityRemoteInterface,
 	keyname model.DeviceConfigurationKeyNameType,
 	valueType model.DeviceConfigurationKeyValueTypeType) (any, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return nil, api.ErrNoCompatibleEntity
 	}
 
@@ -114,7 +114,7 @@ func (e *UCEVCC) deviceConfigurationValueForKeyName(
 func (e *UCEVCC) CommunicationStandard(entity spineapi.EntityRemoteInterface) (string, error) {
 	unknown := api.UCEVCCCommunicationStandardUnknown
 
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return unknown, api.ErrNoCompatibleEntity
 	}
 
@@ -137,7 +137,7 @@ func (e *UCEVCC) CommunicationStandard(entity spineapi.EntityRemoteInterface) (s
 // possible errors:
 //   - ErrDataNotAvailable if that information is not (yet) available
 func (e *UCEVCC) AsymmetricChargingSupported(entity spineapi.EntityRemoteInterface) (bool, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return false, api.ErrNoCompatibleEntity
 	}
 
@@ -161,7 +161,7 @@ func (e *UCEVCC) AsymmetricChargingSupported(entity spineapi.EntityRemoteInterfa
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
 func (e *UCEVCC) Identifications(entity spineapi.EntityRemoteInterface) ([]api.IdentificationItem, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return nil, api.ErrNoCompatibleEntity
 	}
 
@@ -207,7 +207,7 @@ func (e *UCEVCC) ManufacturerData(
 	deviceName := ""
 	serialNumber := ""
 
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return deviceName, serialNumber, api.ErrNoCompatibleEntity
 	}
 
@@ -238,7 +238,7 @@ func (e *UCEVCC) ManufacturerData(
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *UCEVCC) CurrentLimits(entity spineapi.EntityRemoteInterface) ([]float64, []float64, []float64, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return nil, nil, nil, api.ErrNoCompatibleEntity
 	}
 
@@ -282,7 +282,7 @@ func (e *UCEVCC) CurrentLimits(entity spineapi.EntityRemoteInterface) ([]float64
 func (e *UCEVCC) EVInSleepMode(
 	entity spineapi.EntityRemoteInterface,
 ) (bool, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return false, api.ErrNoCompatibleEntity
 	}
 
@@ -302,14 +302,4 @@ func (e *UCEVCC) EVInSleepMode(
 	}
 
 	return false, nil
-}
-
-// helper
-
-func (e *UCEVCC) isCompatibleEntity(entity spineapi.EntityRemoteInterface) bool {
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return false
-	}
-
-	return true
 }

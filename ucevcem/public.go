@@ -12,7 +12,7 @@ import (
 
 // return the number of ac connected phases of the EV or 0 if it is unknown
 func (e *UCEVCEM) ConnectedPhases(entity spineapi.EntityRemoteInterface) (uint, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}
 
@@ -42,7 +42,7 @@ func (e *UCEVCEM) ConnectedPhases(entity spineapi.EntityRemoteInterface) (uint, 
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *UCEVCEM) CurrentsPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return nil, api.ErrNoCompatibleEntity
 	}
 
@@ -101,7 +101,7 @@ func (e *UCEVCEM) CurrentsPerPhase(entity spineapi.EntityRemoteInterface) ([]flo
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *UCEVCEM) PowerPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return nil, api.ErrNoCompatibleEntity
 	}
 
@@ -161,7 +161,7 @@ func (e *UCEVCEM) PowerPerPhase(entity spineapi.EntityRemoteInterface) ([]float6
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *UCEVCEM) ChargedEnergy(entity spineapi.EntityRemoteInterface) (float64, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}
 
@@ -185,14 +185,4 @@ func (e *UCEVCEM) ChargedEnergy(entity spineapi.EntityRemoteInterface) (float64,
 	}
 
 	return value.GetValue(), err
-}
-
-// helper
-
-func (e *UCEVCEM) isCompatibleEntity(entity spineapi.EntityRemoteInterface) bool {
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
-		return false
-	}
-
-	return true
 }

@@ -14,7 +14,7 @@ import (
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *UCVAPD) CurrentProductionPower(entity spineapi.EntityRemoteInterface) (float64, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}
 
@@ -43,7 +43,7 @@ func (e *UCVAPD) CurrentProductionPower(entity spineapi.EntityRemoteInterface) (
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *UCVAPD) NominalPeakPower(entity spineapi.EntityRemoteInterface) (float64, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}
 
@@ -81,7 +81,7 @@ func (e *UCVAPD) NominalPeakPower(entity spineapi.EntityRemoteInterface) (float6
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *UCVAPD) TotalPVYield(entity spineapi.EntityRemoteInterface) (float64, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}
 
@@ -103,15 +103,6 @@ func (e *UCVAPD) TotalPVYield(entity spineapi.EntityRemoteInterface) (float64, e
 }
 
 // helper
-
-func (e *UCVAPD) isCompatibleEntity(entity spineapi.EntityRemoteInterface) bool {
-	if entity == nil ||
-		(entity.EntityType() != model.EntityTypeTypePVSystem) {
-		return false
-	}
-
-	return true
-}
 
 func (e *UCVAPD) getValuesForTypeCommodityScope(
 	entity spineapi.EntityRemoteInterface,

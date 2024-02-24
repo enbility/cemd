@@ -19,7 +19,7 @@ func (e *UCEVSECC) ManufacturerData(
 	deviceName := ""
 	serialNumber := ""
 
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEVSE {
+	if entity == nil || !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return deviceName, serialNumber, api.ErrNoCompatibleEntity
 	}
 
@@ -54,7 +54,7 @@ func (e *UCEVSECC) OperatingState(
 	operatingState := model.DeviceDiagnosisOperatingStateTypeNormalOperation
 	lastErrorCode := ""
 
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEVSE {
+	if entity == nil || !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return operatingState, lastErrorCode, api.ErrNoCompatibleEntity
 	}
 

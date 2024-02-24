@@ -15,6 +15,8 @@ type UCMGCP struct {
 	service serviceapi.ServiceInterface
 
 	reader api.UseCaseEventReaderInterface
+
+	validEntityTypes []model.EntityTypeType
 }
 
 var _ UCMGCPInterface = (*UCMGCP)(nil)
@@ -25,6 +27,10 @@ func NewUCMGCP(service serviceapi.ServiceInterface, details *shipapi.ServiceDeta
 		reader:  reader,
 	}
 
+	uc.validEntityTypes = []model.EntityTypeType{
+		model.EntityTypeTypeCEM,
+		model.EntityTypeTypeGridConnectionPointOfPremises,
+	}
 	_ = spine.Events.Subscribe(uc)
 
 	return uc
@@ -67,7 +73,7 @@ func (e *UCMGCP) AddUseCase() {
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
 func (e *UCMGCP) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool, error) {
-	if !e.isCompatibleEntity(entity) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return false, api.ErrNoCompatibleEntity
 	}
 

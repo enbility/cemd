@@ -17,7 +17,7 @@ import (
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *UCEVSOC) StateOfCharge(entity spineapi.EntityRemoteInterface) (float64, error) {
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
+	if entity == nil || !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}
 

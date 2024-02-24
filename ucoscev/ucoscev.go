@@ -15,6 +15,8 @@ type UCOSCEV struct {
 	service serviceapi.ServiceInterface
 
 	reader api.UseCaseEventReaderInterface
+
+	validEntityTypes []model.EntityTypeType
 }
 
 var _ UCOSCEVInterface = (*UCOSCEV)(nil)
@@ -23,6 +25,16 @@ func NewUCOSCEV(service serviceapi.ServiceInterface, details *shipapi.ServiceDet
 	uc := &UCOSCEV{
 		service: service,
 		reader:  reader,
+	}
+
+	uc.validEntityTypes = []model.EntityTypeType{
+		model.EntityTypeTypeCompressor,
+		model.EntityTypeTypeElectricalImmersionHeater,
+		model.EntityTypeTypeEVSE,
+		model.EntityTypeTypeHeatPumpAppliance,
+		model.EntityTypeTypeInverter,
+		model.EntityTypeTypeSmartEnergyAppliance,
+		model.EntityTypeTypeSubMeterElectricity,
 	}
 
 	_ = spine.Events.Subscribe(uc)

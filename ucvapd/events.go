@@ -12,12 +12,11 @@ import (
 func (e *UCVAPD) HandleEvent(payload spineapi.EventPayload) {
 	// only about events from an SGMW entity or device changes for this remote device
 
-	entityType := model.EntityTypeTypePVSystem
-	if !util.IsPayloadForEntityType(payload, entityType) {
+	if !util.IsCompatibleEntity(payload.Entity, e.validEntityTypes) {
 		return
 	}
 
-	if util.IsEntityTypeConnected(payload, entityType) {
+	if util.IsEntityConnected(payload) {
 		e.inverterConnected(payload.Entity)
 		return
 	}

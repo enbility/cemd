@@ -6,21 +6,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (s *UtilSuite) Test_IsPayloadForEntityType() {
+func (s *UtilSuite) Test_IsCompatibleEntity() {
 	payload := spineapi.EventPayload{}
-	result := IsPayloadForEntityType(payload, model.EntityTypeTypeEV)
+	validEntityTypes := []model.EntityTypeType{model.EntityTypeTypeEV}
+	result := IsCompatibleEntity(payload.Entity, validEntityTypes)
 	assert.Equal(s.T(), false, result)
 
 	payload = spineapi.EventPayload{
 		Entity: s.mockRemoteEntity,
 	}
-	result = IsPayloadForEntityType(payload, model.EntityTypeTypeEV)
+	result = IsCompatibleEntity(payload.Entity, validEntityTypes)
 	assert.Equal(s.T(), false, result)
 
 	payload = spineapi.EventPayload{
 		Entity: s.evEntity,
 	}
-	result = IsPayloadForEntityType(payload, model.EntityTypeTypeEV)
+	result = IsCompatibleEntity(payload.Entity, validEntityTypes)
 	assert.Equal(s.T(), true, result)
 }
 
@@ -37,9 +38,9 @@ func (s *UtilSuite) Test_IsDeviceDisconnected() {
 	assert.Equal(s.T(), true, result)
 }
 
-func (s *UtilSuite) Test_IsEntityTypeConnected() {
+func (s *UtilSuite) Test_IsEntityConnected() {
 	payload := spineapi.EventPayload{}
-	result := IsEntityTypeConnected(payload, model.EntityTypeTypeEVSE)
+	result := IsEntityConnected(payload)
 	assert.Equal(s.T(), false, result)
 
 	payload = spineapi.EventPayload{
@@ -47,13 +48,13 @@ func (s *UtilSuite) Test_IsEntityTypeConnected() {
 		EventType:  spineapi.EventTypeEntityChange,
 		ChangeType: spineapi.ElementChangeAdd,
 	}
-	result = IsEntityTypeConnected(payload, model.EntityTypeTypeEVSE)
+	result = IsEntityConnected(payload)
 	assert.Equal(s.T(), true, result)
 }
 
-func (s *UtilSuite) Test_IsEntityTypeDisconnected() {
+func (s *UtilSuite) Test_IsEntityDisconnected() {
 	payload := spineapi.EventPayload{}
-	result := IsEntityTypeDisconnected(payload, model.EntityTypeTypeEVSE)
+	result := IsEntityDisconnected(payload)
 	assert.Equal(s.T(), false, result)
 
 	payload = spineapi.EventPayload{
@@ -61,6 +62,6 @@ func (s *UtilSuite) Test_IsEntityTypeDisconnected() {
 		EventType:  spineapi.EventTypeEntityChange,
 		ChangeType: spineapi.ElementChangeRemove,
 	}
-	result = IsEntityTypeDisconnected(payload, model.EntityTypeTypeEVSE)
+	result = IsEntityDisconnected(payload)
 	assert.Equal(s.T(), true, result)
 }

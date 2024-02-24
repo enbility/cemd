@@ -12,12 +12,11 @@ import (
 func (e *UCMGCP) HandleEvent(payload spineapi.EventPayload) {
 	// only about events from an SGMW entity or device changes for this remote device
 
-	entityType := model.EntityTypeTypeGridConnectionPointOfPremises
-	if !util.IsPayloadForEntityType(payload, entityType) {
+	if !util.IsCompatibleEntity(payload.Entity, e.validEntityTypes) {
 		return
 	}
 
-	if util.IsEntityTypeConnected(payload, entityType) {
+	if util.IsEntityConnected(payload) {
 		e.gridConnected(payload.Entity)
 		return
 	}
@@ -120,12 +119,12 @@ func (e *UCMGCP) gridMeasurementDataUpdate(ski string, entity spineapi.EntityRem
 
 	// Scenario 5
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACCurrent); err == nil {
-		e.reader.SpineEvent(ski, entity, api.UCMGCPCurrentMeasurementDataUpdate)
+		e.reader.SpineEvent(ski, entity, api.UCMGCPCurrentsMeasurementDataUpdate)
 	}
 
 	// Scenario 6
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACVoltage); err == nil {
-		e.reader.SpineEvent(ski, entity, api.UCMGCPVoltageMeasurementDataUpdate)
+		e.reader.SpineEvent(ski, entity, api.UCMGCPVoltagesMeasurementDataUpdate)
 	}
 
 	// Scenario 7

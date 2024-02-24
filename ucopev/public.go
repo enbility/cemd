@@ -13,7 +13,7 @@ import (
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
 func (e *UCOPEV) LoadControlLimits(entity spineapi.EntityRemoteInterface) ([]float64, error) {
-	return util.LoadControlLimits(e.service, entity, model.EntityTypeTypeEV, model.LoadControlCategoryTypeObligation)
+	return util.LoadControlLimits(e.service, entity, e.validEntityTypes, model.LoadControlCategoryTypeObligation)
 }
 
 // send new LoadControlLimits to the remote EV
@@ -35,5 +35,5 @@ func (e *UCOPEV) LoadControlLimits(entity spineapi.EntityRemoteInterface) ([]flo
 // and needs to have specific EVSE support for the specific EV brand.
 // In ISO15118-20 this is a standard feature which does not need special support on the EVSE.
 func (e *UCOPEV) WriteLoadControlLimits(entity spineapi.EntityRemoteInterface, limits []api.LoadLimitsPhase) (*model.MsgCounterType, error) {
-	return util.WriteLoadControlLimits(e.service, entity, model.EntityTypeTypeEV, model.LoadControlCategoryTypeObligation, limits)
+	return util.WriteLoadControlLimits(e.service, entity, e.validEntityTypes, model.LoadControlCategoryTypeObligation, limits)
 }

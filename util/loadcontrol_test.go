@@ -13,13 +13,13 @@ func (s *UtilSuite) Test_LoadControlLimits() {
 	var data []float64
 	var err error
 	category := model.LoadControlCategoryTypeObligation
-	entityType := model.EntityTypeTypeEV
+	entityTypes := []model.EntityTypeType{model.EntityTypeTypeEV}
 
-	data, err = LoadControlLimits(s.service, s.mockRemoteEntity, entityType, category)
+	data, err = LoadControlLimits(s.service, s.mockRemoteEntity, entityTypes, category)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
-	data, err = LoadControlLimits(s.service, s.evEntity, entityType, category)
+	data, err = LoadControlLimits(s.service, s.evEntity, entityTypes, category)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
@@ -47,7 +47,7 @@ func (s *UtilSuite) Test_LoadControlLimits() {
 	fErr := rFeature.UpdateData(model.FunctionTypeLoadControlLimitDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = LoadControlLimits(s.service, s.evEntity, entityType, category)
+	data, err = LoadControlLimits(s.service, s.evEntity, entityTypes, category)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), []float64{0.0, 0.0, 0.0}, data)
 
@@ -78,7 +78,7 @@ func (s *UtilSuite) Test_LoadControlLimits() {
 	fErr = rElFeature.UpdateData(model.FunctionTypeElectricalConnectionParameterDescriptionListData, paramData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = LoadControlLimits(s.service, s.evEntity, entityType, category)
+	data, err = LoadControlLimits(s.service, s.evEntity, entityTypes, category)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
@@ -101,7 +101,7 @@ func (s *UtilSuite) Test_LoadControlLimits() {
 	fErr = rFeature.UpdateData(model.FunctionTypeLoadControlLimitListData, limitData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = LoadControlLimits(s.service, s.evEntity, entityType, category)
+	data, err = LoadControlLimits(s.service, s.evEntity, entityTypes, category)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
@@ -130,7 +130,7 @@ func (s *UtilSuite) Test_LoadControlLimits() {
 	fErr = rElFeature.UpdateData(model.FunctionTypeElectricalConnectionPermittedValueSetListData, permData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = LoadControlLimits(s.service, s.evEntity, entityType, category)
+	data, err = LoadControlLimits(s.service, s.evEntity, entityTypes, category)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), []float64{16.0, 16.0, 16.0}, data)
 }
@@ -139,13 +139,13 @@ func (s *UtilSuite) Test_WriteLoadControlLimits() {
 	loadLimits := []api.LoadLimitsPhase{}
 
 	category := model.LoadControlCategoryTypeObligation
-	entityType := model.EntityTypeTypeEV
+	entityTypes := []model.EntityTypeType{model.EntityTypeTypeEV}
 
-	msgCounter, err := WriteLoadControlLimits(s.service, s.mockRemoteEntity, entityType, category, loadLimits)
+	msgCounter, err := WriteLoadControlLimits(s.service, s.mockRemoteEntity, entityTypes, category, loadLimits)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), msgCounter)
 
-	msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, entityType, category, loadLimits)
+	msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, entityTypes, category, loadLimits)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), msgCounter)
 
@@ -176,7 +176,7 @@ func (s *UtilSuite) Test_WriteLoadControlLimits() {
 	fErr := rFeature.UpdateData(model.FunctionTypeElectricalConnectionParameterDescriptionListData, paramData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, entityType, category, loadLimits)
+	msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, entityTypes, category, loadLimits)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), msgCounter)
 
@@ -274,7 +274,7 @@ func (s *UtilSuite) Test_WriteLoadControlLimits() {
 				fErr = rFeature.UpdateData(model.FunctionTypeElectricalConnectionPermittedValueSetListData, permData, nil, nil)
 				assert.Nil(s.T(), fErr)
 
-				msgCounter, err := WriteLoadControlLimits(s.service, s.evEntity, entityType, category, loadLimits)
+				msgCounter, err := WriteLoadControlLimits(s.service, s.evEntity, entityTypes, category, loadLimits)
 				assert.NotNil(t, err)
 				assert.Nil(t, msgCounter)
 
@@ -307,7 +307,7 @@ func (s *UtilSuite) Test_WriteLoadControlLimits() {
 				fErr = rFeature.UpdateData(model.FunctionTypeLoadControlLimitDescriptionListData, descData, nil, nil)
 				assert.Nil(s.T(), fErr)
 
-				msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, entityType, category, loadLimits)
+				msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, entityTypes, category, loadLimits)
 				assert.NotNil(t, err)
 				assert.Nil(t, msgCounter)
 
@@ -329,7 +329,7 @@ func (s *UtilSuite) Test_WriteLoadControlLimits() {
 				fErr = rFeature.UpdateData(model.FunctionTypeLoadControlLimitListData, limitListData, nil, nil)
 				assert.Nil(s.T(), fErr)
 
-				msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, entityType, category, loadLimits)
+				msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, entityTypes, category, loadLimits)
 				assert.NotNil(t, err)
 				assert.Nil(t, msgCounter)
 
@@ -343,11 +343,11 @@ func (s *UtilSuite) Test_WriteLoadControlLimits() {
 					})
 
 				}
-				msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, entityType, category, phaseLimitValues)
+				msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, entityTypes, category, phaseLimitValues)
 				assert.Nil(t, err)
 				assert.NotNil(t, msgCounter)
 
-				msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, entityType, category, phaseLimitValues)
+				msgCounter, err = WriteLoadControlLimits(s.service, s.evEntity, entityTypes, category, phaseLimitValues)
 				assert.Nil(t, err)
 				assert.NotNil(t, msgCounter)
 			}

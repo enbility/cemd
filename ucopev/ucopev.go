@@ -15,6 +15,8 @@ type UCOPEV struct {
 	service serviceapi.ServiceInterface
 
 	reader api.UseCaseEventReaderInterface
+
+	validEntityTypes []model.EntityTypeType
 }
 
 var _ UCOPEVInterface = (*UCOPEV)(nil)
@@ -23,6 +25,10 @@ func NewUCOPEV(service serviceapi.ServiceInterface, details *shipapi.ServiceDeta
 	uc := &UCOPEV{
 		service: service,
 		reader:  reader,
+	}
+
+	uc.validEntityTypes = []model.EntityTypeType{
+		model.EntityTypeTypeEV,
 	}
 
 	_ = spine.Events.Subscribe(uc)
@@ -71,7 +77,7 @@ func (e *UCOPEV) AddUseCase() {
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
 func (e *UCOPEV) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool, error) {
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return false, api.ErrNoCompatibleEntity
 	}
 

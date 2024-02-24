@@ -2,6 +2,7 @@ package ucevsecc
 
 import (
 	"github.com/enbility/cemd/api"
+	"github.com/enbility/cemd/util"
 	serviceapi "github.com/enbility/eebus-go/api"
 	shipapi "github.com/enbility/ship-go/api"
 	spineapi "github.com/enbility/spine-go/api"
@@ -13,6 +14,8 @@ type UCEVSECC struct {
 	service serviceapi.ServiceInterface
 
 	reader api.UseCaseEventReaderInterface
+
+	validEntityTypes []model.EntityTypeType
 }
 
 var _ UCEVSECCInterface = (*UCEVSECC)(nil)
@@ -21,6 +24,10 @@ func NewUCEVSECC(service serviceapi.ServiceInterface, details *shipapi.ServiceDe
 	uc := &UCEVSECC{
 		service: service,
 		reader:  reader,
+	}
+
+	uc.validEntityTypes = []model.EntityTypeType{
+		model.EntityTypeTypeEVSE,
 	}
 
 	_ = spine.Events.Subscribe(uc)
@@ -65,7 +72,7 @@ func (e *UCEVSECC) AddUseCase() {
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
 func (e *UCEVSECC) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool, error) {
-	if entity == nil || entity.EntityType() != model.EntityTypeTypeEVSE {
+	if entity == nil || !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return false, api.ErrNoCompatibleEntity
 	}
 
