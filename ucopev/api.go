@@ -8,7 +8,7 @@ import (
 
 //go:generate mockery
 
-// interface for the EVSE Commissioning and Configuration UseCase
+// interface for the Overload Protection by EV Charging Current Curtailment UseCase
 type UCOPEVInterface interface {
 	api.UseCaseInterface
 

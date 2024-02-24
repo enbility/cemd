@@ -19,7 +19,7 @@ type UCVAPD struct {
 
 var _ UCVAPDInterface = (*UCVAPD)(nil)
 
-func NewUCVAPDV(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.UseCaseEventReaderInterface) *UCVAPD {
+func NewUCVAPD(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.UseCaseEventReaderInterface) *UCVAPD {
 	uc := &UCVAPD{
 		service: service,
 		reader:  reader,
@@ -38,11 +38,16 @@ func (e *UCVAPD) AddFeatures() {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	// client features
-	f := localEntity.GetOrAddFeature(model.FeatureTypeTypeLoadControl, model.RoleTypeClient)
-	f.AddResultHandler(e)
+	var clientFeatures = []model.FeatureTypeType{
+		model.FeatureTypeTypeDeviceConfiguration,
+		model.FeatureTypeTypeElectricalConnection,
+		model.FeatureTypeTypeMeasurement,
+	}
+	for _, feature := range clientFeatures {
+		f := localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
+		f.AddResultHandler(e)
+	}
 
-	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
-	f.AddResultHandler(e)
 }
 
 func (e *UCVAPD) AddUseCase() {

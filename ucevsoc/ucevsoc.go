@@ -38,11 +38,14 @@ func (e *UCEVSOC) AddFeatures() {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	// client features
-	f := localEntity.GetOrAddFeature(model.FeatureTypeTypeMeasurement, model.RoleTypeClient)
-	f.AddFunctionType(model.FunctionTypeMeasurementDescriptionListData, false, false)
-	f.AddFunctionType(model.FunctionTypeMeasurementConstraintsListData, false, false)
-	f.AddFunctionType(model.FunctionTypeMeasurementListData, false, false)
-	f.AddResultHandler(e)
+	var clientFeatures = []model.FeatureTypeType{
+		model.FeatureTypeTypeElectricalConnection,
+		model.FeatureTypeTypeMeasurement,
+	}
+	for _, feature := range clientFeatures {
+		f := localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
+		f.AddResultHandler(e)
+	}
 }
 
 func (e *UCEVSOC) AddUseCase() {

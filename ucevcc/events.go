@@ -140,12 +140,12 @@ func (e *UCEVCC) evConfigurationDataUpdate(ski string, entity spineapi.EntityRem
 
 	// Scenario 2
 	if _, err := evDeviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypeCommunicationsStandard, model.DeviceConfigurationKeyValueTypeTypeString); err == nil {
-		e.reader.SpineEvent(ski, entity, api.UCEVCCCommunicationStandardDataUpdate)
+		e.reader.SpineEvent(ski, entity, api.UCEVCCCommunicationStandardConfigurationDataUpdate)
 	}
 
 	// Scenario 3
 	if _, err := evDeviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypeAsymmetricChargingSupported, model.DeviceConfigurationKeyValueTypeTypeString); err == nil {
-		e.reader.SpineEvent(ski, entity, api.UCEVCCAsymmetricChargingDataUpdate)
+		e.reader.SpineEvent(ski, entity, api.UCEVCCAsymmetricChargingConfigurationDataUpdate)
 	}
 }
 

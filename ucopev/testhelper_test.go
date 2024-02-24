@@ -64,12 +64,12 @@ func (s *UCOPEVSuite) BeforeTest(suiteName, testName string) {
 	s.mockRemoteEntity.EXPECT().Address().Return(entityAddress).Maybe()
 	mockRemoteFeature.EXPECT().DataCopy(mock.Anything).Return(mock.Anything).Maybe()
 
-	var entities []spineapi.EntityRemoteInterface
-
-	s.remoteDevice, entities = setupDevices(s.service, s.T())
 	s.sut = NewUCOPEV(s.service, s.service.LocalService(), s)
 	s.sut.AddFeatures()
 	s.sut.AddUseCase()
+
+	var entities []spineapi.EntityRemoteInterface
+	s.remoteDevice, entities = setupDevices(s.service, s.T())
 	s.evEntity = entities[1]
 }
 
@@ -80,25 +80,19 @@ func setupDevices(
 	spineapi.DeviceRemoteInterface,
 	[]spineapi.EntityRemoteInterface) {
 	localDevice := eebusService.LocalDevice()
-	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
-
-	f := spine.NewFeatureLocal(1, localEntity, model.FeatureTypeTypeLoadControl, model.RoleTypeClient)
-	localEntity.AddFeature(f)
-	f = spine.NewFeatureLocal(2, localEntity, model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
-	localEntity.AddFeature(f)
 
 	writeHandler := shipmocks.NewShipConnectionDataWriterInterface(t)
 	writeHandler.EXPECT().WriteShipMessageWithPayload(mock.Anything).Return().Maybe()
 	sender := spine.NewSender(writeHandler)
 	remoteDevice := spine.NewDeviceRemote(localDevice, remoteSki, sender)
 
-	var clientRemoteFeatures = []struct {
+	remoteDeviceName := "remote"
+
+	var remoteFeatures = []struct {
 		featureType   model.FeatureTypeType
-		role          model.RoleType
 		supportedFcts []model.FunctionType
 	}{
 		{model.FeatureTypeTypeLoadControl,
-			model.RoleTypeServer,
 			[]model.FunctionType{
 				model.FunctionTypeLoadControlLimitDescriptionListData,
 				model.FunctionTypeLoadControlLimitConstraintsListData,
@@ -106,17 +100,14 @@ func setupDevices(
 			},
 		},
 		{model.FeatureTypeTypeDeviceDiagnosis,
-			model.RoleTypeServer,
 			[]model.FunctionType{
 				model.FunctionTypeDeviceDiagnosisStateData,
 			},
 		},
 	}
 
-	remoteDeviceName := "remote"
-
 	var featureInformations []model.NodeManagementDetailedDiscoveryFeatureInformationType
-	for index, feature := range clientRemoteFeatures {
+	for index, feature := range remoteFeatures {
 		supportedFcts := []model.FunctionPropertyType{}
 		for _, fct := range feature.supportedFcts {
 			supportedFct := model.FunctionPropertyType{
@@ -136,7 +127,7 @@ func setupDevices(
 					Feature: eebusutil.Ptr(model.AddressFeatureType(index)),
 				},
 				FeatureType:       eebusutil.Ptr(feature.featureType),
-				Role:              eebusutil.Ptr(feature.role),
+				Role:              eebusutil.Ptr(model.RoleTypeServer),
 				SupportedFunction: supportedFcts,
 			},
 		}

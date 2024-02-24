@@ -8,7 +8,7 @@ import (
 
 //go:generate mockery
 
-// interface for the EVSE Commissioning and Configuration UseCase
+// interface for the Optimization of Self-Consumption During EV Charging UseCase
 type UCOSCEVInterface interface {
 	api.UseCaseInterface
 

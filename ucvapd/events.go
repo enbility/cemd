@@ -65,10 +65,6 @@ func (e *UCVAPD) inverterConnected(entity spineapi.EntityRemoteInterface) {
 		if _, err := electricalConnection.RequestParameterDescriptions(); err != nil {
 			logging.Log().Error(err)
 		}
-
-		if _, err := electricalConnection.RequestPermittedValueSets(); err != nil {
-			logging.Log().Error(err)
-		}
 	}
 
 	if measurement, err := util.Measurement(e.service, entity); err == nil {

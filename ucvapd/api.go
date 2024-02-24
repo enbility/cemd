@@ -7,7 +7,7 @@ import (
 
 //go:generate mockery
 
-// interface for the EVSE Commissioning and Configuration UseCase
+// interface for the Visualization of Aggregated Photovoltaic Data UseCase
 type UCVAPDInterface interface {
 	api.UseCaseInterface
 

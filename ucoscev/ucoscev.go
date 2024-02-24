@@ -38,10 +38,18 @@ func (e *UCOSCEV) AddFeatures() {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	// client features
-	f := localEntity.GetOrAddFeature(model.FeatureTypeTypeLoadControl, model.RoleTypeClient)
-	f.AddResultHandler(e)
+	var clientFeatures = []model.FeatureTypeType{
+		model.FeatureTypeTypeLoadControl,
+		model.FeatureTypeTypeElectricalConnection,
+	}
+	for _, feature := range clientFeatures {
+		f := localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
+		f.AddResultHandler(e)
+	}
 
-	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
+	// server features
+	f := localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
+	f.AddFunctionType(model.FunctionTypeDeviceDiagnosisStateData, false, false)
 	f.AddResultHandler(e)
 }
 

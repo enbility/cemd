@@ -36,8 +36,14 @@ func (e *UCEVCEM) AddFeatures() {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	// client features
-	f := localEntity.GetOrAddFeature(model.FeatureTypeTypeMeasurement, model.RoleTypeClient)
-	f.AddResultHandler(e)
+	var clientFeatures = []model.FeatureTypeType{
+		model.FeatureTypeTypeElectricalConnection,
+		model.FeatureTypeTypeMeasurement,
+	}
+	for _, feature := range clientFeatures {
+		f := localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
+		f.AddResultHandler(e)
+	}
 }
 
 func (e *UCEVCEM) AddUseCase() {

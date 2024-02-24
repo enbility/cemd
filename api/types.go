@@ -189,12 +189,15 @@ const (
 	// EV communication standard data was updated
 	//
 	// Use Case EVCC, Scenario 2
-	UCEVCCCommunicationStandardDataUpdate UseCaseEventType = "ucEVCCCommunicationStandardDataUpdate"
+	// Note: the referred data may be updated together with all other configuration items of this use case
+	UCEVCCCommunicationStandardConfigurationDataUpdate UseCaseEventType = "ucEVCCCommunicationStandardConfigurationDataUpdate"
 
 	// EV asymmetric charging data was updated
 	//
 	// Use Case EVCC, Scenario 3
-	UCEVCCAsymmetricChargingDataUpdate UseCaseEventType = "ucEVCCAsymmetricChargingDataUpdate"
+	//
+	// Note: the referred data may be updated together with all other configuration items of this use case
+	UCEVCCAsymmetricChargingConfigurationDataUpdate UseCaseEventType = "ucEVCCAsymmetricChargingConfigurationDataUpdate"
 
 	// EV identificationdata was updated
 	//
@@ -221,25 +224,29 @@ const (
 	// EV number of connected phases data updated
 	//
 	// Use Case EVCEM, Scenario 1
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
 	UCEVCEMNumberOfConnectedPhasesDataUpdate UseCaseEventType = "ucEVCEMNumberOfConnectedPhasesDataUpdate"
 
 	// EV current measurement data updated
 	//
 	// Use Case EVCEM, Scenario 1
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
 	UCEVCEMCurrentMeasurementDataUpdate UseCaseEventType = "ucEVCEMCurrentMeasurementDataUpdate"
 
 	// EV power measurement data updated
 	//
 	// Use Case EVCEM, Scenario 2
 	//
-	// Note: the referred data may be updated together with UCEVCEMCurrentMeasurementDataUpdate
+	// Note: the referred data may be updated together with all other measurement items of this use case
 	UCEVCEMPowerMeasurementDataUpdate UseCaseEventType = "ucEVCEMCurrentMeasurementDataUpdate"
 
 	// EV charging energy measurement data updated
 	//
 	// Use Case EVCEM, Scenario 3
 	//
-	// Note: the referred data may be updated together with UCEVCEMCurrentMeasurementDataUpdate
+	// Note: the referred data may be updated together with all other measurement items of this use case
 	UCEVCEMChargingEnergyMeasurementDataUpdate UseCaseEventType = "UCEVCEMChargingEnergyMeasurementDataUpdate"
 
 	// UCEVSECC
@@ -265,60 +272,78 @@ const (
 	// EV state of charge data was updated
 	//
 	// Use Case EVSOC, Scenario 1
-	UCEVSOCStateOfChargeDataUpdate UseCaseEventType = "ucEVSOCStateOfChargeDataUpdate"
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
+	UCEVSOCStateOfChargeMeasurementDataUpdate UseCaseEventType = "ucEVSOCStateOfChargeMeasurementDataUpdate"
 
 	// EV nominal capacity data was updated
 	//
 	// Use Case EVSOC, Scenario 2
-	UCEVSOCNominalCapacityDataUpdate UseCaseEventType = "ucEVSOCNominalCapacityDataUpdate"
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
+	UCEVSOCNominalCapacityMeasurementDataUpdate UseCaseEventType = "ucEVSOCNominalCapacityMeasurementDataUpdate"
 
 	// EV state of health data was updated
 	//
 	// Use Case EVSOC, Scenario 3
-	UCEVSOCStateOfHealthDataUpdate UseCaseEventType = "ucEVSOCStateOfHealthDataUpdate"
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
+	EVSOCStateOfHealthMeasurementDataUpdate UseCaseEventType = "ucEVSOCStateOfHealthMeasurementDataUpdate"
 
 	// EV actual range data was updated
 	//
 	// Use Case EVSOC, Scenario 4
-	UCEVSOCActualRangeDataUpdate UseCaseEventType = "ucEVSOCActualRangeDataUpdate"
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
+	UCEVSOCActualRangeMeasurementDataUpdate UseCaseEventType = "ucEVSOCActualRangeMeasurementDataUpdate"
 
 	// MGCP
 
 	// Grid momentary power consumption/production data updated
 	//
 	// Use Case MGCP, Scenario 2
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
 	UCMGCPPowerTotalMeasurementDataUpdate UseCaseEventType = "ucMGCPPowerTotalMeasurementDataUpdate"
 
 	// MTotal grid feed in energy data updated
 	//
 	// Use Case MGCP, Scenario 3
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
 	UCMGCPGridFeedInMeasurementDataUpdate UseCaseEventType = "ucMGCPGridFeedInMeasurementDataUpdate"
 
 	// Total grid consumed energy data updated
 	//
 	// Use Case MGCP, Scenario 4
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
 	UCMGCPGridConsumptionMeasurementDataUpdate UseCaseEventType = "ucMGCPGridConsumptionMeasurementDataUpdate"
 
 	// Grid momentary current consumption/production phase detail data updated
 	//
 	// Use Case MGCP, Scenario 5
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
 	UCMGCPCurrentMeasurementDataUpdate UseCaseEventType = "ucMGCPCurrentMeasurementDataUpdate"
 
 	// Grid voltage phase detail data updated
 	//
 	// Use Case MGCP, Scenario 6
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
 	UCMGCPVoltageMeasurementDataUpdate UseCaseEventType = "ucMGCPVoltageMeasurementDataUpdate"
 
 	// Grid frequency data updated
 	//
 	// Use Case MGCP, Scenario 7
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
 	UCMGCPFrequencyMeasurementDataUpdate UseCaseEventType = "ucMGCPFrequencyMeasurementDataUpdate"
 
 	// UCOPEV
 
 	// EV load control obligation limit data updated
-	//
-	// Use Case OPEV, Scenario 1
 	UCOPEVLoadControlLimitDataUpdate UseCaseEventType = "ucOPEVLoadControlLimitDataUpdate"
 
 	// UCOSCEV
@@ -326,9 +351,37 @@ const (
 	// EV load control recommendation limit data updated
 	//
 	// Use Case OSCEV, Scenario 1
-	//
-	// Note: the referred data may be updated together with UCOPEVLoadControlLimitDataUpdate
 	UCOSCEVLoadControlLimitDataUpdate UseCaseEventType = "ucOSCEVLoadControlLimitDataUpdate"
+
+	// UCVABD
+
+	// Battery System (dis)charge power data updated
+	//
+	// Use Case VABD, Scenario 1
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
+	UCVABDPowerTotalMeasurementDataUpdate UseCaseEventType = "ucVABDPowerTotalMeasurementDataUpdate"
+
+	// Battery System cumulated charge energy data updated
+	//
+	// Use Case VABD, Scenario 2
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
+	UCVABDChargeMeasurementDataUpdate UseCaseEventType = "ucVABDChargeMeasurementDataUpdate"
+
+	// Battery System cumulated discharge energy data updated
+	//
+	// Use Case VABD, Scenario 2
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
+	UCVABDDischargeMeasurementDataUpdate UseCaseEventType = "ucVABDDischargeMeasurementDataUpdate"
+
+	// Battery System state of charge data updated
+	//
+	// Use Case VABD, Scenario 4
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
+	UCVABDStateOfChargeMeasurementDataUpdate UseCaseEventType = "ucVABDStateOfChargeMeasurementDataUpdate"
 
 	// UCVAPD
 
@@ -336,7 +389,7 @@ const (
 	//
 	// Use Case VAPD, Scenario 1
 	//
-	// Note: the referred data may be updated together with UCVAPDYieldTotalMeasurementDataUpdate
+	// Note: the referred data may be updated together with all other measurement items of this use case
 	UCVAPDPowerTotalMeasurementDataUpdate UseCaseEventType = "ucVAPDPowerTotalMeasurementDataUpdate"
 
 	// PV System nominal peak power data updated
@@ -348,7 +401,7 @@ const (
 	//
 	// Use Case VAPD, Scenario 3
 	//
-	// Note: the referred data may be updated together with UCVAPDPowerTotalMeasurementDataUpdate
+	// Note: the referred data may be updated together with all other measurement items of this use case
 	UCVAPDYieldTotalMeasurementDataUpdate UseCaseEventType = "ucVAPDYieldTotalMeasurementDataUpdate"
 )
 

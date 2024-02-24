@@ -43,7 +43,6 @@ func (e *UCEVCC) AddFeatures() {
 		model.FeatureTypeTypeElectricalConnection,
 		model.FeatureTypeTypeDeviceDiagnosis,
 	}
-
 	for _, feature := range clientFeatures {
 		f := localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
 		f.AddResultHandler(e)

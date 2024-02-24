@@ -7,7 +7,7 @@ import (
 
 //go:generate mockery
 
-// interface for the EVSE Commissioning and Configuration UseCase
+// interface for the EV Charging Electricity Measurement UseCase
 type UCEVCEMInterface interface {
 	api.UseCaseInterface
 
