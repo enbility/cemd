@@ -169,6 +169,7 @@ func setupDevices(
 	if err != nil {
 		fmt.Println(err)
 	}
+	remoteDevice.UpdateDevice(detailedData.DeviceInformation.Description)
 
 	localDevice.AddRemoteDeviceForSki(remoteSki, remoteDevice)
 

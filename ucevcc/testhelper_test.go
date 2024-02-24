@@ -89,6 +89,11 @@ func setupDevices(
 		Request(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 		Return(&defaultMsgCounter, nil).
 		Maybe()
+	mockSender.
+		EXPECT().
+		Subscribe(mock.Anything, mock.Anything, mock.Anything).
+		Return(&defaultMsgCounter, nil).
+		Maybe()
 	remoteDevice := spine.NewDeviceRemote(localDevice, remoteSki, mockSender)
 
 	remoteDeviceName := "remote"
@@ -190,6 +195,7 @@ func setupDevices(
 	if err != nil {
 		fmt.Println(err)
 	}
+	remoteDevice.UpdateDevice(detailedData.DeviceInformation.Description)
 
 	localDevice.AddRemoteDeviceForSki(remoteSki, remoteDevice)
 
