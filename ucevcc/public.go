@@ -110,7 +110,6 @@ func (e *UCEVCC) deviceConfigurationValueForKeyName(
 //
 // possible errors:
 //   - ErrDataNotAvailable if that information is not (yet) available
-//   - ErrNotSupported if getting the communication standard is not supported
 //   - and others
 func (e *UCEVCC) CommunicationStandard(entity spineapi.EntityRemoteInterface) (string, error) {
 	unknown := api.UCEVCCCommunicationStandardUnknown

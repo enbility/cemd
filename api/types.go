@@ -4,7 +4,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/enbility/eebus-go/api"
 	"github.com/enbility/spine-go/model"
 )
 
@@ -406,15 +405,3 @@ const (
 )
 
 var ErrNoCompatibleEntity = errors.New("entity is not an compatible entity")
-var ErrEVDisconnected = errors.New("ev is disconnected")
-var ErrNotSupported = errors.New("function is not supported")
-
-type Solution struct {
-	Service api.ServiceInterface
-}
-
-func NewSolution(service api.ServiceInterface) *Solution {
-	return &Solution{
-		Service: service,
-	}
-}

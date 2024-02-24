@@ -93,7 +93,7 @@ func (e *UCCEVC) WritePowerLimits(entity spineapi.EntityRemoteInterface, data []
 
 	desc, err := evTimeSeries.GetDescriptionForType(model.TimeSeriesTypeTypeConstraints)
 	if err != nil {
-		return api.ErrNotSupported
+		return features.ErrDataNotAvailable
 	}
 
 	timeSeriesSlots := []model.TimeSeriesSlotType{}
