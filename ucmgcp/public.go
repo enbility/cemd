@@ -1,6 +1,8 @@
 package ucmgcp
 
 import (
+	"slices"
+
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
 	"github.com/enbility/eebus-go/features"
@@ -57,7 +59,7 @@ func (e *UCMGCP) PowerLimitationFactor(entity spineapi.EntityRemoteInterface) (f
 //
 //   - positive values are used for consumption
 //   - negative values are used for production
-func (e *UCMGCP) MomentaryPowerConsumptionOrProduction(entity spineapi.EntityRemoteInterface) (float64, error) {
+func (e *UCMGCP) MomentaryTotalPower(entity spineapi.EntityRemoteInterface) (float64, error) {
 	if entity == nil || !e.isCompatibleEntity(entity) {
 		return 0, api.ErrNoCompatibleEntity
 	}
@@ -158,7 +160,7 @@ func (e *UCMGCP) TotalConsumedEnergy(entity spineapi.EntityRemoteInterface) (flo
 //
 //   - positive values are used for consumption
 //   - negative values are used for production
-func (e *UCMGCP) MomentaryCurrentConsumptionOrProduction(entity spineapi.EntityRemoteInterface) ([]float64, error) {
+func (e *UCMGCP) MomentaryCurrents(entity spineapi.EntityRemoteInterface) ([]float64, error) {
 	if entity == nil || !e.isCompatibleEntity(entity) {
 		return nil, api.ErrNoCompatibleEntity
 	}
@@ -216,7 +218,7 @@ func (e *UCMGCP) MomentaryCurrentConsumptionOrProduction(entity spineapi.EntityR
 // Scenario 6
 
 // return the voltage phase details at the grid connection point
-func (e *UCMGCP) Voltage(entity spineapi.EntityRemoteInterface) ([]float64, error) {
+func (e *UCMGCP) Voltages(entity spineapi.EntityRemoteInterface) ([]float64, error) {
 	if entity == nil || !e.isCompatibleEntity(entity) {
 		return nil, api.ErrNoCompatibleEntity
 	}
@@ -289,8 +291,11 @@ func (e *UCMGCP) Frequency(entity spineapi.EntityRemoteInterface) (float64, erro
 // helper
 
 func (e *UCMGCP) isCompatibleEntity(entity spineapi.EntityRemoteInterface) bool {
-	if entity == nil ||
-		(entity.EntityType() != model.EntityTypeTypeCEM && entity.EntityType() != model.EntityTypeTypeGridConnectionPointOfPremises) {
+	validEntityTypes := []model.EntityTypeType{
+		model.EntityTypeTypeCEM,
+		model.EntityTypeTypeGridConnectionPointOfPremises,
+	}
+	if entity == nil || !slices.Contains(validEntityTypes, entity.EntityType()) {
 		return false
 	}
 

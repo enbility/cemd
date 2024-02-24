@@ -26,7 +26,7 @@ type UCMGCPInterface interface {
 	//
 	//   - positive values are used for consumption
 	//   - negative values are used for production
-	MomentaryPowerConsumptionOrProduction(entity spineapi.EntityRemoteInterface) (float64, error)
+	MomentaryTotalPower(entity spineapi.EntityRemoteInterface) (float64, error)
 
 	// Scenario 3
 
@@ -48,13 +48,13 @@ type UCMGCPInterface interface {
 	//
 	//   - positive values are used for consumption
 	//   - negative values are used for production
-	MomentaryCurrentConsumptionOrProduction(entity spineapi.EntityRemoteInterface) ([]float64, error)
+	MomentaryCurrents(entity spineapi.EntityRemoteInterface) ([]float64, error)
 
 	// Scenario 6
 
 	// return the voltage phase details at the grid connection point
 	//
-	Voltage(entity spineapi.EntityRemoteInterface) ([]float64, error)
+	Voltages(entity spineapi.EntityRemoteInterface) ([]float64, error)
 
 	// Scenario 7
 
