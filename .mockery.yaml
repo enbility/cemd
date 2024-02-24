@@ -1,0 +1,10 @@
+with-expecter: true
+inpackage: false
+dir: "{{ .InterfaceDir }}/mocks/"
+mockname: "{{.InterfaceName}}"
+outpkg: "mocks"
+filename: "{{.InterfaceName}}.go"
+all: true
+packages:
+  github.com/enbility/cemd/api:
+  github.com/enbility/cemd/evsecc:

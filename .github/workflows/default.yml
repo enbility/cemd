@@ -33,7 +33,10 @@ jobs:
           skip-build-cache: true
 
       - name: Test
-        run: go test -race -v -coverprofile=coverage.out  -covermode=atomic ./...
+        run: go test -race -v -coverprofile=coverage_temp.out  -covermode=atomic ./...
+
+      - name: Remove mocks and cmd from coverage
+        run: grep -v -e "/cemd/mocks/" -e "/cemd/cmd/" coverage_temp.out > coverage.out
 
       - name: Send coverage
         uses: coverallsapp/github-action@v2
