@@ -95,7 +95,9 @@ func (e *UCVAPD) inverterConfigurationDescriptionDataUpdate(entity spineapi.Enti
 func (e *UCVAPD) inverterConfigurationDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
 	// Scenario 1
 	if deviceConfiguration, err := util.DeviceConfiguration(e.service, entity); err == nil {
-		if _, err := deviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypePeakPowerOfPVSystem, model.DeviceConfigurationKeyValueTypeTypeScaledNumber); err == nil {
+		if _, err := deviceConfiguration.GetKeyValueForKeyName(
+			model.DeviceConfigurationKeyNameTypePeakPowerOfPVSystem,
+			model.DeviceConfigurationKeyValueTypeTypeScaledNumber); err == nil {
 			e.eventCB(ski, entity.Device(), entity, DataUpdatePowerNominalPeak)
 		}
 	}

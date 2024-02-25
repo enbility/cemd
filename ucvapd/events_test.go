@@ -39,6 +39,42 @@ func (s *UCVAPDSuite) Test_Events() {
 	s.sut.HandleEvent(payload)
 }
 
+func (s *UCVAPDSuite) Test_inverterConfigurationDataUpdate() {
+	s.sut.inverterConfigurationDataUpdate(remoteSki, s.pvEntity)
+
+	descData := &model.DeviceConfigurationKeyValueDescriptionListDataType{
+		DeviceConfigurationKeyValueDescriptionData: []model.DeviceConfigurationKeyValueDescriptionDataType{
+			{
+				KeyId:     eebusutil.Ptr(model.DeviceConfigurationKeyIdType(0)),
+				KeyName:   eebusutil.Ptr(model.DeviceConfigurationKeyNameTypePeakPowerOfPVSystem),
+				ValueType: eebusutil.Ptr(model.DeviceConfigurationKeyValueTypeTypeScaledNumber),
+			},
+		},
+	}
+
+	rFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.pvEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer)
+	fErr := rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, descData, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	s.sut.inverterConfigurationDataUpdate(remoteSki, s.pvEntity)
+
+	data := &model.DeviceConfigurationKeyValueListDataType{
+		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{
+			{
+				KeyId: eebusutil.Ptr(model.DeviceConfigurationKeyIdType(0)),
+				Value: &model.DeviceConfigurationKeyValueValueType{
+					ScaledNumber: model.NewScaledNumberType(10),
+				},
+			},
+		},
+	}
+
+	fErr = rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueListData, data, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	s.sut.inverterConfigurationDataUpdate(remoteSki, s.pvEntity)
+}
+
 func (s *UCVAPDSuite) Test_inverterMeasurementDataUpdate() {
 	s.sut.inverterMeasurementDataUpdate(remoteSki, s.pvEntity)
 
