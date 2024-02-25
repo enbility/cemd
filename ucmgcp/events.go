@@ -29,6 +29,8 @@ func (e *UCMGCP) HandleEvent(payload spineapi.EventPayload) {
 	switch payload.Data.(type) {
 	case *model.DeviceConfigurationKeyValueDescriptionListDataType:
 		e.gridConfigurationDescriptionDataUpdate(payload.Entity)
+	case *model.DeviceConfigurationKeyValueListDataType:
+		e.gridConfigurationDataUpdate(payload.Ski, payload.Entity)
 	case *model.MeasurementDescriptionListDataType:
 		e.gridMeasurementDescriptionDataUpdate(payload.Entity)
 	case *model.MeasurementListDataType:
@@ -87,6 +89,13 @@ func (e *UCMGCP) gridConfigurationDescriptionDataUpdate(entity spineapi.EntityRe
 		if _, err := deviceConfiguration.RequestKeyValues(); err != nil {
 			logging.Log().Error("Error getting configuration key values:", err)
 		}
+	}
+}
+
+// the configuration key data of an SMGW was updated
+func (e *UCMGCP) gridConfigurationDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
+	if _, err := e.PowerLimitationFactor(entity); err == nil {
+		e.reader.Event(ski, entity.Device(), entity, api.UCMGCPPVFeedInPowerLimitationFactorDataUpdate)
 	}
 }
 

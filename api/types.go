@@ -309,6 +309,14 @@ const (
 
 	// MGCP
 
+	// Grid maximum allowed feed-in power as percentage value of the cumulated
+	// nominal peak power of all electricity producting PV systems was updated
+	//
+	// Use Case MGCP, Scenario 2
+	//
+	// Note: the referred data may be updated together with all other measurement items of this use case
+	UCMGCPPVFeedInPowerLimitationFactorDataUpdate EventType = "ucMGCPPVFeedInPowerLimitationFactorDataUpdate"
+
 	// Grid momentary power consumption/production data updated
 	//
 	// Use Case MGCP, Scenario 2

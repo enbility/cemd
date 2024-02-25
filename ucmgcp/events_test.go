@@ -36,6 +36,39 @@ func (s *UCMGCPSuite) Test_Events() {
 	s.sut.HandleEvent(payload)
 }
 
+func (s *UCMGCPSuite) Test_gridConfigurationDataUpdate() {
+	s.sut.gridConfigurationDataUpdate(remoteSki, s.smgwEntity)
+
+	descData := &model.DeviceConfigurationKeyValueDescriptionListDataType{
+		DeviceConfigurationKeyValueDescriptionData: []model.DeviceConfigurationKeyValueDescriptionDataType{
+			{
+				KeyId:   eebusutil.Ptr(model.DeviceConfigurationKeyIdType(0)),
+				KeyName: eebusutil.Ptr(model.DeviceConfigurationKeyNameTypePvCurtailmentLimitFactor),
+			},
+		},
+	}
+
+	rFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.smgwEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer)
+	fErr := rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, descData, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	keyData := &model.DeviceConfigurationKeyValueListDataType{
+		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{
+			{
+				KeyId: eebusutil.Ptr(model.DeviceConfigurationKeyIdType(0)),
+				Value: &model.DeviceConfigurationKeyValueValueType{
+					ScaledNumber: model.NewScaledNumberType(10),
+				},
+			},
+		},
+	}
+
+	fErr = rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueListData, keyData, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	s.sut.gridConfigurationDataUpdate(remoteSki, s.smgwEntity)
+}
+
 func (s *UCMGCPSuite) Test_gridMeasurementDataUpdate() {
 	s.sut.gridMeasurementDataUpdate(remoteSki, s.smgwEntity)
 
