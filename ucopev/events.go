@@ -42,12 +42,12 @@ func (e *UCOPEV) evConnected(entity spineapi.EntityRemoteInterface) {
 			logging.Log().Debug(err)
 		}
 
-		// get measurement descriptions
+		// get descriptions
 		if _, err := evLoadControl.RequestLimitDescriptions(); err != nil {
 			logging.Log().Debug(err)
 		}
 
-		// get measurement constraints
+		// get constraints
 		if _, err := evLoadControl.RequestLimitConstraints(); err != nil {
 			logging.Log().Debug(err)
 		}
@@ -57,7 +57,7 @@ func (e *UCOPEV) evConnected(entity spineapi.EntityRemoteInterface) {
 // the load control limit description data of an EV was updated
 func (e *UCOPEV) evLoadControlLimitDescriptionDataUpdate(entity spineapi.EntityRemoteInterface) {
 	if evLoadControl, err := util.LoadControl(e.service, entity); err == nil {
-		// get measurement values
+		// get values
 		if _, err := evLoadControl.RequestLimitValues(); err != nil {
 			logging.Log().Debug(err)
 		}
