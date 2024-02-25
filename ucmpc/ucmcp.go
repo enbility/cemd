@@ -21,7 +21,7 @@ type UCMPC struct {
 
 var _ UCMCPInterface = (*UCMPC)(nil)
 
-func NewUCMCP(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.EventReaderInterface) *UCMPC {
+func NewUCMPC(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.EventReaderInterface) *UCMPC {
 	uc := &UCMPC{
 		service: service,
 		reader:  reader,
