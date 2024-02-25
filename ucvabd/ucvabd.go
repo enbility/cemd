@@ -5,7 +5,6 @@ import (
 	"github.com/enbility/cemd/util"
 	serviceapi "github.com/enbility/eebus-go/api"
 	"github.com/enbility/eebus-go/features"
-	shipapi "github.com/enbility/ship-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
@@ -21,7 +20,7 @@ type UCVABD struct {
 
 var _ UCVABDInterface = (*UCVABD)(nil)
 
-func NewUCVABD(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.EventReaderInterface) *UCVABD {
+func NewUCVABD(service serviceapi.ServiceInterface, reader api.EventReaderInterface) *UCVABD {
 	uc := &UCVABD{
 		service: service,
 		reader:  reader,

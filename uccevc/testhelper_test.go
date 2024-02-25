@@ -66,7 +66,7 @@ func (s *UCCEVCSuite) BeforeTest(suiteName, testName string) {
 	mockRemoteFeature.EXPECT().Operations().Return(ops).Maybe()
 	mockRemoteFeature.EXPECT().DataCopy(mock.Anything).Return(mock.Anything).Maybe()
 
-	s.sut = NewUCCEVC(s.service, s.service.LocalService(), s)
+	s.sut = NewUCCEVC(s.service, s)
 	s.sut.AddFeatures()
 	s.sut.AddUseCase()
 

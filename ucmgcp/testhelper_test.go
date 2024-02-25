@@ -64,7 +64,7 @@ func (s *UCMGCPSuite) BeforeTest(suiteName, testName string) {
 	s.mockRemoteEntity.EXPECT().Address().Return(entityAddress).Maybe()
 	mockRemoteFeature.EXPECT().DataCopy(mock.Anything).Return(mock.Anything).Maybe()
 
-	s.sut = NewUCMGCP(s.service, s.service.LocalService(), s)
+	s.sut = NewUCMGCP(s.service, s)
 	s.sut.AddFeatures()
 	s.sut.AddUseCase()
 

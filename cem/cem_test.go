@@ -55,7 +55,7 @@ func (s *CemSuite) Test_CEM() {
 	err := s.sut.Setup()
 	assert.Nil(s.T(), err)
 
-	ucEvseCC := ucevsecc.NewUCEVSECC(s.sut.Service, s.sut.Service.LocalService(), s)
+	ucEvseCC := ucevsecc.NewUCEVSECC(s.sut.Service, s)
 	s.sut.AddUseCase(ucEvseCC)
 
 	s.sut.Start()

@@ -5,7 +5,6 @@ import (
 	"github.com/enbility/cemd/util"
 	serviceapi "github.com/enbility/eebus-go/api"
 	"github.com/enbility/eebus-go/features"
-	shipapi "github.com/enbility/ship-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
@@ -21,7 +20,7 @@ type UCCEVC struct {
 
 var _ UCCEVCInterface = (*UCCEVC)(nil)
 
-func NewUCCEVC(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.EventReaderInterface) *UCCEVC {
+func NewUCCEVC(service serviceapi.ServiceInterface, reader api.EventReaderInterface) *UCCEVC {
 	uc := &UCCEVC{
 		service: service,
 		reader:  reader,
