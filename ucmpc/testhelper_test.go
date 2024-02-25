@@ -20,7 +20,7 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-func TestMOCSuite(t *testing.T) {
+func TestMPCSuite(t *testing.T) {
 	suite.Run(t, new(UCMPCSuite))
 }
 
