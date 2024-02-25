@@ -14,14 +14,14 @@ import (
 type UCMPC struct {
 	service serviceapi.ServiceInterface
 
-	reader api.UseCaseEventReaderInterface
+	reader api.EventReaderInterface
 
 	validEntityTypes []model.EntityTypeType
 }
 
 var _ UCMCPInterface = (*UCMPC)(nil)
 
-func NewUCMCP(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.UseCaseEventReaderInterface) *UCMPC {
+func NewUCMCP(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.EventReaderInterface) *UCMPC {
 	uc := &UCMPC{
 		service: service,
 		reader:  reader,

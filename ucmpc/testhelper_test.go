@@ -36,7 +36,7 @@ type UCMPCSuite struct {
 	monitoredEntity  spineapi.EntityRemoteInterface
 }
 
-func (s *UCMPCSuite) SpineEvent(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
+func (s *UCMPCSuite) Event(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.EventType) {
 }
 
 func (s *UCMPCSuite) BeforeTest(suiteName, testName string) {

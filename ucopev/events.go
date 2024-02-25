@@ -86,7 +86,7 @@ func (e *UCOPEV) evLoadControlLimitDataUpdate(ski string, entity spineapi.Entity
 			continue
 		}
 
-		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCOPEVLoadControlLimitDataUpdate)
+		e.reader.Event(ski, entity.Device(), entity, api.UCOPEVLoadControlLimitDataUpdate)
 		return
 	}
 

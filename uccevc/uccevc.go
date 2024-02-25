@@ -14,14 +14,14 @@ import (
 type UCCEVC struct {
 	service serviceapi.ServiceInterface
 
-	reader api.UseCaseEventReaderInterface
+	reader api.EventReaderInterface
 
 	validEntityTypes []model.EntityTypeType
 }
 
 var _ UCCEVCInterface = (*UCCEVC)(nil)
 
-func NewUCCEVC(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.UseCaseEventReaderInterface) *UCCEVC {
+func NewUCCEVC(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.EventReaderInterface) *UCCEVC {
 	uc := &UCCEVC{
 		service: service,
 		reader:  reader,

@@ -97,7 +97,7 @@ func (e *UCVAPD) inverterConfigurationDataUpdate(ski string, entity spineapi.Ent
 	// Scenario 1
 	if deviceConfiguration, err := util.DeviceConfiguration(e.service, entity); err == nil {
 		if _, err := deviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypePeakPowerOfPVSystem, model.DeviceConfigurationKeyValueTypeTypeScaledNumber); err == nil {
-			e.reader.SpineEvent(ski, entity.Device(), entity, api.UCVAPDPeakPowerDataUpdate)
+			e.reader.Event(ski, entity.Device(), entity, api.UCVAPDPeakPowerDataUpdate)
 		}
 	}
 }
@@ -116,11 +116,11 @@ func (e *UCVAPD) inverterMeasurementDescriptionDataUpdate(entity spineapi.Entity
 func (e *UCVAPD) inverterMeasurementDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
 	// Scenario 2
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACPowerTotal); err == nil {
-		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCVAPDPowerTotalMeasurementDataUpdate)
+		e.reader.Event(ski, entity.Device(), entity, api.UCVAPDPowerTotalMeasurementDataUpdate)
 	}
 
 	// Scenario 3
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACYieldTotal); err == nil {
-		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCVAPDYieldTotalMeasurementDataUpdate)
+		e.reader.Event(ski, entity.Device(), entity, api.UCVAPDYieldTotalMeasurementDataUpdate)
 	}
 }

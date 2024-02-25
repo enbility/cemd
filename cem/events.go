@@ -10,12 +10,12 @@ import (
 func (h *Cem) HandleEvent(payload spineapi.EventPayload) {
 
 	if util.IsDeviceConnected(payload) {
-		h.reader.SpineEvent(payload.Ski, payload.Device, nil, api.DeviceConnected)
+		h.reader.Event(payload.Ski, payload.Device, nil, api.DeviceConnected)
 		return
 	}
 
 	if util.IsDeviceDisconnected(payload) {
-		h.reader.SpineEvent(payload.Ski, payload.Device, nil, api.DeviceDisconnected)
+		h.reader.Event(payload.Ski, payload.Device, nil, api.DeviceDisconnected)
 		return
 	}
 }

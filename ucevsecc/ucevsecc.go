@@ -13,14 +13,14 @@ import (
 type UCEVSECC struct {
 	service serviceapi.ServiceInterface
 
-	reader api.UseCaseEventReaderInterface
+	reader api.EventReaderInterface
 
 	validEntityTypes []model.EntityTypeType
 }
 
 var _ UCEVSECCInterface = (*UCEVSECC)(nil)
 
-func NewUCEVSECC(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.UseCaseEventReaderInterface) *UCEVSECC {
+func NewUCEVSECC(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.EventReaderInterface) *UCEVSECC {
 	uc := &UCEVSECC{
 		service: service,
 		reader:  reader,

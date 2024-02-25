@@ -14,14 +14,14 @@ import (
 type UCVABD struct {
 	service serviceapi.ServiceInterface
 
-	reader api.UseCaseEventReaderInterface
+	reader api.EventReaderInterface
 
 	validEntityTypes []model.EntityTypeType
 }
 
 var _ UCVABDInterface = (*UCVABD)(nil)
 
-func NewUCVABD(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.UseCaseEventReaderInterface) *UCVABD {
+func NewUCVABD(service serviceapi.ServiceInterface, details *shipapi.ServiceDetails, reader api.EventReaderInterface) *UCVABD {
 	uc := &UCVABD{
 		service: service,
 		reader:  reader,

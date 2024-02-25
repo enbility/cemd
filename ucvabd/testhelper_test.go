@@ -36,7 +36,7 @@ type UCVABDSuite struct {
 	batteryEntity    spineapi.EntityRemoteInterface
 }
 
-func (s *UCVABDSuite) SpineEvent(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
+func (s *UCVABDSuite) Event(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.EventType) {
 }
 
 func (s *UCVABDSuite) BeforeTest(suiteName, testName string) {

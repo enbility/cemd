@@ -41,14 +41,12 @@ type UseCaseInterface interface {
 	IsUseCaseSupported(remoteEntity spineapi.EntityRemoteInterface) (bool, error)
 }
 
-// interface for informing the cem about specific events
-// for each supported usecase
+// interface for informing the HEMS about specific events
 //
-// UseCaseEventType values can be found in the api definition of each
-// supported usecase
-//
-// implemented by the actual CEM, used by UCEvseCCInterface implementation
-type UseCaseEventReaderInterface interface {
-	// Inform about a new usecase specific event
-	SpineEvent(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event UseCaseEventType)
+// implemented by the actual HEMS
+type EventReaderInterface interface {
+	// Inform about a new cem or usecase specific event
+	//
+	// used by use case implementations
+	Event(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event EventType)
 }

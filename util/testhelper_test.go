@@ -35,7 +35,7 @@ type UtilSuite struct {
 	monitoredEntity  spineapi.EntityRemoteInterface
 }
 
-func (s *UtilSuite) SpineEvent(ski string, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
+func (s *UtilSuite) Event(ski string, entity spineapi.EntityRemoteInterface, event api.EventType) {
 }
 
 func (s *UtilSuite) BeforeTest(suiteName, testName string) {

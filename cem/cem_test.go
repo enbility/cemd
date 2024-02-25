@@ -62,8 +62,8 @@ func (s *CemSuite) Test_CEM() {
 	s.sut.Shutdown()
 }
 
-// UseCaseEventReaderInterface
-func (d *CemSuite) SpineEvent(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
+// ReaderInterface
+func (d *CemSuite) Event(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.EventType) {
 }
 
 // eebusapi.ServiceReaderInterface

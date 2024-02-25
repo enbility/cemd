@@ -4,6 +4,7 @@ import (
 	"github.com/enbility/cemd/cem"
 	"github.com/enbility/cemd/ucevsecc"
 	eebusapi "github.com/enbility/eebus-go/api"
+	"github.com/enbility/ship-go/logging"
 )
 
 type DemoCem struct {
@@ -13,7 +14,8 @@ type DemoCem struct {
 func NewDemoCem(configuration *eebusapi.Configuration) *DemoCem {
 	demo := &DemoCem{}
 
-	demo.cem = cem.NewCEM(configuration, demo, demo, demo)
+	noLogging := &logging.NoLogging{}
+	demo.cem = cem.NewCEM(configuration, demo, demo, noLogging)
 
 	return demo
 }

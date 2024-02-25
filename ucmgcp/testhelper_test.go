@@ -36,7 +36,7 @@ type UCMGCPSuite struct {
 	smgwEntity       spineapi.EntityRemoteInterface
 }
 
-func (s *UCMGCPSuite) SpineEvent(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
+func (s *UCMGCPSuite) Event(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.EventType) {
 }
 
 func (s *UCMGCPSuite) BeforeTest(suiteName, testName string) {

@@ -14,7 +14,7 @@ type Cem struct {
 
 	Currency model.CurrencyType
 
-	reader api.UseCaseEventReaderInterface
+	reader api.EventReaderInterface
 
 	usecases []api.UseCaseInterface
 }
@@ -22,7 +22,7 @@ type Cem struct {
 func NewCEM(
 	serviceDescription *eebusapi.Configuration,
 	serviceHandler eebusapi.ServiceReaderInterface,
-	reader api.UseCaseEventReaderInterface,
+	reader api.EventReaderInterface,
 	log logging.LoggingInterface) *Cem {
 	cem := &Cem{
 		Service:  service.NewService(serviceDescription, serviceHandler),

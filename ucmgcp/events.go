@@ -104,32 +104,32 @@ func (e *UCMGCP) gridMeasurementDescriptionDataUpdate(entity spineapi.EntityRemo
 func (e *UCMGCP) gridMeasurementDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
 	// Scenario 2
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACPowerTotal); err == nil {
-		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCMGCPPowerTotalMeasurementDataUpdate)
+		e.reader.Event(ski, entity.Device(), entity, api.UCMGCPPowerTotalMeasurementDataUpdate)
 	}
 
 	// Scenario 3
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeGridFeedIn); err == nil {
-		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCMGCPGridFeedInMeasurementDataUpdate)
+		e.reader.Event(ski, entity.Device(), entity, api.UCMGCPGridFeedInMeasurementDataUpdate)
 	}
 
 	// Scenario 4
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeGridConsumption); err == nil {
-		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCMGCPGridConsumptionMeasurementDataUpdate)
+		e.reader.Event(ski, entity.Device(), entity, api.UCMGCPGridConsumptionMeasurementDataUpdate)
 	}
 
 	// Scenario 5
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACCurrent); err == nil {
-		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCMGCPCurrentsMeasurementDataUpdate)
+		e.reader.Event(ski, entity.Device(), entity, api.UCMGCPCurrentsMeasurementDataUpdate)
 	}
 
 	// Scenario 6
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACVoltage); err == nil {
-		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCMGCPVoltagesMeasurementDataUpdate)
+		e.reader.Event(ski, entity.Device(), entity, api.UCMGCPVoltagesMeasurementDataUpdate)
 	}
 
 	// Scenario 7
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACFrequency); err == nil {
-		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCMGCPFrequencyMeasurementDataUpdate)
+		e.reader.Event(ski, entity.Device(), entity, api.UCMGCPFrequencyMeasurementDataUpdate)
 	}
 
 }

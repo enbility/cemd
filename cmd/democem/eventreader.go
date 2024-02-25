@@ -5,8 +5,8 @@ import (
 	spineapi "github.com/enbility/spine-go/api"
 )
 
-var _ api.UseCaseEventReaderInterface = (*DemoCem)(nil)
+var _ api.EventReaderInterface = (*DemoCem)(nil)
 
-// Handle incomfing usecase specific event
-func (h *DemoCem) SpineEvent(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
+// Handle incoming usecase specific events
+func (h *DemoCem) Event(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.EventType) {
 }
