@@ -1,7 +1,6 @@
 package ucvabd
 
 import (
-	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
 	"github.com/enbility/ship-go/logging"
 	spineapi "github.com/enbility/spine-go/api"
@@ -81,21 +80,21 @@ func (e *UCVABD) inverterMeasurementDescriptionDataUpdate(entity spineapi.Entity
 func (e *UCVABD) inverterMeasurementDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
 	// Scenario 1
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACPowerTotal); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCVABDPowerTotalMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdatePower)
 	}
 
 	// Scenario 2
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeCharge); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCVABDChargeMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateEnergyCharged)
 	}
 
 	// Scenario 3
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeDischarge); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCVABDDischargeMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateEnergyDischarged)
 	}
 
 	// Scenario 4
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeStateOfCharge); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCVABDStateOfChargeMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateStateOfCharge)
 	}
 }

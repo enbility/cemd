@@ -123,7 +123,7 @@ func (e *UCMPC) EnergyProduced(entity spineapi.EntityRemoteInterface) (float64, 
 //
 //   - positive values are used for consumption
 //   - negative values are used for production
-func (e *UCMPC) CurrentsPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error) {
+func (e *UCMPC) CurrentPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error) {
 	if entity == nil || !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return nil, api.ErrNoCompatibleEntity
 	}

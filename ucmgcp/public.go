@@ -151,7 +151,7 @@ func (e *UCMGCP) EnergyConsumed(entity spineapi.EntityRemoteInterface) (float64,
 //
 //   - positive values are used for consumption
 //   - negative values are used for production
-func (e *UCMGCP) CurrentsPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error) {
+func (e *UCMGCP) CurrentPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error) {
 	if entity == nil || !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return nil, api.ErrNoCompatibleEntity
 	}

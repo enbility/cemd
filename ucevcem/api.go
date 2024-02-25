@@ -17,7 +17,7 @@ type UCEVCEMInterface interface {
 	// Scenario 1
 
 	// return the last current measurement for each phase of the connected EV
-	CurrentsPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error)
+	CurrentPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error)
 
 	// Scenario 2
 

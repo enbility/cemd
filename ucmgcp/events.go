@@ -1,7 +1,6 @@
 package ucmgcp
 
 import (
-	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
 	"github.com/enbility/ship-go/logging"
 	spineapi "github.com/enbility/spine-go/api"
@@ -95,7 +94,7 @@ func (e *UCMGCP) gridConfigurationDescriptionDataUpdate(entity spineapi.EntityRe
 // the configuration key data of an SMGW was updated
 func (e *UCMGCP) gridConfigurationDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
 	if _, err := e.PowerLimitationFactor(entity); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCMGCPPVFeedInPowerLimitationFactorDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdatePowerLimitationFactor)
 	}
 }
 
@@ -113,32 +112,32 @@ func (e *UCMGCP) gridMeasurementDescriptionDataUpdate(entity spineapi.EntityRemo
 func (e *UCMGCP) gridMeasurementDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
 	// Scenario 2
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACPowerTotal); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCMGCPPowerTotalMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdatePower)
 	}
 
 	// Scenario 3
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeGridFeedIn); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCMGCPGridFeedInMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateEnergyFeedIn)
 	}
 
 	// Scenario 4
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeGridConsumption); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCMGCPGridConsumptionMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateEnergyConsumed)
 	}
 
 	// Scenario 5
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACCurrent); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCMGCPCurrentsMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateCurrentPerPhase)
 	}
 
 	// Scenario 6
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACVoltage); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCMGCPVoltagesMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateVoltagePerPhase)
 	}
 
 	// Scenario 7
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACFrequency); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCMGCPFrequencyMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateFrequency)
 	}
 
 }

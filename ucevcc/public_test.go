@@ -10,12 +10,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (s *UCEVCCSuite) Test_EVCurrentChargeState() {
-	data, err := s.sut.CurrentChargeState(s.mockRemoteEntity)
+func (s *UCEVCCSuite) Test_ChargeState() {
+	data, err := s.sut.ChargeState(s.mockRemoteEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), api.EVChargeStateTypeUnplugged, data)
 
-	data, err = s.sut.CurrentChargeState(s.evEntity)
+	data, err = s.sut.ChargeState(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), api.EVChargeStateTypeUnknown, data)
 
@@ -27,7 +27,7 @@ func (s *UCEVCCSuite) Test_EVCurrentChargeState() {
 	fErr := rFeature.UpdateData(model.FunctionTypeDeviceDiagnosisStateData, stateData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.CurrentChargeState(s.evEntity)
+	data, err = s.sut.ChargeState(s.evEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), api.EVChargeStateTypeActive, data)
 
@@ -38,7 +38,7 @@ func (s *UCEVCCSuite) Test_EVCurrentChargeState() {
 	fErr = rFeature.UpdateData(model.FunctionTypeDeviceDiagnosisStateData, stateData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.CurrentChargeState(s.evEntity)
+	data, err = s.sut.ChargeState(s.evEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), api.EVChargeStateTypePaused, data)
 
@@ -49,7 +49,7 @@ func (s *UCEVCCSuite) Test_EVCurrentChargeState() {
 	fErr = rFeature.UpdateData(model.FunctionTypeDeviceDiagnosisStateData, stateData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.CurrentChargeState(s.evEntity)
+	data, err = s.sut.ChargeState(s.evEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), api.EVChargeStateTypeError, data)
 
@@ -60,7 +60,7 @@ func (s *UCEVCCSuite) Test_EVCurrentChargeState() {
 	fErr = rFeature.UpdateData(model.FunctionTypeDeviceDiagnosisStateData, stateData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.CurrentChargeState(s.evEntity)
+	data, err = s.sut.ChargeState(s.evEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), api.EVChargeStateTypeFinished, data)
 
@@ -71,7 +71,7 @@ func (s *UCEVCCSuite) Test_EVCurrentChargeState() {
 	fErr = rFeature.UpdateData(model.FunctionTypeDeviceDiagnosisStateData, stateData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.CurrentChargeState(s.evEntity)
+	data, err = s.sut.ChargeState(s.evEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), api.EVChargeStateTypeUnknown, data)
 }
@@ -159,12 +159,12 @@ func (s *UCEVCCSuite) Test_EVCommunicationStandard() {
 	assert.Equal(s.T(), string(model.DeviceConfigurationKeyValueStringTypeISO151182ED2), data)
 }
 
-func (s *UCEVCCSuite) Test_EVAsymmetricChargingSupported() {
-	data, err := s.sut.AsymmetricChargingSupported(s.mockRemoteEntity)
+func (s *UCEVCCSuite) Test_EVAsymmetricChargingSupport() {
+	data, err := s.sut.AsymmetricChargingSupport(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), false, data)
 
-	data, err = s.sut.AsymmetricChargingSupported(s.evEntity)
+	data, err = s.sut.AsymmetricChargingSupport(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), false, data)
 
@@ -181,7 +181,7 @@ func (s *UCEVCCSuite) Test_EVAsymmetricChargingSupported() {
 	fErr := rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.AsymmetricChargingSupported(s.evEntity)
+	data, err = s.sut.AsymmetricChargingSupport(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), false, data)
 
@@ -197,7 +197,7 @@ func (s *UCEVCCSuite) Test_EVAsymmetricChargingSupported() {
 	fErr = rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.AsymmetricChargingSupported(s.evEntity)
+	data, err = s.sut.AsymmetricChargingSupport(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), false, data)
 
@@ -215,7 +215,7 @@ func (s *UCEVCCSuite) Test_EVAsymmetricChargingSupported() {
 	fErr = rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueListData, devData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.AsymmetricChargingSupported(s.evEntity)
+	data, err = s.sut.AsymmetricChargingSupport(s.evEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), true, data)
 }

@@ -1,7 +1,6 @@
 package ucevsecc
 
 import (
-	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
 	"github.com/enbility/eebus-go/features"
 	spineapi "github.com/enbility/spine-go/api"
@@ -55,12 +54,12 @@ func (e *UCEVSECC) evseConnected(ski string, entity spineapi.EntityRemoteInterfa
 		_, _ = evseDeviceDiagnosis.RequestState()
 	}
 
-	e.eventCB(ski, entity.Device(), entity, api.UCEVSECCEventConnected)
+	e.eventCB(ski, entity.Device(), entity, EvseConnected)
 }
 
 // an EVSE was disconnected
 func (e *UCEVSECC) evseDisconnected(ski string, entity spineapi.EntityRemoteInterface) {
-	e.eventCB(ski, entity.Device(), entity, api.UCEVSECCEventDisconnected)
+	e.eventCB(ski, entity.Device(), entity, EvseDisconnected)
 }
 
 // the manufacturer Data of an EVSE was updated
@@ -71,7 +70,7 @@ func (e *UCEVSECC) evseManufacturerDataUpdate(ski string, entity spineapi.Entity
 	}
 
 	if _, err := evDeviceClassification.GetManufacturerDetails(); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCEVSECCEventManufacturerUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateManufacturerData)
 	}
 }
 
@@ -83,6 +82,6 @@ func (e *UCEVSECC) evseStateUpdate(ski string, entity spineapi.EntityRemoteInter
 	}
 
 	if _, err := evDeviceDiagnosis.GetState(); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCEVSECCEventOperationStateUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateOperatingState)
 	}
 }

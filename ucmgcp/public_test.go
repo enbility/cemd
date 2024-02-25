@@ -219,12 +219,12 @@ func (s *UCMGCPSuite) Test_EnergyConsumed() {
 	assert.Equal(s.T(), 10.0, data)
 }
 
-func (s *UCMGCPSuite) Test_CurrentsPerPhase() {
-	data, err := s.sut.CurrentsPerPhase(s.mockRemoteEntity)
+func (s *UCMGCPSuite) Test_CurrentPerPhase() {
+	data, err := s.sut.CurrentPerPhase(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
-	data, err = s.sut.CurrentsPerPhase(s.smgwEntity)
+	data, err = s.sut.CurrentPerPhase(s.smgwEntity)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
@@ -255,7 +255,7 @@ func (s *UCMGCPSuite) Test_CurrentsPerPhase() {
 	fErr := rFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.CurrentsPerPhase(s.smgwEntity)
+	data, err = s.sut.CurrentPerPhase(s.smgwEntity)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
@@ -279,7 +279,7 @@ func (s *UCMGCPSuite) Test_CurrentsPerPhase() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, measData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.CurrentsPerPhase(s.smgwEntity)
+	data, err = s.sut.CurrentPerPhase(s.smgwEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 0, len(data))
 
@@ -319,7 +319,7 @@ func (s *UCMGCPSuite) Test_CurrentsPerPhase() {
 	fErr = rElFeature.UpdateData(model.FunctionTypeElectricalConnectionDescriptionListData, elDescData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.CurrentsPerPhase(s.smgwEntity)
+	data, err = s.sut.CurrentPerPhase(s.smgwEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), []float64{10, 10, 10}, data)
 

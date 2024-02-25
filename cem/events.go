@@ -1,7 +1,6 @@
 package cem
 
 import (
-	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
 	spineapi "github.com/enbility/spine-go/api"
 )
@@ -10,12 +9,12 @@ import (
 func (h *Cem) HandleEvent(payload spineapi.EventPayload) {
 
 	if util.IsDeviceConnected(payload) {
-		h.eventCB(payload.Ski, payload.Device, nil, api.DeviceConnected)
+		h.eventCB(payload.Ski, payload.Device, nil, DeviceConnected)
 		return
 	}
 
 	if util.IsDeviceDisconnected(payload) {
-		h.eventCB(payload.Ski, payload.Device, nil, api.DeviceDisconnected)
+		h.eventCB(payload.Ski, payload.Device, nil, DeviceDisconnected)
 		return
 	}
 }

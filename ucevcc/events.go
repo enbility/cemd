@@ -1,7 +1,6 @@
 package ucevcc
 
 import (
-	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
 	"github.com/enbility/ship-go/logging"
 	spineapi "github.com/enbility/spine-go/api"
@@ -39,6 +38,8 @@ func (e *UCEVCC) HandleEvent(payload spineapi.EventPayload) {
 		e.evConfigurationDescriptionDataUpdate(payload.Entity)
 	case *model.DeviceConfigurationKeyValueListDataType:
 		e.evConfigurationDataUpdate(payload.Ski, payload.Entity)
+	case *model.DeviceDiagnosisOperatingStateType:
+		e.evOperatingStateDataUpdate(payload.Ski, payload.Entity)
 	case *model.DeviceClassificationManufacturerDataType:
 		e.evManufacturerDataUpdate(payload.Ski, payload.Entity)
 	case *model.ElectricalConnectionParameterDescriptionListDataType:
@@ -112,12 +113,12 @@ func (e *UCEVCC) evConnected(ski string, entity spineapi.EntityRemoteInterface) 
 		}
 	}
 
-	e.eventCB(ski, entity.Device(), entity, api.UCEVCCEventConnected)
+	e.eventCB(ski, entity.Device(), entity, EvConnected)
 }
 
 // an EV was disconnected
 func (e *UCEVCC) evDisconnected(ski string, entity spineapi.EntityRemoteInterface) {
-	e.eventCB(ski, entity.Device(), entity, api.UCEVCCEventDisconnected)
+	e.eventCB(ski, entity.Device(), entity, EvDisconnected)
 }
 
 // the configuration key description data of an EV was updated
@@ -139,12 +140,24 @@ func (e *UCEVCC) evConfigurationDataUpdate(ski string, entity spineapi.EntityRem
 
 	// Scenario 2
 	if _, err := evDeviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypeCommunicationsStandard, model.DeviceConfigurationKeyValueTypeTypeString); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCEVCCCommunicationStandardConfigurationDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateCommunicationStandard)
 	}
 
 	// Scenario 3
 	if _, err := evDeviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypeAsymmetricChargingSupported, model.DeviceConfigurationKeyValueTypeTypeString); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCEVCCAsymmetricChargingConfigurationDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, AsymmetricChargingSupportDataUpdate)
+	}
+}
+
+// the operating state of an EV was updated
+func (e *UCEVCC) evOperatingStateDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
+	deviceDiagnosis, err := util.DeviceDiagnosis(e.service, entity)
+	if err != nil {
+		return
+	}
+
+	if _, err := deviceDiagnosis.GetState(); err == nil {
+		e.eventCB(ski, entity.Device(), entity, DataUpdateIdentifications)
 	}
 }
 
@@ -162,7 +175,7 @@ func (e *UCEVCC) evIdentificationDataUpdate(ski string, entity spineapi.EntityRe
 				continue
 			}
 
-			e.eventCB(ski, entity.Device(), entity, api.UCEVCCIdentificationDataUpdate)
+			e.eventCB(ski, entity.Device(), entity, DataUpdateIdentifications)
 			return
 		}
 	}
@@ -177,7 +190,7 @@ func (e *UCEVCC) evManufacturerDataUpdate(ski string, entity spineapi.EntityRemo
 
 	// Scenario 5
 	if _, err := evDeviceClassification.GetManufacturerDetails(); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCEVCCManufacturerDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateManufacturerData)
 	}
 
 }
@@ -209,5 +222,5 @@ func (e *UCEVCC) evElectricalPermittedValuesUpdate(ski string, entity spineapi.E
 	}
 
 	// Scenario 6
-	e.eventCB(ski, entity.Device(), entity, api.UCEVCCChargingPowerLimitsDataUpdate)
+	e.eventCB(ski, entity.Device(), entity, DataUpdateCurrentLimits)
 }

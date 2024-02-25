@@ -48,12 +48,12 @@ func (s *UCEVCEMSuite) Test_EVConnectedPhases() {
 	assert.Equal(s.T(), uint(1), data)
 }
 
-func (s *UCEVCEMSuite) Test_EVCurrentsPerPhase() {
-	data, err := s.sut.CurrentsPerPhase(s.mockRemoteEntity)
+func (s *UCEVCEMSuite) Test_EVCurrentPerPhase() {
+	data, err := s.sut.CurrentPerPhase(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
-	data, err = s.sut.CurrentsPerPhase(s.evEntity)
+	data, err = s.sut.CurrentPerPhase(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
@@ -92,7 +92,7 @@ func (s *UCEVCEMSuite) Test_EVCurrentsPerPhase() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, measDesc, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.CurrentsPerPhase(s.evEntity)
+	data, err = s.sut.CurrentPerPhase(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
@@ -108,7 +108,7 @@ func (s *UCEVCEMSuite) Test_EVCurrentsPerPhase() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, measData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.CurrentsPerPhase(s.evEntity)
+	data, err = s.sut.CurrentPerPhase(s.evEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 10.0, data[0])
 }

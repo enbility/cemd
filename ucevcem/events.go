@@ -1,7 +1,6 @@
 package ucevcem
 
 import (
-	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
 	"github.com/enbility/ship-go/logging"
 	spineapi "github.com/enbility/spine-go/api"
@@ -61,7 +60,7 @@ func (e *UCEVCEM) evElectricalConnectionDescriptionDataUpdate(ski string, entity
 		return
 	}
 
-	e.eventCB(ski, entity.Device(), entity, api.UCEVCEMNumberOfConnectedPhasesDataUpdate)
+	e.eventCB(ski, entity.Device(), entity, DataUpdatePhasesConnected)
 }
 
 // the measurement description data of an EV was updated
@@ -78,16 +77,16 @@ func (e *UCEVCEM) evMeasurementDescriptionDataUpdate(entity spineapi.EntityRemot
 func (e *UCEVCEM) evMeasurementDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
 	// Scenario 1
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACCurrent); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCEVCEMCurrentMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateCurrentPerPhase)
 	}
 
 	// Scenario 2
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACPower); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCEVCEMPowerMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdatePowerPerPhase)
 	}
 
 	// Scenario 3
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeCharge); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCEVCEMChargingEnergyMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateEnergyCharged)
 	}
 }

@@ -9,7 +9,7 @@ import (
 )
 
 // return the current charge state of the EV
-func (e *UCEVCC) CurrentChargeState(entity spineapi.EntityRemoteInterface) (api.EVChargeStateType, error) {
+func (e *UCEVCC) ChargeState(entity spineapi.EntityRemoteInterface) (api.EVChargeStateType, error) {
 	if entity == nil || entity.EntityType() != model.EntityTypeTypeEV {
 		return api.EVChargeStateTypeUnplugged, nil
 	}
@@ -53,7 +53,7 @@ func (e *UCEVCC) EVConnected(entity spineapi.EntityRemoteInterface) bool {
 	}
 
 	// getting current charge state should work
-	if _, err := e.CurrentChargeState(entity); err != nil {
+	if _, err := e.ChargeState(entity); err != nil {
 		return false
 	}
 
@@ -135,7 +135,7 @@ func (e *UCEVCC) CommunicationStandard(entity spineapi.EntityRemoteInterface) (s
 //
 // possible errors:
 //   - ErrDataNotAvailable if that information is not (yet) available
-func (e *UCEVCC) AsymmetricChargingSupported(entity spineapi.EntityRemoteInterface) (bool, error) {
+func (e *UCEVCC) AsymmetricChargingSupport(entity spineapi.EntityRemoteInterface) (bool, error) {
 	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return false, api.ErrNoCompatibleEntity
 	}

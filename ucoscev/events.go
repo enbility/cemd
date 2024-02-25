@@ -1,7 +1,6 @@
 package ucoscev
 
 import (
-	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
@@ -51,8 +50,7 @@ func (e *UCOSCEV) evLoadControlLimitDataUpdate(ski string, entity spineapi.Entit
 			continue
 		}
 
-		e.eventCB(ski, entity.Device(), entity, api.UCOPEVLoadControlLimitDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateLimit)
 		return
 	}
-
 }

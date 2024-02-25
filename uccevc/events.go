@@ -1,7 +1,6 @@
 package uccevc
 
 import (
-	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
 	"github.com/enbility/ship-go/logging"
 	spineapi "github.com/enbility/spine-go/api"
@@ -113,7 +112,7 @@ func (e *UCCEVC) evTimeSeriesDescriptionDataUpdate(ski string, entity spineapi.E
 		return
 	}
 
-	e.eventCB(ski, entity.Device(), entity, api.UCCEVCEnergyDemandProvided)
+	e.eventCB(ski, entity.Device(), entity, DataUpdateEnergyDemand)
 
 	_, err = e.TimeSlotConstraints(entity)
 	if err != nil {
@@ -127,18 +126,17 @@ func (e *UCCEVC) evTimeSeriesDescriptionDataUpdate(ski string, entity spineapi.E
 		return
 	}
 
-	e.eventCB(ski, entity.Device(), entity, api.UCCEVPowerLimitsRequested)
-	e.eventCB(ski, entity.Device(), entity, api.UCCEVCIncentivesRequested)
+	e.eventCB(ski, entity.Device(), entity, DataRequestedPowerLimitsAndIncentives)
 }
 
 // the load control limit data of an EV was updated
 func (e *UCCEVC) evTimeSeriesDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
 	if _, err := e.ChargePlan(entity); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCCEVCChargePlanProvided)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateChargePlan)
 	}
 
 	if _, err := e.ChargePlanConstraints(entity); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCCEVCChargePlanConstraintsProvided)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateTimeSlotConstraints)
 	}
 }
 
@@ -152,16 +150,15 @@ func (e *UCCEVC) evIncentiveTableDescriptionDataUpdate(ski string, entity spinea
 	}
 
 	// check if we are required to update the plan
-	if !e.evCheckIncentiveTableDescriptionUpdateRequired(entity) {
-		return
+	if e.evCheckIncentiveTableDescriptionUpdateRequired(entity) {
+		e.eventCB(ski, entity.Device(), entity, DataRequestedIncentiveTableDescription)
 	}
 
-	e.eventCB(ski, entity.Device(), entity, api.UCCEVCIncentiveDescriptionsRequired)
 }
 
 // the load control limit data of an EV was updated
 func (e *UCCEVC) evIncentiveTableDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	e.eventCB(ski, entity.Device(), entity, api.UCCEVCIncentiveTableDataUpdate)
+	e.eventCB(ski, entity.Device(), entity, DataUpdateIncentiveTable)
 }
 
 // check timeSeries descriptions if constraints element has updateRequired set to true

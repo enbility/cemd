@@ -41,7 +41,7 @@ func (e *UCEVCEM) PhasesConnected(entity spineapi.EntityRemoteInterface) (uint, 
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *UCEVCEM) CurrentsPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error) {
+func (e *UCEVCEM) CurrentPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error) {
 	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return nil, api.ErrNoCompatibleEntity
 	}

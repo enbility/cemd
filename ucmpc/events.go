@@ -1,7 +1,6 @@
 package ucmpc
 
 import (
-	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
 	"github.com/enbility/ship-go/logging"
 	spineapi "github.com/enbility/spine-go/api"
@@ -81,35 +80,35 @@ func (e *UCMPC) deviceMeasurementDescriptionDataUpdate(entity spineapi.EntityRem
 func (e *UCMPC) deviceMeasurementDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
 	// Scenario 1
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACPowerTotal); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCMPCPowerTotalMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdatePower)
 	}
 
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACPower); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCMPCPowerPerPhaseMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdatePowerPerPhase)
 	}
 
 	// Scenario 2
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACEnergyConsumed); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCMPCEnergyConsumedMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateEnergyConsumed)
 	}
 
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACEnergyProduced); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCMPCEnergyProcudedMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateEnergyProduced)
 	}
 
 	// Scenario 3
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACCurrent); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCMPCCurrentsMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateCurrentsPerPhase)
 	}
 
 	// Scenario 4
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACVoltage); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCMPCVoltagesMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateVoltagePerPhase)
 	}
 
 	// Scenario 5
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACFrequency); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCMPCFrequencyMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdateFrequency)
 	}
 
 }

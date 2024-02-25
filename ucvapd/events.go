@@ -1,7 +1,6 @@
 package ucvapd
 
 import (
-	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
 	"github.com/enbility/ship-go/logging"
 	spineapi "github.com/enbility/spine-go/api"
@@ -97,7 +96,7 @@ func (e *UCVAPD) inverterConfigurationDataUpdate(ski string, entity spineapi.Ent
 	// Scenario 1
 	if deviceConfiguration, err := util.DeviceConfiguration(e.service, entity); err == nil {
 		if _, err := deviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypePeakPowerOfPVSystem, model.DeviceConfigurationKeyValueTypeTypeScaledNumber); err == nil {
-			e.eventCB(ski, entity.Device(), entity, api.UCVAPDPeakPowerDataUpdate)
+			e.eventCB(ski, entity.Device(), entity, DataUpdatePowerNominalPeak)
 		}
 	}
 }
@@ -116,11 +115,11 @@ func (e *UCVAPD) inverterMeasurementDescriptionDataUpdate(entity spineapi.Entity
 func (e *UCVAPD) inverterMeasurementDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
 	// Scenario 2
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACPowerTotal); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCVAPDPowerTotalMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdatePower)
 	}
 
 	// Scenario 3
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACYieldTotal); err == nil {
-		e.eventCB(ski, entity.Device(), entity, api.UCVAPDYieldTotalMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, DataUpdatePVYieldTotal)
 	}
 }

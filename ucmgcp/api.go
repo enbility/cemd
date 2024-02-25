@@ -48,7 +48,7 @@ type UCMGCPInterface interface {
 	//
 	//   - positive values are used for consumption
 	//   - negative values are used for production
-	CurrentsPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error)
+	CurrentPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error)
 
 	// Scenario 6
 

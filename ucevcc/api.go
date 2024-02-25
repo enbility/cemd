@@ -12,7 +12,7 @@ type UCEVCCInterface interface {
 	api.UseCaseInterface
 
 	// return the current charge state of the EV
-	CurrentChargeState(entity spineapi.EntityRemoteInterface) (api.EVChargeStateType, error)
+	ChargeState(entity spineapi.EntityRemoteInterface) (api.EVChargeStateType, error)
 
 	// Scenario 1 & 8
 
@@ -27,7 +27,7 @@ type UCEVCCInterface interface {
 	// Scenario 3
 
 	// return if the EV supports asymmetric charging
-	AsymmetricChargingSupported(entity spineapi.EntityRemoteInterface) (bool, error)
+	AsymmetricChargingSupport(entity spineapi.EntityRemoteInterface) (bool, error)
 
 	// Scenario 4
 
