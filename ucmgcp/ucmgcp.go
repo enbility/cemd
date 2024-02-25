@@ -13,17 +13,17 @@ import (
 type UCMGCP struct {
 	service serviceapi.ServiceInterface
 
-	reader api.EventReaderInterface
+	eventCB api.EventHandlerCB
 
 	validEntityTypes []model.EntityTypeType
 }
 
 var _ UCMGCPInterface = (*UCMGCP)(nil)
 
-func NewUCMGCP(service serviceapi.ServiceInterface, reader api.EventReaderInterface) *UCMGCP {
+func NewUCMGCP(service serviceapi.ServiceInterface, eventCB api.EventHandlerCB) *UCMGCP {
 	uc := &UCMGCP{
 		service: service,
-		reader:  reader,
+		eventCB: eventCB,
 	}
 
 	uc.validEntityTypes = []model.EntityTypeType{

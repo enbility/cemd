@@ -13,17 +13,17 @@ import (
 type UCOPEV struct {
 	service serviceapi.ServiceInterface
 
-	reader api.EventReaderInterface
+	eventCB api.EventHandlerCB
 
 	validEntityTypes []model.EntityTypeType
 }
 
 var _ UCOPEVInterface = (*UCOPEV)(nil)
 
-func NewUCOPEV(service serviceapi.ServiceInterface, reader api.EventReaderInterface) *UCOPEV {
+func NewUCOPEV(service serviceapi.ServiceInterface, eventCB api.EventHandlerCB) *UCOPEV {
 	uc := &UCOPEV{
 		service: service,
-		reader:  reader,
+		eventCB: eventCB,
 	}
 
 	uc.validEntityTypes = []model.EntityTypeType{

@@ -7,6 +7,11 @@ import (
 
 //go:generate mockery
 
+// Event handler callback
+//
+// Used by Cem and Use Case implementations
+type EventHandlerCB func(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event EventType)
+
 // Implemented by CEM
 type CemInterface interface {
 	// Setup the EEBUS service
@@ -39,14 +44,4 @@ type UseCaseInterface interface {
 	//   - ErrDataNotAvailable if that information is not (yet) available
 	//   - and others
 	IsUseCaseSupported(remoteEntity spineapi.EntityRemoteInterface) (bool, error)
-}
-
-// interface for informing the HEMS about specific events
-//
-// implemented by the actual HEMS
-type EventReaderInterface interface {
-	// Inform about a new cem or usecase specific event
-	//
-	// used by use case implementations
-	Event(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event EventType)
 }

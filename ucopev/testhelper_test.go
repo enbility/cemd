@@ -64,7 +64,7 @@ func (s *UCOPEVSuite) BeforeTest(suiteName, testName string) {
 	s.mockRemoteEntity.EXPECT().Address().Return(entityAddress).Maybe()
 	mockRemoteFeature.EXPECT().DataCopy(mock.Anything).Return(mock.Anything).Maybe()
 
-	s.sut = NewUCOPEV(s.service, s)
+	s.sut = NewUCOPEV(s.service, s.Event)
 	s.sut.AddFeatures()
 	s.sut.AddUseCase()
 

@@ -81,21 +81,21 @@ func (e *UCVABD) inverterMeasurementDescriptionDataUpdate(entity spineapi.Entity
 func (e *UCVABD) inverterMeasurementDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
 	// Scenario 1
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACPowerTotal); err == nil {
-		e.reader.Event(ski, entity.Device(), entity, api.UCVABDPowerTotalMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, api.UCVABDPowerTotalMeasurementDataUpdate)
 	}
 
 	// Scenario 2
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeCharge); err == nil {
-		e.reader.Event(ski, entity.Device(), entity, api.UCVABDChargeMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, api.UCVABDChargeMeasurementDataUpdate)
 	}
 
 	// Scenario 3
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeDischarge); err == nil {
-		e.reader.Event(ski, entity.Device(), entity, api.UCVABDDischargeMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, api.UCVABDDischargeMeasurementDataUpdate)
 	}
 
 	// Scenario 4
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeStateOfCharge); err == nil {
-		e.reader.Event(ski, entity.Device(), entity, api.UCVABDStateOfChargeMeasurementDataUpdate)
+		e.eventCB(ski, entity.Device(), entity, api.UCVABDStateOfChargeMeasurementDataUpdate)
 	}
 }

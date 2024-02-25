@@ -48,14 +48,14 @@ func (s *CemSuite) BeforeTest(suiteName, testName string) {
 	assert.Nil(s.T(), err)
 
 	noLogging := &logging.NoLogging{}
-	s.sut = NewCEM(configuration, s, s, noLogging)
+	s.sut = NewCEM(configuration, s, s.eventCB, noLogging)
 	assert.NotNil(s.T(), s.sut)
 }
 func (s *CemSuite) Test_CEM() {
 	err := s.sut.Setup()
 	assert.Nil(s.T(), err)
 
-	ucEvseCC := ucevsecc.NewUCEVSECC(s.sut.Service, s)
+	ucEvseCC := ucevsecc.NewUCEVSECC(s.sut.Service, s.eventCB)
 	s.sut.AddUseCase(ucEvseCC)
 
 	s.sut.Start()
@@ -63,7 +63,7 @@ func (s *CemSuite) Test_CEM() {
 }
 
 // ReaderInterface
-func (d *CemSuite) Event(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.EventType) {
+func (d *CemSuite) eventCB(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.EventType) {
 }
 
 // eebusapi.ServiceReaderInterface

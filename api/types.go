@@ -307,6 +307,29 @@ const (
 	// Note: the referred data may be updated together with all other measurement items of this use case
 	UCEVSOCActualRangeMeasurementDataUpdate EventType = "ucEVSOCActualRangeMeasurementDataUpdate"
 
+	// LPC
+
+	// Load control obligation limit data updated
+	//
+	// Use Case LPC, Scenario 1
+	UCLPCLoadControlLimitDataUpdate EventType = "ucLPCLoadControlLimitDataUpdate"
+
+	// Failsafe limit for the consumed active (real) power of the
+	// Controllable System data updated
+	//
+	// Use Case LPC, Scenario 2
+	//
+	// Note: the referred data may be updated together with all other configuration items of this use case
+	UCLPCFailSafeConsumptionActivePowerLimitDataUpdate EventType = "ucLPCFailSafeConsumptionActivePowerLimitDataUpdate"
+
+	// Minimum time the Controllable System remains in "failsafe state" unless conditions
+	// specified in this Use Case permit leaving the "failsafe state" data updated
+	//
+	// Use Case LPC, Scenario 2
+	//
+	// Note: the referred data may be updated together with all other configuration items of this use case
+	UCLPCFailsafeDurationMinimumDataUpdate EventType = "ucLPCFailsafeDurationMinimumDataUpdate"
+
 	// MGCP
 
 	// Grid maximum allowed feed-in power as percentage value of the cumulated

@@ -15,7 +15,7 @@ func NewDemoCem(configuration *eebusapi.Configuration) *DemoCem {
 	demo := &DemoCem{}
 
 	noLogging := &logging.NoLogging{}
-	demo.cem = cem.NewCEM(configuration, demo, demo, noLogging)
+	demo.cem = cem.NewCEM(configuration, demo, demo.eventCB, noLogging)
 
 	return demo
 }
@@ -25,7 +25,7 @@ func (d *DemoCem) Setup() error {
 		return err
 	}
 
-	evsecc := ucevsecc.NewUCEVSECC(d.cem.Service, d)
+	evsecc := ucevsecc.NewUCEVSECC(d.cem.Service, d.eventCB)
 	d.cem.AddUseCase(evsecc)
 
 	d.cem.Start()
