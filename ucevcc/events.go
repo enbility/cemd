@@ -112,12 +112,12 @@ func (e *UCEVCC) evConnected(ski string, entity spineapi.EntityRemoteInterface) 
 		}
 	}
 
-	e.reader.SpineEvent(ski, entity, api.UCEVCCEventConnected)
+	e.reader.SpineEvent(ski, entity.Device(), entity, api.UCEVCCEventConnected)
 }
 
 // an EV was disconnected
 func (e *UCEVCC) evDisconnected(ski string, entity spineapi.EntityRemoteInterface) {
-	e.reader.SpineEvent(ski, entity, api.UCEVCCEventDisconnected)
+	e.reader.SpineEvent(ski, entity.Device(), entity, api.UCEVCCEventDisconnected)
 }
 
 // the configuration key description data of an EV was updated
@@ -139,12 +139,12 @@ func (e *UCEVCC) evConfigurationDataUpdate(ski string, entity spineapi.EntityRem
 
 	// Scenario 2
 	if _, err := evDeviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypeCommunicationsStandard, model.DeviceConfigurationKeyValueTypeTypeString); err == nil {
-		e.reader.SpineEvent(ski, entity, api.UCEVCCCommunicationStandardConfigurationDataUpdate)
+		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCEVCCCommunicationStandardConfigurationDataUpdate)
 	}
 
 	// Scenario 3
 	if _, err := evDeviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypeAsymmetricChargingSupported, model.DeviceConfigurationKeyValueTypeTypeString); err == nil {
-		e.reader.SpineEvent(ski, entity, api.UCEVCCAsymmetricChargingConfigurationDataUpdate)
+		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCEVCCAsymmetricChargingConfigurationDataUpdate)
 	}
 }
 
@@ -162,7 +162,7 @@ func (e *UCEVCC) evIdentificationDataUpdate(ski string, entity spineapi.EntityRe
 				continue
 			}
 
-			e.reader.SpineEvent(ski, entity, api.UCEVCCIdentificationDataUpdate)
+			e.reader.SpineEvent(ski, entity.Device(), entity, api.UCEVCCIdentificationDataUpdate)
 			return
 		}
 	}
@@ -177,7 +177,7 @@ func (e *UCEVCC) evManufacturerDataUpdate(ski string, entity spineapi.EntityRemo
 
 	// Scenario 5
 	if _, err := evDeviceClassification.GetManufacturerDetails(); err == nil {
-		e.reader.SpineEvent(ski, entity, api.UCEVCCManufacturerDataUpdate)
+		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCEVCCManufacturerDataUpdate)
 	}
 
 }
@@ -209,5 +209,5 @@ func (e *UCEVCC) evElectricalPermittedValuesUpdate(ski string, entity spineapi.E
 	}
 
 	// Scenario 6
-	e.reader.SpineEvent(ski, entity, api.UCEVCCChargingPowerLimitsDataUpdate)
+	e.reader.SpineEvent(ski, entity.Device(), entity, api.UCEVCCChargingPowerLimitsDataUpdate)
 }

@@ -55,12 +55,12 @@ func (e *UCEVSECC) evseConnected(ski string, entity spineapi.EntityRemoteInterfa
 		_, _ = evseDeviceDiagnosis.RequestState()
 	}
 
-	e.reader.SpineEvent(ski, entity, api.UCEVSECCEventConnected)
+	e.reader.SpineEvent(ski, entity.Device(), entity, api.UCEVSECCEventConnected)
 }
 
 // an EVSE was disconnected
 func (e *UCEVSECC) evseDisconnected(ski string, entity spineapi.EntityRemoteInterface) {
-	e.reader.SpineEvent(ski, entity, api.UCEVSECCEventDisconnected)
+	e.reader.SpineEvent(ski, entity.Device(), entity, api.UCEVSECCEventDisconnected)
 }
 
 // the manufacturer Data of an EVSE was updated
@@ -71,7 +71,7 @@ func (e *UCEVSECC) evseManufacturerDataUpdate(ski string, entity spineapi.Entity
 	}
 
 	if _, err := evDeviceClassification.GetManufacturerDetails(); err == nil {
-		e.reader.SpineEvent(ski, entity, api.UCEVSECCEventManufacturerUpdate)
+		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCEVSECCEventManufacturerUpdate)
 	}
 }
 
@@ -83,6 +83,6 @@ func (e *UCEVSECC) evseStateUpdate(ski string, entity spineapi.EntityRemoteInter
 	}
 
 	if _, err := evDeviceDiagnosis.GetState(); err == nil {
-		e.reader.SpineEvent(ski, entity, api.UCEVSECCEventOperationStateUpdate)
+		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCEVSECCEventOperationStateUpdate)
 	}
 }

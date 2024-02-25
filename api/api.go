@@ -50,5 +50,5 @@ type UseCaseInterface interface {
 // implemented by the actual CEM, used by UCEvseCCInterface implementation
 type UseCaseEventReaderInterface interface {
 	// Inform about a new usecase specific event
-	SpineEvent(ski string, entity spineapi.EntityRemoteInterface, event UseCaseEventType)
+	SpineEvent(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event UseCaseEventType)
 }

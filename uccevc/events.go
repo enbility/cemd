@@ -113,7 +113,7 @@ func (e *UCCEVC) evTimeSeriesDescriptionDataUpdate(ski string, entity spineapi.E
 		return
 	}
 
-	e.reader.SpineEvent(ski, entity, api.UCCEVCEnergyDemandProvided)
+	e.reader.SpineEvent(ski, entity.Device(), entity, api.UCCEVCEnergyDemandProvided)
 
 	_, err = e.TimeSlotConstraints(entity)
 	if err != nil {
@@ -127,18 +127,18 @@ func (e *UCCEVC) evTimeSeriesDescriptionDataUpdate(ski string, entity spineapi.E
 		return
 	}
 
-	e.reader.SpineEvent(ski, entity, api.UCCEVPowerLimitsRequested)
-	e.reader.SpineEvent(ski, entity, api.UCCEVCIncentivesRequested)
+	e.reader.SpineEvent(ski, entity.Device(), entity, api.UCCEVPowerLimitsRequested)
+	e.reader.SpineEvent(ski, entity.Device(), entity, api.UCCEVCIncentivesRequested)
 }
 
 // the load control limit data of an EV was updated
 func (e *UCCEVC) evTimeSeriesDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
 	if _, err := e.ChargePlan(entity); err == nil {
-		e.reader.SpineEvent(ski, entity, api.UCCEVCChargePlanProvided)
+		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCCEVCChargePlanProvided)
 	}
 
 	if _, err := e.ChargePlanConstraints(entity); err == nil {
-		e.reader.SpineEvent(ski, entity, api.UCCEVCChargePlanConstraintsProvided)
+		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCCEVCChargePlanConstraintsProvided)
 	}
 }
 
@@ -156,12 +156,12 @@ func (e *UCCEVC) evIncentiveTableDescriptionDataUpdate(ski string, entity spinea
 		return
 	}
 
-	e.reader.SpineEvent(ski, entity, api.UCCEVCIncentiveDescriptionsRequired)
+	e.reader.SpineEvent(ski, entity.Device(), entity, api.UCCEVCIncentiveDescriptionsRequired)
 }
 
 // the load control limit data of an EV was updated
 func (e *UCCEVC) evIncentiveTableDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	e.reader.SpineEvent(ski, entity, api.UCCEVCIncentiveTableDataUpdate)
+	e.reader.SpineEvent(ski, entity.Device(), entity, api.UCCEVCIncentiveTableDataUpdate)
 }
 
 // check timeSeries descriptions if constraints element has updateRequired set to true

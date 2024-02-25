@@ -8,5 +8,5 @@ import (
 var _ api.UseCaseEventReaderInterface = (*DemoCem)(nil)
 
 // Handle incomfing usecase specific event
-func (h *DemoCem) SpineEvent(ski string, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
+func (h *DemoCem) SpineEvent(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
 }

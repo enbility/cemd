@@ -13,7 +13,7 @@ type DemoCem struct {
 func NewDemoCem(configuration *eebusapi.Configuration) *DemoCem {
 	demo := &DemoCem{}
 
-	demo.cem = cem.NewCEM(configuration, demo, demo)
+	demo.cem = cem.NewCEM(configuration, demo, demo, demo)
 
 	return demo
 }

@@ -17,13 +17,21 @@ func IsCompatibleEntity(entity spineapi.EntityRemoteInterface, entityTypes []mod
 	return slices.Contains(entityTypes, entity.EntityType())
 }
 
+func IsDeviceConnected(payload spineapi.EventPayload) bool {
+	return payload.Device != nil &&
+		payload.EventType == spineapi.EventTypeDeviceChange &&
+		payload.ChangeType == spineapi.ElementChangeAdd
+}
+
 func IsDeviceDisconnected(payload spineapi.EventPayload) bool {
-	return (payload.EventType == spineapi.EventTypeDeviceChange &&
-		payload.ChangeType == spineapi.ElementChangeRemove)
+	return payload.Device != nil &&
+		payload.EventType == spineapi.EventTypeDeviceChange &&
+		payload.ChangeType == spineapi.ElementChangeRemove
 }
 
 func IsEntityConnected(payload spineapi.EventPayload) bool {
-	if payload.EventType == spineapi.EventTypeEntityChange &&
+	if payload.Entity != nil &&
+		payload.EventType == spineapi.EventTypeEntityChange &&
 		payload.ChangeType == spineapi.ElementChangeAdd {
 		return true
 	}
@@ -32,7 +40,8 @@ func IsEntityConnected(payload spineapi.EventPayload) bool {
 }
 
 func IsEntityDisconnected(payload spineapi.EventPayload) bool {
-	if payload.EventType == spineapi.EventTypeEntityChange &&
+	if payload.Entity != nil &&
+		payload.EventType == spineapi.EventTypeEntityChange &&
 		payload.ChangeType == spineapi.ElementChangeRemove {
 		return true
 	}

@@ -2,6 +2,7 @@ package util
 
 import (
 	spineapi "github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/mocks"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
 )
@@ -25,12 +26,29 @@ func (s *UtilSuite) Test_IsCompatibleEntity() {
 	assert.Equal(s.T(), true, result)
 }
 
+func (s *UtilSuite) Test_IsDeviceConnected() {
+	payload := spineapi.EventPayload{}
+	result := IsDeviceConnected(payload)
+	assert.Equal(s.T(), false, result)
+
+	device := mocks.NewDeviceRemoteInterface(s.T())
+	payload = spineapi.EventPayload{
+		Device:     device,
+		EventType:  spineapi.EventTypeDeviceChange,
+		ChangeType: spineapi.ElementChangeAdd,
+	}
+	result = IsDeviceConnected(payload)
+	assert.Equal(s.T(), true, result)
+}
+
 func (s *UtilSuite) Test_IsDeviceDisconnected() {
 	payload := spineapi.EventPayload{}
 	result := IsDeviceDisconnected(payload)
 	assert.Equal(s.T(), false, result)
 
+	device := mocks.NewDeviceRemoteInterface(s.T())
 	payload = spineapi.EventPayload{
+		Device:     device,
 		EventType:  spineapi.EventTypeDeviceChange,
 		ChangeType: spineapi.ElementChangeRemove,
 	}

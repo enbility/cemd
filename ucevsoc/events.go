@@ -58,16 +58,16 @@ func (e *UCEVSOC) evConnected(entity spineapi.EntityRemoteInterface) {
 func (e *UCEVSOC) evMeasurementDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
 	// Scenario 1
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeStateOfCharge); err == nil {
-		e.reader.SpineEvent(ski, entity, api.UCEVSOCStateOfChargeMeasurementDataUpdate)
+		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCEVSOCStateOfChargeMeasurementDataUpdate)
 	}
 
 	// Scenario 3
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeStateOfHealth); err == nil {
-		e.reader.SpineEvent(ski, entity, api.EVSOCStateOfHealthMeasurementDataUpdate)
+		e.reader.SpineEvent(ski, entity.Device(), entity, api.EVSOCStateOfHealthMeasurementDataUpdate)
 	}
 
 	// Scenario 4
 	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeTravelRange); err == nil {
-		e.reader.SpineEvent(ski, entity, api.UCEVSOCActualRangeMeasurementDataUpdate)
+		e.reader.SpineEvent(ski, entity.Device(), entity, api.UCEVSOCActualRangeMeasurementDataUpdate)
 	}
 }

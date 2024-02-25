@@ -36,7 +36,7 @@ type UCOPEVSuite struct {
 	evEntity         spineapi.EntityRemoteInterface
 }
 
-func (s *UCOPEVSuite) SpineEvent(ski string, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
+func (s *UCOPEVSuite) SpineEvent(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
 }
 
 func (s *UCOPEVSuite) BeforeTest(suiteName, testName string) {

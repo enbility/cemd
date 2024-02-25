@@ -151,6 +151,14 @@ const (
 type UseCaseEventType string
 
 const (
+	// CEM
+
+	// Sent when a paired remote device was connected
+	DeviceConnected UseCaseEventType = "deviceConnected"
+
+	// Sent when a paired remote device was disconnected
+	DeviceDisconnected UseCaseEventType = "deviceDisconnected"
+
 	// UCCEVC
 
 	// EV provided an energy demand
