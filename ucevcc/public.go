@@ -119,15 +119,14 @@ func (e *UCEVCC) CommunicationStandard(entity spineapi.EntityRemoteInterface) (s
 	}
 
 	data, err := e.deviceConfigurationValueForKeyName(entity, model.DeviceConfigurationKeyNameTypeCommunicationsStandard, model.DeviceConfigurationKeyValueTypeTypeString)
-	if err != nil {
-		return unknown, err
-	}
-
-	if data == nil {
+	if err != nil || data == nil {
 		return unknown, features.ErrDataNotAvailable
 	}
 
-	value := data.(*model.DeviceConfigurationKeyValueStringType)
+	value, ok := data.(*model.DeviceConfigurationKeyValueStringType)
+	if !ok || value == nil {
+		return unknown, features.ErrDataNotAvailable
+	}
 
 	return string(*value), nil
 }
@@ -142,15 +141,14 @@ func (e *UCEVCC) AsymmetricChargingSupported(entity spineapi.EntityRemoteInterfa
 	}
 
 	data, err := e.deviceConfigurationValueForKeyName(entity, model.DeviceConfigurationKeyNameTypeAsymmetricChargingSupported, model.DeviceConfigurationKeyValueTypeTypeBoolean)
-	if err != nil {
-		return false, err
-	}
-
-	if data == nil {
+	if err != nil || data == nil {
 		return false, features.ErrDataNotAvailable
 	}
 
-	value := data.(*bool)
+	value, ok := data.(*bool)
+	if !ok || value == nil {
+		return false, features.ErrDataNotAvailable
+	}
 
 	return bool(*value), nil
 }
@@ -279,7 +277,7 @@ func (e *UCEVCC) CurrentLimits(entity spineapi.EntityRemoteInterface) ([]float64
 
 // is the EV in sleep mode
 // returns operatingState, lastErrorCode, error
-func (e *UCEVCC) EVInSleepMode(
+func (e *UCEVCC) IsInSleepMode(
 	entity spineapi.EntityRemoteInterface,
 ) (bool, error) {
 	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {

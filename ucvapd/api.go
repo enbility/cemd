@@ -14,15 +14,15 @@ type UCVAPDInterface interface {
 	// Scenario 1
 
 	// return the current production power
-	CurrentProductionPower(entity spineapi.EntityRemoteInterface) (float64, error)
+	Power(entity spineapi.EntityRemoteInterface) (float64, error)
 
 	// Scenario 2
 
 	// return the nominal peak power
-	NominalPeakPower(entity spineapi.EntityRemoteInterface) (float64, error)
+	PowerNominalPeak(entity spineapi.EntityRemoteInterface) (float64, error)
 
 	// Scenario 3
 
 	// return total PV yield
-	TotalPVYield(entity spineapi.EntityRemoteInterface) (float64, error)
+	PVYieldTotal(entity spineapi.EntityRemoteInterface) (float64, error)
 }

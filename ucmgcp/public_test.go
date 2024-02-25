@@ -51,12 +51,12 @@ func (s *UCMGCPSuite) Test_PowerLimitationFactor() {
 	assert.Equal(s.T(), 10.0, data)
 }
 
-func (s *UCMGCPSuite) Test_MomentaryTotalPower() {
-	data, err := s.sut.MomentaryTotalPower(s.mockRemoteEntity)
+func (s *UCMGCPSuite) Test_Power() {
+	data, err := s.sut.Power(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
-	data, err = s.sut.MomentaryTotalPower(s.smgwEntity)
+	data, err = s.sut.Power(s.smgwEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -75,7 +75,7 @@ func (s *UCMGCPSuite) Test_MomentaryTotalPower() {
 	fErr := rFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.MomentaryTotalPower(s.smgwEntity)
+	data, err = s.sut.Power(s.smgwEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -91,7 +91,7 @@ func (s *UCMGCPSuite) Test_MomentaryTotalPower() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, measData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.MomentaryTotalPower(s.smgwEntity)
+	data, err = s.sut.Power(s.smgwEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -108,7 +108,7 @@ func (s *UCMGCPSuite) Test_MomentaryTotalPower() {
 	fErr = rElFeature.UpdateData(model.FunctionTypeElectricalConnectionDescriptionListData, elDescData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.MomentaryTotalPower(s.smgwEntity)
+	data, err = s.sut.Power(s.smgwEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -124,17 +124,17 @@ func (s *UCMGCPSuite) Test_MomentaryTotalPower() {
 	fErr = rElFeature.UpdateData(model.FunctionTypeElectricalConnectionParameterDescriptionListData, elParamData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.MomentaryTotalPower(s.smgwEntity)
+	data, err = s.sut.Power(s.smgwEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 10.0, data)
 }
 
-func (s *UCMGCPSuite) Test_TotalFeedInEnergy() {
-	data, err := s.sut.TotalFeedInEnergy(s.mockRemoteEntity)
+func (s *UCMGCPSuite) Test_EnergyFeedIn() {
+	data, err := s.sut.EnergyFeedIn(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
-	data, err = s.sut.TotalFeedInEnergy(s.smgwEntity)
+	data, err = s.sut.EnergyFeedIn(s.smgwEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -153,7 +153,7 @@ func (s *UCMGCPSuite) Test_TotalFeedInEnergy() {
 	fErr := rFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.TotalFeedInEnergy(s.smgwEntity)
+	data, err = s.sut.EnergyFeedIn(s.smgwEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -169,17 +169,17 @@ func (s *UCMGCPSuite) Test_TotalFeedInEnergy() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, measData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.TotalFeedInEnergy(s.smgwEntity)
+	data, err = s.sut.EnergyFeedIn(s.smgwEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 10.0, data)
 }
 
-func (s *UCMGCPSuite) Test_TotalConsumedEnergy() {
-	data, err := s.sut.TotalConsumedEnergy(s.mockRemoteEntity)
+func (s *UCMGCPSuite) Test_EnergyConsumed() {
+	data, err := s.sut.EnergyConsumed(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
-	data, err = s.sut.TotalConsumedEnergy(s.smgwEntity)
+	data, err = s.sut.EnergyConsumed(s.smgwEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -198,7 +198,7 @@ func (s *UCMGCPSuite) Test_TotalConsumedEnergy() {
 	fErr := rFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.TotalConsumedEnergy(s.smgwEntity)
+	data, err = s.sut.EnergyConsumed(s.smgwEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -214,17 +214,17 @@ func (s *UCMGCPSuite) Test_TotalConsumedEnergy() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, measData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.TotalConsumedEnergy(s.smgwEntity)
+	data, err = s.sut.EnergyConsumed(s.smgwEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 10.0, data)
 }
 
-func (s *UCMGCPSuite) Test_MomentaryCurrents() {
-	data, err := s.sut.MomentaryCurrents(s.mockRemoteEntity)
+func (s *UCMGCPSuite) Test_CurrentsPerPhase() {
+	data, err := s.sut.CurrentsPerPhase(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
-	data, err = s.sut.MomentaryCurrents(s.smgwEntity)
+	data, err = s.sut.CurrentsPerPhase(s.smgwEntity)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
@@ -255,7 +255,7 @@ func (s *UCMGCPSuite) Test_MomentaryCurrents() {
 	fErr := rFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.MomentaryCurrents(s.smgwEntity)
+	data, err = s.sut.CurrentsPerPhase(s.smgwEntity)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
@@ -279,9 +279,9 @@ func (s *UCMGCPSuite) Test_MomentaryCurrents() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, measData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.MomentaryCurrents(s.smgwEntity)
+	data, err = s.sut.CurrentsPerPhase(s.smgwEntity)
 	assert.Nil(s.T(), err)
-	assert.NotNil(s.T(), data)
+	assert.Equal(s.T(), 0, len(data))
 
 	elParamData := &model.ElectricalConnectionParameterDescriptionListDataType{
 		ElectricalConnectionParameterDescriptionData: []model.ElectricalConnectionParameterDescriptionDataType{
@@ -319,18 +319,18 @@ func (s *UCMGCPSuite) Test_MomentaryCurrents() {
 	fErr = rElFeature.UpdateData(model.FunctionTypeElectricalConnectionDescriptionListData, elDescData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.MomentaryCurrents(s.smgwEntity)
+	data, err = s.sut.CurrentsPerPhase(s.smgwEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), []float64{10, 10, 10}, data)
 
 }
 
-func (s *UCMGCPSuite) Test_Voltages() {
-	data, err := s.sut.Voltages(s.mockRemoteEntity)
+func (s *UCMGCPSuite) Test_VoltagePerPhase() {
+	data, err := s.sut.VoltagePerPhase(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
-	data, err = s.sut.Voltages(s.smgwEntity)
+	data, err = s.sut.VoltagePerPhase(s.smgwEntity)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
@@ -361,7 +361,7 @@ func (s *UCMGCPSuite) Test_Voltages() {
 	fErr := rFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.Voltages(s.smgwEntity)
+	data, err = s.sut.VoltagePerPhase(s.smgwEntity)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
@@ -385,9 +385,9 @@ func (s *UCMGCPSuite) Test_Voltages() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, measData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.Voltages(s.smgwEntity)
+	data, err = s.sut.VoltagePerPhase(s.smgwEntity)
 	assert.Nil(s.T(), err)
-	assert.Equal(s.T(), []float64{0, 0, 0}, data)
+	assert.Equal(s.T(), 0, len(data))
 
 	elParamData := &model.ElectricalConnectionParameterDescriptionListDataType{
 		ElectricalConnectionParameterDescriptionData: []model.ElectricalConnectionParameterDescriptionDataType{
@@ -413,7 +413,7 @@ func (s *UCMGCPSuite) Test_Voltages() {
 	fErr = rElFeature.UpdateData(model.FunctionTypeElectricalConnectionParameterDescriptionListData, elParamData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.Voltages(s.smgwEntity)
+	data, err = s.sut.VoltagePerPhase(s.smgwEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), []float64{230, 230, 230}, data)
 }

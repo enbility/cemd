@@ -14,20 +14,20 @@ type UCVABDInterface interface {
 	// Scenario 1
 
 	// return the current (dis)charging power
-	CurrentChargePower(entity spineapi.EntityRemoteInterface) (float64, error)
+	Power(entity spineapi.EntityRemoteInterface) (float64, error)
 
 	// Scenario 2
 
 	// return the cumulated battery system charge energy
-	TotalChargeEnergy(entity spineapi.EntityRemoteInterface) (float64, error)
+	EnergyCharged(entity spineapi.EntityRemoteInterface) (float64, error)
 
 	// Scenario 3
 
 	// return the cumulated battery system discharge energy
-	TotalDischargeEnergy(entity spineapi.EntityRemoteInterface) (float64, error)
+	EnergyDischarged(entity spineapi.EntityRemoteInterface) (float64, error)
 
 	// Scenario 4
 
 	// return the current state of charge of the battery system
-	CurrentStateOfCharge(entity spineapi.EntityRemoteInterface) (float64, error)
+	StateOfCharge(entity spineapi.EntityRemoteInterface) (float64, error)
 }

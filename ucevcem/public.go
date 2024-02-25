@@ -11,7 +11,7 @@ import (
 )
 
 // return the number of ac connected phases of the EV or 0 if it is unknown
-func (e *UCEVCEM) ConnectedPhases(entity spineapi.EntityRemoteInterface) (uint, error) {
+func (e *UCEVCEM) PhasesConnected(entity spineapi.EntityRemoteInterface) (uint, error) {
 	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}
@@ -160,7 +160,7 @@ func (e *UCEVCEM) PowerPerPhase(entity spineapi.EntityRemoteInterface) ([]float6
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *UCEVCEM) ChargedEnergy(entity spineapi.EntityRemoteInterface) (float64, error) {
+func (e *UCEVCEM) EnergyCharged(entity spineapi.EntityRemoteInterface) (float64, error) {
 	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}

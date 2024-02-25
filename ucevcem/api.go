@@ -12,7 +12,7 @@ type UCEVCEMInterface interface {
 	api.UseCaseInterface
 
 	// return the number of ac connected phases of the EV or 0 if it is unknown
-	ConnectedPhases(entity spineapi.EntityRemoteInterface) (uint, error)
+	PhasesConnected(entity spineapi.EntityRemoteInterface) (uint, error)
 
 	// Scenario 1
 
@@ -27,5 +27,5 @@ type UCEVCEMInterface interface {
 	// Scenario 3
 
 	// return the charged energy measurement in Wh of the connected EV
-	ChargedEnergy(entity spineapi.EntityRemoteInterface) (float64, error)
+	EnergyCharged(entity spineapi.EntityRemoteInterface) (float64, error)
 }

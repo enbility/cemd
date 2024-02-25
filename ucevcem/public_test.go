@@ -7,11 +7,11 @@ import (
 )
 
 func (s *UCEVCEMSuite) Test_EVConnectedPhases() {
-	data, err := s.sut.ConnectedPhases(s.mockRemoteEntity)
+	data, err := s.sut.PhasesConnected(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), uint(0), data)
 
-	data, err = s.sut.ConnectedPhases(s.evEntity)
+	data, err = s.sut.PhasesConnected(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), uint(0), data)
 
@@ -27,7 +27,7 @@ func (s *UCEVCEMSuite) Test_EVConnectedPhases() {
 	fErr := rFeature.UpdateData(model.FunctionTypeElectricalConnectionDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.ConnectedPhases(s.evEntity)
+	data, err = s.sut.PhasesConnected(s.evEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), uint(0), data)
 
@@ -43,7 +43,7 @@ func (s *UCEVCEMSuite) Test_EVConnectedPhases() {
 	fErr = rFeature.UpdateData(model.FunctionTypeElectricalConnectionDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.ConnectedPhases(s.evEntity)
+	data, err = s.sut.PhasesConnected(s.evEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), uint(1), data)
 }
@@ -244,11 +244,11 @@ func (s *UCEVCEMSuite) Test_EVPowerPerPhase_Current() {
 }
 
 func (s *UCEVCEMSuite) Test_EVChargedEnergy() {
-	data, err := s.sut.ChargedEnergy(s.mockRemoteEntity)
+	data, err := s.sut.EnergyCharged(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
-	data, err = s.sut.ChargedEnergy(s.evEntity)
+	data, err = s.sut.EnergyCharged(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -267,7 +267,7 @@ func (s *UCEVCEMSuite) Test_EVChargedEnergy() {
 	fErr := rFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, measDesc, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.ChargedEnergy(s.evEntity)
+	data, err = s.sut.EnergyCharged(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -283,7 +283,7 @@ func (s *UCEVCEMSuite) Test_EVChargedEnergy() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, measData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.ChargedEnergy(s.evEntity)
+	data, err = s.sut.EnergyCharged(s.evEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 80.0, data)
 }

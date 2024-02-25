@@ -19,7 +19,7 @@ func (s *UtilSuite) Test_IsCompatibleEntity() {
 	assert.Equal(s.T(), false, result)
 
 	payload = spineapi.EventPayload{
-		Entity: s.evEntity,
+		Entity: s.monitoredEntity,
 	}
 	result = IsCompatibleEntity(payload.Entity, validEntityTypes)
 	assert.Equal(s.T(), true, result)

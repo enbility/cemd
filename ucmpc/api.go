@@ -18,26 +18,26 @@ type UCMCPInterface interface {
 	// possible errors:
 	//   - ErrDataNotAvailable if no such limit is (yet) available
 	//   - and others
-	MomentaryTotalPower(entity spineapi.EntityRemoteInterface) (float64, error)
+	Power(entity spineapi.EntityRemoteInterface) (float64, error)
 
 	// return the momentary active phase specific power consumption or production per phase
 	//
 	// possible errors:
 	//   - ErrDataNotAvailable if no such limit is (yet) available
 	//   - and others
-	MomentaryPhasePower(entity spineapi.EntityRemoteInterface) ([]float64, error)
+	PowerPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error)
 
 	// Scenario 2
 
 	// return the total consumption energy
 	//
 	//   - positive values are used for consumption
-	TotalConsumedEnergy(entity spineapi.EntityRemoteInterface) (float64, error)
+	EnergyConsumed(entity spineapi.EntityRemoteInterface) (float64, error)
 
 	// return the total feed in energy
 	//
 	//   - negative values are used for production
-	TotalProducedEnergy(entity spineapi.EntityRemoteInterface) (float64, error)
+	EnergyProduced(entity spineapi.EntityRemoteInterface) (float64, error)
 
 	// Scenario 3
 
@@ -45,13 +45,13 @@ type UCMCPInterface interface {
 	//
 	//   - positive values are used for consumption
 	//   - negative values are used for production
-	MomentaryCurrents(entity spineapi.EntityRemoteInterface) ([]float64, error)
+	CurrentsPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error)
 
 	// Scenario 4
 
 	// return the phase specific voltage details
 	//
-	Voltages(entity spineapi.EntityRemoteInterface) ([]float64, error)
+	VoltagePerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error)
 
 	// Scenario 5
 

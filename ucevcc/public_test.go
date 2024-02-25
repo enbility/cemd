@@ -451,11 +451,11 @@ func (s *UCEVCCSuite) Test_EVCurrentLimits() {
 }
 
 func (s *UCEVCCSuite) Test_EVInSleepMode() {
-	data, err := s.sut.EVInSleepMode(s.mockRemoteEntity)
+	data, err := s.sut.IsInSleepMode(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), false, data)
 
-	data, err = s.sut.EVInSleepMode(s.evEntity)
+	data, err = s.sut.IsInSleepMode(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), false, data)
 
@@ -465,7 +465,7 @@ func (s *UCEVCCSuite) Test_EVInSleepMode() {
 	fErr := rFeature.UpdateData(model.FunctionTypeDeviceDiagnosisStateData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.EVInSleepMode(s.evEntity)
+	data, err = s.sut.IsInSleepMode(s.evEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), false, data)
 
@@ -476,7 +476,7 @@ func (s *UCEVCCSuite) Test_EVInSleepMode() {
 	fErr = rFeature.UpdateData(model.FunctionTypeDeviceDiagnosisStateData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.EVInSleepMode(s.evEntity)
+	data, err = s.sut.IsInSleepMode(s.evEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), true, data)
 }

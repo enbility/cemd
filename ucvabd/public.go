@@ -16,7 +16,7 @@ import (
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *UCVABD) CurrentChargePower(entity spineapi.EntityRemoteInterface) (float64, error) {
+func (e *UCVABD) Power(entity spineapi.EntityRemoteInterface) (float64, error) {
 	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}
@@ -45,7 +45,7 @@ func (e *UCVABD) CurrentChargePower(entity spineapi.EntityRemoteInterface) (floa
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *UCVABD) TotalChargeEnergy(entity spineapi.EntityRemoteInterface) (float64, error) {
+func (e *UCVABD) EnergyCharged(entity spineapi.EntityRemoteInterface) (float64, error) {
 	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}
@@ -72,7 +72,7 @@ func (e *UCVABD) TotalChargeEnergy(entity spineapi.EntityRemoteInterface) (float
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *UCVABD) TotalDischargeEnergy(entity spineapi.EntityRemoteInterface) (float64, error) {
+func (e *UCVABD) EnergyDischarged(entity spineapi.EntityRemoteInterface) (float64, error) {
 	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}
@@ -99,7 +99,7 @@ func (e *UCVABD) TotalDischargeEnergy(entity spineapi.EntityRemoteInterface) (fl
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *UCVABD) CurrentStateOfCharge(entity spineapi.EntityRemoteInterface) (float64, error) {
+func (e *UCVABD) StateOfCharge(entity spineapi.EntityRemoteInterface) (float64, error) {
 	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}

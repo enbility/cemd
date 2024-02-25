@@ -49,5 +49,5 @@ type UCEVCCInterface interface {
 	// Scenario 7
 
 	// is the EV in sleep mode
-	EVInSleepMode(entity spineapi.EntityRemoteInterface) (bool, error)
+	IsInSleepMode(entity spineapi.EntityRemoteInterface) (bool, error)
 }

@@ -13,7 +13,7 @@ import (
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *UCVAPD) CurrentProductionPower(entity spineapi.EntityRemoteInterface) (float64, error) {
+func (e *UCVAPD) Power(entity spineapi.EntityRemoteInterface) (float64, error) {
 	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}
@@ -42,7 +42,7 @@ func (e *UCVAPD) CurrentProductionPower(entity spineapi.EntityRemoteInterface) (
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *UCVAPD) NominalPeakPower(entity spineapi.EntityRemoteInterface) (float64, error) {
+func (e *UCVAPD) PowerNominalPeak(entity spineapi.EntityRemoteInterface) (float64, error) {
 	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}
@@ -66,9 +66,8 @@ func (e *UCVAPD) NominalPeakPower(entity spineapi.EntityRemoteInterface) (float6
 		return 0, features.ErrDataNotAvailable
 	}
 
-	value := data.(*model.ScaledNumberType)
-
-	if value == nil {
+	value, ok := data.(*model.ScaledNumberType)
+	if !ok || value == nil {
 		return 0, features.ErrDataNotAvailable
 	}
 
@@ -80,7 +79,7 @@ func (e *UCVAPD) NominalPeakPower(entity spineapi.EntityRemoteInterface) (float6
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *UCVAPD) TotalPVYield(entity spineapi.EntityRemoteInterface) (float64, error) {
+func (e *UCVAPD) PVYieldTotal(entity spineapi.EntityRemoteInterface) (float64, error) {
 	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0, api.ErrNoCompatibleEntity
 	}

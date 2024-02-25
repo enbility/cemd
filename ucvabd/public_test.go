@@ -7,11 +7,11 @@ import (
 )
 
 func (s *UCVABDSuite) Test_CurrentChargePower() {
-	data, err := s.sut.CurrentChargePower(s.mockRemoteEntity)
+	data, err := s.sut.Power(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
-	data, err = s.sut.CurrentChargePower(s.batteryEntity)
+	data, err = s.sut.Power(s.batteryEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -30,7 +30,7 @@ func (s *UCVABDSuite) Test_CurrentChargePower() {
 	fErr := measurementFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.CurrentChargePower(s.batteryEntity)
+	data, err = s.sut.Power(s.batteryEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -46,17 +46,17 @@ func (s *UCVABDSuite) Test_CurrentChargePower() {
 	fErr = measurementFeature.UpdateData(model.FunctionTypeMeasurementListData, measData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.CurrentChargePower(s.batteryEntity)
+	data, err = s.sut.Power(s.batteryEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 10.0, data)
 }
 
 func (s *UCVABDSuite) Test_TotalChargeEnergy() {
-	data, err := s.sut.TotalChargeEnergy(s.mockRemoteEntity)
+	data, err := s.sut.EnergyCharged(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
-	data, err = s.sut.TotalChargeEnergy(s.batteryEntity)
+	data, err = s.sut.EnergyCharged(s.batteryEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -75,7 +75,7 @@ func (s *UCVABDSuite) Test_TotalChargeEnergy() {
 	fErr := measurementFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.TotalChargeEnergy(s.batteryEntity)
+	data, err = s.sut.EnergyCharged(s.batteryEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -91,17 +91,17 @@ func (s *UCVABDSuite) Test_TotalChargeEnergy() {
 	fErr = measurementFeature.UpdateData(model.FunctionTypeMeasurementListData, measData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.TotalChargeEnergy(s.batteryEntity)
+	data, err = s.sut.EnergyCharged(s.batteryEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 10.0, data)
 }
 
 func (s *UCVABDSuite) Test_TotalDischargeEnergy() {
-	data, err := s.sut.TotalDischargeEnergy(s.mockRemoteEntity)
+	data, err := s.sut.EnergyDischarged(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
-	data, err = s.sut.TotalDischargeEnergy(s.batteryEntity)
+	data, err = s.sut.EnergyDischarged(s.batteryEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -120,7 +120,7 @@ func (s *UCVABDSuite) Test_TotalDischargeEnergy() {
 	fErr := measurementFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.TotalDischargeEnergy(s.batteryEntity)
+	data, err = s.sut.EnergyDischarged(s.batteryEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -136,17 +136,17 @@ func (s *UCVABDSuite) Test_TotalDischargeEnergy() {
 	fErr = measurementFeature.UpdateData(model.FunctionTypeMeasurementListData, measData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.TotalDischargeEnergy(s.batteryEntity)
+	data, err = s.sut.EnergyDischarged(s.batteryEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 10.0, data)
 }
 
 func (s *UCVABDSuite) Test_CurrentStateOfCharge() {
-	data, err := s.sut.CurrentStateOfCharge(s.mockRemoteEntity)
+	data, err := s.sut.StateOfCharge(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
-	data, err = s.sut.CurrentStateOfCharge(s.batteryEntity)
+	data, err = s.sut.StateOfCharge(s.batteryEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -165,7 +165,7 @@ func (s *UCVABDSuite) Test_CurrentStateOfCharge() {
 	fErr := measurementFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.CurrentStateOfCharge(s.batteryEntity)
+	data, err = s.sut.StateOfCharge(s.batteryEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -181,7 +181,7 @@ func (s *UCVABDSuite) Test_CurrentStateOfCharge() {
 	fErr = measurementFeature.UpdateData(model.FunctionTypeMeasurementListData, measData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.CurrentStateOfCharge(s.batteryEntity)
+	data, err = s.sut.StateOfCharge(s.batteryEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 10.0, data)
 }

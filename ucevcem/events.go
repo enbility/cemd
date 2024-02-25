@@ -57,7 +57,7 @@ func (e *UCEVCEM) evConnected(entity spineapi.EntityRemoteInterface) {
 
 // the electrical connection description data of an EV was updated
 func (e *UCEVCEM) evElectricalConnectionDescriptionDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	if _, err := e.ConnectedPhases(entity); err != nil {
+	if _, err := e.PhasesConnected(entity); err != nil {
 		return
 	}
 

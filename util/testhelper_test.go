@@ -32,7 +32,7 @@ type UtilSuite struct {
 	remoteDevice     spineapi.DeviceRemoteInterface
 	mockRemoteEntity *mocks.EntityRemoteInterface
 	evseEntity       spineapi.EntityRemoteInterface
-	evEntity         spineapi.EntityRemoteInterface
+	monitoredEntity  spineapi.EntityRemoteInterface
 }
 
 func (s *UtilSuite) SpineEvent(ski string, entity spineapi.EntityRemoteInterface, event api.UseCaseEventType) {
@@ -67,7 +67,7 @@ func (s *UtilSuite) BeforeTest(suiteName, testName string) {
 
 	s.remoteDevice, entities = setupDevices(s.service, s.T())
 	s.evseEntity = entities[0]
-	s.evEntity = entities[1]
+	s.monitoredEntity = entities[1]
 }
 
 const remoteSki string = "testremoteski"

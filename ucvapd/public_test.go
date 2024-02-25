@@ -7,11 +7,11 @@ import (
 )
 
 func (s *UCVAPDSuite) Test_CurrentProductionPower() {
-	data, err := s.sut.CurrentProductionPower(s.mockRemoteEntity)
+	data, err := s.sut.Power(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
-	data, err = s.sut.CurrentProductionPower(s.pvEntity)
+	data, err = s.sut.Power(s.pvEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -30,7 +30,7 @@ func (s *UCVAPDSuite) Test_CurrentProductionPower() {
 	fErr := measurementFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.CurrentProductionPower(s.pvEntity)
+	data, err = s.sut.Power(s.pvEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -46,17 +46,17 @@ func (s *UCVAPDSuite) Test_CurrentProductionPower() {
 	fErr = measurementFeature.UpdateData(model.FunctionTypeMeasurementListData, measData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.CurrentProductionPower(s.pvEntity)
+	data, err = s.sut.Power(s.pvEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 10.0, data)
 }
 
 func (s *UCVAPDSuite) Test_NominalPeakPower() {
-	data, err := s.sut.NominalPeakPower(s.mockRemoteEntity)
+	data, err := s.sut.PowerNominalPeak(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
-	data, err = s.sut.NominalPeakPower(s.pvEntity)
+	data, err = s.sut.PowerNominalPeak(s.pvEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -86,17 +86,17 @@ func (s *UCVAPDSuite) Test_NominalPeakPower() {
 	fErr = confFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueListData, keyData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.NominalPeakPower(s.pvEntity)
+	data, err = s.sut.PowerNominalPeak(s.pvEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 10.0, data)
 }
 
 func (s *UCVAPDSuite) Test_TotalPVYield() {
-	data, err := s.sut.TotalPVYield(s.mockRemoteEntity)
+	data, err := s.sut.PVYieldTotal(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
-	data, err = s.sut.TotalPVYield(s.pvEntity)
+	data, err = s.sut.PVYieldTotal(s.pvEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -115,7 +115,7 @@ func (s *UCVAPDSuite) Test_TotalPVYield() {
 	fErr := measurementFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.TotalPVYield(s.pvEntity)
+	data, err = s.sut.PVYieldTotal(s.pvEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data)
 
@@ -131,7 +131,7 @@ func (s *UCVAPDSuite) Test_TotalPVYield() {
 	fErr = measurementFeature.UpdateData(model.FunctionTypeMeasurementListData, measData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.TotalPVYield(s.pvEntity)
+	data, err = s.sut.PVYieldTotal(s.pvEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 10.0, data)
 }
