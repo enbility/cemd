@@ -3,7 +3,7 @@ package ucvabd
 import (
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
@@ -34,7 +34,7 @@ func (e *UCVABD) Power(entity spineapi.EntityRemoteInterface) (float64, error) {
 	mId := data[0].MeasurementId
 	value := data[0].Value
 	if mId == nil || value == nil {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	return value.GetValue(), nil
@@ -61,7 +61,7 @@ func (e *UCVABD) EnergyCharged(entity spineapi.EntityRemoteInterface) (float64, 
 	// we assume thre is only one result
 	value := data[0].Value
 	if value == nil {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	return value.GetValue(), nil
@@ -88,7 +88,7 @@ func (e *UCVABD) EnergyDischarged(entity spineapi.EntityRemoteInterface) (float6
 	// we assume thre is only one result
 	value := data[0].Value
 	if value == nil {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	return value.GetValue(), nil
@@ -115,7 +115,7 @@ func (e *UCVABD) StateOfCharge(entity spineapi.EntityRemoteInterface) (float64, 
 	// we assume thre is only one result
 	value := data[0].Value
 	if value == nil {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	return value.GetValue(), nil
@@ -134,7 +134,7 @@ func (e *UCVABD) getValuesForTypeCommodityScope(
 
 	measurementF, err := util.Measurement(e.service, entity)
 	if err != nil {
-		return nil, features.ErrFunctionNotSupported
+		return nil, eebusapi.ErrFunctionNotSupported
 	}
 
 	return measurementF.GetValuesForTypeCommodityScope(measurement, commodity, scope)

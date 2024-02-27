@@ -5,7 +5,7 @@ import (
 
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
@@ -18,12 +18,12 @@ func (e *UCEVCEM) PhasesConnected(entity spineapi.EntityRemoteInterface) (uint, 
 
 	evElectricalConnection, err := util.ElectricalConnection(e.service, entity)
 	if err != nil {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	data, err := evElectricalConnection.GetDescriptions()
 	if err != nil {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	for _, item := range data {
@@ -181,7 +181,7 @@ func (e *UCEVCEM) EnergyCharged(entity spineapi.EntityRemoteInterface) (float64,
 	// we assume there is only one result
 	value := data[0].Value
 	if value == nil {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	return value.GetValue(), err

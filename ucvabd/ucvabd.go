@@ -3,15 +3,14 @@ package ucvabd
 import (
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	serviceapi "github.com/enbility/eebus-go/api"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
 )
 
 type UCVABD struct {
-	service serviceapi.ServiceInterface
+	service eebusapi.ServiceInterface
 
 	eventCB api.EventHandlerCB
 
@@ -20,7 +19,7 @@ type UCVABD struct {
 
 var _ UCVABDInterface = (*UCVABD)(nil)
 
-func NewUCVABD(service serviceapi.ServiceInterface, eventCB api.EventHandlerCB) *UCVABD {
+func NewUCVABD(service eebusapi.ServiceInterface, eventCB api.EventHandlerCB) *UCVABD {
 	uc := &UCVABD{
 		service: service,
 		eventCB: eventCB,
@@ -93,7 +92,7 @@ func (e *UCVABD) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool
 	// check for required features
 	electricalConnection, err := util.ElectricalConnection(e.service, entity)
 	if err != nil {
-		return false, features.ErrFunctionNotSupported
+		return false, eebusapi.ErrFunctionNotSupported
 	}
 
 	// check if electrical connection descriptions and parameter descriptions are available name
@@ -107,7 +106,7 @@ func (e *UCVABD) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool
 	// check for required features
 	measurement, err := util.Measurement(e.service, entity)
 	if err != nil {
-		return false, features.ErrFunctionNotSupported
+		return false, eebusapi.ErrFunctionNotSupported
 	}
 
 	// check if measurement descriptions contains a required scope

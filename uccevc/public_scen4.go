@@ -5,7 +5,7 @@ import (
 
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
@@ -19,17 +19,17 @@ func (e *UCCEVC) ChargePlanConstraints(entity spineapi.EntityRemoteInterface) ([
 
 	evTimeSeries, err := util.TimeSeries(e.service, entity)
 	if err != nil {
-		return constraints, features.ErrDataNotAvailable
+		return constraints, eebusapi.ErrDataNotAvailable
 	}
 
 	data, err := evTimeSeries.GetValueForType(model.TimeSeriesTypeTypeConstraints)
 	if err != nil {
-		return constraints, features.ErrDataNotAvailable
+		return constraints, eebusapi.ErrDataNotAvailable
 	}
 
 	// we need at least a time series slot
 	if data.TimeSeriesSlot == nil {
-		return constraints, features.ErrDataNotAvailable
+		return constraints, eebusapi.ErrDataNotAvailable
 	}
 
 	// get the values for all slots
@@ -74,17 +74,17 @@ func (e *UCCEVC) ChargePlan(entity spineapi.EntityRemoteInterface) (api.ChargePl
 
 	evTimeSeries, err := util.TimeSeries(e.service, entity)
 	if err != nil {
-		return plan, features.ErrDataNotAvailable
+		return plan, eebusapi.ErrDataNotAvailable
 	}
 
 	data, err := evTimeSeries.GetValueForType(model.TimeSeriesTypeTypePlan)
 	if err != nil {
-		return plan, features.ErrDataNotAvailable
+		return plan, eebusapi.ErrDataNotAvailable
 	}
 
 	// we need at least a time series slot
 	if data.TimeSeriesSlot == nil {
-		return plan, features.ErrDataNotAvailable
+		return plan, eebusapi.ErrDataNotAvailable
 	}
 
 	startAvailable := false

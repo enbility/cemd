@@ -3,7 +3,7 @@ package ucevcc
 import (
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
@@ -26,7 +26,7 @@ func (e *UCEVCC) ChargeState(entity spineapi.EntityRemoteInterface) (api.EVCharg
 
 	operatingState := diagnosisState.OperatingState
 	if operatingState == nil {
-		return api.EVChargeStateTypeUnknown, features.ErrDataNotAvailable
+		return api.EVChargeStateTypeUnknown, eebusapi.ErrDataNotAvailable
 	}
 
 	switch *operatingState {
@@ -76,7 +76,7 @@ func (e *UCEVCC) deviceConfigurationValueForKeyName(
 
 	evDeviceConfiguration, err := util.DeviceConfiguration(e.service, entity)
 	if err != nil {
-		return nil, features.ErrDataNotAvailable
+		return nil, eebusapi.ErrDataNotAvailable
 	}
 
 	// check if device configuration descriptions has an communication standard key name
@@ -91,7 +91,7 @@ func (e *UCEVCC) deviceConfigurationValueForKeyName(
 	}
 
 	if data == nil {
-		return nil, features.ErrDataNotAvailable
+		return nil, eebusapi.ErrDataNotAvailable
 	}
 
 	return data, nil
@@ -120,12 +120,12 @@ func (e *UCEVCC) CommunicationStandard(entity spineapi.EntityRemoteInterface) (s
 
 	data, err := e.deviceConfigurationValueForKeyName(entity, model.DeviceConfigurationKeyNameTypeCommunicationsStandard, model.DeviceConfigurationKeyValueTypeTypeString)
 	if err != nil || data == nil {
-		return unknown, features.ErrDataNotAvailable
+		return unknown, eebusapi.ErrDataNotAvailable
 	}
 
 	value, ok := data.(*model.DeviceConfigurationKeyValueStringType)
 	if !ok || value == nil {
-		return unknown, features.ErrDataNotAvailable
+		return unknown, eebusapi.ErrDataNotAvailable
 	}
 
 	return string(*value), nil
@@ -142,12 +142,12 @@ func (e *UCEVCC) AsymmetricChargingSupport(entity spineapi.EntityRemoteInterface
 
 	data, err := e.deviceConfigurationValueForKeyName(entity, model.DeviceConfigurationKeyNameTypeAsymmetricChargingSupported, model.DeviceConfigurationKeyValueTypeTypeBoolean)
 	if err != nil || data == nil {
-		return false, features.ErrDataNotAvailable
+		return false, eebusapi.ErrDataNotAvailable
 	}
 
 	value, ok := data.(*bool)
 	if !ok || value == nil {
-		return false, features.ErrDataNotAvailable
+		return false, eebusapi.ErrDataNotAvailable
 	}
 
 	return bool(*value), nil
@@ -165,7 +165,7 @@ func (e *UCEVCC) Identifications(entity spineapi.EntityRemoteInterface) ([]api.I
 
 	evIdentification, err := util.Identification(e.service, entity)
 	if err != nil {
-		return nil, features.ErrDataNotAvailable
+		return nil, eebusapi.ErrDataNotAvailable
 	}
 
 	identifications, err := evIdentification.GetValues()
@@ -211,7 +211,7 @@ func (e *UCEVCC) ManufacturerData(
 
 	evDeviceClassification, err := util.DeviceClassification(e.service, entity)
 	if err != nil {
-		return deviceName, serialNumber, features.ErrDataNotAvailable
+		return deviceName, serialNumber, eebusapi.ErrDataNotAvailable
 	}
 
 	data, err := evDeviceClassification.GetManufacturerDetails()
@@ -242,7 +242,7 @@ func (e *UCEVCC) CurrentLimits(entity spineapi.EntityRemoteInterface) ([]float64
 
 	evElectricalConnection, err := util.ElectricalConnection(e.service, entity)
 	if err != nil {
-		return nil, nil, nil, features.ErrDataNotAvailable
+		return nil, nil, nil, eebusapi.ErrDataNotAvailable
 	}
 
 	var resultMin, resultMax, resultDefault []float64
@@ -269,7 +269,7 @@ func (e *UCEVCC) CurrentLimits(entity spineapi.EntityRemoteInterface) ([]float64
 	}
 
 	if len(resultMin) == 0 {
-		return nil, nil, nil, features.ErrDataNotAvailable
+		return nil, nil, nil, eebusapi.ErrDataNotAvailable
 	}
 
 	return resultMin, resultMax, resultDefault, nil

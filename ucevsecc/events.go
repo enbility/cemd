@@ -2,7 +2,6 @@ package ucevsecc
 
 import (
 	"github.com/enbility/cemd/util"
-	"github.com/enbility/eebus-go/features"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
@@ -43,14 +42,11 @@ func (e *UCEVSECC) HandleEvent(payload spineapi.EventPayload) {
 
 // an EVSE was connected
 func (e *UCEVSECC) evseConnected(ski string, entity spineapi.EntityRemoteInterface) {
-	localDevice := e.service.LocalDevice()
-	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
-
-	if evseDeviceClassification, err := features.NewDeviceClassification(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity); err == nil {
+	if evseDeviceClassification, err := util.DeviceClassification(e.service, entity); err == nil {
 		_, _ = evseDeviceClassification.RequestManufacturerDetails()
 	}
 
-	if evseDeviceDiagnosis, err := features.NewDeviceDiagnosis(model.RoleTypeClient, model.RoleTypeServer, localEntity, entity); err == nil {
+	if evseDeviceDiagnosis, err := util.DeviceDiagnosis(e.service, entity); err == nil {
 		_, _ = evseDeviceDiagnosis.RequestState()
 	}
 

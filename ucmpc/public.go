@@ -3,7 +3,7 @@ package ucmpc
 import (
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
@@ -33,7 +33,7 @@ func (e *UCMPC) Power(entity spineapi.EntityRemoteInterface) (float64, error) {
 		return 0, err
 	}
 	if len(values) != 1 {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 	return values[0], nil
 }
@@ -77,13 +77,13 @@ func (e *UCMPC) EnergyConsumed(entity spineapi.EntityRemoteInterface) (float64, 
 		return 0, err
 	}
 	if len(values) == 0 {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	// we assume thre is only one result
 	value := values[0].Value
 	if value == nil {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	return value.GetValue(), nil
@@ -105,13 +105,13 @@ func (e *UCMPC) EnergyProduced(entity spineapi.EntityRemoteInterface) (float64, 
 		return 0, err
 	}
 	if len(values) == 0 {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	// we assume thre is only one result
 	value := values[0].Value
 	if value == nil {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	return value.GetValue(), nil
@@ -175,14 +175,14 @@ func (e *UCMPC) Frequency(entity spineapi.EntityRemoteInterface) (float64, error
 		return 0, err
 	}
 	if len(values) == 0 {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	// take the first item
 	value := values[0].Value
 
 	if value == nil {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	return value.GetValue(), nil

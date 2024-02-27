@@ -3,15 +3,14 @@ package ucmpc
 import (
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	serviceapi "github.com/enbility/eebus-go/api"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
 )
 
 type UCMPC struct {
-	service serviceapi.ServiceInterface
+	service eebusapi.ServiceInterface
 
 	eventCB api.EventHandlerCB
 
@@ -20,7 +19,7 @@ type UCMPC struct {
 
 var _ UCMCPInterface = (*UCMPC)(nil)
 
-func NewUCMPC(service serviceapi.ServiceInterface, eventCB api.EventHandlerCB) *UCMPC {
+func NewUCMPC(service eebusapi.ServiceInterface, eventCB api.EventHandlerCB) *UCMPC {
 	uc := &UCMPC{
 		service: service,
 		eventCB: eventCB,
@@ -98,17 +97,17 @@ func (e *UCMPC) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool,
 	// check if measurement description contain data for the required scope
 	measurement, err := util.Measurement(e.service, entity)
 	if err != nil {
-		return false, features.ErrFunctionNotSupported
+		return false, eebusapi.ErrFunctionNotSupported
 	}
 
 	if _, err := measurement.GetDescriptionsForScope(model.ScopeTypeTypeACPowerTotal); err != nil {
-		return false, features.ErrDataNotAvailable
+		return false, eebusapi.ErrDataNotAvailable
 	}
 
 	// check if electrical connection descriptions is provided
 	electricalConnection, err := util.ElectricalConnection(e.service, entity)
 	if err != nil {
-		return false, features.ErrFunctionNotSupported
+		return false, eebusapi.ErrFunctionNotSupported
 	}
 
 	if _, err = electricalConnection.GetDescriptions(); err != nil {

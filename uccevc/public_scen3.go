@@ -6,7 +6,7 @@ import (
 
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	eebusutil "github.com/enbility/eebus-go/util"
 	"github.com/enbility/ship-go/logging"
 	spineapi "github.com/enbility/spine-go/api"
@@ -23,7 +23,7 @@ func (e *UCCEVC) IncentiveConstraints(entity spineapi.EntityRemoteInterface) (ap
 
 	evIncentiveTable, err := util.IncentiveTable(e.service, entity)
 	if err != nil {
-		return result, features.ErrDataNotAvailable
+		return result, eebusapi.ErrDataNotAvailable
 	}
 
 	constraints, err := evIncentiveTable.GetConstraints()
@@ -192,7 +192,7 @@ func (e *UCCEVC) WriteIncentives(entity spineapi.EntityRemoteInterface, data []a
 
 	evIncentiveTable, err := util.IncentiveTable(e.service, entity)
 	if err != nil {
-		return features.ErrDataNotAvailable
+		return eebusapi.ErrDataNotAvailable
 	}
 
 	if len(data) == 0 {

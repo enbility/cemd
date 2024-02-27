@@ -3,15 +3,14 @@ package ucoscev
 import (
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	serviceapi "github.com/enbility/eebus-go/api"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
 )
 
 type UCOSCEV struct {
-	service serviceapi.ServiceInterface
+	service eebusapi.ServiceInterface
 
 	eventCB api.EventHandlerCB
 
@@ -20,7 +19,7 @@ type UCOSCEV struct {
 
 var _ UCOSCEVInterface = (*UCOSCEV)(nil)
 
-func NewUCOSCEV(service serviceapi.ServiceInterface, eventCB api.EventHandlerCB) *UCOSCEV {
+func NewUCOSCEV(service eebusapi.ServiceInterface, eventCB api.EventHandlerCB) *UCOSCEV {
 	uc := &UCOSCEV{
 		service: service,
 		eventCB: eventCB,
@@ -100,7 +99,7 @@ func (e *UCOSCEV) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (boo
 	// check if loadcontrol limit descriptions contains a recommendation category
 	evLoadControl, err := util.LoadControl(e.service, entity)
 	if err != nil {
-		return false, features.ErrFunctionNotSupported
+		return false, eebusapi.ErrFunctionNotSupported
 	}
 
 	if _, err = evLoadControl.GetLimitDescriptionsForCategory(model.LoadControlCategoryTypeRecommendation); err != nil {

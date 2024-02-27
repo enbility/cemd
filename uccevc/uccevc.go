@@ -3,15 +3,14 @@ package uccevc
 import (
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	serviceapi "github.com/enbility/eebus-go/api"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
 )
 
 type UCCEVC struct {
-	service serviceapi.ServiceInterface
+	service eebusapi.ServiceInterface
 
 	eventCB api.EventHandlerCB
 
@@ -20,7 +19,7 @@ type UCCEVC struct {
 
 var _ UCCEVCInterface = (*UCCEVC)(nil)
 
-func NewUCCEVC(service serviceapi.ServiceInterface, eventCB api.EventHandlerCB) *UCCEVC {
+func NewUCCEVC(service eebusapi.ServiceInterface, eventCB api.EventHandlerCB) *UCCEVC {
 	uc := &UCCEVC{
 		service: service,
 		eventCB: eventCB,
@@ -94,11 +93,11 @@ func (e *UCCEVC) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool
 	// check for required features
 	evTimeSeries, err := util.TimeSeries(e.service, entity)
 	if err != nil {
-		return false, features.ErrFunctionNotSupported
+		return false, eebusapi.ErrFunctionNotSupported
 	}
 	evIncentiveTable, err := util.IncentiveTable(e.service, entity)
 	if err != nil {
-		return false, features.ErrFunctionNotSupported
+		return false, eebusapi.ErrFunctionNotSupported
 	}
 
 	// check if timeseries descriptions contains constraints data

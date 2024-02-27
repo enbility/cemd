@@ -3,15 +3,14 @@ package ucopev
 import (
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	serviceapi "github.com/enbility/eebus-go/api"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
 )
 
 type UCOPEV struct {
-	service serviceapi.ServiceInterface
+	service eebusapi.ServiceInterface
 
 	eventCB api.EventHandlerCB
 
@@ -20,7 +19,7 @@ type UCOPEV struct {
 
 var _ UCOPEVInterface = (*UCOPEV)(nil)
 
-func NewUCOPEV(service serviceapi.ServiceInterface, eventCB api.EventHandlerCB) *UCOPEV {
+func NewUCOPEV(service eebusapi.ServiceInterface, eventCB api.EventHandlerCB) *UCOPEV {
 	uc := &UCOPEV{
 		service: service,
 		eventCB: eventCB,
@@ -94,7 +93,7 @@ func (e *UCOPEV) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool
 	// check for required features
 	evLoadControl, err := util.LoadControl(e.service, entity)
 	if err != nil {
-		return false, features.ErrFunctionNotSupported
+		return false, eebusapi.ErrFunctionNotSupported
 	}
 
 	// check if loadcontrol limit descriptions contains a recommendation category

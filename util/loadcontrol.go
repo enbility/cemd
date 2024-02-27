@@ -3,7 +3,6 @@ package util
 import (
 	"github.com/enbility/cemd/api"
 	eebusapi "github.com/enbility/eebus-go/api"
-	"github.com/enbility/eebus-go/features"
 	eebusutil "github.com/enbility/eebus-go/util"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
@@ -33,7 +32,7 @@ func LoadControlLimits(
 	// limitDescription contains the measurementId for each limitId
 	limitDescriptions, err := evLoadControl.GetLimitDescriptionsForCategory(category)
 	if err != nil {
-		return nil, features.ErrDataNotAvailable
+		return nil, eebusapi.ErrDataNotAvailable
 	}
 
 	var result []float64
@@ -61,12 +60,12 @@ func LoadControlLimits(
 		}
 
 		if limitDesc == nil || limitDesc.LimitId == nil {
-			return nil, features.ErrDataNotAvailable
+			return nil, eebusapi.ErrDataNotAvailable
 		}
 
 		limitIdData, err := evLoadControl.GetLimitValueForLimitId(*limitDesc.LimitId)
 		if err != nil {
-			return nil, features.ErrDataNotAvailable
+			return nil, eebusapi.ErrDataNotAvailable
 		}
 
 		var limitValue float64
@@ -74,7 +73,7 @@ func LoadControlLimits(
 			// report maximum possible if no limit is available or the limit is not active
 			_, dataMax, _, err := evElectricalConnection.GetLimitsForParameterId(*elParamDesc.ParameterId)
 			if err != nil {
-				return nil, features.ErrDataNotAvailable
+				return nil, eebusapi.ErrDataNotAvailable
 			}
 
 			limitValue = dataMax

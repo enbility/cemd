@@ -5,7 +5,7 @@ import (
 
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
@@ -79,17 +79,17 @@ func (e *UCCEVC) EnergyDemand(entity spineapi.EntityRemoteInterface) (api.Demand
 
 	evTimeSeries, err := util.TimeSeries(e.service, entity)
 	if err != nil {
-		return demand, features.ErrDataNotAvailable
+		return demand, eebusapi.ErrDataNotAvailable
 	}
 
 	data, err := evTimeSeries.GetValueForType(model.TimeSeriesTypeTypeSingleDemand)
 	if err != nil {
-		return demand, features.ErrDataNotAvailable
+		return demand, eebusapi.ErrDataNotAvailable
 	}
 
 	// we need at least a time series slot
 	if data.TimeSeriesSlot == nil {
-		return demand, features.ErrDataNotAvailable
+		return demand, eebusapi.ErrDataNotAvailable
 	}
 
 	// get the value for the first slot, ignore all others, which

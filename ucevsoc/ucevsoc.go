@@ -3,15 +3,14 @@ package ucevsoc
 import (
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	serviceapi "github.com/enbility/eebus-go/api"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
 )
 
 type UCEVSOC struct {
-	service serviceapi.ServiceInterface
+	service eebusapi.ServiceInterface
 
 	eventCB api.EventHandlerCB
 
@@ -20,7 +19,7 @@ type UCEVSOC struct {
 
 var _ UCEVSOCInterface = (*UCEVSOC)(nil)
 
-func NewUCEVSOC(service serviceapi.ServiceInterface, eventCB api.EventHandlerCB) *UCEVSOC {
+func NewUCEVSOC(service eebusapi.ServiceInterface, eventCB api.EventHandlerCB) *UCEVSOC {
 	uc := &UCEVSOC{
 		service: service,
 		eventCB: eventCB,
@@ -89,7 +88,7 @@ func (e *UCEVSOC) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (boo
 	// check for required features
 	evMeasurement, err := util.Measurement(e.service, entity)
 	if err != nil || evMeasurement == nil {
-		return false, features.ErrFunctionNotSupported
+		return false, eebusapi.ErrFunctionNotSupported
 	}
 
 	// check if measurement description contains an element with scope SOC

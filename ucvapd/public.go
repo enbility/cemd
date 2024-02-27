@@ -3,7 +3,7 @@ package ucvapd
 import (
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
@@ -31,7 +31,7 @@ func (e *UCVAPD) Power(entity spineapi.EntityRemoteInterface) (float64, error) {
 	mId := data[0].MeasurementId
 	value := data[0].Value
 	if mId == nil || value == nil {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	return value.GetValue(), nil
@@ -49,7 +49,7 @@ func (e *UCVAPD) PowerNominalPeak(entity spineapi.EntityRemoteInterface) (float6
 
 	deviceConfiguration, err := util.DeviceConfiguration(e.service, entity)
 	if err != nil {
-		return 0, features.ErrFunctionNotSupported
+		return 0, eebusapi.ErrFunctionNotSupported
 	}
 
 	keyName := model.DeviceConfigurationKeyNameTypePeakPowerOfPVSystem
@@ -63,12 +63,12 @@ func (e *UCVAPD) PowerNominalPeak(entity spineapi.EntityRemoteInterface) (float6
 	}
 
 	if data == nil {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	value, ok := data.(*model.ScaledNumberType)
 	if !ok || value == nil {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	return value.GetValue(), nil
@@ -95,7 +95,7 @@ func (e *UCVAPD) PVYieldTotal(entity spineapi.EntityRemoteInterface) (float64, e
 	// we assume thre is only one result
 	value := data[0].Value
 	if value == nil {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	return value.GetValue(), nil
@@ -114,7 +114,7 @@ func (e *UCVAPD) getValuesForTypeCommodityScope(
 
 	measurementF, err := util.Measurement(e.service, entity)
 	if err != nil {
-		return nil, features.ErrFunctionNotSupported
+		return nil, eebusapi.ErrFunctionNotSupported
 	}
 
 	return measurementF.GetValuesForTypeCommodityScope(measurement, commodity, scope)

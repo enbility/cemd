@@ -3,15 +3,14 @@ package ucmgcp
 import (
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	serviceapi "github.com/enbility/eebus-go/api"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
 )
 
 type UCMGCP struct {
-	service serviceapi.ServiceInterface
+	service eebusapi.ServiceInterface
 
 	eventCB api.EventHandlerCB
 
@@ -20,7 +19,7 @@ type UCMGCP struct {
 
 var _ UCMGCPInterface = (*UCMGCP)(nil)
 
-func NewUCMGCP(service serviceapi.ServiceInterface, eventCB api.EventHandlerCB) *UCMGCP {
+func NewUCMGCP(service eebusapi.ServiceInterface, eventCB api.EventHandlerCB) *UCMGCP {
 	uc := &UCMGCP{
 		service: service,
 		eventCB: eventCB,
@@ -93,20 +92,20 @@ func (e *UCMGCP) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool
 	// check if measurement description contain data for the required scope
 	measurement, err := util.Measurement(e.service, entity)
 	if err != nil {
-		return false, features.ErrFunctionNotSupported
+		return false, eebusapi.ErrFunctionNotSupported
 	}
 
 	_, err1 := measurement.GetDescriptionsForScope(model.ScopeTypeTypeACPower)
 	_, err2 := measurement.GetDescriptionsForScope(model.ScopeTypeTypeGridFeedIn)
 	_, err3 := measurement.GetDescriptionsForScope(model.ScopeTypeTypeGridConsumption)
 	if err1 != nil || err2 != nil || err3 != nil {
-		return false, features.ErrDataNotAvailable
+		return false, eebusapi.ErrDataNotAvailable
 	}
 
 	// check if electrical connection descriptions is provided
 	electricalConnection, err := util.ElectricalConnection(e.service, entity)
 	if err != nil {
-		return false, features.ErrFunctionNotSupported
+		return false, eebusapi.ErrFunctionNotSupported
 	}
 
 	if _, err = electricalConnection.GetDescriptions(); err != nil {

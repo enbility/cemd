@@ -3,14 +3,14 @@ package ucevsecc
 import (
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	serviceapi "github.com/enbility/eebus-go/api"
+	eebusapi "github.com/enbility/eebus-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/enbility/spine-go/spine"
 )
 
 type UCEVSECC struct {
-	service serviceapi.ServiceInterface
+	service eebusapi.ServiceInterface
 
 	eventCB api.EventHandlerCB
 
@@ -19,7 +19,7 @@ type UCEVSECC struct {
 
 var _ UCEVSECCInterface = (*UCEVSECC)(nil)
 
-func NewUCEVSECC(service serviceapi.ServiceInterface, eventCB api.EventHandlerCB) *UCEVSECC {
+func NewUCEVSECC(service eebusapi.ServiceInterface, eventCB api.EventHandlerCB) *UCEVSECC {
 	uc := &UCEVSECC{
 		service: service,
 		eventCB: eventCB,

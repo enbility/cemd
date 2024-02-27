@@ -4,7 +4,6 @@ import (
 	"slices"
 
 	eebusapi "github.com/enbility/eebus-go/api"
-	"github.com/enbility/eebus-go/features"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
@@ -16,7 +15,7 @@ func MeasurementValueForScope(
 	scope model.ScopeTypeType) (float64, error) {
 	measurementF, err := Measurement(service, entity)
 	if err != nil {
-		return 0, features.ErrFunctionNotSupported
+		return 0, eebusapi.ErrFunctionNotSupported
 	}
 
 	if data, err := measurementF.GetDescriptionsForScope(scope); err == nil {
@@ -31,7 +30,7 @@ func MeasurementValueForScope(
 		}
 	}
 
-	return 0, features.ErrDataNotAvailable
+	return 0, eebusapi.ErrDataNotAvailable
 }
 
 // return the phase specific voltage details

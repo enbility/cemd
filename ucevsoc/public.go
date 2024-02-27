@@ -3,7 +3,7 @@ package ucevsoc
 import (
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
@@ -34,7 +34,7 @@ func (e *UCEVSOC) StateOfCharge(entity spineapi.EntityRemoteInterface) (float64,
 	// we assume there is only one value, nil is already checked
 	value := data[0].Value
 	if value == nil {
-		return 0, features.ErrDataNotAvailable
+		return 0, eebusapi.ErrDataNotAvailable
 	}
 
 	return value.GetValue(), nil

@@ -6,7 +6,7 @@ import (
 
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
-	"github.com/enbility/eebus-go/features"
+	eebusapi "github.com/enbility/eebus-go/api"
 	eebusutil "github.com/enbility/eebus-go/util"
 	"github.com/enbility/ship-go/logging"
 	spineapi "github.com/enbility/spine-go/api"
@@ -23,7 +23,7 @@ func (e *UCCEVC) TimeSlotConstraints(entity spineapi.EntityRemoteInterface) (api
 
 	evTimeSeries, err := util.TimeSeries(e.service, entity)
 	if err != nil {
-		return result, features.ErrDataNotAvailable
+		return result, eebusapi.ErrDataNotAvailable
 	}
 
 	constraints, err := evTimeSeries.GetConstraints()
@@ -68,7 +68,7 @@ func (e *UCCEVC) WritePowerLimits(entity spineapi.EntityRemoteInterface, data []
 
 	evTimeSeries, err := util.TimeSeries(e.service, entity)
 	if err != nil {
-		return features.ErrDataNotAvailable
+		return eebusapi.ErrDataNotAvailable
 	}
 
 	if len(data) == 0 {
@@ -93,7 +93,7 @@ func (e *UCCEVC) WritePowerLimits(entity spineapi.EntityRemoteInterface, data []
 
 	desc, err := evTimeSeries.GetDescriptionForType(model.TimeSeriesTypeTypeConstraints)
 	if err != nil {
-		return features.ErrDataNotAvailable
+		return eebusapi.ErrDataNotAvailable
 	}
 
 	timeSeriesSlots := []model.TimeSeriesSlotType{}
