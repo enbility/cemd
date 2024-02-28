@@ -123,8 +123,8 @@ func WriteLoadControlLimits(
 		return nil, api.ErrNoCompatibleEntity
 	}
 
-	evLoadControl, err := LoadControl(service, entity)
-	evElectricalConnection, err2 := ElectricalConnection(service, entity)
+	loadControl, err := LoadControl(service, entity)
+	electricalConnection, err2 := ElectricalConnection(service, entity)
 	if err != nil || err2 != nil {
 		return nil, api.ErrNoCompatibleEntity
 	}
@@ -134,13 +134,13 @@ func WriteLoadControlLimits(
 	for _, phaseLimit := range limits {
 		// find out the appropriate limitId for each phase value
 		// limitDescription contains the measurementId for each limitId
-		limitDescriptions, err := evLoadControl.GetLimitDescriptionsForCategory(category)
+		limitDescriptions, err := loadControl.GetLimitDescriptionsForCategory(category)
 		if err != nil {
 			continue
 		}
 
 		// electricalParameterDescription contains the measured phase for each measurementId
-		elParamDesc, err := evElectricalConnection.GetParameterDescriptionForMeasuredPhase(phaseLimit.Phase)
+		elParamDesc, err := electricalConnection.GetParameterDescriptionForMeasuredPhase(phaseLimit.Phase)
 		if err != nil || elParamDesc.MeasurementId == nil {
 			continue
 		}
@@ -160,7 +160,7 @@ func WriteLoadControlLimits(
 			continue
 		}
 
-		limitIdData, err := evLoadControl.GetLimitValueForLimitId(*limitDesc.LimitId)
+		limitIdData, err := loadControl.GetLimitValueForLimitId(*limitDesc.LimitId)
 		if err != nil {
 			continue
 		}
@@ -172,7 +172,7 @@ func WriteLoadControlLimits(
 		}
 
 		// electricalPermittedValueSet contains the allowed min, max and the default values per phase
-		limit := evElectricalConnection.AdjustValueToBeWithinPermittedValuesForParameter(phaseLimit.Value, *elParamDesc.ParameterId)
+		limit := electricalConnection.AdjustValueToBeWithinPermittedValuesForParameter(phaseLimit.Value, *elParamDesc.ParameterId)
 
 		newLimit := model.LoadControlLimitDataType{
 			LimitId:       limitDesc.LimitId,
@@ -182,7 +182,26 @@ func WriteLoadControlLimits(
 		limitData = append(limitData, newLimit)
 	}
 
-	msgCounter, err := evLoadControl.WriteLimitValues(limitData)
+	currentLimits, err := loadControl.GetLimitValues()
+	if err != nil {
+		return nil, eebusapi.ErrDataNotAvailable
+	}
+
+	for index, limit := range currentLimits {
+		if limit.LimitId == nil {
+			continue
+		}
+
+		for _, newLimit := range limitData {
+			if newLimit.LimitId != limit.LimitId {
+				continue
+			}
+
+			currentLimits[index] = newLimit
+		}
+	}
+
+	msgCounter, err := loadControl.WriteLimitValues(currentLimits)
 
 	return msgCounter, err
 }
