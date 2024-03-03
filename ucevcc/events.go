@@ -43,7 +43,7 @@ func (e *UCEVCC) HandleEvent(payload spineapi.EventPayload) {
 	case *model.DeviceClassificationManufacturerDataType:
 		e.evManufacturerDataUpdate(payload.Ski, payload.Entity)
 	case *model.ElectricalConnectionParameterDescriptionListDataType:
-		e.evElectricalParamerDescriptionUpdate(payload.Ski, payload.Entity)
+		e.evElectricalParamerDescriptionUpdate(payload.Entity)
 	case *model.ElectricalConnectionPermittedValueSetListDataType:
 		e.evElectricalPermittedValuesUpdate(payload.Ski, payload.Entity)
 	case *model.IdentificationListDataType:
@@ -196,7 +196,7 @@ func (e *UCEVCC) evManufacturerDataUpdate(ski string, entity spineapi.EntityRemo
 }
 
 // the electrical connection parameter description data of an EV was updated
-func (e *UCEVCC) evElectricalParamerDescriptionUpdate(ski string, entity spineapi.EntityRemoteInterface) {
+func (e *UCEVCC) evElectricalParamerDescriptionUpdate(entity spineapi.EntityRemoteInterface) {
 	if evElectricalConnection, err := util.ElectricalConnection(e.service, entity); err == nil {
 		if _, err := evElectricalConnection.RequestPermittedValueSets(); err != nil {
 			logging.Log().Error("Error getting electrical permitted values:", err)
