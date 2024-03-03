@@ -16,6 +16,9 @@ type UCOPEVInterface interface {
 
 	// return the current loadcontrol obligation limits
 	//
+	// parameters:
+	//   - entity: the entity of the EV
+	//
 	// possible errors:
 	//   - ErrDataNotAvailable if no such limit is (yet) available
 	//   - and others
@@ -24,6 +27,7 @@ type UCOPEVInterface interface {
 	// send new LoadControlLimits to the remote EV
 	//
 	// parameters:
+	//   - entity: the entity of the EV
 	//   - limits: a set of limits containing phase specific limit data
 	//
 	// Sets a maximum A limit for each phase that the EV may not exceed.

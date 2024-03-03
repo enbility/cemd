@@ -15,6 +15,9 @@ type UCMGCPInterface interface {
 
 	// return the current power limitation factor
 	//
+	// parameters:
+	//   - entity: the entity of the device (e.g. SMGW)
+	//
 	// possible errors:
 	//   - ErrDataNotAvailable if no such limit is (yet) available
 	//   - and others
@@ -24,6 +27,10 @@ type UCMGCPInterface interface {
 
 	// return the momentary power consumption or production at the grid connection point
 	//
+	// parameters:
+	//   - entity: the entity of the device (e.g. SMGW)
+	//
+	// return values:
 	//   - positive values are used for consumption
 	//   - negative values are used for production
 	Power(entity spineapi.EntityRemoteInterface) (float64, error)
@@ -32,6 +39,10 @@ type UCMGCPInterface interface {
 
 	// return the total feed in energy at the grid connection point
 	//
+	// parameters:
+	//   - entity: the entity of the device (e.g. SMGW)
+	//
+	// return values:
 	//   - negative values are used for production
 	EnergyFeedIn(entity spineapi.EntityRemoteInterface) (float64, error)
 
@@ -39,6 +50,10 @@ type UCMGCPInterface interface {
 
 	// return the total consumption energy at the grid connection point
 	//
+	// parameters:
+	//   - entity: the entity of the device (e.g. SMGW)
+	//
+	// return values:
 	//   - positive values are used for consumption
 	EnergyConsumed(entity spineapi.EntityRemoteInterface) (float64, error)
 
@@ -46,6 +61,10 @@ type UCMGCPInterface interface {
 
 	// return the momentary current consumption or production at the grid connection point
 	//
+	// parameters:
+	//   - entity: the entity of the device (e.g. SMGW)
+	//
+	// return values:
 	//   - positive values are used for consumption
 	//   - negative values are used for production
 	CurrentPerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error)
@@ -54,11 +73,15 @@ type UCMGCPInterface interface {
 
 	// return the voltage phase details at the grid connection point
 	//
+	// parameters:
+	//   - entity: the entity of the device (e.g. SMGW)
 	VoltagePerPhase(entity spineapi.EntityRemoteInterface) ([]float64, error)
 
 	// Scenario 7
 
 	// return frequency at the grid connection point
 	//
+	// parameters:
+	//   - entity: the entity of the device (e.g. SMGW)
 	Frequency(entity spineapi.EntityRemoteInterface) (float64, error)
 }

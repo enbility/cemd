@@ -14,6 +14,9 @@ type UCEVSOCInterface interface {
 	// Scenario 1
 
 	// return the EVscurrent state of charge of the EV or an error it is unknown
+	//
+	// parameters:
+	//   - entity: the entity of the EV
 	StateOfCharge(entity spineapi.EntityRemoteInterface) (float64, error)
 
 	// Scenario 2 to 4 are not supported, as there is no EV supporting this as of today

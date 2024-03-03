@@ -15,12 +15,20 @@ type UCCEVCInterface interface {
 
 	// returns the current charging stratey
 	//
+	// parameters:
+	//   - entity: the entity of the EV
+	//
 	// returns EVChargeStrategyTypeUnknown if it could not be determined, e.g.
 	// if the vehicle communication is via IEC61851 or the EV doesn't provide
 	// any information about its charging mode or plan
 	ChargeStrategy(remoteEntity spineapi.EntityRemoteInterface) api.EVChargeStrategyType
 
 	// returns the current energy demand
+	//
+	// parameters:
+	//   - entity: the entity of the EV
+	//
+	// return values:
 	//   - EVDemand: details about the actual demands from the EV
 	//   - error: if no data is available
 	//
@@ -32,23 +40,50 @@ type UCCEVCInterface interface {
 	TimeSlotConstraints(entity spineapi.EntityRemoteInterface) (api.TimeSlotConstraints, error)
 
 	// send power limits to the EV
+	//
+	// parameters:
+	//   - entity: the entity of the EV
+	//   - data: the power limits
+	//
 	// if no data is provided, default power limits with the max possible value for 7 days will be sent
 	WritePowerLimits(entity spineapi.EntityRemoteInterface, data []api.DurationSlotValue) error
 
 	// Scenario 3
 
+	// return the current incentive constraints
+	//
+	// parameters:
+	//   - entity: the entity of the EV
 	IncentiveConstraints(entity spineapi.EntityRemoteInterface) (api.IncentiveSlotConstraints, error)
 
+	// send new incentives to the EV
+	//
+	// parameters:
+	//   - entity: the entity of the EV
+	//   - data: the incentive descriptions
 	WriteIncentiveTableDescriptions(entity spineapi.EntityRemoteInterface, data []api.IncentiveTariffDescription) error
 
 	// send incentives to the EV
+	//
+	// parameters:
+	//   - entity: the entity of the EV
+	//   - data: the incentives
+	//
 	// if no data is provided, default incentives with the same price for 7 days will be sent
 	WriteIncentives(entity spineapi.EntityRemoteInterface, data []api.DurationSlotValue) error
 
 	// Scenario 4
 
+	// return the current charge plan constraints
+	//
+	// parameters:
+	//   - entity: the entity of the EV
 	ChargePlanConstraints(entity spineapi.EntityRemoteInterface) ([]api.DurationSlotValue, error)
 
+	// return the current charge plan of the EV
+	//
+	// parameters:
+	//   - entity: the entity of the EV
 	ChargePlan(entity spineapi.EntityRemoteInterface) (api.ChargePlan, error)
 
 	// Scenario 5 & 6

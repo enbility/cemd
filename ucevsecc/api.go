@@ -13,10 +13,18 @@ type UCEVSECCInterface interface {
 	api.UseCaseInterface
 
 	// the manufacturer data of an EVSE
+	//
+	// parameters:
+	//   - entity: the entity of the EV
+	//
 	// returns deviceName, serialNumber, error
 	ManufacturerData(entity spineapi.EntityRemoteInterface) (string, string, error)
 
 	// the operating state data of an EVSE
+	//
+	// parameters:
+	//   - entity: the entity of the EV
+	//
 	// returns operatingState, lastErrorCode, error
 	OperatingState(entity spineapi.EntityRemoteInterface) (model.DeviceDiagnosisOperatingStateType, string, error)
 }
