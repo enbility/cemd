@@ -3,6 +3,7 @@ package ucevcc
 import (
 	"github.com/enbility/cemd/api"
 	spineapi "github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
 )
 
 //go:generate mockery
@@ -31,7 +32,7 @@ type UCEVCCInterface interface {
 	//
 	// parameters:
 	//   - entity: the entity of the EV
-	CommunicationStandard(entity spineapi.EntityRemoteInterface) (string, error)
+	CommunicationStandard(entity spineapi.EntityRemoteInterface) (model.DeviceConfigurationKeyValueStringType, error)
 
 	// Scenario 3
 

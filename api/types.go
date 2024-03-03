@@ -142,11 +142,6 @@ type DurationSlotValue struct {
 	Value    float64       // Energy Cost or Power Limit
 }
 
-// value if the UCEVCC communication standard is unknown
-const (
-	UCEVCCCommunicationStandardUnknown string = "unknown"
-)
-
 // type for cem and usecase specfic event names
 type EventType string
 

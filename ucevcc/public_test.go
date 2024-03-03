@@ -101,11 +101,11 @@ func (s *UCEVCCSuite) Test_EVConnected() {
 func (s *UCEVCCSuite) Test_EVCommunicationStandard() {
 	data, err := s.sut.CommunicationStandard(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), api.UCEVCCCommunicationStandardUnknown, data)
+	assert.Equal(s.T(), UCEVCCCommunicationStandardUnknown, data)
 
 	data, err = s.sut.CommunicationStandard(s.evEntity)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), api.UCEVCCCommunicationStandardUnknown, data)
+	assert.Equal(s.T(), UCEVCCCommunicationStandardUnknown, data)
 
 	descData := &model.DeviceConfigurationKeyValueDescriptionListDataType{
 		DeviceConfigurationKeyValueDescriptionData: []model.DeviceConfigurationKeyValueDescriptionDataType{
@@ -122,7 +122,7 @@ func (s *UCEVCCSuite) Test_EVCommunicationStandard() {
 
 	data, err = s.sut.CommunicationStandard(s.evEntity)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), api.UCEVCCCommunicationStandardUnknown, data)
+	assert.Equal(s.T(), UCEVCCCommunicationStandardUnknown, data)
 
 	descData = &model.DeviceConfigurationKeyValueDescriptionListDataType{
 		DeviceConfigurationKeyValueDescriptionData: []model.DeviceConfigurationKeyValueDescriptionDataType{
@@ -138,7 +138,7 @@ func (s *UCEVCCSuite) Test_EVCommunicationStandard() {
 
 	data, err = s.sut.CommunicationStandard(s.evEntity)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), api.UCEVCCCommunicationStandardUnknown, data)
+	assert.Equal(s.T(), UCEVCCCommunicationStandardUnknown, data)
 
 	devData := &model.DeviceConfigurationKeyValueListDataType{
 		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{
@@ -156,7 +156,7 @@ func (s *UCEVCCSuite) Test_EVCommunicationStandard() {
 
 	data, err = s.sut.CommunicationStandard(s.evEntity)
 	assert.Nil(s.T(), err)
-	assert.Equal(s.T(), string(model.DeviceConfigurationKeyValueStringTypeISO151182ED2), data)
+	assert.Equal(s.T(), model.DeviceConfigurationKeyValueStringTypeISO151182ED2, data)
 }
 
 func (s *UCEVCCSuite) Test_EVAsymmetricChargingSupport() {

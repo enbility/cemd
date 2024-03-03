@@ -111,8 +111,8 @@ func (e *UCEVCC) deviceConfigurationValueForKeyName(
 // possible errors:
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
-func (e *UCEVCC) CommunicationStandard(entity spineapi.EntityRemoteInterface) (string, error) {
-	unknown := api.UCEVCCCommunicationStandardUnknown
+func (e *UCEVCC) CommunicationStandard(entity spineapi.EntityRemoteInterface) (model.DeviceConfigurationKeyValueStringType, error) {
+	unknown := UCEVCCCommunicationStandardUnknown
 
 	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return unknown, api.ErrNoCompatibleEntity
@@ -128,7 +128,7 @@ func (e *UCEVCC) CommunicationStandard(entity spineapi.EntityRemoteInterface) (s
 		return unknown, eebusapi.ErrDataNotAvailable
 	}
 
-	return string(*value), nil
+	return *value, nil
 }
 
 // return if the EV supports asymmetric charging

@@ -1,6 +1,14 @@
 package ucevcc
 
-import "github.com/enbility/cemd/api"
+import (
+	"github.com/enbility/cemd/api"
+	"github.com/enbility/spine-go/model"
+)
+
+// value if the UCEVCC communication standard is unknown
+const (
+	UCEVCCCommunicationStandardUnknown model.DeviceConfigurationKeyValueStringType = "unknown"
+)
 
 const (
 
