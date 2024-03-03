@@ -245,6 +245,14 @@ func (s *UtilSuite) Test_WriteLoadControlLimits() {
 			dataSet := []model.ElectricalConnectionPermittedValueSetDataType{}
 			permittedData := []model.ScaledNumberSetType{}
 			for _, data := range tc.data {
+				// clean up data
+				remoteLoadControlF := s.monitoredEntity.FeatureOfTypeAndRole(model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
+				assert.NotNil(s.T(), remoteLoadControlF)
+
+				emptyLimits := model.LoadControlLimitListDataType{}
+				errT := remoteLoadControlF.UpdateData(model.FunctionTypeLoadControlLimitListData, &emptyLimits, nil, nil)
+				assert.Nil(s.T(), errT)
+
 				for phase := 0; phase < data.phases; phase++ {
 					item := model.ScaledNumberSetType{
 						Range: []model.ScaledNumberRangeType{
@@ -330,8 +338,8 @@ func (s *UtilSuite) Test_WriteLoadControlLimits() {
 				assert.Nil(s.T(), fErr)
 
 				msgCounter, err = WriteLoadControlLimits(s.service, s.monitoredEntity, entityTypes, category, loadLimits)
-				assert.NotNil(t, err)
-				assert.Nil(t, msgCounter)
+				assert.Nil(t, err)
+				assert.NotNil(t, msgCounter)
 
 				phaseLimitValues := []api.LoadLimitsPhase{}
 				for index, limit := range data.limits {
