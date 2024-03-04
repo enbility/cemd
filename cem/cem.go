@@ -6,6 +6,7 @@ import (
 	"github.com/enbility/eebus-go/service"
 	"github.com/enbility/ship-go/logging"
 	"github.com/enbility/spine-go/model"
+	"github.com/enbility/spine-go/spine"
 )
 
 // Generic CEM implementation
@@ -31,6 +32,8 @@ func NewCEM(
 	}
 
 	cem.Service.SetLogging(log)
+
+	_ = spine.Events.Subscribe(cem)
 
 	return cem
 }
