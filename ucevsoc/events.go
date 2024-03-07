@@ -29,7 +29,7 @@ func (e *UCEVSOC) HandleEvent(payload spineapi.EventPayload) {
 	//revive:disable-next-line
 	switch payload.Data.(type) {
 	case *model.MeasurementListDataType:
-		e.evMeasurementDataUpdate(payload.Ski, payload.Entity)
+		e.evMeasurementDataUpdate(payload)
 	}
 }
 
@@ -54,9 +54,9 @@ func (e *UCEVSOC) evConnected(entity spineapi.EntityRemoteInterface) {
 }
 
 // the measurement data of an EV was updated
-func (e *UCEVSOC) evMeasurementDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
+func (e *UCEVSOC) evMeasurementDataUpdate(payload spineapi.EventPayload) {
 	// Scenario 1
-	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeStateOfCharge); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdateStateOfCharge)
+	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeStateOfCharge); err == nil {
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateStateOfCharge)
 	}
 }

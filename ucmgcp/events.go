@@ -29,11 +29,11 @@ func (e *UCMGCP) HandleEvent(payload spineapi.EventPayload) {
 	case *model.DeviceConfigurationKeyValueDescriptionListDataType:
 		e.gridConfigurationDescriptionDataUpdate(payload.Entity)
 	case *model.DeviceConfigurationKeyValueListDataType:
-		e.gridConfigurationDataUpdate(payload.Ski, payload.Entity)
+		e.gridConfigurationDataUpdate(payload)
 	case *model.MeasurementDescriptionListDataType:
 		e.gridMeasurementDescriptionDataUpdate(payload.Entity)
 	case *model.MeasurementListDataType:
-		e.gridMeasurementDataUpdate(payload.Ski, payload.Entity)
+		e.gridMeasurementDataUpdate(payload)
 	}
 }
 
@@ -92,9 +92,9 @@ func (e *UCMGCP) gridConfigurationDescriptionDataUpdate(entity spineapi.EntityRe
 }
 
 // the configuration key data of an SMGW was updated
-func (e *UCMGCP) gridConfigurationDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	if _, err := e.PowerLimitationFactor(entity); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdatePowerLimitationFactor)
+func (e *UCMGCP) gridConfigurationDataUpdate(payload spineapi.EventPayload) {
+	if _, err := e.PowerLimitationFactor(payload.Entity); err == nil {
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdatePowerLimitationFactor)
 	}
 }
 
@@ -109,35 +109,35 @@ func (e *UCMGCP) gridMeasurementDescriptionDataUpdate(entity spineapi.EntityRemo
 }
 
 // the measurement data of an SMGW was updated
-func (e *UCMGCP) gridMeasurementDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
+func (e *UCMGCP) gridMeasurementDataUpdate(payload spineapi.EventPayload) {
 	// Scenario 2
-	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACPowerTotal); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdatePower)
+	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACPowerTotal); err == nil {
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdatePower)
 	}
 
 	// Scenario 3
-	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeGridFeedIn); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdateEnergyFeedIn)
+	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeGridFeedIn); err == nil {
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateEnergyFeedIn)
 	}
 
 	// Scenario 4
-	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeGridConsumption); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdateEnergyConsumed)
+	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeGridConsumption); err == nil {
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateEnergyConsumed)
 	}
 
 	// Scenario 5
-	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACCurrent); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdateCurrentPerPhase)
+	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACCurrent); err == nil {
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateCurrentPerPhase)
 	}
 
 	// Scenario 6
-	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACVoltage); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdateVoltagePerPhase)
+	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACVoltage); err == nil {
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateVoltagePerPhase)
 	}
 
 	// Scenario 7
-	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACFrequency); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdateFrequency)
+	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACFrequency); err == nil {
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateFrequency)
 	}
 
 }

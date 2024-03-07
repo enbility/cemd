@@ -24,13 +24,13 @@ func (e *UCOSCEV) HandleEvent(payload spineapi.EventPayload) {
 	//revive:disable-next-line
 	switch payload.Data.(type) {
 	case *model.LoadControlLimitListDataType:
-		e.evLoadControlLimitDataUpdate(payload.Ski, payload.Entity)
+		e.evLoadControlLimitDataUpdate(payload)
 	}
 }
 
 // the load control limit data of an EV was updated
-func (e *UCOSCEV) evLoadControlLimitDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	evLoadControl, err := util.LoadControl(e.service, entity)
+func (e *UCOSCEV) evLoadControlLimitDataUpdate(payload spineapi.EventPayload) {
+	evLoadControl, err := util.LoadControl(e.service, payload.Entity)
 	if err != nil {
 		return
 	}
@@ -50,7 +50,7 @@ func (e *UCOSCEV) evLoadControlLimitDataUpdate(ski string, entity spineapi.Entit
 			continue
 		}
 
-		e.eventCB(ski, entity.Device(), entity, DataUpdateLimit)
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateLimit)
 		return
 	}
 }

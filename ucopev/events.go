@@ -29,7 +29,7 @@ func (e *UCOPEV) HandleEvent(payload spineapi.EventPayload) {
 	case *model.LoadControlLimitDescriptionListDataType:
 		e.evLoadControlLimitDescriptionDataUpdate(payload.Entity)
 	case *model.LoadControlLimitListDataType:
-		e.evLoadControlLimitDataUpdate(payload.Ski, payload.Entity)
+		e.evLoadControlLimitDataUpdate(payload)
 	}
 }
 
@@ -64,8 +64,8 @@ func (e *UCOPEV) evLoadControlLimitDescriptionDataUpdate(entity spineapi.EntityR
 }
 
 // the load control limit data of an EV was updated
-func (e *UCOPEV) evLoadControlLimitDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	evLoadControl, err := util.LoadControl(e.service, entity)
+func (e *UCOPEV) evLoadControlLimitDataUpdate(payload spineapi.EventPayload) {
+	evLoadControl, err := util.LoadControl(e.service, payload.Entity)
 	if err != nil {
 		return
 	}
@@ -85,7 +85,7 @@ func (e *UCOPEV) evLoadControlLimitDataUpdate(ski string, entity spineapi.Entity
 			continue
 		}
 
-		e.eventCB(ski, entity.Device(), entity, DataUpdateLimit)
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateLimit)
 		return
 	}
 

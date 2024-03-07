@@ -12,14 +12,14 @@ import (
 type UCEVCEM struct {
 	service serviceapi.ServiceInterface
 
-	eventCB api.EventHandlerCB
+	eventCB api.EntityEventCallback
 
 	validEntityTypes []model.EntityTypeType
 }
 
 var _ UCEVCEMInterface = (*UCEVCEM)(nil)
 
-func NewUCEVCEM(service serviceapi.ServiceInterface, eventCB api.EventHandlerCB) *UCEVCEM {
+func NewUCEVCEM(service serviceapi.ServiceInterface, eventCB api.EntityEventCallback) *UCEVCEM {
 	uc := &UCEVCEM{
 		service: service,
 		eventCB: eventCB,

@@ -34,9 +34,15 @@ func (s *UCOSCEVSuite) Test_Events() {
 }
 
 func (s *UCOSCEVSuite) Test_evLoadControlLimitDataUpdate() {
-	s.sut.evLoadControlLimitDataUpdate(remoteSki, s.mockRemoteEntity)
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.mockRemoteEntity,
+	}
+	s.sut.evLoadControlLimitDataUpdate(payload)
 
-	s.sut.evLoadControlLimitDataUpdate(remoteSki, s.evEntity)
+	payload.Entity = s.evEntity
+	s.sut.evLoadControlLimitDataUpdate(payload)
 
 	descData := &model.LoadControlLimitDescriptionListDataType{
 		LoadControlLimitDescriptionData: []model.LoadControlLimitDescriptionDataType{
@@ -51,7 +57,7 @@ func (s *UCOSCEVSuite) Test_evLoadControlLimitDataUpdate() {
 	fErr := rFeature.UpdateData(model.FunctionTypeLoadControlLimitDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.evLoadControlLimitDataUpdate(remoteSki, s.evEntity)
+	s.sut.evLoadControlLimitDataUpdate(payload)
 
 	data := &model.LoadControlLimitListDataType{
 		LoadControlLimitData: []model.LoadControlLimitDataType{
@@ -65,5 +71,5 @@ func (s *UCOSCEVSuite) Test_evLoadControlLimitDataUpdate() {
 	fErr = rFeature.UpdateData(model.FunctionTypeLoadControlLimitListData, data, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.evLoadControlLimitDataUpdate(remoteSki, s.evEntity)
+	s.sut.evLoadControlLimitDataUpdate(payload)
 }

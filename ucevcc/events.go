@@ -11,20 +11,15 @@ import (
 func (e *UCEVCC) HandleEvent(payload spineapi.EventPayload) {
 	// only about events from an EV entity or device changes for this remote device
 
-	if util.IsDeviceDisconnected(payload) {
-		e.evDisconnected(payload.Ski, payload.Entity)
-		return
-	}
-
 	if !util.IsCompatibleEntity(payload.Entity, e.validEntityTypes) {
 		return
 	}
 
 	if util.IsEntityConnected(payload) {
-		e.evConnected(payload.Ski, payload.Entity)
+		e.evConnected(payload)
 		return
 	} else if util.IsEntityDisconnected(payload) {
-		e.evDisconnected(payload.Ski, payload.Entity)
+		e.evDisconnected(payload)
 		return
 	}
 
@@ -37,24 +32,24 @@ func (e *UCEVCC) HandleEvent(payload spineapi.EventPayload) {
 	case *model.DeviceConfigurationKeyValueDescriptionListDataType:
 		e.evConfigurationDescriptionDataUpdate(payload.Entity)
 	case *model.DeviceConfigurationKeyValueListDataType:
-		e.evConfigurationDataUpdate(payload.Ski, payload.Entity)
+		e.evConfigurationDataUpdate(payload)
 	case *model.DeviceDiagnosisOperatingStateType:
-		e.evOperatingStateDataUpdate(payload.Ski, payload.Entity)
+		e.evOperatingStateDataUpdate(payload)
 	case *model.DeviceClassificationManufacturerDataType:
-		e.evManufacturerDataUpdate(payload.Ski, payload.Entity)
+		e.evManufacturerDataUpdate(payload)
 	case *model.ElectricalConnectionParameterDescriptionListDataType:
 		e.evElectricalParamerDescriptionUpdate(payload.Entity)
 	case *model.ElectricalConnectionPermittedValueSetListDataType:
-		e.evElectricalPermittedValuesUpdate(payload.Ski, payload.Entity)
+		e.evElectricalPermittedValuesUpdate(payload)
 	case *model.IdentificationListDataType:
-		e.evIdentificationDataUpdate(payload.Ski, payload.Entity)
+		e.evIdentificationDataUpdate(payload)
 	}
 }
 
 // an EV was connected
-func (e *UCEVCC) evConnected(ski string, entity spineapi.EntityRemoteInterface) {
+func (e *UCEVCC) evConnected(payload spineapi.EventPayload) {
 	// initialise features, e.g. subscriptions, descriptions
-	if evDeviceClassification, err := util.DeviceClassification(e.service, entity); err == nil {
+	if evDeviceClassification, err := util.DeviceClassification(e.service, payload.Entity); err == nil {
 		if _, err := evDeviceClassification.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
@@ -65,7 +60,7 @@ func (e *UCEVCC) evConnected(ski string, entity spineapi.EntityRemoteInterface) 
 		}
 	}
 
-	if evDeviceConfiguration, err := util.DeviceConfiguration(e.service, entity); err == nil {
+	if evDeviceConfiguration, err := util.DeviceConfiguration(e.service, payload.Entity); err == nil {
 		if _, err := evDeviceConfiguration.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
@@ -75,7 +70,7 @@ func (e *UCEVCC) evConnected(ski string, entity spineapi.EntityRemoteInterface) 
 		}
 	}
 
-	if evDeviceDiagnosis, err := util.DeviceDiagnosis(e.service, entity); err == nil {
+	if evDeviceDiagnosis, err := util.DeviceDiagnosis(e.service, payload.Entity); err == nil {
 		if _, err := evDeviceDiagnosis.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
@@ -86,7 +81,7 @@ func (e *UCEVCC) evConnected(ski string, entity spineapi.EntityRemoteInterface) 
 		}
 	}
 
-	if evElectricalConnection, err := util.ElectricalConnection(e.service, entity); err == nil {
+	if evElectricalConnection, err := util.ElectricalConnection(e.service, payload.Entity); err == nil {
 		if _, err := evElectricalConnection.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
@@ -102,7 +97,7 @@ func (e *UCEVCC) evConnected(ski string, entity spineapi.EntityRemoteInterface) 
 		}
 	}
 
-	if evIdentification, err := util.Identification(e.service, entity); err == nil {
+	if evIdentification, err := util.Identification(e.service, payload.Entity); err == nil {
 		if _, err := evIdentification.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
@@ -113,12 +108,12 @@ func (e *UCEVCC) evConnected(ski string, entity spineapi.EntityRemoteInterface) 
 		}
 	}
 
-	e.eventCB(ski, entity.Device(), entity, EvConnected)
+	e.eventCB(payload.Ski, payload.Device, payload.Entity, EvConnected)
 }
 
 // an EV was disconnected
-func (e *UCEVCC) evDisconnected(ski string, entity spineapi.EntityRemoteInterface) {
-	e.eventCB(ski, entity.Device(), entity, EvDisconnected)
+func (e *UCEVCC) evDisconnected(payload spineapi.EventPayload) {
+	e.eventCB(payload.Ski, payload.Device, payload.Entity, EvDisconnected)
 }
 
 // the configuration key description data of an EV was updated
@@ -132,38 +127,38 @@ func (e *UCEVCC) evConfigurationDescriptionDataUpdate(entity spineapi.EntityRemo
 }
 
 // the configuration key data of an EV was updated
-func (e *UCEVCC) evConfigurationDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	evDeviceConfiguration, err := util.DeviceConfiguration(e.service, entity)
+func (e *UCEVCC) evConfigurationDataUpdate(payload spineapi.EventPayload) {
+	evDeviceConfiguration, err := util.DeviceConfiguration(e.service, payload.Entity)
 	if err != nil {
 		return
 	}
 
 	// Scenario 2
 	if _, err := evDeviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypeCommunicationsStandard, model.DeviceConfigurationKeyValueTypeTypeString); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdateCommunicationStandard)
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateCommunicationStandard)
 	}
 
 	// Scenario 3
 	if _, err := evDeviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypeAsymmetricChargingSupported, model.DeviceConfigurationKeyValueTypeTypeString); err == nil {
-		e.eventCB(ski, entity.Device(), entity, AsymmetricChargingSupportDataUpdate)
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, AsymmetricChargingSupportDataUpdate)
 	}
 }
 
 // the operating state of an EV was updated
-func (e *UCEVCC) evOperatingStateDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	deviceDiagnosis, err := util.DeviceDiagnosis(e.service, entity)
+func (e *UCEVCC) evOperatingStateDataUpdate(payload spineapi.EventPayload) {
+	deviceDiagnosis, err := util.DeviceDiagnosis(e.service, payload.Entity)
 	if err != nil {
 		return
 	}
 
 	if _, err := deviceDiagnosis.GetState(); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdateIdentifications)
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateIdentifications)
 	}
 }
 
 // the identification data of an EV was updated
-func (e *UCEVCC) evIdentificationDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	evIdentification, err := util.Identification(e.service, entity)
+func (e *UCEVCC) evIdentificationDataUpdate(payload spineapi.EventPayload) {
+	evIdentification, err := util.Identification(e.service, payload.Entity)
 	if err != nil {
 		return
 	}
@@ -175,22 +170,22 @@ func (e *UCEVCC) evIdentificationDataUpdate(ski string, entity spineapi.EntityRe
 				continue
 			}
 
-			e.eventCB(ski, entity.Device(), entity, DataUpdateIdentifications)
+			e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateIdentifications)
 			return
 		}
 	}
 }
 
 // the manufacturer data of an EV was updated
-func (e *UCEVCC) evManufacturerDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	evDeviceClassification, err := util.DeviceClassification(e.service, entity)
+func (e *UCEVCC) evManufacturerDataUpdate(payload spineapi.EventPayload) {
+	evDeviceClassification, err := util.DeviceClassification(e.service, payload.Entity)
 	if err != nil {
 		return
 	}
 
 	// Scenario 5
 	if _, err := evDeviceClassification.GetManufacturerDetails(); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdateManufacturerData)
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateManufacturerData)
 	}
 
 }
@@ -205,8 +200,8 @@ func (e *UCEVCC) evElectricalParamerDescriptionUpdate(entity spineapi.EntityRemo
 }
 
 // the electrical connection permitted value sets data of an EV was updated
-func (e *UCEVCC) evElectricalPermittedValuesUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	evElectricalConnection, err := util.ElectricalConnection(e.service, entity)
+func (e *UCEVCC) evElectricalPermittedValuesUpdate(payload spineapi.EventPayload) {
+	evElectricalConnection, err := util.ElectricalConnection(e.service, payload.Entity)
 	if err != nil {
 		return
 	}
@@ -222,5 +217,5 @@ func (e *UCEVCC) evElectricalPermittedValuesUpdate(ski string, entity spineapi.E
 	}
 
 	// Scenario 6
-	e.eventCB(ski, entity.Device(), entity, DataUpdateCurrentLimits)
+	e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateCurrentLimits)
 }

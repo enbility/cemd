@@ -30,16 +30,16 @@ func (e *UCCEVC) HandleEvent(payload spineapi.EventPayload) {
 
 	switch payload.Data.(type) {
 	case *model.TimeSeriesDescriptionListDataType:
-		e.evTimeSeriesDescriptionDataUpdate(payload.Ski, payload.Entity)
+		e.evTimeSeriesDescriptionDataUpdate(payload)
 
 	case *model.TimeSeriesListDataType:
-		e.evTimeSeriesDataUpdate(payload.Ski, payload.Entity)
+		e.evTimeSeriesDataUpdate(payload)
 
 	case *model.IncentiveTableDescriptionDataType:
-		e.evIncentiveTableDescriptionDataUpdate(payload.Ski, payload.Entity)
+		e.evIncentiveTableDescriptionDataUpdate(payload)
 
 	case *model.IncentiveDataType:
-		e.evIncentiveTableDataUpdate(payload.Ski, payload.Entity)
+		e.evIncentiveTableDataUpdate(payload)
 	}
 }
 
@@ -94,8 +94,8 @@ func (e *UCCEVC) evConnected(entity spineapi.EntityRemoteInterface) {
 }
 
 // the time series description data of an EV was updated
-func (e *UCCEVC) evTimeSeriesDescriptionDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	if evTimeSeries, err := util.TimeSeries(e.service, entity); err == nil {
+func (e *UCCEVC) evTimeSeriesDescriptionDataUpdate(payload spineapi.EventPayload) {
+	if evTimeSeries, err := util.TimeSeries(e.service, payload.Entity); err == nil {
 		// get time series values
 		if _, err := evTimeSeries.RequestValues(); err != nil {
 			logging.Log().Debug(err)
@@ -103,46 +103,46 @@ func (e *UCCEVC) evTimeSeriesDescriptionDataUpdate(ski string, entity spineapi.E
 	}
 
 	// check if we are required to update the plan
-	if !e.evCheckTimeSeriesDescriptionConstraintsUpdateRequired(entity) {
+	if !e.evCheckTimeSeriesDescriptionConstraintsUpdateRequired(payload.Entity) {
 		return
 	}
 
-	_, err := e.EnergyDemand(entity)
+	_, err := e.EnergyDemand(payload.Entity)
 	if err != nil {
 		return
 	}
 
-	e.eventCB(ski, entity.Device(), entity, DataUpdateEnergyDemand)
+	e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateEnergyDemand)
 
-	_, err = e.TimeSlotConstraints(entity)
+	_, err = e.TimeSlotConstraints(payload.Entity)
 	if err != nil {
 		logging.Log().Error("Error getting timeseries constraints:", err)
 		return
 	}
 
-	_, err = e.IncentiveConstraints(entity)
+	_, err = e.IncentiveConstraints(payload.Entity)
 	if err != nil {
 		logging.Log().Error("Error getting incentive constraints:", err)
 		return
 	}
 
-	e.eventCB(ski, entity.Device(), entity, DataRequestedPowerLimitsAndIncentives)
+	e.eventCB(payload.Ski, payload.Device, payload.Entity, DataRequestedPowerLimitsAndIncentives)
 }
 
 // the load control limit data of an EV was updated
-func (e *UCCEVC) evTimeSeriesDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	if _, err := e.ChargePlan(entity); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdateChargePlan)
+func (e *UCCEVC) evTimeSeriesDataUpdate(payload spineapi.EventPayload) {
+	if _, err := e.ChargePlan(payload.Entity); err == nil {
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateChargePlan)
 	}
 
-	if _, err := e.ChargePlanConstraints(entity); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdateTimeSlotConstraints)
+	if _, err := e.ChargePlanConstraints(payload.Entity); err == nil {
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateTimeSlotConstraints)
 	}
 }
 
 // the incentive table description data of an EV was updated
-func (e *UCCEVC) evIncentiveTableDescriptionDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	if evIncentiveTable, err := util.IncentiveTable(e.service, entity); err == nil {
+func (e *UCCEVC) evIncentiveTableDescriptionDataUpdate(payload spineapi.EventPayload) {
+	if evIncentiveTable, err := util.IncentiveTable(e.service, payload.Entity); err == nil {
 		// get time series values
 		if _, err := evIncentiveTable.RequestValues(); err != nil {
 			logging.Log().Debug(err)
@@ -150,15 +150,15 @@ func (e *UCCEVC) evIncentiveTableDescriptionDataUpdate(ski string, entity spinea
 	}
 
 	// check if we are required to update the plan
-	if e.evCheckIncentiveTableDescriptionUpdateRequired(entity) {
-		e.eventCB(ski, entity.Device(), entity, DataRequestedIncentiveTableDescription)
+	if e.evCheckIncentiveTableDescriptionUpdateRequired(payload.Entity) {
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataRequestedIncentiveTableDescription)
 	}
 
 }
 
 // the load control limit data of an EV was updated
-func (e *UCCEVC) evIncentiveTableDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
-	e.eventCB(ski, entity.Device(), entity, DataUpdateIncentiveTable)
+func (e *UCCEVC) evIncentiveTableDataUpdate(payload spineapi.EventPayload) {
+	e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateIncentiveTable)
 }
 
 // check timeSeries descriptions if constraints element has updateRequired set to true

@@ -40,7 +40,12 @@ func (s *UCVABDSuite) Test_Events() {
 }
 
 func (s *UCVABDSuite) Test_inverterMeasurementDataUpdate() {
-	s.sut.inverterMeasurementDataUpdate(remoteSki, s.batteryEntity)
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.batteryEntity,
+	}
+	s.sut.inverterMeasurementDataUpdate(payload)
 
 	descData := &model.MeasurementDescriptionListDataType{
 		MeasurementDescriptionData: []model.MeasurementDescriptionDataType{
@@ -67,7 +72,7 @@ func (s *UCVABDSuite) Test_inverterMeasurementDataUpdate() {
 	fErr := rFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.inverterMeasurementDataUpdate(remoteSki, s.batteryEntity)
+	s.sut.inverterMeasurementDataUpdate(payload)
 
 	data := &model.MeasurementListDataType{
 		MeasurementData: []model.MeasurementDataType{
@@ -93,5 +98,5 @@ func (s *UCVABDSuite) Test_inverterMeasurementDataUpdate() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, data, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.inverterMeasurementDataUpdate(remoteSki, s.batteryEntity)
+	s.sut.inverterMeasurementDataUpdate(payload)
 }

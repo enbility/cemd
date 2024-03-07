@@ -12,14 +12,14 @@ import (
 type UCOSCEV struct {
 	service eebusapi.ServiceInterface
 
-	eventCB api.EventHandlerCB
+	eventCB api.EntityEventCallback
 
 	validEntityTypes []model.EntityTypeType
 }
 
 var _ UCOSCEVInterface = (*UCOSCEV)(nil)
 
-func NewUCOSCEV(service eebusapi.ServiceInterface, eventCB api.EventHandlerCB) *UCOSCEV {
+func NewUCOSCEV(service eebusapi.ServiceInterface, eventCB api.EntityEventCallback) *UCOSCEV {
 	uc := &UCOSCEV{
 		service: service,
 		eventCB: eventCB,

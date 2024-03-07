@@ -24,8 +24,10 @@ const (
 	// An EV was disconnected
 	//
 	// The callback with this message provides:
-	//   - the device of the EVSE the EV is connected to
+	//   - the device of the EVSE the EV was connected to
 	//   - the entity of the EV
+	//
+	// Note: The ev entity is no longer connected to the device!
 	//
 	// Use Case EVCC, Scenario 8
 	EvDisconnected api.EventType = "EvDisconnected"

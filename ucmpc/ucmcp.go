@@ -12,14 +12,14 @@ import (
 type UCMPC struct {
 	service eebusapi.ServiceInterface
 
-	eventCB api.EventHandlerCB
+	eventCB api.EntityEventCallback
 
 	validEntityTypes []model.EntityTypeType
 }
 
 var _ UCMCPInterface = (*UCMPC)(nil)
 
-func NewUCMPC(service eebusapi.ServiceInterface, eventCB api.EventHandlerCB) *UCMPC {
+func NewUCMPC(service eebusapi.ServiceInterface, eventCB api.EntityEventCallback) *UCMPC {
 	uc := &UCMPC{
 		service: service,
 		eventCB: eventCB,

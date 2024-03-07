@@ -42,9 +42,15 @@ func (s *UCEVSECCSuite) Test_Events() {
 }
 
 func (s *UCEVSECCSuite) Test_evseManufacturerDataUpdate() {
-	s.sut.evseManufacturerDataUpdate(remoteSki, s.mockRemoteEntity)
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.mockRemoteEntity,
+	}
+	s.sut.evseManufacturerDataUpdate(payload)
 
-	s.sut.evseManufacturerDataUpdate(remoteSki, s.evseEntity)
+	payload.Entity = s.evseEntity
+	s.sut.evseManufacturerDataUpdate(payload)
 
 	data := &model.DeviceClassificationManufacturerDataType{
 		BrandName: eebusutil.Ptr(model.DeviceClassificationStringType("test")),
@@ -54,13 +60,19 @@ func (s *UCEVSECCSuite) Test_evseManufacturerDataUpdate() {
 	fErr := rFeature.UpdateData(model.FunctionTypeDeviceClassificationManufacturerData, data, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.evseManufacturerDataUpdate(remoteSki, s.evseEntity)
+	s.sut.evseManufacturerDataUpdate(payload)
 }
 
 func (s *UCEVSECCSuite) Test_evseStateUpdate() {
-	s.sut.evseStateUpdate(remoteSki, s.mockRemoteEntity)
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.mockRemoteEntity,
+	}
+	s.sut.evseStateUpdate(payload)
 
-	s.sut.evseStateUpdate(remoteSki, s.evseEntity)
+	payload.Entity = s.evseEntity
+	s.sut.evseStateUpdate(payload)
 
 	data := &model.DeviceDiagnosisStateDataType{
 		OperatingState: eebusutil.Ptr(model.DeviceDiagnosisOperatingStateTypeNormalOperation),
@@ -70,5 +82,5 @@ func (s *UCEVSECCSuite) Test_evseStateUpdate() {
 	fErr := rFeature.UpdateData(model.FunctionTypeDeviceDiagnosisStateData, data, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.evseStateUpdate(remoteSki, s.evseEntity)
+	s.sut.evseStateUpdate(payload)
 }

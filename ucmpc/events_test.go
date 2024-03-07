@@ -34,7 +34,12 @@ func (s *UCMPCSuite) Test_Events() {
 }
 
 func (s *UCMPCSuite) Test_deviceMeasurementDataUpdate() {
-	s.sut.deviceMeasurementDataUpdate(remoteSki, s.monitoredEntity)
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.monitoredEntity,
+	}
+	s.sut.deviceMeasurementDataUpdate(payload)
 
 	descData := &model.MeasurementDescriptionListDataType{
 		MeasurementDescriptionData: []model.MeasurementDescriptionDataType{
@@ -73,7 +78,7 @@ func (s *UCMPCSuite) Test_deviceMeasurementDataUpdate() {
 	fErr := rFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.deviceMeasurementDataUpdate(remoteSki, s.monitoredEntity)
+	s.sut.deviceMeasurementDataUpdate(payload)
 
 	data := &model.MeasurementListDataType{
 		MeasurementData: []model.MeasurementDataType{
@@ -111,6 +116,5 @@ func (s *UCMPCSuite) Test_deviceMeasurementDataUpdate() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, data, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.deviceMeasurementDataUpdate(remoteSki, s.monitoredEntity)
-
+	s.sut.deviceMeasurementDataUpdate(payload)
 }

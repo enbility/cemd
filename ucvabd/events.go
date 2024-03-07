@@ -29,7 +29,7 @@ func (e *UCVABD) HandleEvent(payload spineapi.EventPayload) {
 	case *model.MeasurementDescriptionListDataType:
 		e.inverterMeasurementDescriptionDataUpdate(payload.Entity)
 	case *model.MeasurementListDataType:
-		e.inverterMeasurementDataUpdate(payload.Ski, payload.Entity)
+		e.inverterMeasurementDataUpdate(payload)
 	}
 }
 
@@ -77,24 +77,24 @@ func (e *UCVABD) inverterMeasurementDescriptionDataUpdate(entity spineapi.Entity
 }
 
 // the measurement data of an SMGW was updated
-func (e *UCVABD) inverterMeasurementDataUpdate(ski string, entity spineapi.EntityRemoteInterface) {
+func (e *UCVABD) inverterMeasurementDataUpdate(payload spineapi.EventPayload) {
 	// Scenario 1
-	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeACPowerTotal); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdatePower)
+	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACPowerTotal); err == nil {
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdatePower)
 	}
 
 	// Scenario 2
-	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeCharge); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdateEnergyCharged)
+	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeCharge); err == nil {
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateEnergyCharged)
 	}
 
 	// Scenario 3
-	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeDischarge); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdateEnergyDischarged)
+	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeDischarge); err == nil {
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateEnergyDischarged)
 	}
 
 	// Scenario 4
-	if _, err := util.MeasurementValueForScope(e.service, entity, model.ScopeTypeTypeStateOfCharge); err == nil {
-		e.eventCB(ski, entity.Device(), entity, DataUpdateStateOfCharge)
+	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeStateOfCharge); err == nil {
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateStateOfCharge)
 	}
 }

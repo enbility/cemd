@@ -40,7 +40,12 @@ func (s *UCVAPDSuite) Test_Events() {
 }
 
 func (s *UCVAPDSuite) Test_inverterConfigurationDataUpdate() {
-	s.sut.inverterConfigurationDataUpdate(remoteSki, s.pvEntity)
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.pvEntity,
+	}
+	s.sut.inverterConfigurationDataUpdate(payload)
 
 	descData := &model.DeviceConfigurationKeyValueDescriptionListDataType{
 		DeviceConfigurationKeyValueDescriptionData: []model.DeviceConfigurationKeyValueDescriptionDataType{
@@ -56,7 +61,7 @@ func (s *UCVAPDSuite) Test_inverterConfigurationDataUpdate() {
 	fErr := rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.inverterConfigurationDataUpdate(remoteSki, s.pvEntity)
+	s.sut.inverterConfigurationDataUpdate(payload)
 
 	data := &model.DeviceConfigurationKeyValueListDataType{
 		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{
@@ -72,11 +77,16 @@ func (s *UCVAPDSuite) Test_inverterConfigurationDataUpdate() {
 	fErr = rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueListData, data, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.inverterConfigurationDataUpdate(remoteSki, s.pvEntity)
+	s.sut.inverterConfigurationDataUpdate(payload)
 }
 
 func (s *UCVAPDSuite) Test_inverterMeasurementDataUpdate() {
-	s.sut.inverterMeasurementDataUpdate(remoteSki, s.pvEntity)
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.pvEntity,
+	}
+	s.sut.inverterConfigurationDataUpdate(payload)
 
 	descData := &model.MeasurementDescriptionListDataType{
 		MeasurementDescriptionData: []model.MeasurementDescriptionDataType{
@@ -95,7 +105,7 @@ func (s *UCVAPDSuite) Test_inverterMeasurementDataUpdate() {
 	fErr := rFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.inverterMeasurementDataUpdate(remoteSki, s.pvEntity)
+	s.sut.inverterConfigurationDataUpdate(payload)
 
 	data := &model.MeasurementListDataType{
 		MeasurementData: []model.MeasurementDataType{
@@ -113,5 +123,5 @@ func (s *UCVAPDSuite) Test_inverterMeasurementDataUpdate() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, data, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.inverterMeasurementDataUpdate(remoteSki, s.pvEntity)
+	s.sut.inverterConfigurationDataUpdate(payload)
 }

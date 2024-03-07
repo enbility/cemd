@@ -31,9 +31,15 @@ func (s *UCEVSOCSuite) Test_Events() {
 }
 
 func (s *UCEVSOCSuite) Test_evMeasurementDataUpdate() {
-	s.sut.evMeasurementDataUpdate(remoteSki, s.mockRemoteEntity)
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.mockRemoteEntity,
+	}
+	s.sut.evMeasurementDataUpdate(payload)
 
-	s.sut.evMeasurementDataUpdate(remoteSki, s.evEntity)
+	payload.Entity = s.evEntity
+	s.sut.evMeasurementDataUpdate(payload)
 
 	descData := &model.MeasurementDescriptionListDataType{
 		MeasurementDescriptionData: []model.MeasurementDescriptionDataType{
@@ -56,7 +62,7 @@ func (s *UCEVSOCSuite) Test_evMeasurementDataUpdate() {
 	fErr := rFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.evMeasurementDataUpdate(remoteSki, s.evEntity)
+	s.sut.evMeasurementDataUpdate(payload)
 
 	data := &model.MeasurementListDataType{
 		MeasurementData: []model.MeasurementDataType{
@@ -78,5 +84,5 @@ func (s *UCEVSOCSuite) Test_evMeasurementDataUpdate() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, data, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.evMeasurementDataUpdate(remoteSki, s.evEntity)
+	s.sut.evMeasurementDataUpdate(payload)
 }

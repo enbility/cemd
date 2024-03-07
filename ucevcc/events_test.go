@@ -54,9 +54,15 @@ func (s *UCEVCCSuite) Test_Events() {
 }
 
 func (s *UCEVCCSuite) Test_evConfigurationDataUpdate() {
-	s.sut.evConfigurationDataUpdate(remoteSki, s.mockRemoteEntity)
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.mockRemoteEntity,
+	}
+	s.sut.evConfigurationDataUpdate(payload)
 
-	s.sut.evConfigurationDataUpdate(remoteSki, s.evEntity)
+	payload.Entity = s.evEntity
+	s.sut.evConfigurationDataUpdate(payload)
 
 	descData := &model.DeviceConfigurationKeyValueDescriptionListDataType{
 		DeviceConfigurationKeyValueDescriptionData: []model.DeviceConfigurationKeyValueDescriptionDataType{
@@ -75,7 +81,7 @@ func (s *UCEVCCSuite) Test_evConfigurationDataUpdate() {
 	fErr := rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.evConfigurationDataUpdate(remoteSki, s.evEntity)
+	s.sut.evConfigurationDataUpdate(payload)
 
 	data := &model.DeviceConfigurationKeyValueListDataType{
 		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{
@@ -97,13 +103,41 @@ func (s *UCEVCCSuite) Test_evConfigurationDataUpdate() {
 	fErr = rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueListData, data, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.evConfigurationDataUpdate(remoteSki, s.evEntity)
+	s.sut.evConfigurationDataUpdate(payload)
+}
+
+func (s *UCEVCCSuite) Test_evOperatingStateDataUpdate() {
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.mockRemoteEntity,
+	}
+	s.sut.evOperatingStateDataUpdate(payload)
+
+	payload.Entity = s.evEntity
+	s.sut.evOperatingStateDataUpdate(payload)
+
+	data := &model.DeviceDiagnosisStateDataType{
+		OperatingState: eebusutil.Ptr(model.DeviceDiagnosisOperatingStateTypeNormalOperation),
+	}
+
+	rFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.evEntity, model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
+	fErr := rFeature.UpdateData(model.FunctionTypeDeviceDiagnosisStateData, data, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	s.sut.evOperatingStateDataUpdate(payload)
 }
 
 func (s *UCEVCCSuite) Test_evIdentificationDataUpdate() {
-	s.sut.evIdentificationDataUpdate(remoteSki, s.mockRemoteEntity)
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.mockRemoteEntity,
+	}
+	s.sut.evIdentificationDataUpdate(payload)
 
-	s.sut.evIdentificationDataUpdate(remoteSki, s.evEntity)
+	payload.Entity = s.evEntity
+	s.sut.evIdentificationDataUpdate(payload)
 
 	data := &model.IdentificationListDataType{
 		IdentificationData: []model.IdentificationDataType{
@@ -123,13 +157,19 @@ func (s *UCEVCCSuite) Test_evIdentificationDataUpdate() {
 	fErr := rFeature.UpdateData(model.FunctionTypeIdentificationListData, data, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.evIdentificationDataUpdate(remoteSki, s.evEntity)
+	s.sut.evIdentificationDataUpdate(payload)
 }
 
 func (s *UCEVCCSuite) Test_evManufacturerDataUpdate() {
-	s.sut.evManufacturerDataUpdate(remoteSki, s.mockRemoteEntity)
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.mockRemoteEntity,
+	}
+	s.sut.evManufacturerDataUpdate(payload)
 
-	s.sut.evManufacturerDataUpdate(remoteSki, s.evEntity)
+	payload.Entity = s.evEntity
+	s.sut.evManufacturerDataUpdate(payload)
 
 	data := &model.DeviceClassificationManufacturerDataType{
 		BrandName: eebusutil.Ptr(model.DeviceClassificationStringType("test")),
@@ -139,13 +179,19 @@ func (s *UCEVCCSuite) Test_evManufacturerDataUpdate() {
 	fErr := rFeature.UpdateData(model.FunctionTypeDeviceClassificationManufacturerData, data, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.evManufacturerDataUpdate(remoteSki, s.evEntity)
+	s.sut.evManufacturerDataUpdate(payload)
 }
 
 func (s *UCEVCCSuite) Test_evElectricalPermittedValuesUpdate() {
-	s.sut.evElectricalPermittedValuesUpdate(remoteSki, s.mockRemoteEntity)
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.mockRemoteEntity,
+	}
+	s.sut.evElectricalPermittedValuesUpdate(payload)
 
-	s.sut.evElectricalPermittedValuesUpdate(remoteSki, s.evEntity)
+	payload.Entity = s.evEntity
+	s.sut.evElectricalPermittedValuesUpdate(payload)
 
 	paramData := &model.ElectricalConnectionParameterDescriptionListDataType{
 		ElectricalConnectionParameterDescriptionData: []model.ElectricalConnectionParameterDescriptionDataType{
@@ -161,7 +207,7 @@ func (s *UCEVCCSuite) Test_evElectricalPermittedValuesUpdate() {
 	fErr := rFeature.UpdateData(model.FunctionTypeElectricalConnectionParameterDescriptionListData, paramData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.evElectricalPermittedValuesUpdate(remoteSki, s.evEntity)
+	s.sut.evElectricalPermittedValuesUpdate(payload)
 
 	permData := &model.ElectricalConnectionPermittedValueSetListDataType{
 		ElectricalConnectionPermittedValueSetData: []model.ElectricalConnectionPermittedValueSetDataType{
@@ -175,5 +221,5 @@ func (s *UCEVCCSuite) Test_evElectricalPermittedValuesUpdate() {
 	fErr = rFeature.UpdateData(model.FunctionTypeElectricalConnectionPermittedValueSetListData, permData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.evElectricalPermittedValuesUpdate(remoteSki, s.evEntity)
+	s.sut.evElectricalPermittedValuesUpdate(payload)
 }

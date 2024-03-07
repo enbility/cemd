@@ -37,7 +37,12 @@ func (s *UCMGCPSuite) Test_Events() {
 }
 
 func (s *UCMGCPSuite) Test_gridConfigurationDataUpdate() {
-	s.sut.gridConfigurationDataUpdate(remoteSki, s.smgwEntity)
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.smgwEntity,
+	}
+	s.sut.gridConfigurationDataUpdate(payload)
 
 	descData := &model.DeviceConfigurationKeyValueDescriptionListDataType{
 		DeviceConfigurationKeyValueDescriptionData: []model.DeviceConfigurationKeyValueDescriptionDataType{
@@ -66,11 +71,16 @@ func (s *UCMGCPSuite) Test_gridConfigurationDataUpdate() {
 	fErr = rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueListData, keyData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.gridConfigurationDataUpdate(remoteSki, s.smgwEntity)
+	s.sut.gridConfigurationDataUpdate(payload)
 }
 
 func (s *UCMGCPSuite) Test_gridMeasurementDataUpdate() {
-	s.sut.gridMeasurementDataUpdate(remoteSki, s.smgwEntity)
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.smgwEntity,
+	}
+	s.sut.gridMeasurementDataUpdate(payload)
 
 	descData := &model.MeasurementDescriptionListDataType{
 		MeasurementDescriptionData: []model.MeasurementDescriptionDataType{
@@ -105,7 +115,7 @@ func (s *UCMGCPSuite) Test_gridMeasurementDataUpdate() {
 	fErr := rFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.gridMeasurementDataUpdate(remoteSki, s.smgwEntity)
+	s.sut.gridMeasurementDataUpdate(payload)
 
 	data := &model.MeasurementListDataType{
 		MeasurementData: []model.MeasurementDataType{
@@ -139,6 +149,5 @@ func (s *UCMGCPSuite) Test_gridMeasurementDataUpdate() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, data, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.gridMeasurementDataUpdate(remoteSki, s.smgwEntity)
-
+	s.sut.gridMeasurementDataUpdate(payload)
 }

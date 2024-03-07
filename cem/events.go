@@ -9,12 +9,12 @@ import (
 func (h *Cem) HandleEvent(payload spineapi.EventPayload) {
 
 	if util.IsDeviceConnected(payload) {
-		h.eventCB(payload.Ski, payload.Device, nil, DeviceConnected)
+		h.eventCB(payload.Ski, payload.Device, DeviceConnected)
 		return
 	}
 
 	if util.IsDeviceDisconnected(payload) {
-		h.eventCB(payload.Ski, payload.Device, nil, DeviceDisconnected)
+		h.eventCB(payload.Ski, payload.Device, DeviceDisconnected)
 		return
 	}
 }

@@ -6,5 +6,8 @@ import (
 )
 
 // Handle incoming usecase specific events
-func (h *DemoCem) eventCB(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.EventType) {
+func (h *DemoCem) deviceEventCB(ski string, device spineapi.DeviceRemoteInterface, event api.EventType) {
+}
+
+func (h *DemoCem) entityEventCB(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.EventType) {
 }

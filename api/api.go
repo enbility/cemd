@@ -7,10 +7,15 @@ import (
 
 //go:generate mockery
 
-// Event handler callback
+// Device event callback
 //
-// Used by Cem and Use Case implementations
-type EventHandlerCB func(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event EventType)
+// Used by CEM implementation
+type DeviceEventCallback func(ski string, device spineapi.DeviceRemoteInterface, event EventType)
+
+// Entity event callback
+//
+// Used by Use Case implementations
+type EntityEventCallback func(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event EventType)
 
 // Implemented by CEM
 type CemInterface interface {

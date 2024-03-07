@@ -42,9 +42,15 @@ func (s *UCCEVCSuite) Test_Events() {
 }
 
 func (s *UCCEVCSuite) Test_evTimeSeriesDescriptionDataUpdate() {
-	s.sut.evTimeSeriesDescriptionDataUpdate(remoteSki, s.mockRemoteEntity)
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.mockRemoteEntity,
+	}
+	s.sut.evTimeSeriesDescriptionDataUpdate(payload)
 
-	s.sut.evTimeSeriesDescriptionDataUpdate(remoteSki, s.evEntity)
+	payload.Entity = s.evEntity
+	s.sut.evTimeSeriesDescriptionDataUpdate(payload)
 
 	timeDesc := &model.TimeSeriesDescriptionListDataType{
 		TimeSeriesDescriptionData: []model.TimeSeriesDescriptionDataType{
@@ -64,7 +70,7 @@ func (s *UCCEVCSuite) Test_evTimeSeriesDescriptionDataUpdate() {
 	fErr := rTimeFeature.UpdateData(model.FunctionTypeTimeSeriesDescriptionListData, timeDesc, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.evTimeSeriesDescriptionDataUpdate(remoteSki, s.evEntity)
+	s.sut.evTimeSeriesDescriptionDataUpdate(payload)
 
 	timeData := &model.TimeSeriesListDataType{
 		TimeSeriesData: []model.TimeSeriesDataType{
@@ -96,7 +102,7 @@ func (s *UCCEVCSuite) Test_evTimeSeriesDescriptionDataUpdate() {
 	assert.Equal(s.T(), 0.0, demand.DurationUntilStart)
 	assert.Equal(s.T(), 0.0, demand.DurationUntilEnd)
 
-	s.sut.evTimeSeriesDescriptionDataUpdate(remoteSki, s.evEntity)
+	s.sut.evTimeSeriesDescriptionDataUpdate(payload)
 
 	constData := &model.TimeSeriesConstraintsListDataType{
 		TimeSeriesConstraintsData: []model.TimeSeriesConstraintsDataType{
@@ -114,7 +120,7 @@ func (s *UCCEVCSuite) Test_evTimeSeriesDescriptionDataUpdate() {
 	fErr = rTimeFeature.UpdateData(model.FunctionTypeTimeSeriesConstraintsListData, constData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.evTimeSeriesDescriptionDataUpdate(remoteSki, s.evEntity)
+	s.sut.evTimeSeriesDescriptionDataUpdate(payload)
 
 	incConstData := &model.IncentiveTableConstraintsDataType{
 		IncentiveTableConstraints: []model.IncentiveTableConstraintsType{
@@ -131,6 +137,6 @@ func (s *UCCEVCSuite) Test_evTimeSeriesDescriptionDataUpdate() {
 	fErr = rFeature.UpdateData(model.FunctionTypeIncentiveTableConstraintsData, incConstData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.evTimeSeriesDescriptionDataUpdate(remoteSki, s.evEntity)
+	s.sut.evTimeSeriesDescriptionDataUpdate(payload)
 
 }
