@@ -23,11 +23,11 @@ This library provides a foundation to implement energy management solutions usin
 - `ucevsecc`: Use Case EVSE Commissioning and Configuration V1.0.1
 - `ucevsoc`: Use Case EV State Of Charge V1.0.0 RC1
 - `ucmgcp`: Use Case Monitoring of Grid Connection Point V1.0.0
-- `ucmpc`: Use Case Monitoring of Power Consumption V1.0.0
+- `ucmpc`: Use Case Monitoring of Power Consumption V1.0.0 as a Monitoring Appliance
 - `ucopev`: Use Case Overload Protection by EV Charging Current Curtailment V1.0.1b
 - `ucoscev`: Use Case Optimization of Self Consumption During EV Charging V1.0.1b
-- `ucvabd`: Use Case Visualization of Aggregated Battery Data V1.0.0 RC1
-- `ucvapd`: Use Case Visualization of Aggregated Photovoltaic Data V1.0.0 RC1
+- `ucvabd`: Use Case Visualization of Aggregated Battery Data V1.0.0 RC1 as a Visualization Appliance
+- `ucvapd`: Use Case Visualization of Aggregated Photovoltaic Data V1.0.0 RC1 as a Visualization Appliance
 - `util`: various internal helpers
 
 ## Usage
