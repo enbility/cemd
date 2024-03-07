@@ -86,7 +86,7 @@ func (s *UCVAPDSuite) Test_inverterMeasurementDataUpdate() {
 		Device: s.remoteDevice,
 		Entity: s.pvEntity,
 	}
-	s.sut.inverterConfigurationDataUpdate(payload)
+	s.sut.inverterMeasurementDataUpdate(payload)
 
 	descData := &model.MeasurementDescriptionListDataType{
 		MeasurementDescriptionData: []model.MeasurementDescriptionDataType{
@@ -105,7 +105,9 @@ func (s *UCVAPDSuite) Test_inverterMeasurementDataUpdate() {
 	fErr := rFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.inverterConfigurationDataUpdate(payload)
+	s.sut.inverterMeasurementDescriptionDataUpdate(payload.Entity)
+
+	s.sut.inverterMeasurementDataUpdate(payload)
 
 	data := &model.MeasurementListDataType{
 		MeasurementData: []model.MeasurementDataType{
@@ -123,5 +125,5 @@ func (s *UCVAPDSuite) Test_inverterMeasurementDataUpdate() {
 	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, data, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	s.sut.inverterConfigurationDataUpdate(payload)
+	s.sut.inverterMeasurementDataUpdate(payload)
 }
