@@ -10,11 +10,6 @@ import (
 func (e *UCEVSECC) HandleEvent(payload spineapi.EventPayload) {
 	// only about events from an EVSE entity or device changes for this remote device
 
-	if util.IsDeviceDisconnected(payload) {
-		e.evseDisconnected(payload)
-		return
-	}
-
 	if !util.IsCompatibleEntity(payload.Entity, e.validEntityTypes) {
 		return
 	}
