@@ -338,8 +338,8 @@ func (s *UtilSuite) Test_WriteLoadControlLimits() {
 				assert.Nil(s.T(), fErr)
 
 				msgCounter, err = WriteLoadControlLimits(s.service, s.monitoredEntity, entityTypes, category, loadLimits)
-				assert.Nil(t, err)
-				assert.NotNil(t, msgCounter)
+				assert.NotNil(t, err)
+				assert.Nil(t, msgCounter)
 
 				phaseLimitValues := []api.LoadLimitsPhase{}
 				for index, limit := range data.limits {

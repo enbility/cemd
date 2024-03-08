@@ -182,26 +182,7 @@ func WriteLoadControlLimits(
 		limitData = append(limitData, newLimit)
 	}
 
-	currentLimits, err := loadControl.GetLimitValues()
-	if err != nil {
-		return nil, eebusapi.ErrDataNotAvailable
-	}
-
-	for index, limit := range currentLimits {
-		if limit.LimitId == nil {
-			continue
-		}
-
-		for _, newLimit := range limitData {
-			if newLimit.LimitId != limit.LimitId {
-				continue
-			}
-
-			currentLimits[index] = newLimit
-		}
-	}
-
-	msgCounter, err := loadControl.WriteLimitValues(currentLimits)
+	msgCounter, err := loadControl.WriteLimitValues(limitData)
 
 	return msgCounter, err
 }
