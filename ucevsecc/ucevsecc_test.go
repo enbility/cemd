@@ -6,6 +6,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func (s *UCEVSECCSuite) Test_UpdateUseCaseAvailability() {
+	s.sut.UpdateUseCaseAvailability(true)
+}
+
 func (s *UCEVSECCSuite) Test_IsUseCaseSupported() {
 	data, err := s.sut.IsUseCaseSupported(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
