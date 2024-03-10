@@ -87,7 +87,7 @@ func (e *UCLPC) loadControlLimitDataUpdate(payload spineapi.EventPayload) {
 	}
 }
 
-// the configuration key description data of an SMGW was updated
+// the configuration key description data was updated
 func (e *UCLPC) configurationDescriptionDataUpdate(entity spineapi.EntityRemoteInterface) {
 	if deviceConfiguration, err := util.DeviceConfiguration(e.service, entity); err == nil {
 		// key value descriptions received, now get the data
@@ -97,7 +97,7 @@ func (e *UCLPC) configurationDescriptionDataUpdate(entity spineapi.EntityRemoteI
 	}
 }
 
-// the configuration key data of an SMGW was updated
+// the configuration key data was updated
 func (e *UCLPC) configurationDataUpdate(payload spineapi.EventPayload) {
 	if _, err := e.FailsafeConsumptionActivePowerLimit(payload.Entity); err != nil {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateFailsafeConsumptionActivePowerLimit)
