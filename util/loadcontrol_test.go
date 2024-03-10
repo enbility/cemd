@@ -364,3 +364,54 @@ func (s *UtilSuite) Test_WriteLoadControlLimits() {
 		})
 	}
 }
+
+func (s *UtilSuite) Test_GetLocalLimitDescriptionsForTypeCategoryDirectionScope() {
+	limitType := model.LoadControlLimitTypeTypeSignDependentAbsValueLimit
+	limitCategory := model.LoadControlCategoryTypeObligation
+	limitDirection := model.EnergyDirectionTypeConsume
+	limitScopeType := model.ScopeTypeTypeActivePowerLimit
+
+	data := GetLocalLimitDescriptionsForTypeCategoryDirectionScope(s.service, limitType, limitCategory, limitDirection, limitScopeType)
+	assert.Nil(s.T(), data.LimitId)
+
+	entity := s.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
+	feature := entity.FeatureOfTypeAndRole(model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
+
+	desc := &model.LoadControlLimitDescriptionListDataType{
+		LoadControlLimitDescriptionData: []model.LoadControlLimitDescriptionDataType{
+			{
+				LimitId:        eebusutil.Ptr(model.LoadControlLimitIdType(0)),
+				LimitType:      eebusutil.Ptr(limitType),
+				LimitCategory:  eebusutil.Ptr(limitCategory),
+				LimitDirection: eebusutil.Ptr(limitDirection),
+				ScopeType:      eebusutil.Ptr(limitScopeType),
+			},
+		},
+	}
+	feature.SetData(model.FunctionTypeLoadControlLimitDescriptionListData, desc)
+
+	data = GetLocalLimitDescriptionsForTypeCategoryDirectionScope(s.service, limitType, limitCategory, limitDirection, limitScopeType)
+	assert.NotNil(s.T(), data.LimitId)
+}
+
+func (s *UtilSuite) Test_GetLocalLimitValueForLimitId() {
+	limitId := model.LoadControlLimitIdType(0)
+
+	data := GetLocalLimitValueForLimitId(s.service, limitId)
+	assert.Nil(s.T(), data.LimitId)
+
+	entity := s.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
+	feature := entity.FeatureOfTypeAndRole(model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
+
+	desc := &model.LoadControlLimitListDataType{
+		LoadControlLimitData: []model.LoadControlLimitDataType{
+			{
+				LimitId: eebusutil.Ptr(model.LoadControlLimitIdType(0)),
+			},
+		},
+	}
+	feature.SetData(model.FunctionTypeLoadControlLimitListData, desc)
+
+	data = GetLocalLimitValueForLimitId(s.service, limitId)
+	assert.NotNil(s.T(), data.LimitId)
+}

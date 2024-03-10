@@ -1,4 +1,4 @@
-package util
+package uclpcserver
 
 import (
 	"fmt"
@@ -20,25 +20,28 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-func TestUtilSuite(t *testing.T) {
-	suite.Run(t, new(UtilSuite))
+func TestLPCServerSuite(t *testing.T) {
+	suite.Run(t, new(UCLPCServerSuite))
 }
 
-type UtilSuite struct {
+type UCLPCServerSuite struct {
 	suite.Suite
+
+	sut *UCLPCServer
 
 	service eebusapi.ServiceInterface
 
 	remoteDevice     spineapi.DeviceRemoteInterface
 	mockRemoteEntity *mocks.EntityRemoteInterface
-	evseEntity       spineapi.EntityRemoteInterface
 	monitoredEntity  spineapi.EntityRemoteInterface
+	loadControlFeature,
+	deviceConfigurationFeature spineapi.FeatureLocalInterface
 }
 
-func (s *UtilSuite) Event(ski string, entity spineapi.EntityRemoteInterface, event api.EventType) {
+func (s *UCLPCServerSuite) Event(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.EventType) {
 }
 
-func (s *UtilSuite) BeforeTest(suiteName, testName string) {
+func (s *UCLPCServerSuite) BeforeTest(suiteName, testName string) {
 	cert, _ := cert.CreateCertificate("test", "test", "DE", "test")
 	configuration, _ := eebusapi.NewConfiguration(
 		"test", "test", "test", "test",
@@ -63,11 +66,15 @@ func (s *UtilSuite) BeforeTest(suiteName, testName string) {
 	s.mockRemoteEntity.EXPECT().Address().Return(entityAddress).Maybe()
 	mockRemoteFeature.EXPECT().DataCopy(mock.Anything).Return(mock.Anything).Maybe()
 
-	var entities []spineapi.EntityRemoteInterface
+	s.sut = NewUCLPC(s.service, s.Event)
+	s.sut.AddFeatures()
+	s.sut.AddUseCase()
 
-	s.remoteDevice, entities = setupDevices(s.service, s.T())
-	s.evseEntity = entities[0]
-	s.monitoredEntity = entities[1]
+	localEntity := s.sut.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
+	s.loadControlFeature = localEntity.FeatureOfTypeAndRole(model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
+	s.deviceConfigurationFeature = localEntity.FeatureOfTypeAndRole(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer)
+
+	s.remoteDevice, s.monitoredEntity = setupDevices(s.service, s.T())
 }
 
 const remoteSki string = "testremoteski"
@@ -75,17 +82,11 @@ const remoteSki string = "testremoteski"
 func setupDevices(
 	eebusService eebusapi.ServiceInterface, t *testing.T) (
 	spineapi.DeviceRemoteInterface,
-	[]spineapi.EntityRemoteInterface) {
+	spineapi.EntityRemoteInterface) {
 	localDevice := eebusService.LocalDevice()
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
 
-	f := spine.NewFeatureLocal(1, localEntity, model.FeatureTypeTypeLoadControl, model.RoleTypeClient)
-	localEntity.AddFeature(f)
-	f = spine.NewFeatureLocal(2, localEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient)
-	localEntity.AddFeature(f)
-	f = spine.NewFeatureLocal(3, localEntity, model.FeatureTypeTypeMeasurement, model.RoleTypeClient)
-	localEntity.AddFeature(f)
-	f = spine.NewFeatureLocal(1, localEntity, model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
+	f := spine.NewFeatureLocal(1, localEntity, model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeLoadControlLimitDescriptionListData, true, false)
 	f.AddFunctionType(model.FunctionTypeLoadControlLimitListData, true, true)
 	localEntity.AddFeature(f)
@@ -94,49 +95,44 @@ func setupDevices(
 	f.AddFunctionType(model.FunctionTypeElectricalConnectionPermittedValueSetListData, true, false)
 	f.AddFunctionType(model.FunctionTypeElectricalConnectionCharacteristicListData, true, true)
 	localEntity.AddFeature(f)
-	f = spine.NewFeatureLocal(2, localEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer)
-	f.AddFunctionType(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, true, false)
-	f.AddFunctionType(model.FunctionTypeDeviceConfigurationKeyValueListData, true, true)
-	localEntity.AddFeature(f)
 
 	writeHandler := shipmocks.NewShipConnectionDataWriterInterface(t)
 	writeHandler.EXPECT().WriteShipMessageWithPayload(mock.Anything).Return().Maybe()
 	sender := spine.NewSender(writeHandler)
 	remoteDevice := spine.NewDeviceRemote(localDevice, remoteSki, sender)
 
-	var clientRemoteFeatures = []struct {
+	remoteDeviceName := "remote"
+
+	var remoteFeatures = []struct {
 		featureType   model.FeatureTypeType
 		role          model.RoleType
 		supportedFcts []model.FunctionType
 	}{
 		{model.FeatureTypeTypeLoadControl,
+			model.RoleTypeClient,
+			[]model.FunctionType{},
+		},
+		{model.FeatureTypeTypeDeviceConfiguration,
+			model.RoleTypeClient,
+			[]model.FunctionType{},
+		},
+		{model.FeatureTypeTypeDeviceDiagnosis,
+			model.RoleTypeClient,
+			[]model.FunctionType{},
+		},
+		{model.FeatureTypeTypeDeviceDiagnosis,
 			model.RoleTypeServer,
 			[]model.FunctionType{
-				model.FunctionTypeLoadControlLimitDescriptionListData,
-				model.FunctionTypeLoadControlLimitConstraintsListData,
-				model.FunctionTypeLoadControlLimitListData,
+				model.FunctionTypeDeviceDiagnosisHeartbeatData,
 			},
 		},
 		{model.FeatureTypeTypeElectricalConnection,
-			model.RoleTypeServer,
-			[]model.FunctionType{
-				model.FunctionTypeElectricalConnectionParameterDescriptionListData,
-				model.FunctionTypeElectricalConnectionPermittedValueSetListData,
-			},
-		},
-		{model.FeatureTypeTypeMeasurement,
-			model.RoleTypeServer,
-			[]model.FunctionType{
-				model.FunctionTypeMeasurementDescriptionListData,
-				model.FunctionTypeMeasurementListData,
-			},
+			model.RoleTypeClient,
+			[]model.FunctionType{},
 		},
 	}
-
-	remoteDeviceName := "remote"
-
 	var featureInformations []model.NodeManagementDetailedDiscoveryFeatureInformationType
-	for index, feature := range clientRemoteFeatures {
+	for index, feature := range remoteFeatures {
 		supportedFcts := []model.FunctionPropertyType{}
 		for _, fct := range feature.supportedFcts {
 			supportedFct := model.FunctionPropertyType{
@@ -152,7 +148,7 @@ func setupDevices(
 			Description: &model.NetworkManagementFeatureDescriptionDataType{
 				FeatureAddress: &model.FeatureAddressType{
 					Device:  eebusutil.Ptr(model.AddressDeviceType(remoteDeviceName)),
-					Entity:  []model.AddressEntityType{1, 1},
+					Entity:  []model.AddressEntityType{1},
 					Feature: eebusutil.Ptr(model.AddressFeatureType(index)),
 				},
 				FeatureType:       eebusutil.Ptr(feature.featureType),
@@ -178,16 +174,7 @@ func setupDevices(
 						Device: eebusutil.Ptr(model.AddressDeviceType(remoteDeviceName)),
 						Entity: []model.AddressEntityType{1},
 					},
-					EntityType: eebusutil.Ptr(model.EntityTypeTypeEVSE),
-				},
-			},
-			{
-				Description: &model.NetworkManagementEntityDescriptionDataType{
-					EntityAddress: &model.EntityAddressType{
-						Device: eebusutil.Ptr(model.AddressDeviceType(remoteDeviceName)),
-						Entity: []model.AddressEntityType{1, 1},
-					},
-					EntityType: eebusutil.Ptr(model.EntityTypeTypeEV),
+					EntityType: eebusutil.Ptr(model.EntityTypeTypeGridGuard),
 				},
 			},
 		},
@@ -198,8 +185,9 @@ func setupDevices(
 	if err != nil {
 		fmt.Println(err)
 	}
+	remoteDevice.UpdateDevice(detailedData.DeviceInformation.Description)
 
 	localDevice.AddRemoteDeviceForSki(remoteSki, remoteDevice)
 
-	return remoteDevice, entities
+	return remoteDevice, entities[0]
 }

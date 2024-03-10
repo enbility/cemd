@@ -6,6 +6,7 @@ import (
 	eebusutil "github.com/enbility/eebus-go/util"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
+	"github.com/enbility/spine-go/spine"
 )
 
 // return the current loadcontrol limits for a categoriy
@@ -196,4 +197,68 @@ func WriteLoadControlLimits(
 	msgCounter, err := loadControl.WriteLimitValues(limitData)
 
 	return msgCounter, err
+}
+
+func GetLocalLimitDescriptionsForTypeCategoryDirectionScope(
+	service eebusapi.ServiceInterface,
+	limitType model.LoadControlLimitTypeType,
+	limitCategory model.LoadControlCategoryType,
+	limitDirection model.EnergyDirectionType,
+	scopeType model.ScopeTypeType,
+) (description model.LoadControlLimitDescriptionDataType) {
+	description = model.LoadControlLimitDescriptionDataType{}
+
+	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
+
+	loadControl := localEntity.FeatureOfTypeAndRole(model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
+	if loadControl == nil {
+		return
+	}
+
+	data, err := spine.LocalFeatureDataCopyOfType[*model.LoadControlLimitDescriptionListDataType](
+		loadControl, model.FunctionTypeLoadControlLimitDescriptionListData)
+	if err != nil || data == nil || data.LoadControlLimitDescriptionData == nil {
+		return
+	}
+
+	for _, desc := range data.LoadControlLimitDescriptionData {
+		if desc.LimitType != nil && *desc.LimitType == limitType &&
+			desc.LimitCategory != nil && *desc.LimitCategory == limitCategory &&
+			desc.LimitDirection != nil && *desc.LimitDirection == limitDirection &&
+			desc.ScopeType != nil && *desc.ScopeType == scopeType {
+			description = desc
+			break
+		}
+	}
+
+	return description
+}
+
+func GetLocalLimitValueForLimitId(
+	service eebusapi.ServiceInterface,
+	limitId model.LoadControlLimitIdType,
+) (value model.LoadControlLimitDataType) {
+	value = model.LoadControlLimitDataType{}
+
+	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
+
+	loadControl := localEntity.FeatureOfTypeAndRole(model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
+	if loadControl == nil {
+		return
+	}
+
+	values, err := spine.LocalFeatureDataCopyOfType[*model.LoadControlLimitListDataType](
+		loadControl, model.FunctionTypeLoadControlLimitListData)
+	if err != nil || values == nil || values.LoadControlLimitData == nil {
+		return
+	}
+
+	for _, item := range values.LoadControlLimitData {
+		if item.LimitId != nil && *item.LimitId == limitId {
+			value = item
+			break
+		}
+	}
+
+	return
 }

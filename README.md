@@ -22,6 +22,8 @@ This library provides a foundation to implement energy management solutions usin
 - `ucevcem`: Use Case EV Charging Electricity Measurement V1.0.1
 - `ucevsecc`: Use Case EVSE Commissioning and Configuration V1.0.1
 - `ucevsoc`: Use Case EV State Of Charge V1.0.0 RC1
+- `uclpc`: Use Case Limitation of Power Consumption V1.0.0 as a Energy Guard
+- `uclpcserver`: Use Case Limitation of Power Consumption V1.0.0 as a Controllable System
 - `ucmgcp`: Use Case Monitoring of Grid Connection Point V1.0.0
 - `ucmpc`: Use Case Monitoring of Power Consumption V1.0.0 as a Monitoring Appliance
 - `ucopev`: Use Case Overload Protection by EV Charging Current Curtailment V1.0.1b
