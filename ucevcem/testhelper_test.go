@@ -60,6 +60,8 @@ func (s *UCEVCEMSuite) BeforeTest(suiteName, testName string) {
 	s.mockRemoteEntity.EXPECT().Device().Return(mockRemoteDevice).Maybe()
 	s.mockRemoteEntity.EXPECT().EntityType().Return(mock.Anything).Maybe()
 	mockRemoteFeature.EXPECT().DataCopy(mock.Anything).Return(mock.Anything).Maybe()
+	mockRemoteFeature.EXPECT().Address().Return(&model.FeatureAddressType{}).Maybe()
+	mockRemoteFeature.EXPECT().Operations().Return(nil).Maybe()
 
 	s.sut = NewUCEVCEM(s.service, s.Event)
 	s.sut.AddFeatures()

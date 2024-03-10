@@ -41,6 +41,23 @@ func (s *UCCEVCSuite) Test_Events() {
 	s.sut.HandleEvent(payload)
 }
 
+func (s *UCCEVCSuite) Test_Failures() {
+	payload := spineapi.EventPayload{
+		Entity: s.mockRemoteEntity,
+	}
+	s.sut.evConnected(s.mockRemoteEntity)
+
+	s.sut.evTimeSeriesDescriptionDataUpdate(payload)
+
+	s.sut.evTimeSeriesDataUpdate(payload)
+
+	s.sut.evIncentiveTableDescriptionDataUpdate(payload)
+
+	s.sut.evCheckTimeSeriesDescriptionConstraintsUpdateRequired(s.mockRemoteEntity)
+
+	s.sut.evCheckIncentiveTableDescriptionUpdateRequired(s.mockRemoteEntity)
+}
+
 func (s *UCCEVCSuite) Test_evTimeSeriesDescriptionDataUpdate() {
 	payload := spineapi.EventPayload{
 		Ski:    remoteSki,

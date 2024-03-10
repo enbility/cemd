@@ -63,6 +63,8 @@ func (s *UCEVSOCSuite) BeforeTest(suiteName, testName string) {
 	entityAddress := &model.EntityAddressType{}
 	s.mockRemoteEntity.EXPECT().Address().Return(entityAddress).Maybe()
 	mockRemoteFeature.EXPECT().DataCopy(mock.Anything).Return(mock.Anything).Maybe()
+	mockRemoteFeature.EXPECT().Address().Return(&model.FeatureAddressType{}).Maybe()
+	mockRemoteFeature.EXPECT().Operations().Return(nil).Maybe()
 
 	s.sut = NewUCEVSOC(s.service, s.Event)
 	s.sut.AddFeatures()

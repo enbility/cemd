@@ -65,6 +65,8 @@ func (s *UCCEVCSuite) BeforeTest(suiteName, testName string) {
 	ops := map[model.FunctionType]spineapi.OperationsInterface{}
 	mockRemoteFeature.EXPECT().Operations().Return(ops).Maybe()
 	mockRemoteFeature.EXPECT().DataCopy(mock.Anything).Return(mock.Anything).Maybe()
+	mockRemoteFeature.EXPECT().Address().Return(&model.FeatureAddressType{}).Maybe()
+	mockRemoteFeature.EXPECT().Operations().Return(nil).Maybe()
 
 	s.sut = NewUCCEVC(s.service, s.Event)
 	s.sut.AddFeatures()

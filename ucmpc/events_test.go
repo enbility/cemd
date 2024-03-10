@@ -33,6 +33,12 @@ func (s *UCMPCSuite) Test_Events() {
 	s.sut.HandleEvent(payload)
 }
 
+func (s *UCMPCSuite) Test_Failures() {
+	s.sut.deviceConnected(s.mockRemoteEntity)
+
+	s.sut.deviceMeasurementDescriptionDataUpdate(s.mockRemoteEntity)
+}
+
 func (s *UCMPCSuite) Test_deviceMeasurementDataUpdate() {
 	payload := spineapi.EventPayload{
 		Ski:    remoteSki,

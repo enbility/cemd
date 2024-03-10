@@ -39,6 +39,14 @@ func (s *UCVAPDSuite) Test_Events() {
 	s.sut.HandleEvent(payload)
 }
 
+func (s *UCVAPDSuite) Test_Failures() {
+	s.sut.inverterConnected(s.mockRemoteEntity)
+
+	s.sut.inverterConfigurationDescriptionDataUpdate(s.mockRemoteEntity)
+
+	s.sut.inverterMeasurementDescriptionDataUpdate(s.mockRemoteEntity)
+}
+
 func (s *UCVAPDSuite) Test_inverterConfigurationDataUpdate() {
 	payload := spineapi.EventPayload{
 		Ski:    remoteSki,

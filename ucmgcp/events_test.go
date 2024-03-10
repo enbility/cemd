@@ -36,6 +36,14 @@ func (s *UCMGCPSuite) Test_Events() {
 	s.sut.HandleEvent(payload)
 }
 
+func (s *UCMGCPSuite) Test_Failures() {
+	s.sut.gridConnected(s.mockRemoteEntity)
+
+	s.sut.gridConfigurationDescriptionDataUpdate(s.mockRemoteEntity)
+
+	s.sut.gridMeasurementDescriptionDataUpdate(s.mockRemoteEntity)
+}
+
 func (s *UCMGCPSuite) Test_gridConfigurationDataUpdate() {
 	payload := spineapi.EventPayload{
 		Ski:    remoteSki,

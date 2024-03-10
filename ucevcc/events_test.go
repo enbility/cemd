@@ -40,6 +40,10 @@ func (s *UCEVCCSuite) Test_Events() {
 	payload.Data = eebusutil.Ptr(model.DeviceConfigurationKeyValueListDataType{})
 	s.sut.HandleEvent(payload)
 
+	var value model.DeviceDiagnosisOperatingStateType
+	payload.Data = &value
+	s.sut.HandleEvent(payload)
+
 	payload.Data = eebusutil.Ptr(model.DeviceClassificationManufacturerDataType{})
 	s.sut.HandleEvent(payload)
 
@@ -51,6 +55,17 @@ func (s *UCEVCCSuite) Test_Events() {
 
 	payload.Data = eebusutil.Ptr(model.IdentificationListDataType{})
 	s.sut.HandleEvent(payload)
+}
+
+func (s *UCEVCCSuite) Test_Failures() {
+	payload := spineapi.EventPayload{
+		Entity: s.mockRemoteEntity,
+	}
+	s.sut.evConnected(payload)
+
+	s.sut.evConfigurationDescriptionDataUpdate(s.mockRemoteEntity)
+
+	s.sut.evElectricalParamerDescriptionUpdate(s.mockRemoteEntity)
 }
 
 func (s *UCEVCCSuite) Test_evConfigurationDataUpdate() {

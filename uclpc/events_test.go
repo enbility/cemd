@@ -39,6 +39,12 @@ func (s *UCLPCSuite) Test_Events() {
 	s.sut.HandleEvent(payload)
 }
 
+func (s *UCLPCSuite) Test_Failures() {
+	s.sut.connected(s.mockRemoteEntity)
+
+	s.sut.configurationDescriptionDataUpdate(s.mockRemoteEntity)
+}
+
 func (s *UCLPCSuite) Test_loadControlLimitDataUpdate() {
 	payload := spineapi.EventPayload{
 		Ski:    remoteSki,

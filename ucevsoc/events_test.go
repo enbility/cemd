@@ -30,6 +30,10 @@ func (s *UCEVSOCSuite) Test_Events() {
 	s.sut.HandleEvent(payload)
 }
 
+func (s *UCEVSOCSuite) Test_Failures() {
+	s.sut.evConnected(s.mockRemoteEntity)
+}
+
 func (s *UCEVSOCSuite) Test_evMeasurementDataUpdate() {
 	payload := spineapi.EventPayload{
 		Ski:    remoteSki,
