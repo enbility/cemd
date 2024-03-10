@@ -70,6 +70,12 @@ func (e *UCMPC) AddUseCase() {
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5})
 }
 
+func (e *UCMPC) UpdateUseCaseAvailability(available bool) {
+	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
+
+	localEntity.SetUseCaseAvailability(model.UseCaseActorTypeCEM, e.UseCaseName(), available)
+}
+
 // returns if the entity supports the usecase
 //
 // possible errors:

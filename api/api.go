@@ -32,7 +32,7 @@ type CemInterface interface {
 	AddUseCase(usecase UseCaseInterface)
 }
 
-// Implemented by each UseCase
+// Implemented by each Use Case
 type UseCaseInterface interface {
 	// provide the usecase name
 	UseCaseName() model.UseCaseNameType
@@ -40,8 +40,11 @@ type UseCaseInterface interface {
 	// add the features
 	AddFeatures()
 
-	// add the usecase
+	// add the use case
 	AddUseCase()
+
+	// update availability of the use case
+	UpdateUseCaseAvailability(available bool)
 
 	// returns if the entity supports the usecase
 	//
