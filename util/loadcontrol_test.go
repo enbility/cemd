@@ -10,7 +10,7 @@ import (
 )
 
 func (s *UtilSuite) Test_LoadControlLimits() {
-	var data []float64
+	var data []api.LoadLimitsPhase
 	var err error
 	category := model.LoadControlCategoryTypeObligation
 	entityTypes := []model.EntityTypeType{model.EntityTypeTypeEV}
@@ -49,7 +49,8 @@ func (s *UtilSuite) Test_LoadControlLimits() {
 
 	data, err = LoadControlLimits(s.service, s.monitoredEntity, entityTypes, category)
 	assert.Nil(s.T(), err)
-	assert.Equal(s.T(), []float64{0.0, 0.0, 0.0}, data)
+	assert.Equal(s.T(), 3, len(data))
+	assert.Equal(s.T(), 0.0, data[0].Value)
 
 	paramData := &model.ElectricalConnectionParameterDescriptionListDataType{
 		ElectricalConnectionParameterDescriptionData: []model.ElectricalConnectionParameterDescriptionDataType{
@@ -132,7 +133,8 @@ func (s *UtilSuite) Test_LoadControlLimits() {
 
 	data, err = LoadControlLimits(s.service, s.monitoredEntity, entityTypes, category)
 	assert.Nil(s.T(), err)
-	assert.Equal(s.T(), []float64{16.0, 16.0, 16.0}, data)
+	assert.Equal(s.T(), 3, len(data))
+	assert.Equal(s.T(), 16.0, data[0].Value)
 }
 
 func (s *UtilSuite) Test_WriteLoadControlLimits() {

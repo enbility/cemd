@@ -9,10 +9,16 @@ import (
 
 // return the current loadcontrol recommendation limits
 //
+// parameters:
+//   - entity: the entity of the EV
+//
+// return values:
+//   - limits: per phase data
+//
 // possible errors:
-//   - ErrDataNotAvailable if no such measurement is (yet) available
+//   - ErrDataNotAvailable if no such limit is (yet) available
 //   - and others
-func (e *UCOSCEV) LoadControlLimits(entity spineapi.EntityRemoteInterface) ([]float64, error) {
+func (e *UCOSCEV) LoadControlLimits(entity spineapi.EntityRemoteInterface) (limits []api.LoadLimitsPhase, resultErr error) {
 	return util.LoadControlLimits(e.service, entity, e.validEntityTypes, model.LoadControlCategoryTypeRecommendation)
 }
 

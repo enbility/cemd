@@ -19,10 +19,13 @@ type UCOPEVInterface interface {
 	// parameters:
 	//   - entity: the entity of the EV
 	//
+	// return values:
+	//   - limits: per phase data
+	//
 	// possible errors:
 	//   - ErrDataNotAvailable if no such limit is (yet) available
 	//   - and others
-	LoadControlLimits(entity spineapi.EntityRemoteInterface) ([]float64, error)
+	LoadControlLimits(entity spineapi.EntityRemoteInterface) (limits []api.LoadLimitsPhase, resultErr error)
 
 	// send new LoadControlLimits to the remote EV
 	//

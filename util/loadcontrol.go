@@ -17,34 +17,38 @@ func LoadControlLimits(
 	service eebusapi.ServiceInterface,
 	entity spineapi.EntityRemoteInterface,
 	entityTypes []model.EntityTypeType,
-	category model.LoadControlCategoryType) ([]float64, error) {
+	category model.LoadControlCategoryType) (limits []api.LoadLimitsPhase, resultErr error) {
+
+	limits = nil
+	resultErr = api.ErrNoCompatibleEntity
 	if entity == nil || !IsCompatibleEntity(entity, entityTypes) {
-		return nil, api.ErrNoCompatibleEntity
+		return
 	}
 
 	evLoadControl, err := LoadControl(service, entity)
 	evElectricalConnection, err2 := ElectricalConnection(service, entity)
 	if err != nil || err2 != nil {
-		return nil, api.ErrNoCompatibleEntity
+		return
 	}
 
+	resultErr = eebusapi.ErrDataNotAvailable
 	// find out the appropriate limitId for each phase value
 	// limitDescription contains the measurementId for each limitId
 	limitDescriptions, err := evLoadControl.GetLimitDescriptionsForCategory(category)
 	if err != nil {
-		return nil, eebusapi.ErrDataNotAvailable
+		return
 	}
 
-	var result []float64
+	var result []api.LoadLimitsPhase
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < len(PhaseNameMapping); i++ {
 		phaseName := PhaseNameMapping[i]
 
 		// electricalParameterDescription contains the measured phase for each measurementId
 		elParamDesc, err := evElectricalConnection.GetParameterDescriptionForMeasuredPhase(phaseName)
 		if err != nil || elParamDesc.MeasurementId == nil {
-			// there is no data for this phase, the phase may not exit
-			result = append(result, 0)
+			// there is no data for this phase, the phase may not exist
+			result = append(result, api.LoadLimitsPhase{Phase: phaseName})
 			continue
 		}
 
@@ -60,12 +64,12 @@ func LoadControlLimits(
 		}
 
 		if limitDesc == nil || limitDesc.LimitId == nil {
-			return nil, eebusapi.ErrDataNotAvailable
+			return
 		}
 
 		limitIdData, err := evLoadControl.GetLimitValueForLimitId(*limitDesc.LimitId)
 		if err != nil {
-			return nil, eebusapi.ErrDataNotAvailable
+			return
 		}
 
 		var limitValue float64
@@ -73,7 +77,7 @@ func LoadControlLimits(
 			// report maximum possible if no limit is available or the limit is not active
 			_, dataMax, _, err := evElectricalConnection.GetLimitsForParameterId(*elParamDesc.ParameterId)
 			if err != nil {
-				return nil, eebusapi.ErrDataNotAvailable
+				return
 			}
 
 			limitValue = dataMax
@@ -81,7 +85,14 @@ func LoadControlLimits(
 			limitValue = limitIdData.Value.GetValue()
 		}
 
-		result = append(result, limitValue)
+		newLimit := api.LoadLimitsPhase{
+			Phase:        phaseName,
+			IsChangeable: (limitIdData.IsLimitChangeable != nil && *limitIdData.IsLimitChangeable),
+			IsActive:     (limitIdData.IsLimitActive != nil && *limitIdData.IsLimitActive),
+			Value:        limitValue,
+		}
+
+		result = append(result, newLimit)
 	}
 
 	return result, nil

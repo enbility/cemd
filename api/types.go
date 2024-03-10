@@ -18,11 +18,20 @@ const (
 	EVChargeStateTypeFinished  EVChargeStateType = "finished"
 )
 
-// Defines a phase specific limit
+// Defines a phase specific limit data set
 type LoadLimitsPhase struct {
-	Phase    model.ElectricalConnectionPhaseNameType
-	IsActive bool
-	Value    float64
+	Phase        model.ElectricalConnectionPhaseNameType // the phase
+	IsChangeable bool                                    // if the value can be changed via write, ignored when writing data
+	IsActive     bool                                    // if the limit is active
+	Value        float64                                 // the limit in A
+}
+
+// Defines a limit data set
+type LoadLimit struct {
+	Duration     time.Duration // the duration of the limit,
+	IsChangeable bool          // if the value can be changed via write, ignored when writing data
+	IsActive     bool          // if the limit is active
+	Value        float64       // the limit in A
 }
 
 // identification
