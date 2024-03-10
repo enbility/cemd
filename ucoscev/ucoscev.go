@@ -28,7 +28,7 @@ func NewUCOSCEV(service eebusapi.ServiceInterface, eventCB api.EntityEventCallba
 	uc.validEntityTypes = []model.EntityTypeType{
 		model.EntityTypeTypeCompressor,
 		model.EntityTypeTypeElectricalImmersionHeater,
-		model.EntityTypeTypeEVSE,
+		model.EntityTypeTypeEV,
 		model.EntityTypeTypeHeatPumpAppliance,
 		model.EntityTypeTypeInverter,
 		model.EntityTypeTypeSmartEnergyAppliance,
