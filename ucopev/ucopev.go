@@ -47,14 +47,12 @@ func (e *UCOPEV) AddFeatures() {
 		model.FeatureTypeTypeElectricalConnection,
 	}
 	for _, feature := range clientFeatures {
-		f := localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
-		f.AddResultHandler(e)
+		_ = localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
 	}
 
 	// server features
 	f := localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeDeviceDiagnosisStateData, false, false)
-	f.AddResultHandler(e)
 }
 
 func (e *UCOPEV) AddUseCase() {

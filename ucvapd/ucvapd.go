@@ -47,10 +47,8 @@ func (e *UCVAPD) AddFeatures() {
 		model.FeatureTypeTypeMeasurement,
 	}
 	for _, feature := range clientFeatures {
-		f := localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
-		f.AddResultHandler(e)
+		_ = localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
 	}
-
 }
 
 func (e *UCVAPD) AddUseCase() {

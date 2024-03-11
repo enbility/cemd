@@ -47,22 +47,19 @@ func (e *UCLPC) AddFeatures() {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	// client features
-	f := localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient)
-	f.AddResultHandler(e)
-
-	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeLoadControl, model.RoleTypeClient)
-	f.AddResultHandler(e)
-
-	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeClient)
-	f.AddResultHandler(e)
-
-	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeElectricalConnection, model.RoleTypeClient)
-	f.AddResultHandler(e)
+	var clientFeatures = []model.FeatureTypeType{
+		model.FeatureTypeTypeDeviceDiagnosis,
+		model.FeatureTypeTypeLoadControl,
+		model.FeatureTypeTypeDeviceConfiguration,
+		model.FeatureTypeTypeElectricalConnection,
+	}
+	for _, feature := range clientFeatures {
+		_ = localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
+	}
 
 	// server features
-	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
+	f := localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeDeviceDiagnosisHeartbeatData, true, false)
-	f.AddResultHandler(e)
 }
 
 func (e *UCLPC) AddUseCase() {

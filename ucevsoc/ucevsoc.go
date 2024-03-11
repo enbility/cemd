@@ -47,8 +47,7 @@ func (e *UCEVSOC) AddFeatures() {
 		model.FeatureTypeTypeMeasurement,
 	}
 	for _, feature := range clientFeatures {
-		f := localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
-		f.AddResultHandler(e)
+		_ = localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
 	}
 }
 

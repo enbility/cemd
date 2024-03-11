@@ -7,32 +7,44 @@ import (
 	"github.com/enbility/spine-go/model"
 )
 
-func (e *UCEVCC) HandleResult(errorMsg api.ResultMessage) {
+func (e *UCEVCC) HandleResponse(responseMsg api.ResponseMessage) {
 	// before SPINE 1.3 the heartbeats are on the EVSE entity
-	if errorMsg.EntityRemote == nil ||
-		(errorMsg.EntityRemote.EntityType() != model.EntityTypeTypeEV &&
-			errorMsg.EntityRemote.EntityType() != model.EntityTypeTypeEVSE) {
+	if responseMsg.EntityRemote == nil ||
+		(responseMsg.EntityRemote.EntityType() != model.EntityTypeTypeEV &&
+			responseMsg.EntityRemote.EntityType() != model.EntityTypeTypeEVSE) {
 		return
 	}
 
 	// handle errors coming from the remote EVSE entity
-	if errorMsg.FeatureLocal.Type() == model.FeatureTypeTypeDeviceDiagnosis {
-		e.handleResultDeviceDiagnosis(errorMsg)
+	if responseMsg.FeatureLocal.Type() == model.FeatureTypeTypeDeviceDiagnosis {
+		e.handleResultDeviceDiagnosis(responseMsg)
 	}
 }
 
 // Handle DeviceDiagnosis Results
-func (e *UCEVCC) handleResultDeviceDiagnosis(resultMsg api.ResultMessage) {
+func (e *UCEVCC) handleResultDeviceDiagnosis(responseMsg api.ResponseMessage) {
 	// is this an error for a heartbeat message?
-	if resultMsg.DeviceRemote == nil ||
-		resultMsg.Result == nil ||
-		resultMsg.Result.ErrorNumber == nil ||
-		*resultMsg.Result.ErrorNumber == model.ErrorNumberTypeNoError {
+	if responseMsg.DeviceRemote == nil ||
+		responseMsg.Data == nil {
+		return
+	}
+
+	var result *model.ResultDataType
+
+	switch responseMsg.Data.(type) {
+	case *model.ResultDataType:
+		result = responseMsg.Data.(*model.ResultDataType)
+	default:
+		return
+	}
+
+	if result.ErrorNumber == nil ||
+		*result.ErrorNumber == model.ErrorNumberTypeNoError {
 		return
 	}
 
 	// check if this is for a cached notify message
-	datagram, err := resultMsg.DeviceRemote.Sender().DatagramForMsgCounter(resultMsg.MsgCounterReference)
+	datagram, err := responseMsg.DeviceRemote.Sender().DatagramForMsgCounter(responseMsg.MsgCounterReference)
 	if err != nil {
 		return
 	}
@@ -40,10 +52,10 @@ func (e *UCEVCC) handleResultDeviceDiagnosis(resultMsg api.ResultMessage) {
 	if len(datagram.Payload.Cmd) > 0 &&
 		datagram.Payload.Cmd[0].DeviceDiagnosisHeartbeatData != nil {
 		// something is horribly wrong, disconnect and hope a new connection will fix it
-		errorText := fmt.Sprintf("Error Code: %d", resultMsg.Result.ErrorNumber)
-		if resultMsg.Result.Description != nil {
-			errorText = fmt.Sprintf("%s - %s", errorText, string(*resultMsg.Result.Description))
+		errorText := fmt.Sprintf("Error Code: %d", result.ErrorNumber)
+		if result.Description != nil {
+			errorText = fmt.Sprintf("%s - %s", errorText, string(*result.Description))
 		}
-		e.service.DisconnectSKI(resultMsg.DeviceRemote.Ski(), errorText)
+		e.service.DisconnectSKI(responseMsg.DeviceRemote.Ski(), errorText)
 	}
 }

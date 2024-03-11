@@ -43,14 +43,12 @@ func (e *UCLPCServer) AddFeatures() {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	// client features
-	f := localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient)
-	f.AddResultHandler(e)
+	_ = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient)
 
 	// server features
-	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
+	f := localEntity.GetOrAddFeature(model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeLoadControlLimitDescriptionListData, true, false)
 	f.AddFunctionType(model.FunctionTypeLoadControlLimitListData, true, true)
-	f.AddResultHandler(e)
 
 	var limitId model.LoadControlLimitIdType = 0
 	// get the highest limitId
@@ -80,7 +78,6 @@ func (e *UCLPCServer) AddFeatures() {
 	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, true, false)
 	f.AddFunctionType(model.FunctionTypeDeviceConfigurationKeyValueListData, true, true)
-	f.AddResultHandler(e)
 
 	var configId model.DeviceConfigurationKeyIdType = 0
 	// get the heighest keyId
@@ -112,11 +109,9 @@ func (e *UCLPCServer) AddFeatures() {
 
 	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeDeviceDiagnosisHeartbeatData, true, true)
-	f.AddResultHandler(e)
 
 	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeElectricalConnectionCharacteristicListData, true, true)
-	f.AddResultHandler(e)
 
 	var elCharId model.ElectricalConnectionCharacteristicIdType = 0
 	// get the heighest CharacteristicId

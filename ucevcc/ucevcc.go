@@ -51,7 +51,7 @@ func (e *UCEVCC) AddFeatures() {
 	}
 	for _, feature := range clientFeatures {
 		f := localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
-		f.AddResultHandler(e)
+		f.AddResultCallback(e.HandleResponse)
 	}
 }
 

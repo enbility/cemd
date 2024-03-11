@@ -13,20 +13,35 @@ func (s *UCEVCCSuite) Test_Results() {
 	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
 	localFeature := localEntity.FeatureOfTypeAndRole(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeClient)
 
-	errorMsg := spineapi.ResultMessage{
+	errorMsg := spineapi.ResponseMessage{
+		DeviceRemote: s.remoteDevice,
+		EntityRemote: s.evEntity,
+		FeatureLocal: localFeature,
+		Data:         eebusutil.Ptr(model.MsgCounterType(0)),
+	}
+	s.sut.HandleResponse(errorMsg)
+
+	errorMsg = spineapi.ResponseMessage{
+		EntityRemote: s.evEntity,
+		FeatureLocal: localFeature,
+		Data:         eebusutil.Ptr(model.MsgCounterType(0)),
+	}
+	s.sut.HandleResponse(errorMsg)
+
+	errorMsg = spineapi.ResponseMessage{
 		DeviceRemote: s.remoteDevice,
 		EntityRemote: s.mockRemoteEntity,
 		FeatureLocal: localFeature,
-		Result: &model.ResultDataType{
+		Data: &model.ResultDataType{
 			ErrorNumber: eebusutil.Ptr(model.ErrorNumberTypeNoError),
 		},
 	}
-	s.sut.HandleResult(errorMsg)
+	s.sut.HandleResponse(errorMsg)
 
 	errorMsg.EntityRemote = s.evEntity
-	s.sut.HandleResult(errorMsg)
+	s.sut.HandleResponse(errorMsg)
 
-	errorMsg.Result = &model.ResultDataType{
+	errorMsg.Data = &model.ResultDataType{
 		ErrorNumber: eebusutil.Ptr(model.ErrorNumberTypeGeneralError),
 		Description: eebusutil.Ptr(model.DescriptionType("test error")),
 	}
@@ -37,7 +52,7 @@ func (s *UCEVCCSuite) Test_Results() {
 		DatagramForMsgCounter(errorMsg.MsgCounterReference).
 		Return(model.DatagramType{}, errors.New("test")).Once()
 
-	s.sut.HandleResult(errorMsg)
+	s.sut.HandleResponse(errorMsg)
 
 	datagram := model.DatagramType{
 		Payload: model.PayloadType{
@@ -53,6 +68,5 @@ func (s *UCEVCCSuite) Test_Results() {
 		DatagramForMsgCounter(errorMsg.MsgCounterReference).
 		Return(datagram, nil).Once()
 
-	s.sut.HandleResult(errorMsg)
-
+	s.sut.HandleResponse(errorMsg)
 }
