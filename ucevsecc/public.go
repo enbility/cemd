@@ -12,36 +12,39 @@ import (
 func (e *UCEVSECC) ManufacturerData(
 	entity spineapi.EntityRemoteInterface,
 ) (
-	string,
-	string,
+	*ManufacturerData,
 	error,
 ) {
-	deviceName := ""
-	serialNumber := ""
-
 	if entity == nil || !util.IsCompatibleEntity(entity, e.validEntityTypes) {
-		return deviceName, serialNumber, api.ErrNoCompatibleEntity
+		return nil, api.ErrNoCompatibleEntity
 	}
 
 	evseDeviceClassification, err := util.DeviceClassification(e.service, entity)
 	if err != nil {
-		return deviceName, serialNumber, err
+		return nil, err
 	}
 
 	data, err := evseDeviceClassification.GetManufacturerDetails()
 	if err != nil {
-		return deviceName, serialNumber, err
+		return nil, err
 	}
 
-	if data.DeviceName != nil {
-		deviceName = string(*data.DeviceName)
+	ret := &ManufacturerData{
+		DeviceName:                     util.Deref((*string)(data.DeviceName)),
+		DeviceCode:                     util.Deref((*string)(data.DeviceCode)),
+		SerialNumber:                   util.Deref((*string)(data.SerialNumber)),
+		SoftwareRevision:               util.Deref((*string)(data.SoftwareRevision)),
+		HardwareRevision:               util.Deref((*string)(data.HardwareRevision)),
+		VendorName:                     util.Deref((*string)(data.VendorName)),
+		VendorCode:                     util.Deref((*string)(data.VendorCode)),
+		BrandName:                      util.Deref((*string)(data.BrandName)),
+		PowerSource:                    util.Deref((*string)(data.PowerSource)),
+		ManufacturerNodeIdentification: util.Deref((*string)(data.ManufacturerNodeIdentification)),
+		ManufacturerLabel:              util.Deref((*string)(data.ManufacturerLabel)),
+		ManufacturerDescription:        util.Deref((*string)(data.ManufacturerDescription)),
 	}
 
-	if data.SerialNumber != nil {
-		serialNumber = string(*data.SerialNumber)
-	}
-
-	return deviceName, serialNumber, nil
+	return ret, nil
 }
 
 // the operating state data of an EVSE

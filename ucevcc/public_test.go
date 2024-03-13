@@ -254,20 +254,17 @@ func (s *UCEVCCSuite) Test_EVIdentification() {
 }
 
 func (s *UCEVCCSuite) Test_EVManufacturerData() {
-	device, serial, err := s.sut.ManufacturerData(s.mockRemoteEntity)
+	data, err := s.sut.ManufacturerData(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), "", device)
-	assert.Equal(s.T(), "", serial)
+	assert.Nil(s.T(), data)
 
-	device, serial, err = s.sut.ManufacturerData(s.evEntity)
+	data, err = s.sut.ManufacturerData(s.evEntity)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), "", device)
-	assert.Equal(s.T(), "", serial)
+	assert.Nil(s.T(), data)
 
-	device, serial, err = s.sut.ManufacturerData(s.evEntity)
+	data, err = s.sut.ManufacturerData(s.evEntity)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), "", device)
-	assert.Equal(s.T(), "", serial)
+	assert.Nil(s.T(), data)
 
 	descData := &model.DeviceClassificationManufacturerDataType{}
 
@@ -275,10 +272,11 @@ func (s *UCEVCCSuite) Test_EVManufacturerData() {
 	fErr := rFeature.UpdateData(model.FunctionTypeDeviceClassificationManufacturerData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	device, serial, err = s.sut.ManufacturerData(s.evEntity)
+	data, err = s.sut.ManufacturerData(s.evEntity)
 	assert.Nil(s.T(), err)
-	assert.Equal(s.T(), "", device)
-	assert.Equal(s.T(), "", serial)
+	assert.NotNil(s.T(), data)
+	assert.Equal(s.T(), "", data.DeviceName)
+	assert.Equal(s.T(), "", data.SerialNumber)
 
 	descData = &model.DeviceClassificationManufacturerDataType{
 		DeviceName:   eebusutil.Ptr(model.DeviceClassificationStringType("test")),
@@ -288,10 +286,12 @@ func (s *UCEVCCSuite) Test_EVManufacturerData() {
 	fErr = rFeature.UpdateData(model.FunctionTypeDeviceClassificationManufacturerData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	device, serial, err = s.sut.ManufacturerData(s.evEntity)
+	data, err = s.sut.ManufacturerData(s.evEntity)
 	assert.Nil(s.T(), err)
-	assert.Equal(s.T(), "test", device)
-	assert.Equal(s.T(), "12345", serial)
+	assert.NotNil(s.T(), data)
+	assert.Equal(s.T(), "test", data.DeviceName)
+	assert.Equal(s.T(), "12345", data.SerialNumber)
+	assert.Equal(s.T(), "", data.BrandName)
 }
 
 func (s *UCEVCCSuite) Test_EVCurrentLimits() {

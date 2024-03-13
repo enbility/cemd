@@ -8,6 +8,21 @@ import (
 
 //go:generate mockery
 
+type ManufacturerData struct {
+	DeviceName                     string `json:"deviceName,omitempty"`
+	DeviceCode                     string `json:"deviceCode,omitempty"`
+	SerialNumber                   string `json:"serialNumber,omitempty"`
+	SoftwareRevision               string `json:"softwareRevision,omitempty"`
+	HardwareRevision               string `json:"hardwareRevision,omitempty"`
+	VendorName                     string `json:"vendorName,omitempty"`
+	VendorCode                     string `json:"vendorCode,omitempty"`
+	BrandName                      string `json:"brandName,omitempty"`
+	PowerSource                    string `json:"powerSource,omitempty"`
+	ManufacturerNodeIdentification string `json:"manufacturerNodeIdentification,omitempty"`
+	ManufacturerLabel              string `json:"manufacturerLabel,omitempty"`
+	ManufacturerDescription        string `json:"manufacturerDescription,omitempty"`
+}
+
 // interface for the EV Commissioning and Configuration UseCase
 type UCEVCCInterface interface {
 	api.UseCaseInterface
@@ -58,7 +73,7 @@ type UCEVCCInterface interface {
 	//
 	// parameters:
 	//   - entity: the entity of the EV
-	ManufacturerData(entity spineapi.EntityRemoteInterface) (string, string, error)
+	ManufacturerData(entity spineapi.EntityRemoteInterface) (*ManufacturerData, error)
 
 	// Scenario 6
 

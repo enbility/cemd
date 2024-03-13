@@ -48,3 +48,10 @@ func IsEntityDisconnected(payload spineapi.EventPayload) bool {
 
 	return false
 }
+
+func Deref(v *string) string {
+	if v != nil {
+		return string(*v)
+	}
+	return ""
+}
