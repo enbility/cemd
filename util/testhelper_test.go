@@ -85,6 +85,8 @@ func setupDevices(
 	localEntity.AddFeature(f)
 	f = spine.NewFeatureLocal(3, localEntity, model.FeatureTypeTypeMeasurement, model.RoleTypeClient)
 	localEntity.AddFeature(f)
+	f = spine.NewFeatureLocal(4, localEntity, model.FeatureTypeTypeDeviceClassification, model.RoleTypeClient)
+	localEntity.AddFeature(f)
 	f = spine.NewFeatureLocal(1, localEntity, model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeLoadControlLimitDescriptionListData, true, false)
 	f.AddFunctionType(model.FunctionTypeLoadControlLimitListData, true, true)
@@ -94,9 +96,13 @@ func setupDevices(
 	f.AddFunctionType(model.FunctionTypeElectricalConnectionPermittedValueSetListData, true, false)
 	f.AddFunctionType(model.FunctionTypeElectricalConnectionCharacteristicListData, true, true)
 	localEntity.AddFeature(f)
-	f = spine.NewFeatureLocal(2, localEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer)
+	f = spine.NewFeatureLocal(3, localEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, true, false)
 	f.AddFunctionType(model.FunctionTypeDeviceConfigurationKeyValueListData, true, true)
+	localEntity.AddFeature(f)
+	f = spine.NewFeatureLocal(4, localEntity, model.FeatureTypeTypeDeviceClassification, model.RoleTypeServer)
+	f.AddFunctionType(model.FunctionTypeDeviceClassificationManufacturerData, true, false)
+	f.AddFunctionType(model.FunctionTypeDeviceClassificationUserData, true, true)
 	localEntity.AddFeature(f)
 
 	writeHandler := shipmocks.NewShipConnectionDataWriterInterface(t)
@@ -129,6 +135,13 @@ func setupDevices(
 			[]model.FunctionType{
 				model.FunctionTypeMeasurementDescriptionListData,
 				model.FunctionTypeMeasurementListData,
+			},
+		},
+		{model.FeatureTypeTypeDeviceClassification,
+			model.RoleTypeServer,
+			[]model.FunctionType{
+				model.FunctionTypeDeviceClassificationManufacturerData,
+				model.FunctionTypeDeviceClassificationUserData,
 			},
 		},
 	}
