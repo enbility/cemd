@@ -198,7 +198,7 @@ func (e *UCEVCC) Identifications(entity spineapi.EntityRemoteInterface) ([]api.I
 func (e *UCEVCC) ManufacturerData(
 	entity spineapi.EntityRemoteInterface,
 ) (
-	*ManufacturerData,
+	*api.ManufacturerData,
 	error,
 ) {
 
@@ -216,7 +216,7 @@ func (e *UCEVCC) ManufacturerData(
 		return nil, err
 	}
 
-	ret := &ManufacturerData{
+	ret := &api.ManufacturerData{
 		DeviceName:                     util.Deref((*string)(data.DeviceName)),
 		DeviceCode:                     util.Deref((*string)(data.DeviceCode)),
 		SerialNumber:                   util.Deref((*string)(data.SerialNumber)),

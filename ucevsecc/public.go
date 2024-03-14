@@ -12,7 +12,7 @@ import (
 func (e *UCEVSECC) ManufacturerData(
 	entity spineapi.EntityRemoteInterface,
 ) (
-	*ManufacturerData,
+	*api.ManufacturerData,
 	error,
 ) {
 	if entity == nil || !util.IsCompatibleEntity(entity, e.validEntityTypes) {
@@ -29,7 +29,7 @@ func (e *UCEVSECC) ManufacturerData(
 		return nil, err
 	}
 
-	ret := &ManufacturerData{
+	ret := &api.ManufacturerData{
 		DeviceName:                     util.Deref((*string)(data.DeviceName)),
 		DeviceCode:                     util.Deref((*string)(data.DeviceCode)),
 		SerialNumber:                   util.Deref((*string)(data.SerialNumber)),
