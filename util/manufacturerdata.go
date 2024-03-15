@@ -12,22 +12,22 @@ import (
 // possible errors:
 //   - ErrNoCompatibleEntity if entity is not compatible
 //   - and others
-func ManufacturerData(service eebusapi.ServiceInterface, entity spineapi.EntityRemoteInterface, entityTypes []model.EntityTypeType) (*api.ManufacturerData, error) {
+func ManufacturerData(service eebusapi.ServiceInterface, entity spineapi.EntityRemoteInterface, entityTypes []model.EntityTypeType) (api.ManufacturerData, error) {
 	if entity == nil || !IsCompatibleEntity(entity, entityTypes) {
-		return nil, api.ErrNoCompatibleEntity
+		return api.ManufacturerData{}, api.ErrNoCompatibleEntity
 	}
 
 	deviceClassification, err := DeviceClassification(service, entity)
 	if err != nil {
-		return nil, err
+		return api.ManufacturerData{}, err
 	}
 
 	data, err := deviceClassification.GetManufacturerDetails()
 	if err != nil {
-		return nil, err
+		return api.ManufacturerData{}, err
 	}
 
-	ret := &api.ManufacturerData{
+	ret := api.ManufacturerData{
 		DeviceName:                     Deref((*string)(data.DeviceName)),
 		DeviceCode:                     Deref((*string)(data.DeviceCode)),
 		SerialNumber:                   Deref((*string)(data.SerialNumber)),

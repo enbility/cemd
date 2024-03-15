@@ -198,7 +198,7 @@ func (e *UCEVCC) Identifications(entity spineapi.EntityRemoteInterface) ([]api.I
 func (e *UCEVCC) ManufacturerData(
 	entity spineapi.EntityRemoteInterface,
 ) (
-	*api.ManufacturerData,
+	api.ManufacturerData,
 	error,
 ) {
 

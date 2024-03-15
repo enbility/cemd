@@ -18,7 +18,7 @@ type UCEVSECCInterface interface {
 	//   - entity: the entity of the EV
 	//
 	// returns deviceName, serialNumber, error
-	ManufacturerData(entity spineapi.EntityRemoteInterface) (*api.ManufacturerData, error)
+	ManufacturerData(entity spineapi.EntityRemoteInterface) (api.ManufacturerData, error)
 
 	// the operating state data of an EVSE
 	//

@@ -12,7 +12,7 @@ import (
 func (e *UCEVSECC) ManufacturerData(
 	entity spineapi.EntityRemoteInterface,
 ) (
-	*api.ManufacturerData,
+	api.ManufacturerData,
 	error,
 ) {
 	return util.ManufacturerData(e.service, entity, e.validEntityTypes)

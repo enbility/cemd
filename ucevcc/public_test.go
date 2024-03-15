@@ -254,17 +254,14 @@ func (s *UCEVCCSuite) Test_EVIdentification() {
 }
 
 func (s *UCEVCCSuite) Test_EVManufacturerData() {
-	data, err := s.sut.ManufacturerData(s.mockRemoteEntity)
+	_, err := s.sut.ManufacturerData(nil)
 	assert.NotNil(s.T(), err)
-	assert.Nil(s.T(), data)
 
-	data, err = s.sut.ManufacturerData(s.evEntity)
+	_, err = s.sut.ManufacturerData(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
-	assert.Nil(s.T(), data)
 
-	data, err = s.sut.ManufacturerData(s.evEntity)
+	_, err = s.sut.ManufacturerData(s.evEntity)
 	assert.NotNil(s.T(), err)
-	assert.Nil(s.T(), data)
 
 	descData := &model.DeviceClassificationManufacturerDataType{}
 
@@ -272,7 +269,7 @@ func (s *UCEVCCSuite) Test_EVManufacturerData() {
 	fErr := rFeature.UpdateData(model.FunctionTypeDeviceClassificationManufacturerData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.ManufacturerData(s.evEntity)
+	data, err := s.sut.ManufacturerData(s.evEntity)
 	assert.Nil(s.T(), err)
 	assert.NotNil(s.T(), data)
 	assert.Equal(s.T(), "", data.DeviceName)

@@ -9,13 +9,11 @@ import (
 func (s *UtilSuite) Test_ManufacturerData() {
 	entityTypes := []model.EntityTypeType{model.EntityTypeTypeEV}
 
-	data, err := ManufacturerData(s.service, s.mockRemoteEntity, entityTypes)
+	_, err := ManufacturerData(s.service, s.mockRemoteEntity, entityTypes)
 	assert.NotNil(s.T(), err)
-	assert.Nil(s.T(), data)
 
-	data, err = ManufacturerData(s.service, s.monitoredEntity, entityTypes)
+	_, err = ManufacturerData(s.service, s.monitoredEntity, entityTypes)
 	assert.NotNil(s.T(), err)
-	assert.Nil(s.T(), data)
 
 	descData := &model.DeviceClassificationManufacturerDataType{
 
@@ -28,7 +26,7 @@ func (s *UtilSuite) Test_ManufacturerData() {
 	assert.NotNil(s.T(), rFeature)
 	fErr := rFeature.UpdateData(model.FunctionTypeDeviceClassificationManufacturerData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
-	data, err = ManufacturerData(s.service, s.monitoredEntity, entityTypes)
+	data, err := ManufacturerData(s.service, s.monitoredEntity, entityTypes)
 	assert.Nil(s.T(), err)
 	assert.NotNil(s.T(), data)
 	assert.Equal(s.T(), "deviceName", data.DeviceName)
