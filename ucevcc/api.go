@@ -58,7 +58,7 @@ type UCEVCCInterface interface {
 	//
 	// parameters:
 	//   - entity: the entity of the EV
-	ManufacturerData(entity spineapi.EntityRemoteInterface) (string, string, error)
+	ManufacturerData(entity spineapi.EntityRemoteInterface) (api.ManufacturerData, error)
 
 	// Scenario 6
 

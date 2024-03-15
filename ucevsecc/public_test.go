@@ -7,20 +7,14 @@ import (
 )
 
 func (s *UCEVSECCSuite) Test_EVSEManufacturerData() {
-	device, serial, err := s.sut.ManufacturerData(nil)
+	_, err := s.sut.ManufacturerData(nil)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), "", device)
-	assert.Equal(s.T(), "", serial)
 
-	device, serial, err = s.sut.ManufacturerData(s.mockRemoteEntity)
+	_, err = s.sut.ManufacturerData(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), "", device)
-	assert.Equal(s.T(), "", serial)
 
-	device, serial, err = s.sut.ManufacturerData(s.evseEntity)
+	_, err = s.sut.ManufacturerData(s.evseEntity)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), "", device)
-	assert.Equal(s.T(), "", serial)
 
 	descData := &model.DeviceClassificationManufacturerDataType{}
 
@@ -28,10 +22,11 @@ func (s *UCEVSECCSuite) Test_EVSEManufacturerData() {
 	fErr := rFeature.UpdateData(model.FunctionTypeDeviceClassificationManufacturerData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	device, serial, err = s.sut.ManufacturerData(s.evseEntity)
+	data, err := s.sut.ManufacturerData(s.evseEntity)
 	assert.Nil(s.T(), err)
-	assert.Equal(s.T(), "", device)
-	assert.Equal(s.T(), "", serial)
+	assert.NotNil(s.T(), data)
+	assert.Equal(s.T(), "", data.DeviceName)
+	assert.Equal(s.T(), "", data.SerialNumber)
 
 	descData = &model.DeviceClassificationManufacturerDataType{
 		DeviceName:   eebusutil.Ptr(model.DeviceClassificationStringType("test")),
@@ -41,10 +36,12 @@ func (s *UCEVSECCSuite) Test_EVSEManufacturerData() {
 	fErr = rFeature.UpdateData(model.FunctionTypeDeviceClassificationManufacturerData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	device, serial, err = s.sut.ManufacturerData(s.evseEntity)
+	data, err = s.sut.ManufacturerData(s.evseEntity)
 	assert.Nil(s.T(), err)
-	assert.Equal(s.T(), "test", device)
-	assert.Equal(s.T(), "12345", serial)
+	assert.NotNil(s.T(), data)
+	assert.Equal(s.T(), "test", data.DeviceName)
+	assert.Equal(s.T(), "12345", data.SerialNumber)
+	assert.Equal(s.T(), "", data.BrandName)
 }
 
 func (s *UCEVSECCSuite) Test_EVSEOperatingState() {

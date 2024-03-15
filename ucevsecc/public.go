@@ -12,36 +12,10 @@ import (
 func (e *UCEVSECC) ManufacturerData(
 	entity spineapi.EntityRemoteInterface,
 ) (
-	string,
-	string,
+	api.ManufacturerData,
 	error,
 ) {
-	deviceName := ""
-	serialNumber := ""
-
-	if entity == nil || !util.IsCompatibleEntity(entity, e.validEntityTypes) {
-		return deviceName, serialNumber, api.ErrNoCompatibleEntity
-	}
-
-	evseDeviceClassification, err := util.DeviceClassification(e.service, entity)
-	if err != nil {
-		return deviceName, serialNumber, err
-	}
-
-	data, err := evseDeviceClassification.GetManufacturerDetails()
-	if err != nil {
-		return deviceName, serialNumber, err
-	}
-
-	if data.DeviceName != nil {
-		deviceName = string(*data.DeviceName)
-	}
-
-	if data.SerialNumber != nil {
-		serialNumber = string(*data.SerialNumber)
-	}
-
-	return deviceName, serialNumber, nil
+	return util.ManufacturerData(e.service, entity, e.validEntityTypes)
 }
 
 // the operating state data of an EVSE

@@ -549,38 +549,33 @@ func (_c *UCEVCCInterface_IsUseCaseSupported_Call) RunAndReturn(run func(api.Ent
 }
 
 // ManufacturerData provides a mock function with given fields: entity
-func (_m *UCEVCCInterface) ManufacturerData(entity api.EntityRemoteInterface) (string, string, error) {
+func (_m *UCEVCCInterface) ManufacturerData(entity api.EntityRemoteInterface) (*cemdapi.ManufacturerData, error) {
 	ret := _m.Called(entity)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ManufacturerData")
 	}
 
-	var r0 string
-	var r1 string
-	var r2 error
-	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) (string, string, error)); ok {
+	var r0 *cemdapi.ManufacturerData
+	var r1 error
+	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) (*cemdapi.ManufacturerData, error)); ok {
 		return rf(entity)
 	}
-	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) string); ok {
+	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) *cemdapi.ManufacturerData); ok {
 		r0 = rf(entity)
 	} else {
-		r0 = ret.Get(0).(string)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*cemdapi.ManufacturerData)
+		}
 	}
 
-	if rf, ok := ret.Get(1).(func(api.EntityRemoteInterface) string); ok {
+	if rf, ok := ret.Get(1).(func(api.EntityRemoteInterface) error); ok {
 		r1 = rf(entity)
 	} else {
-		r1 = ret.Get(1).(string)
+		r1 = ret.Error(1)
 	}
 
-	if rf, ok := ret.Get(2).(func(api.EntityRemoteInterface) error); ok {
-		r2 = rf(entity)
-	} else {
-		r2 = ret.Error(2)
-	}
-
-	return r0, r1, r2
+	return r0, r1
 }
 
 // UCEVCCInterface_ManufacturerData_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ManufacturerData'
@@ -601,12 +596,12 @@ func (_c *UCEVCCInterface_ManufacturerData_Call) Run(run func(entity api.EntityR
 	return _c
 }
 
-func (_c *UCEVCCInterface_ManufacturerData_Call) Return(_a0 string, _a1 string, _a2 error) *UCEVCCInterface_ManufacturerData_Call {
-	_c.Call.Return(_a0, _a1, _a2)
+func (_c *UCEVCCInterface_ManufacturerData_Call) Return(_a0 *cemdapi.ManufacturerData, _a1 error) *UCEVCCInterface_ManufacturerData_Call {
+	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *UCEVCCInterface_ManufacturerData_Call) RunAndReturn(run func(api.EntityRemoteInterface) (string, string, error)) *UCEVCCInterface_ManufacturerData_Call {
+func (_c *UCEVCCInterface_ManufacturerData_Call) RunAndReturn(run func(api.EntityRemoteInterface) (*cemdapi.ManufacturerData, error)) *UCEVCCInterface_ManufacturerData_Call {
 	_c.Call.Return(run)
 	return _c
 }

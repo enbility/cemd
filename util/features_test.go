@@ -3,7 +3,7 @@ package util
 import "github.com/stretchr/testify/assert"
 
 func (s *UtilSuite) Test_Features() {
-	feature1, err := DeviceClassification(s.service, s.monitoredEntity)
+	feature1, err := DeviceClassification(s.service, s.evseEntity)
 	assert.Nil(s.T(), feature1)
 	assert.NotNil(s.T(), err)
 

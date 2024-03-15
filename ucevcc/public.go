@@ -198,36 +198,11 @@ func (e *UCEVCC) Identifications(entity spineapi.EntityRemoteInterface) ([]api.I
 func (e *UCEVCC) ManufacturerData(
 	entity spineapi.EntityRemoteInterface,
 ) (
-	string,
-	string,
+	api.ManufacturerData,
 	error,
 ) {
-	deviceName := ""
-	serialNumber := ""
 
-	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
-		return deviceName, serialNumber, api.ErrNoCompatibleEntity
-	}
-
-	evDeviceClassification, err := util.DeviceClassification(e.service, entity)
-	if err != nil {
-		return deviceName, serialNumber, eebusapi.ErrDataNotAvailable
-	}
-
-	data, err := evDeviceClassification.GetManufacturerDetails()
-	if err != nil {
-		return deviceName, serialNumber, err
-	}
-
-	if data.DeviceName != nil {
-		deviceName = string(*data.DeviceName)
-	}
-
-	if data.SerialNumber != nil {
-		serialNumber = string(*data.SerialNumber)
-	}
-
-	return deviceName, serialNumber, nil
+	return util.ManufacturerData(e.service, entity, e.validEntityTypes)
 }
 
 // return the min, max, default limits for each phase of the connected EV
