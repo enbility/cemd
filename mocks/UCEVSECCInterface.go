@@ -145,24 +145,22 @@ func (_c *UCEVSECCInterface_IsUseCaseSupported_Call) RunAndReturn(run func(api.E
 }
 
 // ManufacturerData provides a mock function with given fields: entity
-func (_m *UCEVSECCInterface) ManufacturerData(entity api.EntityRemoteInterface) (*cemdapi.ManufacturerData, error) {
+func (_m *UCEVSECCInterface) ManufacturerData(entity api.EntityRemoteInterface) (cemdapi.ManufacturerData, error) {
 	ret := _m.Called(entity)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ManufacturerData")
 	}
 
-	var r0 *cemdapi.ManufacturerData
+	var r0 cemdapi.ManufacturerData
 	var r1 error
-	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) (*cemdapi.ManufacturerData, error)); ok {
+	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) (cemdapi.ManufacturerData, error)); ok {
 		return rf(entity)
 	}
-	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) *cemdapi.ManufacturerData); ok {
+	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) cemdapi.ManufacturerData); ok {
 		r0 = rf(entity)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*cemdapi.ManufacturerData)
-		}
+		r0 = ret.Get(0).(cemdapi.ManufacturerData)
 	}
 
 	if rf, ok := ret.Get(1).(func(api.EntityRemoteInterface) error); ok {
@@ -192,12 +190,12 @@ func (_c *UCEVSECCInterface_ManufacturerData_Call) Run(run func(entity api.Entit
 	return _c
 }
 
-func (_c *UCEVSECCInterface_ManufacturerData_Call) Return(_a0 *cemdapi.ManufacturerData, _a1 error) *UCEVSECCInterface_ManufacturerData_Call {
+func (_c *UCEVSECCInterface_ManufacturerData_Call) Return(_a0 cemdapi.ManufacturerData, _a1 error) *UCEVSECCInterface_ManufacturerData_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *UCEVSECCInterface_ManufacturerData_Call) RunAndReturn(run func(api.EntityRemoteInterface) (*cemdapi.ManufacturerData, error)) *UCEVSECCInterface_ManufacturerData_Call {
+func (_c *UCEVSECCInterface_ManufacturerData_Call) RunAndReturn(run func(api.EntityRemoteInterface) (cemdapi.ManufacturerData, error)) *UCEVSECCInterface_ManufacturerData_Call {
 	_c.Call.Return(run)
 	return _c
 }
