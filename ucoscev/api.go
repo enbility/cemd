@@ -14,6 +14,12 @@ type UCOSCEVInterface interface {
 
 	// Scenario 1
 
+	// return the min, max, default limits for each phase of the connected EV
+	//
+	// parameters:
+	//   - entity: the entity of the EV
+	CurrentLimits(entity spineapi.EntityRemoteInterface) ([]float64, []float64, []float64, error)
+
 	// return the current loadcontrol recommendation limits
 	//
 	// parameters:

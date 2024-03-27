@@ -7,6 +7,15 @@ import (
 	"github.com/enbility/spine-go/model"
 )
 
+// return the min, max, default limits for each phase of the connected EV
+//
+// possible errors:
+//   - ErrDataNotAvailable if no such measurement is (yet) available
+//   - and others
+func (e *UCOPEV) CurrentLimits(entity spineapi.EntityRemoteInterface) ([]float64, []float64, []float64, error) {
+	return util.GetPhaseCurrentLimits(e.service, entity, e.validEntityTypes)
+}
+
 // return the current loadcontrol obligation limits
 //
 // parameters:
