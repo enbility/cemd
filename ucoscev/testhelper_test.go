@@ -96,6 +96,13 @@ func setupDevices(
 		role          model.RoleType
 		supportedFcts []model.FunctionType
 	}{
+		{model.FeatureTypeTypeElectricalConnection,
+			model.RoleTypeServer,
+			[]model.FunctionType{
+				model.FunctionTypeElectricalConnectionParameterDescriptionListData,
+				model.FunctionTypeElectricalConnectionPermittedValueSetListData,
+			},
+		},
 		{model.FeatureTypeTypeLoadControl,
 			model.RoleTypeServer,
 			[]model.FunctionType{

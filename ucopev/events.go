@@ -26,6 +26,8 @@ func (e *UCOPEV) HandleEvent(payload spineapi.EventPayload) {
 	}
 
 	switch payload.Data.(type) {
+	case *model.ElectricalConnectionPermittedValueSetListDataType:
+		e.evElectricalPermittedValuesUpdate(payload)
 	case *model.LoadControlLimitDescriptionListDataType:
 		e.evLoadControlLimitDescriptionDataUpdate(payload.Entity)
 	case *model.LoadControlLimitListDataType:
@@ -89,4 +91,25 @@ func (e *UCOPEV) evLoadControlLimitDataUpdate(payload spineapi.EventPayload) {
 		return
 	}
 
+}
+
+// the electrical connection permitted value sets data of an EV was updated
+func (e *UCOPEV) evElectricalPermittedValuesUpdate(payload spineapi.EventPayload) {
+	evElectricalConnection, err := util.ElectricalConnection(e.service, payload.Entity)
+	if err != nil {
+		return
+	}
+
+	data, err := evElectricalConnection.GetParameterDescriptionForMeasuredPhase(model.ElectricalConnectionPhaseNameTypeA)
+	if err != nil || data.ParameterId == nil {
+		return
+	}
+
+	values, err := evElectricalConnection.GetPermittedValueSetForParameterId(*data.ParameterId)
+	if err != nil || values == nil {
+		return
+	}
+
+	// Scenario 6
+	e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateCurrentLimits)
 }

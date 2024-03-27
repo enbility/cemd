@@ -94,6 +94,12 @@ func setupDevices(
 		featureType   model.FeatureTypeType
 		supportedFcts []model.FunctionType
 	}{
+		{model.FeatureTypeTypeElectricalConnection,
+			[]model.FunctionType{
+				model.FunctionTypeElectricalConnectionParameterDescriptionListData,
+				model.FunctionTypeElectricalConnectionPermittedValueSetListData,
+			},
+		},
 		{model.FeatureTypeTypeLoadControl,
 			[]model.FunctionType{
 				model.FunctionTypeLoadControlLimitDescriptionListData,

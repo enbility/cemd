@@ -23,6 +23,8 @@ func (e *UCOSCEV) HandleEvent(payload spineapi.EventPayload) {
 	// the codefactor warning is invalid, as .(type) check can not be replaced with if then
 	//revive:disable-next-line
 	switch payload.Data.(type) {
+	case *model.ElectricalConnectionPermittedValueSetListDataType:
+		e.evElectricalPermittedValuesUpdate(payload)
 	case *model.LoadControlLimitListDataType:
 		e.evLoadControlLimitDataUpdate(payload)
 	}
@@ -53,4 +55,25 @@ func (e *UCOSCEV) evLoadControlLimitDataUpdate(payload spineapi.EventPayload) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateLimit)
 		return
 	}
+}
+
+// the electrical connection permitted value sets data of an EV was updated
+func (e *UCOSCEV) evElectricalPermittedValuesUpdate(payload spineapi.EventPayload) {
+	evElectricalConnection, err := util.ElectricalConnection(e.service, payload.Entity)
+	if err != nil {
+		return
+	}
+
+	data, err := evElectricalConnection.GetParameterDescriptionForMeasuredPhase(model.ElectricalConnectionPhaseNameTypeA)
+	if err != nil || data.ParameterId == nil {
+		return
+	}
+
+	values, err := evElectricalConnection.GetPermittedValueSetForParameterId(*data.ParameterId)
+	if err != nil || values == nil {
+		return
+	}
+
+	// Scenario 6
+	e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateCurrentLimits)
 }

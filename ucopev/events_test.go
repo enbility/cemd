@@ -26,6 +26,9 @@ func (s *UCOPEVSuite) Test_Events() {
 
 	payload.EventType = spineapi.EventTypeDataChange
 	payload.ChangeType = spineapi.ElementChangeUpdate
+	payload.Data = eebusutil.Ptr(model.ElectricalConnectionPermittedValueSetListDataType{})
+	s.sut.HandleEvent(payload)
+
 	payload.Data = eebusutil.Ptr(model.LoadControlLimitDescriptionListDataType{})
 	s.sut.HandleEvent(payload)
 
@@ -37,6 +40,82 @@ func (s *UCOPEVSuite) Test_Failures() {
 	s.sut.evConnected(s.mockRemoteEntity)
 
 	s.sut.evLoadControlLimitDescriptionDataUpdate(s.mockRemoteEntity)
+}
+
+func (s *UCOPEVSuite) Test_evElectricalPermittedValuesUpdate() {
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.mockRemoteEntity,
+	}
+	s.sut.evElectricalPermittedValuesUpdate(payload)
+
+	payload.Entity = s.evEntity
+	s.sut.evElectricalPermittedValuesUpdate(payload)
+
+	paramData := &model.ElectricalConnectionParameterDescriptionListDataType{
+		ElectricalConnectionParameterDescriptionData: []model.ElectricalConnectionParameterDescriptionDataType{
+			{
+				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
+				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(0)),
+				MeasurementId:          eebusutil.Ptr(model.MeasurementIdType(0)),
+				AcMeasuredPhases:       eebusutil.Ptr(model.ElectricalConnectionPhaseNameTypeA),
+			},
+			{
+				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
+				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(1)),
+				MeasurementId:          eebusutil.Ptr(model.MeasurementIdType(1)),
+				AcMeasuredPhases:       eebusutil.Ptr(model.ElectricalConnectionPhaseNameTypeB),
+			},
+			{
+				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
+				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(2)),
+				MeasurementId:          eebusutil.Ptr(model.MeasurementIdType(2)),
+				AcMeasuredPhases:       eebusutil.Ptr(model.ElectricalConnectionPhaseNameTypeC),
+			},
+		},
+	}
+
+	rFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.evEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer)
+	fErr := rFeature.UpdateData(model.FunctionTypeElectricalConnectionParameterDescriptionListData, paramData, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	s.sut.evElectricalPermittedValuesUpdate(payload)
+
+	data := &model.ElectricalConnectionPermittedValueSetListDataType{
+		ElectricalConnectionPermittedValueSetData: []model.ElectricalConnectionPermittedValueSetDataType{
+			{
+				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
+				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(0)),
+				PermittedValueSet: []model.ScaledNumberSetType{
+					{
+						Value: []model.ScaledNumberType{
+							*model.NewScaledNumberType(0.1),
+						},
+						Range: []model.ScaledNumberRangeType{
+							{
+								Min: model.NewScaledNumberType(1400),
+								Max: model.NewScaledNumberType(11000),
+							},
+						},
+					},
+				},
+			},
+			{
+				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
+				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(1)),
+			},
+			{
+				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
+				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(2)),
+			},
+		},
+	}
+
+	fErr = rFeature.UpdateData(model.FunctionTypeElectricalConnectionPermittedValueSetListData, data, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	s.sut.evElectricalPermittedValuesUpdate(payload)
 }
 
 func (s *UCOPEVSuite) Test_evLoadControlLimitDataUpdate() {
