@@ -62,11 +62,11 @@ type UCEVCCInterface interface {
 
 	// Scenario 6
 
-	// return the min, max, default limits for each phase of the connected EV
+	// return the minimum, maximum charging and, standby power of the connected EV
 	//
 	// parameters:
 	//   - entity: the entity of the EV
-	CurrentLimits(entity spineapi.EntityRemoteInterface) ([]float64, []float64, []float64, error)
+	CurrentLimits(entity spineapi.EntityRemoteInterface) (float64, float64, float64, error)
 
 	// Scenario 7
 

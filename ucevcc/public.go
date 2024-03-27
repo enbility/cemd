@@ -205,49 +205,47 @@ func (e *UCEVCC) ManufacturerData(
 	return util.ManufacturerData(e.service, entity, e.validEntityTypes)
 }
 
-// return the min, max, default limits for each phase of the connected EV
+// return the minimum, maximum charging and, standby power of the connected EV
 //
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *UCEVCC) CurrentLimits(entity spineapi.EntityRemoteInterface) ([]float64, []float64, []float64, error) {
+func (e *UCEVCC) CurrentLimits(entity spineapi.EntityRemoteInterface) (float64, float64, float64, error) {
 	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
-		return nil, nil, nil, api.ErrNoCompatibleEntity
+		return 0.0, 0.0, 0.0, api.ErrNoCompatibleEntity
 	}
 
 	evElectricalConnection, err := util.ElectricalConnection(e.service, entity)
 	if err != nil {
-		return nil, nil, nil, eebusapi.ErrDataNotAvailable
+		return 0.0, 0.0, 0.0, eebusapi.ErrDataNotAvailable
 	}
 
-	var resultMin, resultMax, resultDefault []float64
-
-	for _, phaseName := range util.PhaseNameMapping {
-		// electricalParameterDescription contains the measured phase for each measurementId
-		elParamDesc, err := evElectricalConnection.GetParameterDescriptionForMeasuredPhase(phaseName)
-		if err != nil || elParamDesc.ParameterId == nil {
-			continue
-		}
-
-		dataMin, dataMax, dataDefault, err := evElectricalConnection.GetLimitsForParameterId(*elParamDesc.ParameterId)
-		if err != nil {
-			continue
-		}
-
-		// Min current data should be derived from min power data
-		// but as this value is only properly provided via VAS the
-		// currrent min values can not be trusted.
-
-		resultMin = append(resultMin, dataMin)
-		resultMax = append(resultMax, dataMax)
-		resultDefault = append(resultDefault, dataDefault)
+	elParamDesc, err := evElectricalConnection.GetParameterDescriptionForScopeType(model.ScopeTypeTypeACPowerTotal)
+	if err != nil || elParamDesc.ParameterId == nil {
+		return 0.0, 0.0, 0.0, eebusapi.ErrDataNotAvailable
 	}
 
-	if len(resultMin) == 0 {
-		return nil, nil, nil, eebusapi.ErrDataNotAvailable
+	dataSet, err := evElectricalConnection.GetPermittedValueSetForParameterId(*elParamDesc.ParameterId)
+	if err != nil || dataSet == nil ||
+		dataSet.PermittedValueSet == nil ||
+		len(dataSet.PermittedValueSet) != 1 ||
+		dataSet.PermittedValueSet[0].Range == nil ||
+		len(dataSet.PermittedValueSet[0].Range) != 1 {
+		return 0.0, 0.0, 0.0, eebusapi.ErrDataNotAvailable
 	}
 
-	return resultMin, resultMax, resultDefault, nil
+	var minValue, maxValue, standByValue float64
+	if dataSet.PermittedValueSet[0].Range[0].Min != nil {
+		minValue = dataSet.PermittedValueSet[0].Range[0].Min.GetValue()
+	}
+	if dataSet.PermittedValueSet[0].Range[0].Max != nil {
+		maxValue = dataSet.PermittedValueSet[0].Range[0].Max.GetValue()
+	}
+	if dataSet.PermittedValueSet[0].Value != nil && len(dataSet.PermittedValueSet[0].Value) > 0 {
+		standByValue = dataSet.PermittedValueSet[0].Value[0].GetValue()
+	}
+
+	return minValue, maxValue, standByValue, nil
 }
 
 // is the EV in sleep mode
