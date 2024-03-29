@@ -257,42 +257,36 @@ func (_c *UCEVCCInterface_CommunicationStandard_Call) RunAndReturn(run func(api.
 }
 
 // CurrentLimits provides a mock function with given fields: entity
-func (_m *UCEVCCInterface) CurrentLimits(entity api.EntityRemoteInterface) ([]float64, []float64, []float64, error) {
+func (_m *UCEVCCInterface) CurrentLimits(entity api.EntityRemoteInterface) (float64, float64, float64, error) {
 	ret := _m.Called(entity)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CurrentLimits")
 	}
 
-	var r0 []float64
-	var r1 []float64
-	var r2 []float64
+	var r0 float64
+	var r1 float64
+	var r2 float64
 	var r3 error
-	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) ([]float64, []float64, []float64, error)); ok {
+	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) (float64, float64, float64, error)); ok {
 		return rf(entity)
 	}
-	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) []float64); ok {
+	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) float64); ok {
 		r0 = rf(entity)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]float64)
-		}
+		r0 = ret.Get(0).(float64)
 	}
 
-	if rf, ok := ret.Get(1).(func(api.EntityRemoteInterface) []float64); ok {
+	if rf, ok := ret.Get(1).(func(api.EntityRemoteInterface) float64); ok {
 		r1 = rf(entity)
 	} else {
-		if ret.Get(1) != nil {
-			r1 = ret.Get(1).([]float64)
-		}
+		r1 = ret.Get(1).(float64)
 	}
 
-	if rf, ok := ret.Get(2).(func(api.EntityRemoteInterface) []float64); ok {
+	if rf, ok := ret.Get(2).(func(api.EntityRemoteInterface) float64); ok {
 		r2 = rf(entity)
 	} else {
-		if ret.Get(2) != nil {
-			r2 = ret.Get(2).([]float64)
-		}
+		r2 = ret.Get(2).(float64)
 	}
 
 	if rf, ok := ret.Get(3).(func(api.EntityRemoteInterface) error); ok {
@@ -322,12 +316,12 @@ func (_c *UCEVCCInterface_CurrentLimits_Call) Run(run func(entity api.EntityRemo
 	return _c
 }
 
-func (_c *UCEVCCInterface_CurrentLimits_Call) Return(_a0 []float64, _a1 []float64, _a2 []float64, _a3 error) *UCEVCCInterface_CurrentLimits_Call {
+func (_c *UCEVCCInterface_CurrentLimits_Call) Return(_a0 float64, _a1 float64, _a2 float64, _a3 error) *UCEVCCInterface_CurrentLimits_Call {
 	_c.Call.Return(_a0, _a1, _a2, _a3)
 	return _c
 }
 
-func (_c *UCEVCCInterface_CurrentLimits_Call) RunAndReturn(run func(api.EntityRemoteInterface) ([]float64, []float64, []float64, error)) *UCEVCCInterface_CurrentLimits_Call {
+func (_c *UCEVCCInterface_CurrentLimits_Call) RunAndReturn(run func(api.EntityRemoteInterface) (float64, float64, float64, error)) *UCEVCCInterface_CurrentLimits_Call {
 	_c.Call.Return(run)
 	return _c
 }

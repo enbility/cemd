@@ -88,6 +88,82 @@ func (_c *UCOSCEVInterface_AddUseCase_Call) RunAndReturn(run func()) *UCOSCEVInt
 	return _c
 }
 
+// CurrentLimits provides a mock function with given fields: entity
+func (_m *UCOSCEVInterface) CurrentLimits(entity api.EntityRemoteInterface) ([]float64, []float64, []float64, error) {
+	ret := _m.Called(entity)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CurrentLimits")
+	}
+
+	var r0 []float64
+	var r1 []float64
+	var r2 []float64
+	var r3 error
+	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) ([]float64, []float64, []float64, error)); ok {
+		return rf(entity)
+	}
+	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) []float64); ok {
+		r0 = rf(entity)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]float64)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(api.EntityRemoteInterface) []float64); ok {
+		r1 = rf(entity)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).([]float64)
+		}
+	}
+
+	if rf, ok := ret.Get(2).(func(api.EntityRemoteInterface) []float64); ok {
+		r2 = rf(entity)
+	} else {
+		if ret.Get(2) != nil {
+			r2 = ret.Get(2).([]float64)
+		}
+	}
+
+	if rf, ok := ret.Get(3).(func(api.EntityRemoteInterface) error); ok {
+		r3 = rf(entity)
+	} else {
+		r3 = ret.Error(3)
+	}
+
+	return r0, r1, r2, r3
+}
+
+// UCOSCEVInterface_CurrentLimits_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CurrentLimits'
+type UCOSCEVInterface_CurrentLimits_Call struct {
+	*mock.Call
+}
+
+// CurrentLimits is a helper method to define mock.On call
+//   - entity api.EntityRemoteInterface
+func (_e *UCOSCEVInterface_Expecter) CurrentLimits(entity interface{}) *UCOSCEVInterface_CurrentLimits_Call {
+	return &UCOSCEVInterface_CurrentLimits_Call{Call: _e.mock.On("CurrentLimits", entity)}
+}
+
+func (_c *UCOSCEVInterface_CurrentLimits_Call) Run(run func(entity api.EntityRemoteInterface)) *UCOSCEVInterface_CurrentLimits_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(api.EntityRemoteInterface))
+	})
+	return _c
+}
+
+func (_c *UCOSCEVInterface_CurrentLimits_Call) Return(_a0 []float64, _a1 []float64, _a2 []float64, _a3 error) *UCOSCEVInterface_CurrentLimits_Call {
+	_c.Call.Return(_a0, _a1, _a2, _a3)
+	return _c
+}
+
+func (_c *UCOSCEVInterface_CurrentLimits_Call) RunAndReturn(run func(api.EntityRemoteInterface) ([]float64, []float64, []float64, error)) *UCOSCEVInterface_CurrentLimits_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // IsUseCaseSupported provides a mock function with given fields: remoteEntity
 func (_m *UCOSCEVInterface) IsUseCaseSupported(remoteEntity api.EntityRemoteInterface) (bool, error) {
 	ret := _m.Called(remoteEntity)
