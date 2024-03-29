@@ -34,9 +34,12 @@ type UCEVCCSuite struct {
 	mockSender       *mocks.SenderInterface
 	mockRemoteEntity *mocks.EntityRemoteInterface
 	evEntity         spineapi.EntityRemoteInterface
+
+	eventCBInvoked bool
 }
 
 func (s *UCEVCCSuite) Event(ski string, device spineapi.DeviceRemoteInterface, entity spineapi.EntityRemoteInterface, event api.EventType) {
+	s.eventCBInvoked = true
 }
 
 func (s *UCEVCCSuite) BeforeTest(suiteName, testName string) {
@@ -65,6 +68,8 @@ func (s *UCEVCCSuite) BeforeTest(suiteName, testName string) {
 	mockRemoteFeature.EXPECT().DataCopy(mock.Anything).Return(mock.Anything).Maybe()
 	mockRemoteFeature.EXPECT().Address().Return(&model.FeatureAddressType{}).Maybe()
 	mockRemoteFeature.EXPECT().Operations().Return(nil).Maybe()
+
+	s.eventCBInvoked = false
 
 	s.sut = NewUCEVCC(s.service, s.Event)
 	s.sut.AddFeatures()
