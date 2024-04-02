@@ -228,7 +228,7 @@ func (s *UCEVCCSuite) Test_evElectricalPermittedValuesUpdate() {
 			{
 				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
 				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(0)),
-				ScopeType:              eebusutil.Ptr(model.ScopeTypeTypeACPower),
+				ScopeType:              eebusutil.Ptr(model.ScopeTypeTypeACPowerTotal),
 			},
 		},
 	}

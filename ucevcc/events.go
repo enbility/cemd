@@ -206,7 +206,7 @@ func (e *UCEVCC) evElectricalPermittedValuesUpdate(payload spineapi.EventPayload
 		return
 	}
 
-	data, err := evElectricalConnection.GetParameterDescriptionForScopeType(model.ScopeTypeTypeACPower)
+	data, err := evElectricalConnection.GetParameterDescriptionForScopeType(model.ScopeTypeTypeACPowerTotal)
 	if err != nil || data.ParameterId == nil {
 		return
 	}
