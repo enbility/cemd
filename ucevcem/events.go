@@ -37,6 +37,13 @@ func (e *UCEVCEM) HandleEvent(payload spineapi.EventPayload) {
 // an EV was connected
 func (e *UCEVCEM) evConnected(entity spineapi.EntityRemoteInterface) {
 	// initialise features, e.g. subscriptions, descriptions
+
+	if evElectricalConnection, err := util.ElectricalConnection(e.service, entity); err == nil {
+		if _, err := evElectricalConnection.Subscribe(); err != nil {
+			logging.Log().Debug(err)
+		}
+	}
+
 	if evMeasurement, err := util.Measurement(e.service, entity); err == nil {
 		if _, err := evMeasurement.Subscribe(); err != nil {
 			logging.Log().Debug(err)
