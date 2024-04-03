@@ -3,12 +3,12 @@ github.com/ahmetb/go-linq/v3 v3.2.0/go.mod h1:haQ3JfOeWK8HpVxMtHHEMPVgBKiYyQ+f1/
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/enbility/eebus-go v0.0.0-20240327124756-c2f35e1217be h1:HD3VqcjLzF1W9zLCA+qEJ2gfPKBm2n29XdBVIPaQ1Es=
-github.com/enbility/eebus-go v0.0.0-20240327124756-c2f35e1217be/go.mod h1:f2X3uJaPyP9vhK0jnyYI2VMkq+HUnjp9usyeAeuMSyw=
+github.com/enbility/eebus-go v0.0.0-20240403142700-2f6a203b9c99 h1:6uhFCOpzAS1bdxaH/od6B30Xn20PQpfuByxhnemWCGY=
+github.com/enbility/eebus-go v0.0.0-20240403142700-2f6a203b9c99/go.mod h1:zgZeurjiQgixRvIMPd1ofN2xQJGXDq4371DyeqHDZi8=
 github.com/enbility/ship-go v0.0.0-20240327112751-034de9b6e652 h1:r71X9nuRTe2bUwWVRBpgaWII/oweFVWeM3DvgPtorAM=
 github.com/enbility/ship-go v0.0.0-20240327112751-034de9b6e652/go.mod h1:ovyrJE3oPnGT5+eQnOqWut80gFDQ0XHn3ZWU2fHV9xQ=
-github.com/enbility/spine-go v0.0.0-20240313120235-e9eec2c46534 h1:DPyWFN3+6eAJwdA2nrLzXOXPSoe+mb0ccUFSVB8TI90=
-github.com/enbility/spine-go v0.0.0-20240313120235-e9eec2c46534/go.mod h1:2SXeC20kPX23mTnsudvPq9qprgo7GKDiNiVdX0ebovw=
+github.com/enbility/spine-go v0.0.0-20240403141316-f4ab578e8a1a h1:H34tdsbi4MIQYbZxYKdMx5fm37WsXmJbyD2R3vGo4EQ=
+github.com/enbility/spine-go v0.0.0-20240403141316-f4ab578e8a1a/go.mod h1:2SXeC20kPX23mTnsudvPq9qprgo7GKDiNiVdX0ebovw=
 github.com/enbility/zeroconf/v2 v2.0.0-20240210101930-d0004078577b h1:sg3c6LJ4eWffwtt9SW0lgcIX4Oh274vwdJnNFNNrDco=
 github.com/enbility/zeroconf/v2 v2.0.0-20240210101930-d0004078577b/go.mod h1:BjzRRiYX6mWdOgku1xxDE+NsV8PijTby7Q7BkYVdfDU=
 github.com/godbus/dbus/v5 v5.1.0 h1:4KLkAxT3aOY8Li4FRJe/KvhoNFFxo0m6fNuFUO8QJUk=

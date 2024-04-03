@@ -177,7 +177,7 @@ func (s *UtilSuite) Test_GetLocalElectricalConnectionCharacteristicForContextTyp
 	feature := entity.FeatureOfTypeAndRole(model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer)
 
 	charData := &model.ElectricalConnectionCharacteristicListDataType{
-		ElectricalConnectionCharacteristicListData: []model.ElectricalConnectionCharacteristicDataType{
+		ElectricalConnectionCharacteristicData: []model.ElectricalConnectionCharacteristicDataType{
 			{
 				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
 				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(0)),
@@ -205,7 +205,7 @@ func (s *UtilSuite) Test_SetLocalElectricalConnectionCharacteristicForContextTyp
 	feature := entity.FeatureOfTypeAndRole(model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer)
 
 	charData := &model.ElectricalConnectionCharacteristicListDataType{
-		ElectricalConnectionCharacteristicListData: []model.ElectricalConnectionCharacteristicDataType{
+		ElectricalConnectionCharacteristicData: []model.ElectricalConnectionCharacteristicDataType{
 			{
 				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
 				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(0)),

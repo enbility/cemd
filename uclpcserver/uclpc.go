@@ -116,8 +116,8 @@ func (e *UCLPCServer) AddFeatures() {
 	var elCharId model.ElectricalConnectionCharacteristicIdType = 0
 	// get the heighest CharacteristicId
 	if desc, err := spine.LocalFeatureDataCopyOfType[*model.ElectricalConnectionCharacteristicListDataType](
-		f, model.FunctionTypeElectricalConnectionCharacteristicListData); err == nil && desc.ElectricalConnectionCharacteristicListData != nil {
-		for _, desc := range desc.ElectricalConnectionCharacteristicListData {
+		f, model.FunctionTypeElectricalConnectionCharacteristicListData); err == nil && desc.ElectricalConnectionCharacteristicData != nil {
+		for _, desc := range desc.ElectricalConnectionCharacteristicData {
 			if desc.CharacteristicId != nil && *desc.CharacteristicId >= elCharId {
 				elCharId++
 			}
@@ -127,7 +127,7 @@ func (e *UCLPCServer) AddFeatures() {
 	// ElectricalConnectionId and ParameterId should be identical to the ones used
 	// in a MPC Server role implementation, which is not done here (yet)
 	elCharData := &model.ElectricalConnectionCharacteristicListDataType{
-		ElectricalConnectionCharacteristicListData: []model.ElectricalConnectionCharacteristicDataType{
+		ElectricalConnectionCharacteristicData: []model.ElectricalConnectionCharacteristicDataType{
 			{
 				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
 				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(0)),

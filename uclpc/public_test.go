@@ -334,7 +334,7 @@ func (s *UCLPCSuite) Test_PowerConsumptionNominalMax() {
 	assert.Equal(s.T(), 0.0, data)
 
 	charData := &model.ElectricalConnectionCharacteristicListDataType{
-		ElectricalConnectionCharacteristicListData: []model.ElectricalConnectionCharacteristicDataType{
+		ElectricalConnectionCharacteristicData: []model.ElectricalConnectionCharacteristicDataType{
 			{
 				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
 				CharacteristicId:       eebusutil.Ptr(model.ElectricalConnectionCharacteristicIdType(0)),

@@ -67,11 +67,11 @@ func GetLocalElectricalConnectionCharacteristicForContextType(
 	function := model.FunctionTypeElectricalConnectionCharacteristicListData
 	data, err := spine.LocalFeatureDataCopyOfType[*model.ElectricalConnectionCharacteristicListDataType](
 		electricalConnection, function)
-	if err != nil || data == nil || data.ElectricalConnectionCharacteristicListData == nil {
+	if err != nil || data == nil || data.ElectricalConnectionCharacteristicData == nil {
 		return
 	}
 
-	for _, item := range data.ElectricalConnectionCharacteristicListData {
+	for _, item := range data.ElectricalConnectionCharacteristicData {
 		if item.CharacteristicContext != nil && *item.CharacteristicContext == context &&
 			item.CharacteristicType != nil && *item.CharacteristicType == charType {
 			charData = item
@@ -105,7 +105,7 @@ func SetLocalElectricalConnectionCharacteristicForContextType(
 	function := model.FunctionTypeElectricalConnectionCharacteristicListData
 
 	listData := &model.ElectricalConnectionCharacteristicListDataType{
-		ElectricalConnectionCharacteristicListData: []model.ElectricalConnectionCharacteristicDataType{charData},
+		ElectricalConnectionCharacteristicData: []model.ElectricalConnectionCharacteristicDataType{charData},
 	}
 	electricalConnection.SetData(function, listData)
 
