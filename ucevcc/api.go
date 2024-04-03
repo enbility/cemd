@@ -66,7 +66,7 @@ type UCEVCCInterface interface {
 	//
 	// parameters:
 	//   - entity: the entity of the EV
-	CurrentLimits(entity spineapi.EntityRemoteInterface) (float64, float64, float64, error)
+	ChargingPowerLimits(entity spineapi.EntityRemoteInterface) (float64, float64, float64, error)
 
 	// Scenario 7
 

@@ -210,7 +210,7 @@ func (e *UCEVCC) ManufacturerData(
 // possible errors:
 //   - ErrDataNotAvailable if no such measurement is (yet) available
 //   - and others
-func (e *UCEVCC) CurrentLimits(entity spineapi.EntityRemoteInterface) (float64, float64, float64, error) {
+func (e *UCEVCC) ChargingPowerLimits(entity spineapi.EntityRemoteInterface) (float64, float64, float64, error) {
 	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return 0.0, 0.0, 0.0, api.ErrNoCompatibleEntity
 	}

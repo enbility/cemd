@@ -291,14 +291,14 @@ func (s *UCEVCCSuite) Test_EVManufacturerData() {
 	assert.Equal(s.T(), "", data.BrandName)
 }
 
-func (s *UCEVCCSuite) Test_EVCurrentLimits() {
-	minData, maxData, standByData, err := s.sut.CurrentLimits(s.mockRemoteEntity)
+func (s *UCEVCCSuite) Test_EVChargingPowerLimits() {
+	minData, maxData, standByData, err := s.sut.ChargingPowerLimits(s.mockRemoteEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, minData)
 	assert.Equal(s.T(), 0.0, maxData)
 	assert.Equal(s.T(), 0.0, standByData)
 
-	minData, maxData, standByData, err = s.sut.CurrentLimits(s.evEntity)
+	minData, maxData, standByData, err = s.sut.ChargingPowerLimits(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, minData)
 	assert.Equal(s.T(), 0.0, maxData)
@@ -318,7 +318,7 @@ func (s *UCEVCCSuite) Test_EVCurrentLimits() {
 	fErr := rFeature.UpdateData(model.FunctionTypeElectricalConnectionParameterDescriptionListData, paramData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	minData, maxData, standByData, err = s.sut.CurrentLimits(s.evEntity)
+	minData, maxData, standByData, err = s.sut.ChargingPowerLimits(s.evEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, minData)
 	assert.Equal(s.T(), 0.0, maxData)
@@ -377,7 +377,7 @@ func (s *UCEVCCSuite) Test_EVCurrentLimits() {
 			fErr := rFeature.UpdateData(model.FunctionTypeElectricalConnectionPermittedValueSetListData, permData, nil, nil)
 			assert.Nil(s.T(), fErr)
 
-			minData, maxData, standByData, err = s.sut.CurrentLimits(s.evEntity)
+			minData, maxData, standByData, err = s.sut.ChargingPowerLimits(s.evEntity)
 			assert.Nil(s.T(), err)
 
 			assert.Nil(s.T(), err)
