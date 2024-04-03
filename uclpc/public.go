@@ -302,26 +302,3 @@ func (e *UCLPC) PowerConsumptionNominalMax(entity spineapi.EntityRemoteInterface
 
 	return data.Value.GetValue(), nil
 }
-
-// return nominal maximum active (real) power the Controllable System is
-// allowed to consume due to the customer's contract.
-func (e *UCLPC) ContractualConsumptionNominalMax(entity spineapi.EntityRemoteInterface) (float64, error) {
-	if entity == nil || !util.IsCompatibleEntity(entity, e.validEntityTypes) {
-		return 0, api.ErrNoCompatibleEntity
-	}
-
-	electricalConnection, err := util.ElectricalConnection(e.service, entity)
-	if err != nil || electricalConnection == nil {
-		return 0, err
-	}
-
-	data, err := electricalConnection.GetCharacteristicForContextType(
-		model.ElectricalConnectionCharacteristicContextTypeEntity,
-		model.ElectricalConnectionCharacteristicTypeTypeContractualConsumptionNominalMax,
-	)
-	if err != nil || data.Value == nil {
-		return 0, err
-	}
-
-	return data.Value.GetValue(), nil
-}

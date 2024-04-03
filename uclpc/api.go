@@ -84,11 +84,4 @@ type UCLCPInterface interface {
 	// parameters:
 	//   - entity: the entity of the e.g. EVSE
 	PowerConsumptionNominalMax(entity spineapi.EntityRemoteInterface) (float64, error)
-
-	// return nominal maximum active (real) power the Controllable System is
-	// allowed to consume due to the customer's contract.
-	//
-	// parameters:
-	//   - entity: the entity of the e.g. EVSE
-	ContractualConsumptionNominalMax(entity spineapi.EntityRemoteInterface) (float64, error)
 }

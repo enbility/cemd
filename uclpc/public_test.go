@@ -353,33 +353,3 @@ func (s *UCLPCSuite) Test_PowerConsumptionNominalMax() {
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 8000.0, data)
 }
-
-func (s *UCLPCSuite) Test_ContractualConsumptionNominalMax() {
-	data, err := s.sut.ContractualConsumptionNominalMax(s.mockRemoteEntity)
-	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), 0.0, data)
-
-	data, err = s.sut.ContractualConsumptionNominalMax(s.monitoredEntity)
-	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), 0.0, data)
-
-	charData := &model.ElectricalConnectionCharacteristicListDataType{
-		ElectricalConnectionCharacteristicListData: []model.ElectricalConnectionCharacteristicDataType{
-			{
-				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
-				CharacteristicId:       eebusutil.Ptr(model.ElectricalConnectionCharacteristicIdType(0)),
-				CharacteristicContext:  eebusutil.Ptr(model.ElectricalConnectionCharacteristicContextTypeEntity),
-				CharacteristicType:     eebusutil.Ptr(model.ElectricalConnectionCharacteristicTypeTypeContractualConsumptionNominalMax),
-				Value:                  model.NewScaledNumberType(7000),
-			},
-		},
-	}
-
-	rFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.monitoredEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer)
-	fErr := rFeature.UpdateData(model.FunctionTypeElectricalConnectionCharacteristicListData, charData, nil, nil)
-	assert.Nil(s.T(), fErr)
-
-	data, err = s.sut.ContractualConsumptionNominalMax(s.monitoredEntity)
-	assert.Nil(s.T(), err)
-	assert.Equal(s.T(), 7000.0, data)
-}
