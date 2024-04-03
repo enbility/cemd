@@ -100,7 +100,6 @@ func (e *UCLPC) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool,
 			model.FeatureTypeTypeDeviceDiagnosis,
 			model.FeatureTypeTypeLoadControl,
 			model.FeatureTypeTypeDeviceConfiguration,
-			model.FeatureTypeTypeElectricalConnection,
 		},
 	) {
 		return false, nil
@@ -115,10 +114,6 @@ func (e *UCLPC) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool,
 	}
 
 	if _, err := util.DeviceConfiguration(e.service, entity); err != nil {
-		return false, eebusapi.ErrFunctionNotSupported
-	}
-
-	if _, err := util.ElectricalConnection(e.service, entity); err != nil {
 		return false, eebusapi.ErrFunctionNotSupported
 	}
 
