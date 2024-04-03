@@ -60,19 +60,6 @@ func (s *UCLPCServerSuite) Test_FailsafeDurationMinimum() {
 	assert.Nil(s.T(), err)
 }
 
-func (s *UCLPCServerSuite) Test_PowerConsumptionNominalMax() {
-	value, err := s.sut.PowerConsumptionNominalMax()
-	assert.Equal(s.T(), 0.0, value)
-	assert.NotNil(s.T(), err)
-
-	err = s.sut.SetPowerConsumptionNominalMax(10)
-	assert.Nil(s.T(), err)
-
-	value, err = s.sut.PowerConsumptionNominalMax()
-	assert.Equal(s.T(), 10.0, value)
-	assert.Nil(s.T(), err)
-}
-
 func (s *UCLPCServerSuite) Test_ContractualConsumptionNominalMax() {
 	value, err := s.sut.ContractualConsumptionNominalMax()
 	assert.Equal(s.T(), 0.0, value)

@@ -68,17 +68,6 @@ type UCLCPServerInterface interface {
 	// Scenario 4
 
 	// return nominal maximum active (real) power the Controllable System is
-	// able to consume according to the device label or data sheet.
-	PowerConsumptionNominalMax() (float64, error)
-
-	// set nominal maximum active (real) power the Controllable System is
-	// able to consume according to the device label or data sheet.
-	//
-	// parameters:
-	//   - value: nominal max power consumption in W
-	SetPowerConsumptionNominalMax(value float64) (resultErr error)
-
-	// return nominal maximum active (real) power the Controllable System is
 	// allowed to consume due to the customer's contract.
 	ContractualConsumptionNominalMax() (float64, error)
 

@@ -177,35 +177,6 @@ func (e *UCLPCServer) SetFailsafeDurationMinimum(duration time.Duration, changea
 // Scenario 4
 
 // return nominal maximum active (real) power the Controllable System is
-// able to consume according to the device label or data sheet.
-func (e *UCLPCServer) PowerConsumptionNominalMax() (value float64, resultErr error) {
-	value = 0
-	resultErr = eebusapi.ErrDataNotAvailable
-
-	charData := util.GetLocalElectricalConnectionCharacteristicForContextType(
-		e.service,
-		model.ElectricalConnectionCharacteristicContextTypeEntity,
-		model.ElectricalConnectionCharacteristicTypeTypePowerConsumptionNominalMax,
-	)
-	if charData.CharacteristicId == nil || charData.Value == nil {
-		return
-	}
-
-	return charData.Value.GetValue(), nil
-}
-
-// set nominal maximum active (real) power the Controllable System is
-// able to consume according to the device label or data sheet.
-func (e *UCLPCServer) SetPowerConsumptionNominalMax(value float64) error {
-	return util.SetLocalElectricalConnectionCharacteristicForContextType(
-		e.service,
-		model.ElectricalConnectionCharacteristicContextTypeEntity,
-		model.ElectricalConnectionCharacteristicTypeTypePowerConsumptionNominalMax,
-		value,
-	)
-}
-
-// return nominal maximum active (real) power the Controllable System is
 // allowed to consume due to the customer's contract.
 func (e *UCLPCServer) ContractualConsumptionNominalMax() (value float64, resultErr error) {
 	value = 0
