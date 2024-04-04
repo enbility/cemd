@@ -43,6 +43,10 @@ func (e *UCOPEV) evConnected(entity spineapi.EntityRemoteInterface) {
 			logging.Log().Debug(err)
 		}
 
+		if _, err := evLoadControl.Bind(); err != nil {
+			logging.Log().Debug(err)
+		}
+
 		// get descriptions
 		if _, err := evLoadControl.RequestLimitDescriptions(); err != nil {
 			logging.Log().Debug(err)
