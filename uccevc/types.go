@@ -30,6 +30,13 @@ const (
 	//   - the entity of the EV
 	DataUpdateIncentiveTable api.EventType = "DataUpdateIncentiveTable"
 
+	// EV incentive table data constraints updated
+	//
+	// The callback with this message provides:
+	//   - the device of the EVSE the EV is connected to
+	//   - the entity of the EV
+	DataUpdateIncentiveTableConstraints api.EventType = "DataUpdateIncentiveTableConstraints"
+
 	// EV requested an incentive table, call to WriteIncentiveTableDescriptions required
 	//
 	// The callback with this message provides:

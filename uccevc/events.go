@@ -38,6 +38,9 @@ func (e *UCCEVC) HandleEvent(payload spineapi.EventPayload) {
 	case *model.IncentiveTableDescriptionDataType:
 		e.evIncentiveTableDescriptionDataUpdate(payload)
 
+	case *model.IncentiveTableConstraintsDataType:
+		e.evIncentiveTableConstraintsDataUpdate(payload)
+
 	case *model.IncentiveDataType:
 		e.evIncentiveTableDataUpdate(payload)
 	}
@@ -156,7 +159,12 @@ func (e *UCCEVC) evIncentiveTableDescriptionDataUpdate(payload spineapi.EventPay
 
 }
 
-// the load control limit data of an EV was updated
+// the incentive table constraint data of an EV was updated
+func (e *UCCEVC) evIncentiveTableConstraintsDataUpdate(payload spineapi.EventPayload) {
+	e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateIncentiveTable)
+}
+
+// the incentive table data of an EV was updated
 func (e *UCCEVC) evIncentiveTableDataUpdate(payload spineapi.EventPayload) {
 	e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateIncentiveTable)
 }

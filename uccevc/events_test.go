@@ -37,6 +37,9 @@ func (s *UCCEVCSuite) Test_Events() {
 	payload.Data = eebusutil.Ptr(model.IncentiveTableDescriptionDataType{})
 	s.sut.HandleEvent(payload)
 
+	payload.Data = eebusutil.Ptr(model.IncentiveTableConstraintsDataType{})
+	s.sut.HandleEvent(payload)
+
 	payload.Data = eebusutil.Ptr(model.IncentiveDataType{})
 	s.sut.HandleEvent(payload)
 }
