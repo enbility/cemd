@@ -56,7 +56,7 @@ const (
 	//   - the entity of the EV
 	//
 	// Note: the referred data may be updated together with all other configuration items of this use case
-	AsymmetricChargingSupportDataUpdate api.EventType = "AsymmetricChargingSupportDataUpdate"
+	DataUpdateAsymmetricChargingSupport api.EventType = "DataUpdateAsymmetricChargingSupport"
 
 	// EV identificationdata was updated
 	//

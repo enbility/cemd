@@ -140,7 +140,7 @@ func (e *UCEVCC) evConfigurationDataUpdate(payload spineapi.EventPayload) {
 
 	// Scenario 3
 	if _, err := evDeviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypeAsymmetricChargingSupported, model.DeviceConfigurationKeyValueTypeTypeString); err == nil {
-		e.eventCB(payload.Ski, payload.Device, payload.Entity, AsymmetricChargingSupportDataUpdate)
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateAsymmetricChargingSupport)
 	}
 }
 
