@@ -58,7 +58,8 @@ func (e *UCOSCEV) AddFeatures() {
 
 	// server features
 	f := localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
-	f.AddFunctionType(model.FunctionTypeDeviceDiagnosisStateData, false, false)
+	f.AddFunctionType(model.FunctionTypeDeviceDiagnosisStateData, true, false)
+	f.AddFunctionType(model.FunctionTypeDeviceDiagnosisHeartbeatData, true, false)
 }
 
 func (e *UCOSCEV) AddUseCase() {

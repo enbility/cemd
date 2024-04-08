@@ -108,7 +108,7 @@ func (e *UCLPCServer) AddFeatures() {
 	f.SetData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, deviceConfigDesc)
 
 	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
-	f.AddFunctionType(model.FunctionTypeDeviceDiagnosisHeartbeatData, true, true)
+	f.AddFunctionType(model.FunctionTypeDeviceDiagnosisHeartbeatData, true, false)
 
 	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeElectricalConnectionCharacteristicListData, true, true)
