@@ -35,7 +35,7 @@ func (e *UCLPC) HandleEvent(payload spineapi.EventPayload) {
 	}
 }
 
-// the remote device was connected
+// the remote entity was connected
 func (e *UCLPC) connected(entity spineapi.EntityRemoteInterface) {
 	// initialise features, e.g. subscriptions, descriptions
 	if loadControl, err := util.LoadControl(e.service, entity); err == nil {
@@ -45,6 +45,12 @@ func (e *UCLPC) connected(entity spineapi.EntityRemoteInterface) {
 
 		// get descriptions
 		if _, err := loadControl.RequestLimitDescriptions(); err != nil {
+			logging.Log().Debug(err)
+		}
+	}
+
+	if localDeviceDiag, err := util.DeviceDiagnosis(e.service, entity); err == nil {
+		if _, err := localDeviceDiag.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}
 	}
