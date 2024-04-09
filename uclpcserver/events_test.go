@@ -50,7 +50,7 @@ func (s *UCLPCServerSuite) Test_Events() {
 
 	payload.EventType = spineapi.EventTypeBindingChange
 	payload.ChangeType = spineapi.ElementChangeAdd
-	payload.LocalFeature = s.deviceDiagnosisFeature
+	payload.LocalFeature = s.loadControlFeature
 	s.sut.HandleEvent(payload)
 }
 

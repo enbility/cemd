@@ -27,7 +27,7 @@ func (e *UCLPCServer) HandleEvent(payload spineapi.EventPayload) {
 	if payload.EventType == spineapi.EventTypeBindingChange &&
 		payload.ChangeType == spineapi.ElementChangeAdd &&
 		payload.LocalFeature != nil &&
-		payload.LocalFeature.Type() == model.FeatureTypeTypeDeviceDiagnosis &&
+		payload.LocalFeature.Type() == model.FeatureTypeTypeLoadControl &&
 		payload.LocalFeature.Role() == model.RoleTypeServer {
 		e.subscribeHeartbeatWorkaround(payload)
 		return
@@ -106,16 +106,16 @@ func (e *UCLPCServer) deviceConnected(payload spineapi.EventPayload) {
 		return
 	}
 
-	// we only found more one matching entity, this is not good
+	// we found more than one matching entity, this is not good
 	// according to KEO the subscription should be done on the entity that requests a binding to
 	// the local loadControlLimit server feature
-	e.heartbeatWorkaround = true
+	e.heartbeatKeoWorkaround = true
 }
 
 // subscribe to the DeviceDiagnosis Server of the entity that created a binding
 func (e *UCLPCServer) subscribeHeartbeatWorkaround(payload spineapi.EventPayload) {
 	// the workaround is not needed, exit
-	if !e.heartbeatWorkaround {
+	if !e.heartbeatKeoWorkaround {
 		return
 	}
 
