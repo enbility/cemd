@@ -94,7 +94,7 @@ func (e *UCLPCServer) AddFeatures() {
 	f.AddFunctionType(model.FunctionTypeDeviceConfigurationKeyValueListData, true, true)
 
 	var configId model.DeviceConfigurationKeyIdType = 0
-	// get the heighest keyId
+	// get the highest keyId
 	if desc, err := spine.LocalFeatureDataCopyOfType[*model.DeviceConfigurationKeyValueDescriptionListDataType](
 		f, model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData); err == nil && desc.DeviceConfigurationKeyValueDescriptionData != nil {
 		for _, desc := range desc.DeviceConfigurationKeyValueDescriptionData {
@@ -142,7 +142,7 @@ func (e *UCLPCServer) AddFeatures() {
 	f.AddFunctionType(model.FunctionTypeElectricalConnectionCharacteristicListData, true, false)
 
 	var elCharId model.ElectricalConnectionCharacteristicIdType = 0
-	// get the heighest CharacteristicId
+	// get the highest CharacteristicId
 	if desc, err := spine.LocalFeatureDataCopyOfType[*model.ElectricalConnectionCharacteristicListDataType](
 		f, model.FunctionTypeElectricalConnectionCharacteristicListData); err == nil && desc.ElectricalConnectionCharacteristicData != nil {
 		for _, desc := range desc.ElectricalConnectionCharacteristicData {
