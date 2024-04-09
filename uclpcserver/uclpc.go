@@ -16,6 +16,8 @@ type UCLPCServer struct {
 	eventCB api.EntityEventCallback
 
 	validEntityTypes []model.EntityTypeType
+
+	heartbeatWorkaround bool
 }
 
 var _ UCLCPServerInterface = (*UCLPCServer)(nil)

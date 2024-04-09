@@ -35,6 +35,7 @@ type UCLPCServerSuite struct {
 	mockRemoteEntity *mocks.EntityRemoteInterface
 	monitoredEntity  spineapi.EntityRemoteInterface
 	loadControlFeature,
+	deviceDiagnosisFeature,
 	deviceConfigurationFeature spineapi.FeatureLocalInterface
 }
 
@@ -74,6 +75,7 @@ func (s *UCLPCServerSuite) BeforeTest(suiteName, testName string) {
 
 	localEntity := s.sut.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 	s.loadControlFeature = localEntity.FeatureOfTypeAndRole(model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
+	s.deviceDiagnosisFeature = localEntity.FeatureOfTypeAndRole(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
 	s.deviceConfigurationFeature = localEntity.FeatureOfTypeAndRole(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer)
 
 	s.remoteDevice, s.monitoredEntity = setupDevices(s.service, s.T())

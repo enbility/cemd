@@ -1,7 +1,10 @@
 package uclpcserver
 
 import (
+	"slices"
+
 	"github.com/enbility/cemd/util"
+	"github.com/enbility/ship-go/logging"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 )
@@ -13,6 +16,22 @@ func (e *UCLPCServer) HandleEvent(payload spineapi.EventPayload) {
 	}
 
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
+
+	if util.IsDeviceConnected(payload) {
+		e.deviceConnected(payload)
+		return
+	}
+
+	// did we receive a binding to the loadControl server and the
+	// heartbeatWorkaround is required?
+	if payload.EventType == spineapi.EventTypeBindingChange &&
+		payload.ChangeType == spineapi.ElementChangeAdd &&
+		payload.LocalFeature != nil &&
+		payload.LocalFeature.Type() == model.FeatureTypeTypeDeviceDiagnosis &&
+		payload.LocalFeature.Role() == model.RoleTypeServer {
+		e.subscribeHeartbeatWorkaround(payload)
+		return
+	}
 
 	if localEntity == nil ||
 		payload.EventType != spineapi.EventTypeDataChange ||
@@ -43,6 +62,67 @@ func (e *UCLPCServer) HandleEvent(payload spineapi.EventPayload) {
 		}
 
 		e.configurationDataUpdate(payload)
+	}
+}
+
+// a remote device was connected and we know its entities
+func (e *UCLPCServer) deviceConnected(payload spineapi.EventPayload) {
+	if payload.Device == nil {
+		return
+	}
+
+	// check if there is a DeviceDiagnosis server on one or more entities
+	remoteDevice := payload.Device
+
+	var deviceDiagEntites []spineapi.EntityRemoteInterface
+
+	entites := remoteDevice.Entities()
+	for _, entity := range entites {
+		if !slices.Contains(e.validEntityTypes, entity.EntityType()) {
+			continue
+		}
+
+		deviceDiagF := entity.FeatureOfTypeAndRole(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
+		if deviceDiagF == nil {
+			continue
+		}
+
+		deviceDiagEntites = append(deviceDiagEntites, entity)
+	}
+
+	// the remote device does not have a DeviceDiagnosis Server, which it should
+	if len(deviceDiagEntites) == 0 {
+		return
+	}
+
+	// we only found one matching entity, as it should be, subscribe
+	if len(deviceDiagEntites) == 1 {
+		if localDeviceDiag, err := util.DeviceDiagnosis(e.service, deviceDiagEntites[0]); err == nil {
+			if _, err := localDeviceDiag.Subscribe(); err != nil {
+				logging.Log().Debug(err)
+			}
+		}
+
+		return
+	}
+
+	// we only found more one matching entity, this is not good
+	// according to KEO the subscription should be done on the entity that requests a binding to
+	// the local loadControlLimit server feature
+	e.heartbeatWorkaround = true
+}
+
+// subscribe to the DeviceDiagnosis Server of the entity that created a binding
+func (e *UCLPCServer) subscribeHeartbeatWorkaround(payload spineapi.EventPayload) {
+	// the workaround is not needed, exit
+	if !e.heartbeatWorkaround {
+		return
+	}
+
+	if localDeviceDiag, err := util.DeviceDiagnosis(e.service, payload.Entity); err == nil {
+		if _, err := localDeviceDiag.Subscribe(); err != nil {
+			logging.Log().Debug(err)
+		}
 	}
 }
 
