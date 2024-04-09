@@ -28,6 +28,7 @@ func NewUCLPC(service eebusapi.ServiceInterface, eventCB api.EntityEventCallback
 
 	uc.validEntityTypes = []model.EntityTypeType{
 		model.EntityTypeTypeGridGuard,
+		model.EntityTypeTypeCEM, // KEO uses this entity type for an SMGW whysoever
 	}
 
 	_ = spine.Events.Subscribe(uc)
