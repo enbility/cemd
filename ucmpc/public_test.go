@@ -382,7 +382,6 @@ func (s *UCMPCSuite) Test_CurrentPerPhase() {
 	data, err = s.sut.CurrentPerPhase(s.monitoredEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), []float64{10, 10, 10}, data)
-
 }
 
 func (s *UCMPCSuite) Test_VoltagePerPhase() {

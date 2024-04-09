@@ -43,7 +43,6 @@ func MeasurementValuesForTypeCommodityScope(
 	energyDirection model.EnergyDirectionType,
 	validPhaseNameTypes []model.ElectricalConnectionPhaseNameType,
 ) ([]float64, error) {
-
 	measurement := measurementType
 	commodity := commodityType
 	scope := scopeType
@@ -99,7 +98,6 @@ func GetValuesForTypeCommodityScope(
 	measurement model.MeasurementTypeType,
 	commodity model.CommodityTypeType,
 	scope model.ScopeTypeType) ([]model.MeasurementDataType, error) {
-
 	measurementFeature, err := Measurement(service, entity)
 	if err != nil || measurementFeature == nil {
 		return nil, err

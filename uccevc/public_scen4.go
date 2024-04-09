@@ -92,7 +92,6 @@ func (e *UCCEVC) ChargePlan(entity spineapi.EntityRemoteInterface) (api.ChargePl
 	currentStart := time.Now()
 	currentEnd := currentStart
 	if data.TimePeriod != nil && data.TimePeriod.StartTime != nil {
-
 		if start, err := data.TimePeriod.StartTime.GetTimeDuration(); err == nil {
 			currentStart = currentStart.Add(start)
 			startAvailable = true

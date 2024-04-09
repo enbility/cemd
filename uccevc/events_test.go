@@ -158,5 +158,4 @@ func (s *UCCEVCSuite) Test_evTimeSeriesDescriptionDataUpdate() {
 	assert.Nil(s.T(), fErr)
 
 	s.sut.evTimeSeriesDescriptionDataUpdate(payload)
-
 }

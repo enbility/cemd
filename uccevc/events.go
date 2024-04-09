@@ -156,7 +156,6 @@ func (e *UCCEVC) evIncentiveTableDescriptionDataUpdate(payload spineapi.EventPay
 	if e.evCheckIncentiveTableDescriptionUpdateRequired(payload.Entity) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataRequestedIncentiveTableDescription)
 	}
-
 }
 
 // the incentive table constraint data of an EV was updated

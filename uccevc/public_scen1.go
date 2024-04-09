@@ -63,7 +63,6 @@ func (e *UCCEVC) ChargeStrategy(entity spineapi.EntityRemoteInterface) api.EVCha
 
 			return api.EVChargeStrategyTypeNoDemand
 		}
-
 	}
 
 	return api.EVChargeStrategyTypeUnknown

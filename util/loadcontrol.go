@@ -19,7 +19,6 @@ func LoadControlLimits(
 	entity spineapi.EntityRemoteInterface,
 	entityTypes []model.EntityTypeType,
 	category model.LoadControlCategoryType) (limits []api.LoadLimitsPhase, resultErr error) {
-
 	limits = nil
 	resultErr = api.ErrNoCompatibleEntity
 	if entity == nil || !IsCompatibleEntity(entity, entityTypes) {

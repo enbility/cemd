@@ -197,5 +197,4 @@ func (s *UtilSuite) Test_MeasurementValuesForTypeCommodityScope() {
 	)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), []float64{10, 10, 10}, data)
-
 }

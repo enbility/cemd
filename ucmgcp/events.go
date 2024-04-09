@@ -139,5 +139,4 @@ func (e *UCMGCP) gridMeasurementDataUpdate(payload spineapi.EventPayload) {
 	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACFrequency); err == nil {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateFrequency)
 	}
-
 }

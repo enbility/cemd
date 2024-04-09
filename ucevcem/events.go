@@ -52,7 +52,6 @@ func (e *UCEVCEM) evConnected(entity spineapi.EntityRemoteInterface) {
 		if _, err := evElectricalConnection.RequestParameterDescriptions(); err != nil {
 			logging.Log().Debug(err)
 		}
-
 	}
 
 	if evMeasurement, err := util.Measurement(e.service, entity); err == nil {

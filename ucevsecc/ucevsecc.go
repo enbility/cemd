@@ -98,7 +98,6 @@ func (e *UCEVSECC) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bo
 		) {
 			return false, nil
 		}
-
 	}
 
 	return true, nil

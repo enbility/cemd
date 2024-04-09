@@ -78,7 +78,6 @@ func (s *UCCEVCSuite) Test_ChargePlanConstaints() {
 
 	_, err = s.sut.ChargePlanConstraints(s.evEntity)
 	assert.Nil(s.T(), err)
-
 }
 
 func (s *UCCEVCSuite) Test_ChargePlan() {

@@ -16,7 +16,7 @@ func (e *UCEVCC) ChargeState(entity spineapi.EntityRemoteInterface) (api.EVCharg
 
 	evDeviceDiagnosis, err := util.DeviceDiagnosis(e.service, entity)
 	if err != nil {
-		return api.EVChargeStateTypeUnplugged, nil
+		return api.EVChargeStateTypeUnplugged, err
 	}
 
 	diagnosisState, err := evDeviceDiagnosis.GetState()
@@ -201,7 +201,6 @@ func (e *UCEVCC) ManufacturerData(
 	api.ManufacturerData,
 	error,
 ) {
-
 	return util.ManufacturerData(e.service, entity, e.validEntityTypes)
 }
 

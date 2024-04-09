@@ -7,7 +7,6 @@ import (
 
 // handle SPINE events
 func (h *Cem) HandleEvent(payload spineapi.EventPayload) {
-
 	if util.IsDeviceConnected(payload) {
 		h.eventCB(payload.Ski, payload.Device, DeviceConnected)
 		return

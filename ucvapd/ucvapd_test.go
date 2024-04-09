@@ -111,5 +111,4 @@ func (s *UCVAPDSuite) Test_IsUseCaseSupported() {
 	data, err = s.sut.IsUseCaseSupported(s.pvEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), true, data)
-
 }

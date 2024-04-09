@@ -94,5 +94,4 @@ func (s *UCVABDSuite) Test_IsUseCaseSupported() {
 	data, err = s.sut.IsUseCaseSupported(s.batteryEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), true, data)
-
 }

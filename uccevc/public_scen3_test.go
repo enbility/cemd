@@ -203,7 +203,6 @@ func (s *UCCEVCSuite) Test_WriteIncentives() {
 	for _, tc := range tests {
 		s.T().Run(tc.name, func(t *testing.T) {
 			for _, data := range tc.data {
-
 				constData = &model.IncentiveTableConstraintsDataType{
 					IncentiveTableConstraints: []model.IncentiveTableConstraintsType{
 						{

@@ -94,7 +94,6 @@ func (e *UCOPEV) evLoadControlLimitDataUpdate(payload spineapi.EventPayload) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateLimit)
 		return
 	}
-
 }
 
 // the electrical connection permitted value sets data of an EV was updated

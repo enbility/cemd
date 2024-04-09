@@ -322,7 +322,6 @@ func (s *UCMGCPSuite) Test_CurrentPerPhase() {
 	data, err = s.sut.CurrentPerPhase(s.smgwEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), []float64{10, 10, 10}, data)
-
 }
 
 func (s *UCMGCPSuite) Test_VoltagePerPhase() {

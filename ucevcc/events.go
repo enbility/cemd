@@ -187,7 +187,6 @@ func (e *UCEVCC) evManufacturerDataUpdate(payload spineapi.EventPayload) {
 	if _, err := evDeviceClassification.GetManufacturerDetails(); err == nil {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateManufacturerData)
 	}
-
 }
 
 // the electrical connection parameter description data of an EV was updated

@@ -351,8 +351,8 @@ func (s *UtilSuite) Test_WriteLoadControlLimits() {
 						IsActive: true,
 						Value:    limit,
 					})
-
 				}
+
 				msgCounter, err = WriteLoadControlLimits(s.service, s.monitoredEntity, entityTypes, category, phaseLimitValues)
 				assert.Nil(t, err)
 				assert.NotNil(t, msgCounter)
