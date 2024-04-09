@@ -1,7 +1,10 @@
 package main
 
 import (
+	"crypto/ecdsa"
 	"crypto/tls"
+	"crypto/x509"
+	"encoding/pem"
 	"flag"
 	"fmt"
 	"log"
@@ -37,6 +40,20 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		// persist certificate into default files
+		pemdata := pem.EncodeToMemory(&pem.Block{
+			Type:  "CERTIFICATE",
+			Bytes: certificate.Certificate[0],
+		})
+		os.WriteFile("cert.crt", pemdata, 0666)
+
+		b, err := x509.MarshalECPrivateKey(certificate.PrivateKey.(*ecdsa.PrivateKey))
+		if err != nil {
+			log.Fatal(err)
+		}
+		pemdata = pem.EncodeToMemory(&pem.Block{Type: "EC PRIVATE KEY", Bytes: b})
+		os.WriteFile("cert.key", pemdata, 0666)
 	} else {
 		fmt.Println("Using certificate file", *crt, "and key file", *key)
 	}
