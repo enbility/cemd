@@ -11,16 +11,16 @@ import (
 
 // handle SPINE events
 func (e *UCLPCServer) HandleEvent(payload spineapi.EventPayload) {
+	if util.IsDeviceConnected(payload) {
+		e.deviceConnected(payload)
+		return
+	}
+
 	if !util.IsCompatibleEntity(payload.Entity, e.validEntityTypes) {
 		return
 	}
 
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
-
-	if util.IsDeviceConnected(payload) {
-		e.deviceConnected(payload)
-		return
-	}
 
 	// did we receive a binding to the loadControl server and the
 	// heartbeatWorkaround is required?
