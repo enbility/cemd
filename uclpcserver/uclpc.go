@@ -139,7 +139,7 @@ func (e *UCLPCServer) AddFeatures() {
 	f.AddFunctionType(model.FunctionTypeDeviceDiagnosisHeartbeatData, true, false)
 
 	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer)
-	f.AddFunctionType(model.FunctionTypeElectricalConnectionCharacteristicListData, true, true)
+	f.AddFunctionType(model.FunctionTypeElectricalConnectionCharacteristicListData, true, false)
 
 	var elCharId model.ElectricalConnectionCharacteristicIdType = 0
 	// get the heighest CharacteristicId
