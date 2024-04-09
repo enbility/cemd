@@ -101,6 +101,10 @@ func (e *UCLPCServer) deviceConnected(payload spineapi.EventPayload) {
 			if _, err := localDeviceDiag.Subscribe(); err != nil {
 				logging.Log().Debug(err)
 			}
+
+			if _, err := localDeviceDiag.RequestHeartbeat(); err != nil {
+				logging.Log().Debug(err)
+			}
 		}
 
 		return
@@ -121,6 +125,10 @@ func (e *UCLPCServer) subscribeHeartbeatWorkaround(payload spineapi.EventPayload
 
 	if localDeviceDiag, err := util.DeviceDiagnosis(e.service, payload.Entity); err == nil {
 		if _, err := localDeviceDiag.Subscribe(); err != nil {
+			logging.Log().Debug(err)
+		}
+
+		if _, err := localDeviceDiag.RequestHeartbeat(); err != nil {
 			logging.Log().Debug(err)
 		}
 	}
