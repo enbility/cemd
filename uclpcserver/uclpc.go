@@ -78,6 +78,17 @@ func (e *UCLPCServer) AddFeatures() {
 	}
 	f.SetData(model.FunctionTypeLoadControlLimitDescriptionListData, loadControlDesc)
 
+	loadControl := &model.LoadControlLimitListDataType{
+		LoadControlLimitData: []model.LoadControlLimitDataType{
+			{
+				LimitId:           eebusutil.Ptr(model.LoadControlLimitIdType(limitId)),
+				IsLimitChangeable: eebusutil.Ptr(true),
+				IsLimitActive:     eebusutil.Ptr(false),
+			},
+		},
+	}
+	f.SetData(model.FunctionTypeLoadControlLimitListData, loadControl)
+
 	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, true, false)
 	f.AddFunctionType(model.FunctionTypeDeviceConfigurationKeyValueListData, true, true)
@@ -109,6 +120,20 @@ func (e *UCLPCServer) AddFeatures() {
 		},
 	}
 	f.SetData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, deviceConfigDesc)
+
+	deviceConfig := &model.DeviceConfigurationKeyValueListDataType{
+		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{
+			{
+				KeyId:             eebusutil.Ptr(model.DeviceConfigurationKeyIdType(configId)),
+				IsValueChangeable: eebusutil.Ptr(true),
+			},
+			{
+				KeyId:             eebusutil.Ptr(model.DeviceConfigurationKeyIdType(configId + 1)),
+				IsValueChangeable: eebusutil.Ptr(true),
+			},
+		},
+	}
+	f.SetData(model.FunctionTypeDeviceConfigurationKeyValueListData, deviceConfig)
 
 	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeDeviceDiagnosisHeartbeatData, true, false)
