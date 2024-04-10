@@ -69,7 +69,7 @@ func (e *UCOSCEV) AddUseCase() {
 		model.UseCaseActorTypeCEM,
 		e.UseCaseName(),
 		model.SpecificationVersionType("1.0.1"),
-		"",
+		"release",
 		true,
 		[]model.UseCaseScenarioSupportType{1, 2, 3})
 }
