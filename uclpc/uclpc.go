@@ -66,7 +66,7 @@ func (e *UCLPC) AddUseCase() {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	localEntity.AddUseCaseSupport(
-		model.UseCaseActorTypeCEM,
+		model.UseCaseActorTypeEnergyGuard,
 		e.UseCaseName(),
 		model.SpecificationVersionType("1.0.0"),
 		"release",
@@ -77,7 +77,7 @@ func (e *UCLPC) AddUseCase() {
 func (e *UCLPC) UpdateUseCaseAvailability(available bool) {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
-	localEntity.SetUseCaseAvailability(model.UseCaseActorTypeCEM, e.UseCaseName(), available)
+	localEntity.SetUseCaseAvailability(model.UseCaseActorTypeEnergyGuard, e.UseCaseName(), available)
 }
 
 // returns if the entity supports the usecase
