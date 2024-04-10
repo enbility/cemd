@@ -78,17 +78,6 @@ func (e *UCLPCServer) AddFeatures() {
 	}
 	f.SetData(model.FunctionTypeLoadControlLimitDescriptionListData, loadControlDesc)
 
-	loadControl := &model.LoadControlLimitListDataType{
-		LoadControlLimitData: []model.LoadControlLimitDataType{
-			{
-				LimitId:           eebusutil.Ptr(model.LoadControlLimitIdType(limitId)),
-				IsLimitChangeable: eebusutil.Ptr(true),
-				IsLimitActive:     eebusutil.Ptr(false),
-			},
-		},
-	}
-	f.SetData(model.FunctionTypeLoadControlLimitListData, loadControl)
-
 	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, true, false)
 	f.AddFunctionType(model.FunctionTypeDeviceConfigurationKeyValueListData, true, true)

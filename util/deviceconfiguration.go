@@ -90,16 +90,23 @@ func SetLocalDeviceConfigurationKeyValue(
 		return
 	}
 
-	keyData := model.DeviceConfigurationKeyValueDataType{
-		KeyId:             eebusutil.Ptr(*description.KeyId),
-		IsValueChangeable: eebusutil.Ptr(changeable),
-		Value:             eebusutil.Ptr(value),
-	}
-	keysData := &model.DeviceConfigurationKeyValueListDataType{
-		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{keyData},
+	data, err := spine.LocalFeatureDataCopyOfType[*model.DeviceConfigurationKeyValueListDataType](deviceConfiguration, model.FunctionTypeDeviceConfigurationKeyValueListData)
+	if err != nil {
+		data = &model.DeviceConfigurationKeyValueListDataType{}
 	}
 
-	deviceConfiguration.SetData(model.FunctionTypeDeviceConfigurationKeyValueListData, keysData)
+	for index, item := range data.DeviceConfigurationKeyValueData {
+		if item.KeyId == nil || *item.KeyId != *description.KeyId {
+			continue
+		}
+
+		item.IsValueChangeable = eebusutil.Ptr(changeable)
+		item.Value = eebusutil.Ptr(value)
+
+		data.DeviceConfigurationKeyValueData[index] = item
+	}
+
+	deviceConfiguration.SetData(model.FunctionTypeDeviceConfigurationKeyValueListData, data)
 
 	return nil
 }

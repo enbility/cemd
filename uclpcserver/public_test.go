@@ -26,7 +26,7 @@ func (s *UCLPCServerSuite) Test_LoadControlLimit() {
 	assert.Nil(s.T(), err)
 }
 
-func (s *UCLPCServerSuite) Test_FailsafeConsumptionActivePowerLimit() {
+func (s *UCLPCServerSuite) Test_Failsafe() {
 	limit, changeable, err := s.sut.FailsafeConsumptionActivePowerLimit()
 	assert.Equal(s.T(), 0.0, limit)
 	assert.Equal(s.T(), false, changeable)
@@ -39,9 +39,7 @@ func (s *UCLPCServerSuite) Test_FailsafeConsumptionActivePowerLimit() {
 	assert.Equal(s.T(), 10.0, limit)
 	assert.Equal(s.T(), true, changeable)
 	assert.Nil(s.T(), err)
-}
 
-func (s *UCLPCServerSuite) Test_FailsafeDurationMinimum() {
 	// The actual tests of the functionality is located in the util package
 	duration, changeable, err := s.sut.FailsafeDurationMinimum()
 	assert.Equal(s.T(), time.Duration(0), duration)
@@ -52,6 +50,11 @@ func (s *UCLPCServerSuite) Test_FailsafeDurationMinimum() {
 	assert.NotNil(s.T(), err)
 
 	err = s.sut.SetFailsafeDurationMinimum(time.Duration(time.Hour*2), true)
+	assert.Nil(s.T(), err)
+
+	limit, changeable, err = s.sut.FailsafeConsumptionActivePowerLimit()
+	assert.Equal(s.T(), 10.0, limit)
+	assert.Equal(s.T(), true, changeable)
 	assert.Nil(s.T(), err)
 
 	duration, changeable, err = s.sut.FailsafeDurationMinimum()
