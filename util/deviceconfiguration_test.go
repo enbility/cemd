@@ -97,4 +97,7 @@ func (s *UtilSuite) Test_SetLocalDeviceConfigurationKeyValue() {
 	assert.NotNil(s.T(), data.Value)
 	assert.NotNil(s.T(), data.Value.ScaledNumber)
 	assert.Equal(s.T(), 10.0, data.Value.ScaledNumber.GetValue())
+
+	err = SetLocalDeviceConfigurationKeyValue(s.service, keyName, true, value)
+	assert.Nil(s.T(), err)
 }

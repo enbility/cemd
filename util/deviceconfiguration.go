@@ -95,6 +95,7 @@ func SetLocalDeviceConfigurationKeyValue(
 		data = &model.DeviceConfigurationKeyValueListDataType{}
 	}
 
+	found := false
 	for index, item := range data.DeviceConfigurationKeyValueData {
 		if item.KeyId == nil || *item.KeyId != *description.KeyId {
 			continue
@@ -104,6 +105,16 @@ func SetLocalDeviceConfigurationKeyValue(
 		item.Value = eebusutil.Ptr(value)
 
 		data.DeviceConfigurationKeyValueData[index] = item
+		found = true
+	}
+
+	if !found {
+		item := model.DeviceConfigurationKeyValueDataType{
+			KeyId:             eebusutil.Ptr(*description.KeyId),
+			IsValueChangeable: eebusutil.Ptr(changeable),
+			Value:             eebusutil.Ptr(value),
+		}
+		data.DeviceConfigurationKeyValueData = append(data.DeviceConfigurationKeyValueData, item)
 	}
 
 	deviceConfiguration.SetData(model.FunctionTypeDeviceConfigurationKeyValueListData, data)
