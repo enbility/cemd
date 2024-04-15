@@ -16,6 +16,7 @@ import (
 	"github.com/enbility/cemd/cmd/democem"
 	eebusapi "github.com/enbility/eebus-go/api"
 	"github.com/enbility/ship-go/cert"
+	"github.com/enbility/ship-go/mdns"
 	"github.com/enbility/spine-go/model"
 )
 
@@ -67,7 +68,7 @@ func main() {
 	configuration, err := eebusapi.NewConfiguration(
 		"Demo",
 		"Demo",
-		"HEMS",
+		"Device",
 		"123456789",
 		model.DeviceTypeTypeEnergyManagementSystem,
 		[]model.EntityTypeType{model.EntityTypeTypeCEM},
@@ -80,13 +81,16 @@ func main() {
 		return
 	}
 
+	configuration.SetMdnsProviderSelection(mdns.MdnsProviderSelectionGoZeroConfOnly)
+
 	if iface != nil && *iface != "" {
 		ifaces := []string{*iface}
 
 		configuration.SetInterfaces(ifaces)
 	}
 
-	demo := democem.NewDemoCem(configuration)
+	demo := democem.NewDemoCem(configuration, *remoteSki)
+
 	if err := demo.Setup(); err != nil {
 		fmt.Println("Error setting up cem: ", err)
 		return
