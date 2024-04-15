@@ -71,6 +71,7 @@ func (e *UCLPCServer) AddFeatures() {
 				LimitType:      eebusutil.Ptr(model.LoadControlLimitTypeTypeSignDependentAbsValueLimit),
 				LimitCategory:  eebusutil.Ptr(model.LoadControlCategoryTypeObligation),
 				LimitDirection: eebusutil.Ptr(model.EnergyDirectionTypeConsume),
+				MeasurementId:  eebusutil.Ptr(model.MeasurementIdType(0)), // This is a fake Measurement ID, as there is no Electrical Connection server defined, it can't provide any meaningful. But KEO requires this to be set :(
 				Unit:           eebusutil.Ptr(model.UnitOfMeasurementTypeW),
 				ScopeType:      eebusutil.Ptr(model.ScopeTypeTypeActivePowerLimit),
 			},
