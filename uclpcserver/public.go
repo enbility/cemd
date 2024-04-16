@@ -21,7 +21,7 @@ import (
 // possible errors:
 //   - ErrDataNotAvailable if no such limit is (yet) available
 //   - and others
-func (e *UCLPCServer) LoadControlLimit() (limit api.LoadLimit, resultErr error) {
+func (e *UCLPCServer) ConsumptionLimit() (limit api.LoadLimit, resultErr error) {
 	limit = api.LoadLimit{
 		Value:        0.0,
 		IsChangeable: false,
@@ -59,7 +59,7 @@ func (e *UCLPCServer) LoadControlLimit() (limit api.LoadLimit, resultErr error) 
 }
 
 // set the current loadcontrol limit data
-func (e *UCLPCServer) SetLoadControlLimit(limit api.LoadLimit) (resultErr error) {
+func (e *UCLPCServer) SetConsumptionLimit(limit api.LoadLimit) (resultErr error) {
 	resultErr = eebusapi.ErrDataNotAvailable
 
 	description := util.GetLocalLimitDescriptionsForTypeCategoryDirectionScope(

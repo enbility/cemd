@@ -25,7 +25,7 @@ import (
 // possible errors:
 //   - ErrDataNotAvailable if no such limit is (yet) available
 //   - and others
-func (e *UCLPC) LoadControlLimit(entity spineapi.EntityRemoteInterface) (
+func (e *UCLPC) ConsumptionLimit(entity spineapi.EntityRemoteInterface) (
 	limit api.LoadLimit, resultErr error) {
 	limit = api.LoadLimit{
 		Value:        0.0,
@@ -77,7 +77,7 @@ func (e *UCLPC) LoadControlLimit(entity spineapi.EntityRemoteInterface) (
 // parameters:
 //   - entity: the entity of the e.g. EVSE
 //   - limit: load limit data
-func (e *UCLPC) WriteLoadControlLimit(
+func (e *UCLPC) WriteConsumptionLimit(
 	entity spineapi.EntityRemoteInterface,
 	limit api.LoadLimit) (*model.MsgCounterType, error) {
 	if entity == nil || !util.IsCompatibleEntity(entity, e.validEntityTypes) {

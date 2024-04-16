@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (s *UCLPCServerSuite) Test_LoadControlLimit() {
-	limit, err := s.sut.LoadControlLimit()
+func (s *UCLPCServerSuite) Test_ConsumptionLimit() {
+	limit, err := s.sut.ConsumptionLimit()
 	assert.Equal(s.T(), 0.0, limit.Value)
 	assert.NotNil(s.T(), err)
 
@@ -18,10 +18,10 @@ func (s *UCLPCServerSuite) Test_LoadControlLimit() {
 		IsChangeable: true,
 		Value:        16,
 	}
-	err = s.sut.SetLoadControlLimit(newLimit)
+	err = s.sut.SetConsumptionLimit(newLimit)
 	assert.Nil(s.T(), err)
 
-	limit, err = s.sut.LoadControlLimit()
+	limit, err = s.sut.ConsumptionLimit()
 	assert.Equal(s.T(), 16.0, limit.Value)
 	assert.Nil(s.T(), err)
 }

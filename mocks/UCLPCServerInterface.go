@@ -3,12 +3,12 @@
 package mocks
 
 import (
-	cemdapi "github.com/enbility/cemd/api"
-	api "github.com/enbility/spine-go/api"
-
+	api "github.com/enbility/cemd/api"
 	mock "github.com/stretchr/testify/mock"
 
 	model "github.com/enbility/spine-go/model"
+
+	spine_goapi "github.com/enbility/spine-go/api"
 
 	time "time"
 )
@@ -86,6 +86,61 @@ func (_c *UCLPCServerInterface_AddUseCase_Call) Return() *UCLPCServerInterface_A
 }
 
 func (_c *UCLPCServerInterface_AddUseCase_Call) RunAndReturn(run func()) *UCLPCServerInterface_AddUseCase_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ConsumptionLimit provides a mock function with given fields:
+func (_m *UCLPCServerInterface) ConsumptionLimit() (api.LoadLimit, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for ConsumptionLimit")
+	}
+
+	var r0 api.LoadLimit
+	var r1 error
+	if rf, ok := ret.Get(0).(func() (api.LoadLimit, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() api.LoadLimit); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(api.LoadLimit)
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UCLPCServerInterface_ConsumptionLimit_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ConsumptionLimit'
+type UCLPCServerInterface_ConsumptionLimit_Call struct {
+	*mock.Call
+}
+
+// ConsumptionLimit is a helper method to define mock.On call
+func (_e *UCLPCServerInterface_Expecter) ConsumptionLimit() *UCLPCServerInterface_ConsumptionLimit_Call {
+	return &UCLPCServerInterface_ConsumptionLimit_Call{Call: _e.mock.On("ConsumptionLimit")}
+}
+
+func (_c *UCLPCServerInterface_ConsumptionLimit_Call) Run(run func()) *UCLPCServerInterface_ConsumptionLimit_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *UCLPCServerInterface_ConsumptionLimit_Call) Return(_a0 api.LoadLimit, _a1 error) *UCLPCServerInterface_ConsumptionLimit_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *UCLPCServerInterface_ConsumptionLimit_Call) RunAndReturn(run func() (api.LoadLimit, error)) *UCLPCServerInterface_ConsumptionLimit_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -270,7 +325,7 @@ func (_c *UCLPCServerInterface_FailsafeDurationMinimum_Call) RunAndReturn(run fu
 }
 
 // IsUseCaseSupported provides a mock function with given fields: remoteEntity
-func (_m *UCLPCServerInterface) IsUseCaseSupported(remoteEntity api.EntityRemoteInterface) (bool, error) {
+func (_m *UCLPCServerInterface) IsUseCaseSupported(remoteEntity spine_goapi.EntityRemoteInterface) (bool, error) {
 	ret := _m.Called(remoteEntity)
 
 	if len(ret) == 0 {
@@ -279,16 +334,16 @@ func (_m *UCLPCServerInterface) IsUseCaseSupported(remoteEntity api.EntityRemote
 
 	var r0 bool
 	var r1 error
-	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) (bool, error)); ok {
+	if rf, ok := ret.Get(0).(func(spine_goapi.EntityRemoteInterface) (bool, error)); ok {
 		return rf(remoteEntity)
 	}
-	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) bool); ok {
+	if rf, ok := ret.Get(0).(func(spine_goapi.EntityRemoteInterface) bool); ok {
 		r0 = rf(remoteEntity)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
-	if rf, ok := ret.Get(1).(func(api.EntityRemoteInterface) error); ok {
+	if rf, ok := ret.Get(1).(func(spine_goapi.EntityRemoteInterface) error); ok {
 		r1 = rf(remoteEntity)
 	} else {
 		r1 = ret.Error(1)
@@ -303,14 +358,14 @@ type UCLPCServerInterface_IsUseCaseSupported_Call struct {
 }
 
 // IsUseCaseSupported is a helper method to define mock.On call
-//   - remoteEntity api.EntityRemoteInterface
+//   - remoteEntity spine_goapi.EntityRemoteInterface
 func (_e *UCLPCServerInterface_Expecter) IsUseCaseSupported(remoteEntity interface{}) *UCLPCServerInterface_IsUseCaseSupported_Call {
 	return &UCLPCServerInterface_IsUseCaseSupported_Call{Call: _e.mock.On("IsUseCaseSupported", remoteEntity)}
 }
 
-func (_c *UCLPCServerInterface_IsUseCaseSupported_Call) Run(run func(remoteEntity api.EntityRemoteInterface)) *UCLPCServerInterface_IsUseCaseSupported_Call {
+func (_c *UCLPCServerInterface_IsUseCaseSupported_Call) Run(run func(remoteEntity spine_goapi.EntityRemoteInterface)) *UCLPCServerInterface_IsUseCaseSupported_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(api.EntityRemoteInterface))
+		run(args[0].(spine_goapi.EntityRemoteInterface))
 	})
 	return _c
 }
@@ -320,62 +375,53 @@ func (_c *UCLPCServerInterface_IsUseCaseSupported_Call) Return(_a0 bool, _a1 err
 	return _c
 }
 
-func (_c *UCLPCServerInterface_IsUseCaseSupported_Call) RunAndReturn(run func(api.EntityRemoteInterface) (bool, error)) *UCLPCServerInterface_IsUseCaseSupported_Call {
+func (_c *UCLPCServerInterface_IsUseCaseSupported_Call) RunAndReturn(run func(spine_goapi.EntityRemoteInterface) (bool, error)) *UCLPCServerInterface_IsUseCaseSupported_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// LoadControlLimit provides a mock function with given fields:
-func (_m *UCLPCServerInterface) LoadControlLimit() (cemdapi.LoadLimit, error) {
-	ret := _m.Called()
+// SetConsumptionLimit provides a mock function with given fields: limit
+func (_m *UCLPCServerInterface) SetConsumptionLimit(limit api.LoadLimit) error {
+	ret := _m.Called(limit)
 
 	if len(ret) == 0 {
-		panic("no return value specified for LoadControlLimit")
+		panic("no return value specified for SetConsumptionLimit")
 	}
 
-	var r0 cemdapi.LoadLimit
-	var r1 error
-	if rf, ok := ret.Get(0).(func() (cemdapi.LoadLimit, error)); ok {
-		return rf()
-	}
-	if rf, ok := ret.Get(0).(func() cemdapi.LoadLimit); ok {
-		r0 = rf()
+	var r0 error
+	if rf, ok := ret.Get(0).(func(api.LoadLimit) error); ok {
+		r0 = rf(limit)
 	} else {
-		r0 = ret.Get(0).(cemdapi.LoadLimit)
+		r0 = ret.Error(0)
 	}
 
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
-// UCLPCServerInterface_LoadControlLimit_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LoadControlLimit'
-type UCLPCServerInterface_LoadControlLimit_Call struct {
+// UCLPCServerInterface_SetConsumptionLimit_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetConsumptionLimit'
+type UCLPCServerInterface_SetConsumptionLimit_Call struct {
 	*mock.Call
 }
 
-// LoadControlLimit is a helper method to define mock.On call
-func (_e *UCLPCServerInterface_Expecter) LoadControlLimit() *UCLPCServerInterface_LoadControlLimit_Call {
-	return &UCLPCServerInterface_LoadControlLimit_Call{Call: _e.mock.On("LoadControlLimit")}
+// SetConsumptionLimit is a helper method to define mock.On call
+//   - limit api.LoadLimit
+func (_e *UCLPCServerInterface_Expecter) SetConsumptionLimit(limit interface{}) *UCLPCServerInterface_SetConsumptionLimit_Call {
+	return &UCLPCServerInterface_SetConsumptionLimit_Call{Call: _e.mock.On("SetConsumptionLimit", limit)}
 }
 
-func (_c *UCLPCServerInterface_LoadControlLimit_Call) Run(run func()) *UCLPCServerInterface_LoadControlLimit_Call {
+func (_c *UCLPCServerInterface_SetConsumptionLimit_Call) Run(run func(limit api.LoadLimit)) *UCLPCServerInterface_SetConsumptionLimit_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run()
+		run(args[0].(api.LoadLimit))
 	})
 	return _c
 }
 
-func (_c *UCLPCServerInterface_LoadControlLimit_Call) Return(_a0 cemdapi.LoadLimit, _a1 error) *UCLPCServerInterface_LoadControlLimit_Call {
-	_c.Call.Return(_a0, _a1)
+func (_c *UCLPCServerInterface_SetConsumptionLimit_Call) Return(resultErr error) *UCLPCServerInterface_SetConsumptionLimit_Call {
+	_c.Call.Return(resultErr)
 	return _c
 }
 
-func (_c *UCLPCServerInterface_LoadControlLimit_Call) RunAndReturn(run func() (cemdapi.LoadLimit, error)) *UCLPCServerInterface_LoadControlLimit_Call {
+func (_c *UCLPCServerInterface_SetConsumptionLimit_Call) RunAndReturn(run func(api.LoadLimit) error) *UCLPCServerInterface_SetConsumptionLimit_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -516,52 +562,6 @@ func (_c *UCLPCServerInterface_SetFailsafeDurationMinimum_Call) Return(resultErr
 }
 
 func (_c *UCLPCServerInterface_SetFailsafeDurationMinimum_Call) RunAndReturn(run func(time.Duration, bool) error) *UCLPCServerInterface_SetFailsafeDurationMinimum_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// SetLoadControlLimit provides a mock function with given fields: limit
-func (_m *UCLPCServerInterface) SetLoadControlLimit(limit cemdapi.LoadLimit) error {
-	ret := _m.Called(limit)
-
-	if len(ret) == 0 {
-		panic("no return value specified for SetLoadControlLimit")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(cemdapi.LoadLimit) error); ok {
-		r0 = rf(limit)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// UCLPCServerInterface_SetLoadControlLimit_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetLoadControlLimit'
-type UCLPCServerInterface_SetLoadControlLimit_Call struct {
-	*mock.Call
-}
-
-// SetLoadControlLimit is a helper method to define mock.On call
-//   - limit cemdapi.LoadLimit
-func (_e *UCLPCServerInterface_Expecter) SetLoadControlLimit(limit interface{}) *UCLPCServerInterface_SetLoadControlLimit_Call {
-	return &UCLPCServerInterface_SetLoadControlLimit_Call{Call: _e.mock.On("SetLoadControlLimit", limit)}
-}
-
-func (_c *UCLPCServerInterface_SetLoadControlLimit_Call) Run(run func(limit cemdapi.LoadLimit)) *UCLPCServerInterface_SetLoadControlLimit_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(cemdapi.LoadLimit))
-	})
-	return _c
-}
-
-func (_c *UCLPCServerInterface_SetLoadControlLimit_Call) Return(resultErr error) *UCLPCServerInterface_SetLoadControlLimit_Call {
-	_c.Call.Return(resultErr)
-	return _c
-}
-
-func (_c *UCLPCServerInterface_SetLoadControlLimit_Call) RunAndReturn(run func(cemdapi.LoadLimit) error) *UCLPCServerInterface_SetLoadControlLimit_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -16,7 +16,7 @@ type UCLPCInterface interface {
 
 	// Scenario 1
 
-	// return the current loadcontrol limit data
+	// return the current consumption limit data
 	//
 	// parameters:
 	//   - entity: the entity of the e.g. EVSE
@@ -27,14 +27,14 @@ type UCLPCInterface interface {
 	// possible errors:
 	//   - ErrDataNotAvailable if no such limit is (yet) available
 	//   - and others
-	LoadControlLimit(entity spineapi.EntityRemoteInterface) (limit api.LoadLimit, resultErr error)
+	ConsumptionLimit(entity spineapi.EntityRemoteInterface) (limit api.LoadLimit, resultErr error)
 
 	// send new LoadControlLimits
 	//
 	// parameters:
 	//   - entity: the entity of the e.g. EVSE
 	//   - limit: load limit data
-	WriteLoadControlLimit(entity spineapi.EntityRemoteInterface, limit api.LoadLimit) (*model.MsgCounterType, error)
+	WriteConsumptionLimit(entity spineapi.EntityRemoteInterface, limit api.LoadLimit) (*model.MsgCounterType, error)
 
 	// Scenario 2
 

@@ -10,13 +10,13 @@ import (
 )
 
 func (s *UCLPCSuite) Test_LoadControlLimit() {
-	data, err := s.sut.LoadControlLimit(s.monitoredEntity)
+	data, err := s.sut.ConsumptionLimit(s.monitoredEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data.Value)
 	assert.Equal(s.T(), false, data.IsChangeable)
 	assert.Equal(s.T(), false, data.IsActive)
 
-	data, err = s.sut.LoadControlLimit(s.monitoredEntity)
+	data, err = s.sut.ConsumptionLimit(s.monitoredEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data.Value)
 	assert.Equal(s.T(), false, data.IsChangeable)
@@ -38,7 +38,7 @@ func (s *UCLPCSuite) Test_LoadControlLimit() {
 	fErr := rFeature.UpdateData(model.FunctionTypeLoadControlLimitDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.LoadControlLimit(s.monitoredEntity)
+	data, err = s.sut.ConsumptionLimit(s.monitoredEntity)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), 0.0, data.Value)
 	assert.Equal(s.T(), false, data.IsChangeable)
@@ -61,7 +61,7 @@ func (s *UCLPCSuite) Test_LoadControlLimit() {
 	fErr = rFeature.UpdateData(model.FunctionTypeLoadControlLimitListData, limitData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = s.sut.LoadControlLimit(s.monitoredEntity)
+	data, err = s.sut.ConsumptionLimit(s.monitoredEntity)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 6000.0, data.Value)
 	assert.Equal(s.T(), true, data.IsChangeable)
@@ -74,10 +74,10 @@ func (s *UCLPCSuite) Test_WriteLoadControlLimit() {
 		IsActive: true,
 		Duration: 0,
 	}
-	_, err := s.sut.WriteLoadControlLimit(s.mockRemoteEntity, limit)
+	_, err := s.sut.WriteConsumptionLimit(s.mockRemoteEntity, limit)
 	assert.NotNil(s.T(), err)
 
-	_, err = s.sut.WriteLoadControlLimit(s.monitoredEntity, limit)
+	_, err = s.sut.WriteConsumptionLimit(s.monitoredEntity, limit)
 	assert.NotNil(s.T(), err)
 
 	descData := &model.LoadControlLimitDescriptionListDataType{
@@ -96,7 +96,7 @@ func (s *UCLPCSuite) Test_WriteLoadControlLimit() {
 	fErr := rFeature.UpdateData(model.FunctionTypeLoadControlLimitDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	_, err = s.sut.WriteLoadControlLimit(s.monitoredEntity, limit)
+	_, err = s.sut.WriteConsumptionLimit(s.monitoredEntity, limit)
 	assert.NotNil(s.T(), err)
 
 	limitData := &model.LoadControlLimitListDataType{
@@ -113,11 +113,11 @@ func (s *UCLPCSuite) Test_WriteLoadControlLimit() {
 	fErr = rFeature.UpdateData(model.FunctionTypeLoadControlLimitListData, limitData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	_, err = s.sut.WriteLoadControlLimit(s.monitoredEntity, limit)
+	_, err = s.sut.WriteConsumptionLimit(s.monitoredEntity, limit)
 	assert.NotNil(s.T(), err)
 
 	limit.Duration = time.Duration(time.Hour * 2)
-	_, err = s.sut.WriteLoadControlLimit(s.monitoredEntity, limit)
+	_, err = s.sut.WriteConsumptionLimit(s.monitoredEntity, limit)
 	assert.NotNil(s.T(), err)
 }
 

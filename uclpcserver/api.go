@@ -14,7 +14,7 @@ type UCLPCServerInterface interface {
 
 	// Scenario 1
 
-	// return the current loadcontrol limit data
+	// return the current consumption limit data
 	//
 	// return values:
 	//   - limit: load limit data
@@ -22,10 +22,10 @@ type UCLPCServerInterface interface {
 	// possible errors:
 	//   - ErrDataNotAvailable if no such limit is (yet) available
 	//   - and others
-	LoadControlLimit() (api.LoadLimit, error)
+	ConsumptionLimit() (api.LoadLimit, error)
 
 	// set the current loadcontrol limit data
-	SetLoadControlLimit(limit api.LoadLimit) (resultErr error)
+	SetConsumptionLimit(limit api.LoadLimit) (resultErr error)
 
 	// Scenario 2
 

@@ -90,6 +90,62 @@ func (_c *UCLPCInterface_AddUseCase_Call) RunAndReturn(run func()) *UCLPCInterfa
 	return _c
 }
 
+// ConsumptionLimit provides a mock function with given fields: entity
+func (_m *UCLPCInterface) ConsumptionLimit(entity api.EntityRemoteInterface) (cemdapi.LoadLimit, error) {
+	ret := _m.Called(entity)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ConsumptionLimit")
+	}
+
+	var r0 cemdapi.LoadLimit
+	var r1 error
+	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) (cemdapi.LoadLimit, error)); ok {
+		return rf(entity)
+	}
+	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) cemdapi.LoadLimit); ok {
+		r0 = rf(entity)
+	} else {
+		r0 = ret.Get(0).(cemdapi.LoadLimit)
+	}
+
+	if rf, ok := ret.Get(1).(func(api.EntityRemoteInterface) error); ok {
+		r1 = rf(entity)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UCLPCInterface_ConsumptionLimit_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ConsumptionLimit'
+type UCLPCInterface_ConsumptionLimit_Call struct {
+	*mock.Call
+}
+
+// ConsumptionLimit is a helper method to define mock.On call
+//   - entity api.EntityRemoteInterface
+func (_e *UCLPCInterface_Expecter) ConsumptionLimit(entity interface{}) *UCLPCInterface_ConsumptionLimit_Call {
+	return &UCLPCInterface_ConsumptionLimit_Call{Call: _e.mock.On("ConsumptionLimit", entity)}
+}
+
+func (_c *UCLPCInterface_ConsumptionLimit_Call) Run(run func(entity api.EntityRemoteInterface)) *UCLPCInterface_ConsumptionLimit_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(api.EntityRemoteInterface))
+	})
+	return _c
+}
+
+func (_c *UCLPCInterface_ConsumptionLimit_Call) Return(limit cemdapi.LoadLimit, resultErr error) *UCLPCInterface_ConsumptionLimit_Call {
+	_c.Call.Return(limit, resultErr)
+	return _c
+}
+
+func (_c *UCLPCInterface_ConsumptionLimit_Call) RunAndReturn(run func(api.EntityRemoteInterface) (cemdapi.LoadLimit, error)) *UCLPCInterface_ConsumptionLimit_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // FailsafeConsumptionActivePowerLimit provides a mock function with given fields: entity
 func (_m *UCLPCInterface) FailsafeConsumptionActivePowerLimit(entity api.EntityRemoteInterface) (float64, error) {
 	ret := _m.Called(entity)
@@ -258,62 +314,6 @@ func (_c *UCLPCInterface_IsUseCaseSupported_Call) RunAndReturn(run func(api.Enti
 	return _c
 }
 
-// LoadControlLimit provides a mock function with given fields: entity
-func (_m *UCLPCInterface) LoadControlLimit(entity api.EntityRemoteInterface) (cemdapi.LoadLimit, error) {
-	ret := _m.Called(entity)
-
-	if len(ret) == 0 {
-		panic("no return value specified for LoadControlLimit")
-	}
-
-	var r0 cemdapi.LoadLimit
-	var r1 error
-	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) (cemdapi.LoadLimit, error)); ok {
-		return rf(entity)
-	}
-	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface) cemdapi.LoadLimit); ok {
-		r0 = rf(entity)
-	} else {
-		r0 = ret.Get(0).(cemdapi.LoadLimit)
-	}
-
-	if rf, ok := ret.Get(1).(func(api.EntityRemoteInterface) error); ok {
-		r1 = rf(entity)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// UCLPCInterface_LoadControlLimit_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LoadControlLimit'
-type UCLPCInterface_LoadControlLimit_Call struct {
-	*mock.Call
-}
-
-// LoadControlLimit is a helper method to define mock.On call
-//   - entity api.EntityRemoteInterface
-func (_e *UCLPCInterface_Expecter) LoadControlLimit(entity interface{}) *UCLPCInterface_LoadControlLimit_Call {
-	return &UCLPCInterface_LoadControlLimit_Call{Call: _e.mock.On("LoadControlLimit", entity)}
-}
-
-func (_c *UCLPCInterface_LoadControlLimit_Call) Run(run func(entity api.EntityRemoteInterface)) *UCLPCInterface_LoadControlLimit_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(api.EntityRemoteInterface))
-	})
-	return _c
-}
-
-func (_c *UCLPCInterface_LoadControlLimit_Call) Return(limit cemdapi.LoadLimit, resultErr error) *UCLPCInterface_LoadControlLimit_Call {
-	_c.Call.Return(limit, resultErr)
-	return _c
-}
-
-func (_c *UCLPCInterface_LoadControlLimit_Call) RunAndReturn(run func(api.EntityRemoteInterface) (cemdapi.LoadLimit, error)) *UCLPCInterface_LoadControlLimit_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // PowerConsumptionNominalMax provides a mock function with given fields: entity
 func (_m *UCLPCInterface) PowerConsumptionNominalMax(entity api.EntityRemoteInterface) (float64, error) {
 	ret := _m.Called(entity)
@@ -448,6 +448,65 @@ func (_c *UCLPCInterface_UseCaseName_Call) RunAndReturn(run func() model.UseCase
 	return _c
 }
 
+// WriteConsumptionLimit provides a mock function with given fields: entity, limit
+func (_m *UCLPCInterface) WriteConsumptionLimit(entity api.EntityRemoteInterface, limit cemdapi.LoadLimit) (*model.MsgCounterType, error) {
+	ret := _m.Called(entity, limit)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WriteConsumptionLimit")
+	}
+
+	var r0 *model.MsgCounterType
+	var r1 error
+	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface, cemdapi.LoadLimit) (*model.MsgCounterType, error)); ok {
+		return rf(entity, limit)
+	}
+	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface, cemdapi.LoadLimit) *model.MsgCounterType); ok {
+		r0 = rf(entity, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.MsgCounterType)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(api.EntityRemoteInterface, cemdapi.LoadLimit) error); ok {
+		r1 = rf(entity, limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UCLPCInterface_WriteConsumptionLimit_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WriteConsumptionLimit'
+type UCLPCInterface_WriteConsumptionLimit_Call struct {
+	*mock.Call
+}
+
+// WriteConsumptionLimit is a helper method to define mock.On call
+//   - entity api.EntityRemoteInterface
+//   - limit cemdapi.LoadLimit
+func (_e *UCLPCInterface_Expecter) WriteConsumptionLimit(entity interface{}, limit interface{}) *UCLPCInterface_WriteConsumptionLimit_Call {
+	return &UCLPCInterface_WriteConsumptionLimit_Call{Call: _e.mock.On("WriteConsumptionLimit", entity, limit)}
+}
+
+func (_c *UCLPCInterface_WriteConsumptionLimit_Call) Run(run func(entity api.EntityRemoteInterface, limit cemdapi.LoadLimit)) *UCLPCInterface_WriteConsumptionLimit_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(api.EntityRemoteInterface), args[1].(cemdapi.LoadLimit))
+	})
+	return _c
+}
+
+func (_c *UCLPCInterface_WriteConsumptionLimit_Call) Return(_a0 *model.MsgCounterType, _a1 error) *UCLPCInterface_WriteConsumptionLimit_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *UCLPCInterface_WriteConsumptionLimit_Call) RunAndReturn(run func(api.EntityRemoteInterface, cemdapi.LoadLimit) (*model.MsgCounterType, error)) *UCLPCInterface_WriteConsumptionLimit_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // WriteFailsafeConsumptionActivePowerLimit provides a mock function with given fields: entity, value
 func (_m *UCLPCInterface) WriteFailsafeConsumptionActivePowerLimit(entity api.EntityRemoteInterface, value float64) (*model.MsgCounterType, error) {
 	ret := _m.Called(entity, value)
@@ -562,65 +621,6 @@ func (_c *UCLPCInterface_WriteFailsafeDurationMinimum_Call) Return(_a0 *model.Ms
 }
 
 func (_c *UCLPCInterface_WriteFailsafeDurationMinimum_Call) RunAndReturn(run func(api.EntityRemoteInterface, time.Duration) (*model.MsgCounterType, error)) *UCLPCInterface_WriteFailsafeDurationMinimum_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// WriteLoadControlLimit provides a mock function with given fields: entity, limit
-func (_m *UCLPCInterface) WriteLoadControlLimit(entity api.EntityRemoteInterface, limit cemdapi.LoadLimit) (*model.MsgCounterType, error) {
-	ret := _m.Called(entity, limit)
-
-	if len(ret) == 0 {
-		panic("no return value specified for WriteLoadControlLimit")
-	}
-
-	var r0 *model.MsgCounterType
-	var r1 error
-	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface, cemdapi.LoadLimit) (*model.MsgCounterType, error)); ok {
-		return rf(entity, limit)
-	}
-	if rf, ok := ret.Get(0).(func(api.EntityRemoteInterface, cemdapi.LoadLimit) *model.MsgCounterType); ok {
-		r0 = rf(entity, limit)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*model.MsgCounterType)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(api.EntityRemoteInterface, cemdapi.LoadLimit) error); ok {
-		r1 = rf(entity, limit)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// UCLPCInterface_WriteLoadControlLimit_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WriteLoadControlLimit'
-type UCLPCInterface_WriteLoadControlLimit_Call struct {
-	*mock.Call
-}
-
-// WriteLoadControlLimit is a helper method to define mock.On call
-//   - entity api.EntityRemoteInterface
-//   - limit cemdapi.LoadLimit
-func (_e *UCLPCInterface_Expecter) WriteLoadControlLimit(entity interface{}, limit interface{}) *UCLPCInterface_WriteLoadControlLimit_Call {
-	return &UCLPCInterface_WriteLoadControlLimit_Call{Call: _e.mock.On("WriteLoadControlLimit", entity, limit)}
-}
-
-func (_c *UCLPCInterface_WriteLoadControlLimit_Call) Run(run func(entity api.EntityRemoteInterface, limit cemdapi.LoadLimit)) *UCLPCInterface_WriteLoadControlLimit_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(api.EntityRemoteInterface), args[1].(cemdapi.LoadLimit))
-	})
-	return _c
-}
-
-func (_c *UCLPCInterface_WriteLoadControlLimit_Call) Return(_a0 *model.MsgCounterType, _a1 error) *UCLPCInterface_WriteLoadControlLimit_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *UCLPCInterface_WriteLoadControlLimit_Call) RunAndReturn(run func(api.EntityRemoteInterface, cemdapi.LoadLimit) (*model.MsgCounterType, error)) *UCLPCInterface_WriteLoadControlLimit_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -36,7 +36,7 @@ func (d *DemoCem) Setup() error {
 	lpcs := uclpcserver.NewUCLPC(d.cem.Service, d.entityEventCB)
 	d.cem.AddUseCase(lpcs)
 
-	if err := lpcs.SetLoadControlLimit(api.LoadLimit{
+	if err := lpcs.SetConsumptionLimit(api.LoadLimit{
 		IsChangeable: true,
 		IsActive:     false,
 		Value:        0,
