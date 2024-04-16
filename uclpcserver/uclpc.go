@@ -20,7 +20,7 @@ type UCLPCServer struct {
 	heartbeatKeoWorkaround bool // required because KEO Stack uses multiple identical entities for the same functionality, and it is not clear which to use
 }
 
-var _ UCLCPServerInterface = (*UCLPCServer)(nil)
+var _ UCLPCServerInterface = (*UCLPCServer)(nil)
 
 func NewUCLPC(service eebusapi.ServiceInterface, eventCB api.EntityEventCallback) *UCLPCServer {
 	uc := &UCLPCServer{

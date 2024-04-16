@@ -41,16 +41,16 @@ func (d *DemoCem) Setup() error {
 		IsActive:     false,
 		Value:        0,
 	}); err != nil {
-		logging.Log().Debug(err)
+		logging.Log().Error(err)
 	}
 	if err := lpcs.SetContractualConsumptionNominalMax(22000); err != nil {
-		logging.Log().Debug(err)
+		logging.Log().Error(err)
 	}
 	if err := lpcs.SetFailsafeConsumptionActivePowerLimit(4300, true); err != nil {
-		logging.Log().Debug(err)
+		logging.Log().Error(err)
 	}
 	if err := lpcs.SetFailsafeDurationMinimum(time.Hour*2, true); err != nil {
-		logging.Log().Debug(err)
+		logging.Log().Error(err)
 	}
 
 	evsecc := ucevsecc.NewUCEVSECC(d.cem.Service, d.entityEventCB)

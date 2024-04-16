@@ -17,7 +17,7 @@ type UCLPC struct {
 	validEntityTypes []model.EntityTypeType
 }
 
-var _ UCLCPInterface = (*UCLPC)(nil)
+var _ UCLPCInterface = (*UCLPC)(nil)
 
 func NewUCLPC(service eebusapi.ServiceInterface, eventCB api.EntityEventCallback) *UCLPC {
 	uc := &UCLPC{
