@@ -10,7 +10,7 @@ import (
 
 //go:generate mockery
 
-// interface for the Limitation of Power Consumption UseCase as a server
+// interface for the Limitation of Power Consumption UseCase
 type UCLPCInterface interface {
 	api.UseCaseInterface
 

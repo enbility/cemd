@@ -8,7 +8,7 @@ import (
 
 //go:generate mockery
 
-// interface for the Monitoring of Power Consumption UseCase
+// interface for the Limitation of Power Consumption UseCase as a server
 type UCLPCServerInterface interface {
 	api.UseCaseInterface
 
