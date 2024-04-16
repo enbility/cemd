@@ -8,6 +8,7 @@ import (
 	"github.com/enbility/cemd/cem"
 	"github.com/enbility/cemd/ucevsecc"
 	"github.com/enbility/cemd/uclpcserver"
+	"github.com/enbility/cemd/uclppserver"
 	eebusapi "github.com/enbility/eebus-go/api"
 	"github.com/enbility/ship-go/logging"
 )
@@ -50,6 +51,26 @@ func (d *DemoCem) Setup() error {
 		logging.Log().Error(err)
 	}
 	if err := lpcs.SetFailsafeDurationMinimum(time.Hour*2, true); err != nil {
+		logging.Log().Error(err)
+	}
+
+	lpps := uclppserver.NewUCLPP(d.cem.Service, d.entityEventCB)
+	d.cem.AddUseCase(lpps)
+
+	if err := lpps.SetProductionLimit(api.LoadLimit{
+		IsChangeable: true,
+		IsActive:     false,
+		Value:        0,
+	}); err != nil {
+		logging.Log().Error(err)
+	}
+	if err := lpps.SetContractualProductionNominalMax(-7000); err != nil {
+		logging.Log().Error(err)
+	}
+	if err := lpps.SetFailsafeProductionActivePowerLimit(0, true); err != nil {
+		logging.Log().Error(err)
+	}
+	if err := lpps.SetFailsafeDurationMinimum(time.Hour*2, true); err != nil {
 		logging.Log().Error(err)
 	}
 

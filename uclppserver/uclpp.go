@@ -55,28 +55,32 @@ func (e *UCLPPServer) AddFeatures() {
 
 	var limitId model.LoadControlLimitIdType = 0
 	// get the highest limitId
-	if desc, err := spine.LocalFeatureDataCopyOfType[*model.LoadControlLimitDescriptionListDataType](
-		f, model.FunctionTypeLoadControlLimitDescriptionListData); err == nil && desc.LoadControlLimitDescriptionData != nil {
-		for _, desc := range desc.LoadControlLimitDescriptionData {
+	loadControlDesc, err := spine.LocalFeatureDataCopyOfType[*model.LoadControlLimitDescriptionListDataType](
+		f, model.FunctionTypeLoadControlLimitDescriptionListData)
+	if err == nil && loadControlDesc.LoadControlLimitDescriptionData != nil {
+		for _, desc := range loadControlDesc.LoadControlLimitDescriptionData {
 			if desc.LimitId != nil && *desc.LimitId >= limitId {
 				limitId++
 			}
 		}
 	}
 
-	loadControlDesc := &model.LoadControlLimitDescriptionListDataType{
-		LoadControlLimitDescriptionData: []model.LoadControlLimitDescriptionDataType{
-			{
-				LimitId:        eebusutil.Ptr(model.LoadControlLimitIdType(limitId)),
-				LimitType:      eebusutil.Ptr(model.LoadControlLimitTypeTypeSignDependentAbsValueLimit),
-				LimitCategory:  eebusutil.Ptr(model.LoadControlCategoryTypeObligation),
-				LimitDirection: eebusutil.Ptr(model.EnergyDirectionTypeProduce),
-				MeasurementId:  eebusutil.Ptr(model.MeasurementIdType(0)), // This is a fake Measurement ID, as there is no Electrical Connection server defined, it can't provide any meaningful. But KEO requires this to be set :(
-				Unit:           eebusutil.Ptr(model.UnitOfMeasurementTypeW),
-				ScopeType:      eebusutil.Ptr(model.ScopeTypeTypeActivePowerLimit),
-			},
-		},
+	if loadControlDesc == nil || len(loadControlDesc.LoadControlLimitDescriptionData) == 0 {
+		loadControlDesc = &model.LoadControlLimitDescriptionListDataType{
+			LoadControlLimitDescriptionData: []model.LoadControlLimitDescriptionDataType{},
+		}
 	}
+
+	newLimitDesc := model.LoadControlLimitDescriptionDataType{
+		LimitId:        eebusutil.Ptr(model.LoadControlLimitIdType(limitId)),
+		LimitType:      eebusutil.Ptr(model.LoadControlLimitTypeTypeSignDependentAbsValueLimit),
+		LimitCategory:  eebusutil.Ptr(model.LoadControlCategoryTypeObligation),
+		LimitDirection: eebusutil.Ptr(model.EnergyDirectionTypeProduce),
+		MeasurementId:  eebusutil.Ptr(model.MeasurementIdType(0)), // This is a fake Measurement ID, as there is no Electrical Connection server defined, it can't provide any meaningful. But KEO requires this to be set :(
+		Unit:           eebusutil.Ptr(model.UnitOfMeasurementTypeW),
+		ScopeType:      eebusutil.Ptr(model.ScopeTypeTypeActivePowerLimit),
+	}
+	loadControlDesc.LoadControlLimitDescriptionData = append(loadControlDesc.LoadControlLimitDescriptionData, newLimitDesc)
 	f.SetData(model.FunctionTypeLoadControlLimitDescriptionListData, loadControlDesc)
 
 	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer)
@@ -85,45 +89,58 @@ func (e *UCLPPServer) AddFeatures() {
 
 	var configId model.DeviceConfigurationKeyIdType = 0
 	// get the highest keyId
-	if desc, err := spine.LocalFeatureDataCopyOfType[*model.DeviceConfigurationKeyValueDescriptionListDataType](
-		f, model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData); err == nil && desc.DeviceConfigurationKeyValueDescriptionData != nil {
-		for _, desc := range desc.DeviceConfigurationKeyValueDescriptionData {
+	deviceConfigDesc, err := spine.LocalFeatureDataCopyOfType[*model.DeviceConfigurationKeyValueDescriptionListDataType](
+		f, model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData)
+	if err == nil && deviceConfigDesc.DeviceConfigurationKeyValueDescriptionData != nil {
+		for _, desc := range deviceConfigDesc.DeviceConfigurationKeyValueDescriptionData {
 			if desc.KeyId != nil && *desc.KeyId >= configId {
 				configId++
 			}
 		}
 	}
 
-	deviceConfigDesc := &model.DeviceConfigurationKeyValueDescriptionListDataType{
-		DeviceConfigurationKeyValueDescriptionData: []model.DeviceConfigurationKeyValueDescriptionDataType{
-			{
-				KeyId:     eebusutil.Ptr(model.DeviceConfigurationKeyIdType(configId)),
-				KeyName:   eebusutil.Ptr(model.DeviceConfigurationKeyNameTypeFailsafeProductionActivePowerLimit),
-				ValueType: eebusutil.Ptr(model.DeviceConfigurationKeyValueTypeTypeScaledNumber),
-				Unit:      eebusutil.Ptr(model.UnitOfMeasurementTypeW),
-			},
-			{
-				KeyId:     eebusutil.Ptr(model.DeviceConfigurationKeyIdType(configId + 1)),
-				KeyName:   eebusutil.Ptr(model.DeviceConfigurationKeyNameTypeFailsafeDurationMinimum),
-				ValueType: eebusutil.Ptr(model.DeviceConfigurationKeyValueTypeTypeDuration),
-			},
+	if deviceConfigDesc == nil || len(deviceConfigDesc.DeviceConfigurationKeyValueDescriptionData) == 0 {
+		deviceConfigDesc = &model.DeviceConfigurationKeyValueDescriptionListDataType{
+			DeviceConfigurationKeyValueDescriptionData: []model.DeviceConfigurationKeyValueDescriptionDataType{},
+		}
+	}
+
+	newConfigs := []model.DeviceConfigurationKeyValueDescriptionDataType{
+		{
+			KeyId:     eebusutil.Ptr(model.DeviceConfigurationKeyIdType(configId)),
+			KeyName:   eebusutil.Ptr(model.DeviceConfigurationKeyNameTypeFailsafeProductionActivePowerLimit),
+			ValueType: eebusutil.Ptr(model.DeviceConfigurationKeyValueTypeTypeScaledNumber),
+			Unit:      eebusutil.Ptr(model.UnitOfMeasurementTypeW),
+		},
+		{
+			KeyId:     eebusutil.Ptr(model.DeviceConfigurationKeyIdType(configId + 1)),
+			KeyName:   eebusutil.Ptr(model.DeviceConfigurationKeyNameTypeFailsafeDurationMinimum),
+			ValueType: eebusutil.Ptr(model.DeviceConfigurationKeyValueTypeTypeDuration),
 		},
 	}
+	deviceConfigDesc.DeviceConfigurationKeyValueDescriptionData = append(deviceConfigDesc.DeviceConfigurationKeyValueDescriptionData, newConfigs...)
 	f.SetData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, deviceConfigDesc)
 
-	deviceConfig := &model.DeviceConfigurationKeyValueListDataType{
-		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{
-			{
-				KeyId:             eebusutil.Ptr(model.DeviceConfigurationKeyIdType(configId)),
-				IsValueChangeable: eebusutil.Ptr(true),
-			},
-			{
-				KeyId:             eebusutil.Ptr(model.DeviceConfigurationKeyIdType(configId + 1)),
-				IsValueChangeable: eebusutil.Ptr(true),
-			},
+	configData, err := spine.LocalFeatureDataCopyOfType[*model.DeviceConfigurationKeyValueListDataType](f, model.FunctionTypeDeviceConfigurationKeyValueListData)
+	if err != nil || configData == nil || len(configData.DeviceConfigurationKeyValueData) == 0 {
+		configData = &model.DeviceConfigurationKeyValueListDataType{
+			DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{},
+		}
+	}
+
+	newConfigData := []model.DeviceConfigurationKeyValueDataType{
+		{
+			KeyId:             eebusutil.Ptr(model.DeviceConfigurationKeyIdType(configId)),
+			IsValueChangeable: eebusutil.Ptr(true),
+		},
+		{
+			KeyId:             eebusutil.Ptr(model.DeviceConfigurationKeyIdType(configId + 1)),
+			IsValueChangeable: eebusutil.Ptr(true),
 		},
 	}
-	f.SetData(model.FunctionTypeDeviceConfigurationKeyValueListData, deviceConfig)
+
+	configData.DeviceConfigurationKeyValueData = append(configData.DeviceConfigurationKeyValueData, newConfigData...)
+	f.SetData(model.FunctionTypeDeviceConfigurationKeyValueListData, configData)
 
 	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeDeviceDiagnosisHeartbeatData, true, false)
@@ -133,29 +150,33 @@ func (e *UCLPPServer) AddFeatures() {
 
 	var elCharId model.ElectricalConnectionCharacteristicIdType = 0
 	// get the highest CharacteristicId
-	if desc, err := spine.LocalFeatureDataCopyOfType[*model.ElectricalConnectionCharacteristicListDataType](
-		f, model.FunctionTypeElectricalConnectionCharacteristicListData); err == nil && desc.ElectricalConnectionCharacteristicData != nil {
-		for _, desc := range desc.ElectricalConnectionCharacteristicData {
+	elCharData, err := spine.LocalFeatureDataCopyOfType[*model.ElectricalConnectionCharacteristicListDataType](
+		f, model.FunctionTypeElectricalConnectionCharacteristicListData)
+	if err == nil && elCharData.ElectricalConnectionCharacteristicData != nil {
+		for _, desc := range elCharData.ElectricalConnectionCharacteristicData {
 			if desc.CharacteristicId != nil && *desc.CharacteristicId >= elCharId {
 				elCharId++
 			}
 		}
 	}
 
+	if err != nil || configData == nil || len(configData.DeviceConfigurationKeyValueData) == 0 {
+		elCharData = &model.ElectricalConnectionCharacteristicListDataType{
+			ElectricalConnectionCharacteristicData: []model.ElectricalConnectionCharacteristicDataType{},
+		}
+	}
+
 	// ElectricalConnectionId and ParameterId should be identical to the ones used
 	// in a MPC Server role implementation, which is not done here (yet)
-	elCharData := &model.ElectricalConnectionCharacteristicListDataType{
-		ElectricalConnectionCharacteristicData: []model.ElectricalConnectionCharacteristicDataType{
-			{
-				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
-				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(0)),
-				CharacteristicId:       eebusutil.Ptr(elCharId),
-				CharacteristicContext:  eebusutil.Ptr(model.ElectricalConnectionCharacteristicContextTypeEntity),
-				CharacteristicType:     eebusutil.Ptr(model.ElectricalConnectionCharacteristicTypeTypeContractualProductionNominalMax),
-				Unit:                   eebusutil.Ptr(model.UnitOfMeasurementTypeW),
-			},
-		},
+	newCharData := model.ElectricalConnectionCharacteristicDataType{
+		ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
+		ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(0)),
+		CharacteristicId:       eebusutil.Ptr(elCharId),
+		CharacteristicContext:  eebusutil.Ptr(model.ElectricalConnectionCharacteristicContextTypeEntity),
+		CharacteristicType:     eebusutil.Ptr(model.ElectricalConnectionCharacteristicTypeTypeContractualProductionNominalMax),
+		Unit:                   eebusutil.Ptr(model.UnitOfMeasurementTypeW),
 	}
+	elCharData.ElectricalConnectionCharacteristicData = append(elCharData.ElectricalConnectionCharacteristicData, newCharData)
 	f.SetData(model.FunctionTypeElectricalConnectionCharacteristicListData, elCharData)
 }
 
