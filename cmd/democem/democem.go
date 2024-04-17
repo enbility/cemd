@@ -15,18 +15,18 @@ import (
 
 type DemoCem struct {
 	cem *cem.Cem
-
-	remoteSki string
 }
 
-func NewDemoCem(configuration *eebusapi.Configuration, remoteSki string) *DemoCem {
-	demo := &DemoCem{
-		remoteSki: remoteSki,
-	}
+func NewDemoCem(configuration *eebusapi.Configuration) *DemoCem {
+	demo := &DemoCem{}
 
 	demo.cem = cem.NewCEM(configuration, demo, demo.deviceEventCB, demo)
 
 	return demo
+}
+
+func (d *DemoCem) RegisterRemoteSKI(remoteSki string) {
+	d.cem.Service.RegisterRemoteSKI(remoteSki, true)
 }
 
 func (d *DemoCem) Setup() error {
@@ -76,8 +76,6 @@ func (d *DemoCem) Setup() error {
 
 	evsecc := ucevsecc.NewUCEVSECC(d.cem.Service, d.entityEventCB)
 	d.cem.AddUseCase(evsecc)
-
-	d.cem.Service.RegisterRemoteSKI(d.remoteSki, true)
 
 	d.cem.Start()
 

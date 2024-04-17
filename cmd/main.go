@@ -30,11 +30,6 @@ func main() {
 
 	flag.Parse()
 
-	if len(os.Args) == 1 || remoteSki == nil || *remoteSki == "" {
-		flag.Usage()
-		return
-	}
-
 	certificate, err := tls.LoadX509KeyPair(*crt, *key)
 	if err != nil {
 		certificate, err = cert.CreateCertificate("Demo", "Demo", "DE", "Demo-Unit-10")
@@ -89,7 +84,11 @@ func main() {
 		configuration.SetInterfaces(ifaces)
 	}
 
-	demo := democem.NewDemoCem(configuration, *remoteSki)
+	demo := democem.NewDemoCem(configuration)
+
+	if len(os.Args) > 1 && *remoteSki != "" {
+		demo.RegisterRemoteSKI(*remoteSki)
+	}
 
 	if err := demo.Setup(); err != nil {
 		fmt.Println("Error setting up cem: ", err)
