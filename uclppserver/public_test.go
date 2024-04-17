@@ -1,0 +1,77 @@
+package uclppserver
+
+import (
+	"time"
+
+	"github.com/enbility/cemd/api"
+	"github.com/stretchr/testify/assert"
+)
+
+func (s *UCLPPServerSuite) Test_LoadControlLimit() {
+	limit, err := s.sut.ProductionLimit()
+	assert.Equal(s.T(), 0.0, limit.Value)
+	assert.NotNil(s.T(), err)
+
+	newLimit := api.LoadLimit{
+		Duration:     time.Duration(time.Hour * 2),
+		IsActive:     true,
+		IsChangeable: true,
+		Value:        16,
+	}
+	err = s.sut.SetProductionLimit(newLimit)
+	assert.Nil(s.T(), err)
+
+	limit, err = s.sut.ProductionLimit()
+	assert.Equal(s.T(), 16.0, limit.Value)
+	assert.Nil(s.T(), err)
+}
+
+func (s *UCLPPServerSuite) Test_Failsafe() {
+	limit, changeable, err := s.sut.FailsafeProductionActivePowerLimit()
+	assert.Equal(s.T(), 0.0, limit)
+	assert.Equal(s.T(), false, changeable)
+	assert.NotNil(s.T(), err)
+
+	err = s.sut.SetFailsafeProductionActivePowerLimit(10, true)
+	assert.Nil(s.T(), err)
+
+	limit, changeable, err = s.sut.FailsafeProductionActivePowerLimit()
+	assert.Equal(s.T(), 10.0, limit)
+	assert.Equal(s.T(), true, changeable)
+	assert.Nil(s.T(), err)
+
+	// The actual tests of the functionality is located in the util package
+	duration, changeable, err := s.sut.FailsafeDurationMinimum()
+	assert.Equal(s.T(), time.Duration(0), duration)
+	assert.Equal(s.T(), false, changeable)
+	assert.NotNil(s.T(), err)
+
+	err = s.sut.SetFailsafeDurationMinimum(time.Duration(time.Hour*1), true)
+	assert.NotNil(s.T(), err)
+
+	err = s.sut.SetFailsafeDurationMinimum(time.Duration(time.Hour*2), true)
+	assert.Nil(s.T(), err)
+
+	limit, changeable, err = s.sut.FailsafeProductionActivePowerLimit()
+	assert.Equal(s.T(), 10.0, limit)
+	assert.Equal(s.T(), true, changeable)
+	assert.Nil(s.T(), err)
+
+	duration, changeable, err = s.sut.FailsafeDurationMinimum()
+	assert.Equal(s.T(), time.Duration(time.Hour*2), duration)
+	assert.Equal(s.T(), true, changeable)
+	assert.Nil(s.T(), err)
+}
+
+func (s *UCLPPServerSuite) Test_ContractualProductionNominalMax() {
+	value, err := s.sut.ContractualProductionNominalMax()
+	assert.Equal(s.T(), 0.0, value)
+	assert.NotNil(s.T(), err)
+
+	err = s.sut.SetContractualProductionNominalMax(10)
+	assert.Nil(s.T(), err)
+
+	value, err = s.sut.ContractualProductionNominalMax()
+	assert.Equal(s.T(), 10.0, value)
+	assert.Nil(s.T(), err)
+}

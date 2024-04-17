@@ -15,6 +15,8 @@ packages:
   github.com/enbility/cemd/ucevsoc:
   github.com/enbility/cemd/uclpc:
   github.com/enbility/cemd/uclpcserver:
+  github.com/enbility/cemd/uclpp:
+  github.com/enbility/cemd/uclppserver:
   github.com/enbility/cemd/ucmgcp:
   github.com/enbility/cemd/ucmpc:
   github.com/enbility/cemd/ucopev:

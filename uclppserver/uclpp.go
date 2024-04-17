@@ -1,4 +1,4 @@
-package uclpcserver
+package uclppserver
 
 import (
 	"github.com/enbility/cemd/api"
@@ -10,7 +10,7 @@ import (
 	"github.com/enbility/spine-go/spine"
 )
 
-type UCLPCServer struct {
+type UCLPPServer struct {
 	service eebusapi.ServiceInterface
 
 	eventCB api.EntityEventCallback
@@ -20,10 +20,10 @@ type UCLPCServer struct {
 	heartbeatKeoWorkaround bool // required because KEO Stack uses multiple identical entities for the same functionality, and it is not clear which to use
 }
 
-var _ UCLPCServerInterface = (*UCLPCServer)(nil)
+var _ UCLPPServerInterface = (*UCLPPServer)(nil)
 
-func NewUCLPC(service eebusapi.ServiceInterface, eventCB api.EntityEventCallback) *UCLPCServer {
-	uc := &UCLPCServer{
+func NewUCLPP(service eebusapi.ServiceInterface, eventCB api.EntityEventCallback) *UCLPPServer {
+	uc := &UCLPPServer{
 		service: service,
 		eventCB: eventCB,
 	}
@@ -38,11 +38,11 @@ func NewUCLPC(service eebusapi.ServiceInterface, eventCB api.EntityEventCallback
 	return uc
 }
 
-func (c *UCLPCServer) UseCaseName() model.UseCaseNameType {
-	return model.UseCaseNameTypeLimitationOfPowerConsumption
+func (c *UCLPPServer) UseCaseName() model.UseCaseNameType {
+	return model.UseCaseNameTypeLimitationOfPowerProduction
 }
 
-func (e *UCLPCServer) AddFeatures() {
+func (e *UCLPPServer) AddFeatures() {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	// client features
@@ -55,18 +55,18 @@ func (e *UCLPCServer) AddFeatures() {
 
 	var limitId model.LoadControlLimitIdType = 0
 	// get the highest limitId
-	desc, err := spine.LocalFeatureDataCopyOfType[*model.LoadControlLimitDescriptionListDataType](
+	loadControlDesc, err := spine.LocalFeatureDataCopyOfType[*model.LoadControlLimitDescriptionListDataType](
 		f, model.FunctionTypeLoadControlLimitDescriptionListData)
-	if err == nil && desc.LoadControlLimitDescriptionData != nil {
-		for _, desc := range desc.LoadControlLimitDescriptionData {
+	if err == nil && loadControlDesc.LoadControlLimitDescriptionData != nil {
+		for _, desc := range loadControlDesc.LoadControlLimitDescriptionData {
 			if desc.LimitId != nil && *desc.LimitId >= limitId {
 				limitId++
 			}
 		}
 	}
 
-	if desc == nil || len(desc.LoadControlLimitDescriptionData) == 0 {
-		desc = &model.LoadControlLimitDescriptionListDataType{
+	if loadControlDesc == nil || len(loadControlDesc.LoadControlLimitDescriptionData) == 0 {
+		loadControlDesc = &model.LoadControlLimitDescriptionListDataType{
 			LoadControlLimitDescriptionData: []model.LoadControlLimitDescriptionDataType{},
 		}
 	}
@@ -75,13 +75,13 @@ func (e *UCLPCServer) AddFeatures() {
 		LimitId:        eebusutil.Ptr(model.LoadControlLimitIdType(limitId)),
 		LimitType:      eebusutil.Ptr(model.LoadControlLimitTypeTypeSignDependentAbsValueLimit),
 		LimitCategory:  eebusutil.Ptr(model.LoadControlCategoryTypeObligation),
-		LimitDirection: eebusutil.Ptr(model.EnergyDirectionTypeConsume),
+		LimitDirection: eebusutil.Ptr(model.EnergyDirectionTypeProduce),
 		MeasurementId:  eebusutil.Ptr(model.MeasurementIdType(0)), // This is a fake Measurement ID, as there is no Electrical Connection server defined, it can't provide any meaningful. But KEO requires this to be set :(
 		Unit:           eebusutil.Ptr(model.UnitOfMeasurementTypeW),
 		ScopeType:      eebusutil.Ptr(model.ScopeTypeTypeActivePowerLimit),
 	}
-	desc.LoadControlLimitDescriptionData = append(desc.LoadControlLimitDescriptionData, newLimitDesc)
-	f.SetData(model.FunctionTypeLoadControlLimitDescriptionListData, desc)
+	loadControlDesc.LoadControlLimitDescriptionData = append(loadControlDesc.LoadControlLimitDescriptionData, newLimitDesc)
+	f.SetData(model.FunctionTypeLoadControlLimitDescriptionListData, loadControlDesc)
 
 	f = localEntity.GetOrAddFeature(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, true, false)
@@ -99,7 +99,7 @@ func (e *UCLPCServer) AddFeatures() {
 		}
 	}
 
-	if err != nil || deviceConfigDesc == nil || len(deviceConfigDesc.DeviceConfigurationKeyValueDescriptionData) == 0 {
+	if deviceConfigDesc == nil || len(deviceConfigDesc.DeviceConfigurationKeyValueDescriptionData) == 0 {
 		deviceConfigDesc = &model.DeviceConfigurationKeyValueDescriptionListDataType{
 			DeviceConfigurationKeyValueDescriptionData: []model.DeviceConfigurationKeyValueDescriptionDataType{},
 		}
@@ -108,7 +108,7 @@ func (e *UCLPCServer) AddFeatures() {
 	newConfigs := []model.DeviceConfigurationKeyValueDescriptionDataType{
 		{
 			KeyId:     eebusutil.Ptr(model.DeviceConfigurationKeyIdType(configId)),
-			KeyName:   eebusutil.Ptr(model.DeviceConfigurationKeyNameTypeFailsafeConsumptionActivePowerLimit),
+			KeyName:   eebusutil.Ptr(model.DeviceConfigurationKeyNameTypeFailsafeProductionActivePowerLimit),
 			ValueType: eebusutil.Ptr(model.DeviceConfigurationKeyValueTypeTypeScaledNumber),
 			Unit:      eebusutil.Ptr(model.UnitOfMeasurementTypeW),
 		},
@@ -173,14 +173,14 @@ func (e *UCLPCServer) AddFeatures() {
 		ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(0)),
 		CharacteristicId:       eebusutil.Ptr(elCharId),
 		CharacteristicContext:  eebusutil.Ptr(model.ElectricalConnectionCharacteristicContextTypeEntity),
-		CharacteristicType:     eebusutil.Ptr(model.ElectricalConnectionCharacteristicTypeTypeContractualConsumptionNominalMax),
+		CharacteristicType:     eebusutil.Ptr(model.ElectricalConnectionCharacteristicTypeTypeContractualProductionNominalMax),
 		Unit:                   eebusutil.Ptr(model.UnitOfMeasurementTypeW),
 	}
 	elCharData.ElectricalConnectionCharacteristicData = append(elCharData.ElectricalConnectionCharacteristicData, newCharData)
 	f.SetData(model.FunctionTypeElectricalConnectionCharacteristicListData, elCharData)
 }
 
-func (e *UCLPCServer) AddUseCase() {
+func (e *UCLPPServer) AddUseCase() {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	localEntity.AddUseCaseSupport(
@@ -192,7 +192,7 @@ func (e *UCLPCServer) AddUseCase() {
 		[]model.UseCaseScenarioSupportType{1, 2, 3, 4})
 }
 
-func (e *UCLPCServer) UpdateUseCaseAvailability(available bool) {
+func (e *UCLPPServer) UpdateUseCaseAvailability(available bool) {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	localEntity.SetUseCaseAvailability(model.UseCaseActorTypeControllableSystem, e.UseCaseName(), available)
@@ -203,7 +203,7 @@ func (e *UCLPCServer) UpdateUseCaseAvailability(available bool) {
 // possible errors:
 //   - ErrDataNotAvailable if that information is not (yet) available
 //   - and others
-func (e *UCLPCServer) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool, error) {
+func (e *UCLPPServer) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool, error) {
 	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
 		return false, api.ErrNoCompatibleEntity
 	}
