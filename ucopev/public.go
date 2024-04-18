@@ -29,7 +29,13 @@ func (e *UCOPEV) CurrentLimits(entity spineapi.EntityRemoteInterface) ([]float64
 //   - and others
 func (e *UCOPEV) LoadControlLimits(entity spineapi.EntityRemoteInterface) (
 	limits []api.LoadLimitsPhase, resultErr error) {
-	return util.LoadControlLimits(e.service, entity, e.validEntityTypes, model.LoadControlCategoryTypeObligation)
+	return util.LoadControlLimits(
+		e.service,
+		entity,
+		e.validEntityTypes,
+		model.LoadControlLimitTypeTypeMaxValueLimit,
+		model.LoadControlCategoryTypeObligation,
+		model.ScopeTypeTypeOverloadProtection)
 }
 
 // send new LoadControlLimits to the remote EV

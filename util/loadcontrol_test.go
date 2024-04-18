@@ -12,14 +12,16 @@ import (
 func (s *UtilSuite) Test_LoadControlLimits() {
 	var data []api.LoadLimitsPhase
 	var err error
+	limitType := model.LoadControlLimitTypeTypeMaxValueLimit
+	scope := model.ScopeTypeTypeSelfConsumption
 	category := model.LoadControlCategoryTypeObligation
 	entityTypes := []model.EntityTypeType{model.EntityTypeTypeEV}
 
-	data, err = LoadControlLimits(s.service, s.mockRemoteEntity, entityTypes, category)
+	data, err = LoadControlLimits(s.service, s.mockRemoteEntity, entityTypes, limitType, category, scope)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
-	data, err = LoadControlLimits(s.service, s.monitoredEntity, entityTypes, category)
+	data, err = LoadControlLimits(s.service, s.monitoredEntity, entityTypes, limitType, category, scope)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
@@ -29,16 +31,22 @@ func (s *UtilSuite) Test_LoadControlLimits() {
 				LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(0)),
 				LimitCategory: eebusutil.Ptr(category),
 				MeasurementId: eebusutil.Ptr(model.MeasurementIdType(0)),
+				LimitType:     eebusutil.Ptr(limitType),
+				ScopeType:     eebusutil.Ptr(scope),
 			},
 			{
 				LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(1)),
 				LimitCategory: eebusutil.Ptr(category),
 				MeasurementId: eebusutil.Ptr(model.MeasurementIdType(1)),
+				LimitType:     eebusutil.Ptr(limitType),
+				ScopeType:     eebusutil.Ptr(scope),
 			},
 			{
 				LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(2)),
 				LimitCategory: eebusutil.Ptr(category),
 				MeasurementId: eebusutil.Ptr(model.MeasurementIdType(2)),
+				LimitType:     eebusutil.Ptr(limitType),
+				ScopeType:     eebusutil.Ptr(scope),
 			},
 		},
 	}
@@ -47,7 +55,7 @@ func (s *UtilSuite) Test_LoadControlLimits() {
 	fErr := rFeature.UpdateData(model.FunctionTypeLoadControlLimitDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = LoadControlLimits(s.service, s.monitoredEntity, entityTypes, category)
+	data, err = LoadControlLimits(s.service, s.monitoredEntity, entityTypes, limitType, category, scope)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 3, len(data))
 	assert.Equal(s.T(), 0.0, data[0].Value)
@@ -79,7 +87,7 @@ func (s *UtilSuite) Test_LoadControlLimits() {
 	fErr = rElFeature.UpdateData(model.FunctionTypeElectricalConnectionParameterDescriptionListData, paramData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = LoadControlLimits(s.service, s.monitoredEntity, entityTypes, category)
+	data, err = LoadControlLimits(s.service, s.monitoredEntity, entityTypes, limitType, category, scope)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
@@ -102,7 +110,7 @@ func (s *UtilSuite) Test_LoadControlLimits() {
 	fErr = rFeature.UpdateData(model.FunctionTypeLoadControlLimitListData, limitData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = LoadControlLimits(s.service, s.monitoredEntity, entityTypes, category)
+	data, err = LoadControlLimits(s.service, s.monitoredEntity, entityTypes, limitType, category, scope)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), data)
 
@@ -131,7 +139,7 @@ func (s *UtilSuite) Test_LoadControlLimits() {
 	fErr = rElFeature.UpdateData(model.FunctionTypeElectricalConnectionPermittedValueSetListData, permData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	data, err = LoadControlLimits(s.service, s.monitoredEntity, entityTypes, category)
+	data, err = LoadControlLimits(s.service, s.monitoredEntity, entityTypes, limitType, category, scope)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), 3, len(data))
 	assert.Equal(s.T(), 16.0, data[0].Value)

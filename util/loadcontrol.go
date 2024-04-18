@@ -18,7 +18,9 @@ func LoadControlLimits(
 	service eebusapi.ServiceInterface,
 	entity spineapi.EntityRemoteInterface,
 	entityTypes []model.EntityTypeType,
-	category model.LoadControlCategoryType) (limits []api.LoadLimitsPhase, resultErr error) {
+	limitType model.LoadControlLimitTypeType,
+	limitCategory model.LoadControlCategoryType,
+	scopeType model.ScopeTypeType) (limits []api.LoadLimitsPhase, resultErr error) {
 	limits = nil
 	resultErr = api.ErrNoCompatibleEntity
 	if entity == nil || !IsCompatibleEntity(entity, entityTypes) {
@@ -34,7 +36,8 @@ func LoadControlLimits(
 	resultErr = eebusapi.ErrDataNotAvailable
 	// find out the appropriate limitId for each phase value
 	// limitDescription contains the measurementId for each limitId
-	limitDescriptions, err := evLoadControl.GetLimitDescriptionsForCategory(category)
+	limitDescriptions, err := evLoadControl.GetLimitDescriptionsForTypeCategoryDirectionScope(
+		limitType, limitCategory, "", scopeType)
 	if err != nil {
 		return
 	}
