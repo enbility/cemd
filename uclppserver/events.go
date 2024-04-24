@@ -136,7 +136,7 @@ func (e *UCLPPServer) subscribeHeartbeatWorkaround(payload spineapi.EventPayload
 
 // the load control limit data was updated
 func (e *UCLPPServer) loadControlLimitDataUpdate(payload spineapi.EventPayload) {
-	if _, err := e.ProductionLimit(); err != nil {
+	if _, err := e.ProductionLimit(); err == nil {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateLimit)
 	}
 }
