@@ -143,10 +143,10 @@ func (e *UCLPPServer) loadControlLimitDataUpdate(payload spineapi.EventPayload) 
 
 // the configuration key data of an SMGW was updated
 func (e *UCLPPServer) configurationDataUpdate(payload spineapi.EventPayload) {
-	if _, _, err := e.FailsafeProductionActivePowerLimit(); err != nil {
+	if _, _, err := e.FailsafeProductionActivePowerLimit(); err == nil {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateFailsafeProductionActivePowerLimit)
 	}
-	if _, _, err := e.FailsafeDurationMinimum(); err != nil {
+	if _, _, err := e.FailsafeDurationMinimum(); err == nil {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateFailsafeDurationMinimum)
 	}
 }
