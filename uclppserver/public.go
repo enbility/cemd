@@ -91,6 +91,7 @@ func (e *UCLPPServer) SetProductionLimit(limit api.LoadLimit) (resultErr error) 
 			EndTime: model.NewAbsoluteOrRelativeTimeTypeFromDuration(limit.Duration),
 		}
 	}
+	// TODO: this overwrites LPC data as well
 	limits := &model.LoadControlLimitListDataType{
 		LoadControlLimitData: []model.LoadControlLimitDataType{limitData},
 	}
