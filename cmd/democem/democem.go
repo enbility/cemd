@@ -77,7 +77,7 @@ func (d *DemoCem) Setup() error {
 	evsecc := ucevsecc.NewUCEVSECC(d.cem.Service, d.entityEventCB)
 	d.cem.AddUseCase(evsecc)
 
-	d.cem.Service.RegisterRemoteSKI(d.remoteSki, true)
+	d.cem.Service.RegisterRemoteSKI(d.remoteSki)
 
 	d.cem.Start()
 
