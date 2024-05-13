@@ -79,35 +79,35 @@ func (e *UCMPC) deviceMeasurementDescriptionDataUpdate(entity spineapi.EntityRem
 // the measurement data of a device was updated
 func (e *UCMPC) deviceMeasurementDataUpdate(payload spineapi.EventPayload) {
 	// Scenario 1
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACPowerTotal); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeACPowerTotal) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdatePower)
 	}
 
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACPower); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeACPower) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdatePowerPerPhase)
 	}
 
 	// Scenario 2
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACEnergyConsumed); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeACEnergyConsumed) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateEnergyConsumed)
 	}
 
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACEnergyProduced); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeACEnergyProduced) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateEnergyProduced)
 	}
 
 	// Scenario 3
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACCurrent); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeACCurrent) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateCurrentsPerPhase)
 	}
 
 	// Scenario 4
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACVoltage); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeACVoltage) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateVoltagePerPhase)
 	}
 
 	// Scenario 5
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACFrequency); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeACFrequency) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateFrequency)
 	}
 }

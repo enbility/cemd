@@ -10,8 +10,6 @@ const (
 	//   - the entity of the inverter
 	//
 	// Use Case VAPD, Scenario 1
-	//
-	// Note: the referred data may be updated together with all other measurement items of this use case
 	DataUpdatePower api.EventType = "DataUpdatePower"
 
 	// PV System nominal peak power data updated
@@ -30,7 +28,5 @@ const (
 	//   - the entity of the inverter
 	//
 	// Use Case VAPD, Scenario 3
-	//
-	// Note: the referred data may be updated together with all other measurement items of this use case
 	DataUpdatePVYieldTotal api.EventType = "DataUpdatePVYieldTotal"
 )

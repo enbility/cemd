@@ -2,23 +2,31 @@ package util
 
 import (
 	eebusutil "github.com/enbility/eebus-go/util"
+	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
 )
 
-func (s *UtilSuite) Test_MeasurementValueForScope() {
-	value, err := MeasurementValueForScope(s.service, s.mockRemoteEntity, model.ScopeTypeTypeACPower)
-	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), 0.0, value)
+func (s *UtilSuite) Test_MeasurementCheckPayloadDataForScope() {
+	payload := spineapi.EventPayload{
+		Entity: s.mockRemoteEntity,
+	}
 
-	value, err = MeasurementValueForScope(s.service, s.monitoredEntity, model.ScopeTypeTypeACPower)
-	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), 0.0, value)
+	exists := MeasurementCheckPayloadDataForScope(s.service, payload, model.ScopeTypeTypeACPower)
+	assert.False(s.T(), exists)
+
+	payload.Entity = s.monitoredEntity
+
+	exists = MeasurementCheckPayloadDataForScope(s.service, payload, model.ScopeTypeTypeACPower)
+	assert.False(s.T(), exists)
 
 	descData := &model.MeasurementDescriptionListDataType{
 		MeasurementDescriptionData: []model.MeasurementDescriptionDataType{
 			{
-				MeasurementId: eebusutil.Ptr(model.MeasurementIdType(0)),
+				ScopeType: eebusutil.Ptr(model.ScopeTypeTypeACPower),
+			},
+			{
+				MeasurementId: eebusutil.Ptr(model.MeasurementIdType(1)),
 				ScopeType:     eebusutil.Ptr(model.ScopeTypeTypeACPower),
 			},
 		},
@@ -28,25 +36,35 @@ func (s *UtilSuite) Test_MeasurementValueForScope() {
 	fErr := rFeature.UpdateData(model.FunctionTypeMeasurementDescriptionListData, descData, nil, nil)
 	assert.Nil(s.T(), fErr)
 
-	value, err = MeasurementValueForScope(s.service, s.monitoredEntity, model.ScopeTypeTypeACPower)
-	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), 0.0, value)
+	exists = MeasurementCheckPayloadDataForScope(s.service, payload, model.ScopeTypeTypeACPower)
+	assert.False(s.T(), exists)
 
 	data := &model.MeasurementListDataType{
 		MeasurementData: []model.MeasurementDataType{
+			{},
+		},
+	}
+	payload.Data = data
+
+	exists = MeasurementCheckPayloadDataForScope(s.service, payload, model.ScopeTypeTypeACPower)
+	assert.False(s.T(), exists)
+
+	data = &model.MeasurementListDataType{
+		MeasurementData: []model.MeasurementDataType{
 			{
-				MeasurementId: eebusutil.Ptr(model.MeasurementIdType(0)),
+				Value: model.NewScaledNumberType(80),
+			},
+			{
+				MeasurementId: eebusutil.Ptr(model.MeasurementIdType(1)),
 				Value:         model.NewScaledNumberType(80),
 			},
 		},
 	}
 
-	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, data, nil, nil)
-	assert.Nil(s.T(), fErr)
+	payload.Data = data
 
-	value, err = MeasurementValueForScope(s.service, s.monitoredEntity, model.ScopeTypeTypeACPower)
-	assert.Nil(s.T(), err)
-	assert.Equal(s.T(), 80.0, value)
+	exists = MeasurementCheckPayloadDataForScope(s.service, payload, model.ScopeTypeTypeACPower)
+	assert.True(s.T(), exists)
 }
 
 func (s *UtilSuite) Test_MeasurementValuesForTypeCommodityScope() {

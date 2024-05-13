@@ -9,6 +9,54 @@ import (
 	"github.com/enbility/spine-go/spine"
 )
 
+// Check the payload data if it contains measurementId values for a given scope
+func LoadControlLimitsCheckPayloadDataForTypeCategoryDirectionScope(
+	localServer bool,
+	service eebusapi.ServiceInterface,
+	payload spineapi.EventPayload,
+	limitType model.LoadControlLimitTypeType,
+	limitCategory model.LoadControlCategoryType,
+	direction model.EnergyDirectionType,
+	scope model.ScopeTypeType) bool {
+	var descs []model.LoadControlLimitDescriptionDataType
+
+	if payload.Data == nil {
+		return false
+	}
+
+	limits := payload.Data.(*model.LoadControlLimitListDataType)
+
+	if localServer {
+		descs = GetLocalLimitDescriptionsForTypeCategoryDirectionScope(service, limitType, limitCategory, direction, scope)
+	} else {
+		loadcontrolF, err := LoadControl(service, payload.Entity)
+		if err != nil {
+			return false
+		}
+
+		descs, err = loadcontrolF.GetLimitDescriptionsForTypeCategoryDirectionScope(limitType, limitCategory, direction, scope)
+		if err != nil {
+			return false
+		}
+	}
+
+	for _, item := range descs {
+		if item.LimitId == nil {
+			continue
+		}
+
+		for _, limit := range limits.LoadControlLimitData {
+			if limit.LimitId != nil &&
+				*limit.LimitId == *item.LimitId &&
+				limit.Value != nil {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 // return the current loadcontrol limits for a categoriy
 //
 // possible errors:
@@ -207,8 +255,8 @@ func GetLocalLimitDescriptionsForTypeCategoryDirectionScope(
 	limitCategory model.LoadControlCategoryType,
 	limitDirection model.EnergyDirectionType,
 	scopeType model.ScopeTypeType,
-) (description model.LoadControlLimitDescriptionDataType) {
-	description = model.LoadControlLimitDescriptionDataType{}
+) (descriptions []model.LoadControlLimitDescriptionDataType) {
+	descriptions = []model.LoadControlLimitDescriptionDataType{}
 
 	localEntity := service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
@@ -224,16 +272,16 @@ func GetLocalLimitDescriptionsForTypeCategoryDirectionScope(
 	}
 
 	for _, desc := range data.LoadControlLimitDescriptionData {
-		if desc.LimitType != nil && *desc.LimitType == limitType &&
-			desc.LimitCategory != nil && *desc.LimitCategory == limitCategory &&
-			desc.LimitDirection != nil && *desc.LimitDirection == limitDirection &&
-			desc.ScopeType != nil && *desc.ScopeType == scopeType {
-			description = desc
-			break
+		if desc.LimitId != nil &&
+			(limitType == "" || (desc.LimitType != nil && *desc.LimitType == limitType)) &&
+			(limitCategory == "" || (desc.LimitCategory != nil && *desc.LimitCategory == limitCategory)) &&
+			(limitDirection == "" || (desc.LimitDirection != nil && *desc.LimitDirection == limitDirection)) &&
+			(scopeType == "" || (desc.ScopeType != nil && *desc.ScopeType == scopeType)) {
+			descriptions = append(descriptions, desc)
 		}
 	}
 
-	return description
+	return descriptions
 }
 
 func GetLocalLimitValueForLimitId(

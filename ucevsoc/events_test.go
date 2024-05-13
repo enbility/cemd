@@ -85,8 +85,7 @@ func (s *UCEVSOCSuite) Test_evMeasurementDataUpdate() {
 		},
 	}
 
-	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, data, nil, nil)
-	assert.Nil(s.T(), fErr)
+	payload.Data = data
 
 	s.sut.evMeasurementDataUpdate(payload)
 }

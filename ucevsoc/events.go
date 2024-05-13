@@ -56,7 +56,7 @@ func (e *UCEVSOC) evConnected(entity spineapi.EntityRemoteInterface) {
 // the measurement data of an EV was updated
 func (e *UCEVSOC) evMeasurementDataUpdate(payload spineapi.EventPayload) {
 	// Scenario 1
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeStateOfCharge); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeStateOfCharge) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateStateOfCharge)
 	}
 }

@@ -3,7 +3,7 @@ package uclpcserver
 import "github.com/enbility/cemd/api"
 
 const (
-	// Load control obligation limit data updated
+	// Load control obligation limit data update received
 	//
 	// The callback with this message provides:
 	//   - the device of the e.g. SMGW
@@ -13,26 +13,22 @@ const (
 	DataUpdateLimit api.EventType = "DataUpdateLimit"
 
 	// Failsafe limit for the consumed active (real) power of the
-	// Controllable System data updated
+	// Controllable System data update received
 	//
 	// The callback with this message provides:
 	//   - the device of the e.g. SMGW
 	//   - the entity of the e.g. SMGW
 	//
 	// Use Case LPC, Scenario 2
-	//
-	// Note: the referred data may be updated together with all other configuration items of this use case
 	DataUpdateFailsafeConsumptionActivePowerLimit api.EventType = "DataUpdateFailsafeConsumptionActivePowerLimit"
 
 	// Minimum time the Controllable System remains in "failsafe state" unless conditions
-	// specified in this Use Case permit leaving the "failsafe state" data updated
+	// specified in this Use Case permit leaving the "failsafe state" data update received
 	//
 	// The callback with this message provides:
 	//   - the device of the e.g. SMGW
 	//   - the entity of the e.g. SMGW
 	//
 	// Use Case LPC, Scenario 2
-	//
-	// Note: the referred data may be updated together with all other configuration items of this use case
 	DataUpdateFailsafeDurationMinimum api.EventType = "DataUpdateFailsafeDurationMinimum"
 )

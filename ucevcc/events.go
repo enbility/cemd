@@ -128,18 +128,13 @@ func (e *UCEVCC) evConfigurationDescriptionDataUpdate(entity spineapi.EntityRemo
 
 // the configuration key data of an EV was updated
 func (e *UCEVCC) evConfigurationDataUpdate(payload spineapi.EventPayload) {
-	evDeviceConfiguration, err := util.DeviceConfiguration(e.service, payload.Entity)
-	if err != nil {
-		return
-	}
-
 	// Scenario 2
-	if _, err := evDeviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypeCommunicationsStandard, model.DeviceConfigurationKeyValueTypeTypeString); err == nil {
+	if util.DeviceConfigurationCheckDataPayloadForKeyName(false, e.service, payload, model.DeviceConfigurationKeyNameTypeCommunicationsStandard) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateCommunicationStandard)
 	}
 
 	// Scenario 3
-	if _, err := evDeviceConfiguration.GetKeyValueForKeyName(model.DeviceConfigurationKeyNameTypeAsymmetricChargingSupported, model.DeviceConfigurationKeyValueTypeTypeString); err == nil {
+	if util.DeviceConfigurationCheckDataPayloadForKeyName(false, e.service, payload, model.DeviceConfigurationKeyNameTypeAsymmetricChargingSupported) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateAsymmetricChargingSupport)
 	}
 }

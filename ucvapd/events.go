@@ -116,12 +116,12 @@ func (e *UCVAPD) inverterMeasurementDescriptionDataUpdate(entity spineapi.Entity
 // the measurement data of an SMGW was updated
 func (e *UCVAPD) inverterMeasurementDataUpdate(payload spineapi.EventPayload) {
 	// Scenario 2
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACPowerTotal); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeACPowerTotal) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdatePower)
 	}
 
 	// Scenario 3
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACYieldTotal); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeACYieldTotal) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdatePVYieldTotal)
 	}
 }

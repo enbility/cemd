@@ -68,28 +68,13 @@ func (e *UCLPP) loadControlLimitDescriptionDataUpdate(entity spineapi.EntityRemo
 
 // the load control limit data was updated
 func (e *UCLPP) loadControlLimitDataUpdate(payload spineapi.EventPayload) {
-	loadControl, err := util.LoadControl(e.service, payload.Entity)
-	if err != nil {
-		return
-	}
-
-	data, err := loadControl.GetLimitDescriptionsForCategory(model.LoadControlCategoryTypeObligation)
-	if err != nil {
-		return
-	}
-
-	for _, item := range data {
-		if item.LimitId == nil {
-			continue
-		}
-
-		_, err := loadControl.GetLimitValueForLimitId(*item.LimitId)
-		if err != nil {
-			continue
-		}
-
+	if util.LoadControlLimitsCheckPayloadDataForTypeCategoryDirectionScope(
+		false, e.service, payload,
+		model.LoadControlLimitTypeTypeSignDependentAbsValueLimit,
+		model.LoadControlCategoryTypeObligation,
+		model.EnergyDirectionTypeProduce,
+		model.ScopeTypeTypeActivePowerLimit) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateLimit)
-		return
 	}
 }
 
@@ -105,10 +90,10 @@ func (e *UCLPP) configurationDescriptionDataUpdate(entity spineapi.EntityRemoteI
 
 // the configuration key data was updated
 func (e *UCLPP) configurationDataUpdate(payload spineapi.EventPayload) {
-	if _, err := e.FailsafeProductionActivePowerLimit(payload.Entity); err != nil {
+	if util.DeviceConfigurationCheckDataPayloadForKeyName(false, e.service, payload, model.DeviceConfigurationKeyNameTypeFailsafeProductionActivePowerLimit) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateFailsafeProductionActivePowerLimit)
 	}
-	if _, err := e.FailsafeDurationMinimum(payload.Entity); err != nil {
+	if util.DeviceConfigurationCheckDataPayloadForKeyName(false, e.service, payload, model.DeviceConfigurationKeyNameTypeFailsafeDurationMinimum) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateFailsafeDurationMinimum)
 	}
 }

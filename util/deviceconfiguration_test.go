@@ -2,9 +2,67 @@ package util
 
 import (
 	eebusutil "github.com/enbility/eebus-go/util"
+	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
 )
+
+func (s *UtilSuite) Test_DeviceConfigurationCheckPayloadForKeyName() {
+	keyName := model.DeviceConfigurationKeyNameTypeFailsafeConsumptionActivePowerLimit
+
+	payload := spineapi.EventPayload{
+		Entity: s.mockRemoteEntity,
+	}
+
+	exists := DeviceConfigurationCheckDataPayloadForKeyName(false, s.service, payload, keyName)
+	assert.False(s.T(), exists)
+
+	payload.Entity = s.monitoredEntity
+
+	exists = DeviceConfigurationCheckDataPayloadForKeyName(false, s.service, payload, keyName)
+	assert.False(s.T(), exists)
+
+	descData := &model.DeviceConfigurationKeyValueDescriptionListDataType{
+		DeviceConfigurationKeyValueDescriptionData: []model.DeviceConfigurationKeyValueDescriptionDataType{
+			{
+				KeyId:   eebusutil.Ptr(model.DeviceConfigurationKeyIdType(0)),
+				KeyName: eebusutil.Ptr(keyName),
+			},
+		},
+	}
+
+	rFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.monitoredEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer)
+	fErr := rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, descData, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	exists = DeviceConfigurationCheckDataPayloadForKeyName(false, s.service, payload, keyName)
+	assert.False(s.T(), exists)
+
+	keyData := &model.DeviceConfigurationKeyValueListDataType{
+		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{},
+	}
+
+	payload.Data = keyData
+
+	exists = DeviceConfigurationCheckDataPayloadForKeyName(false, s.service, payload, keyName)
+	assert.False(s.T(), exists)
+
+	keyData = &model.DeviceConfigurationKeyValueListDataType{
+		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{
+			{
+				KeyId: eebusutil.Ptr(model.DeviceConfigurationKeyIdType(0)),
+				Value: &model.DeviceConfigurationKeyValueValueType{
+					String: eebusutil.Ptr(model.DeviceConfigurationKeyValueStringTypeIEC61851),
+				},
+			},
+		},
+	}
+
+	payload.Data = keyData
+
+	exists = DeviceConfigurationCheckDataPayloadForKeyName(false, s.service, payload, keyName)
+	assert.True(s.T(), exists)
+}
 
 func (s *UtilSuite) Test_GetLocalDeviceConfigurationDescriptionForKeyName() {
 	keyName := model.DeviceConfigurationKeyNameTypeFailsafeConsumptionActivePowerLimit

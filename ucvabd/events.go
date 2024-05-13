@@ -79,22 +79,22 @@ func (e *UCVABD) inverterMeasurementDescriptionDataUpdate(entity spineapi.Entity
 // the measurement data of an SMGW was updated
 func (e *UCVABD) inverterMeasurementDataUpdate(payload spineapi.EventPayload) {
 	// Scenario 1
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACPowerTotal); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeACPowerTotal) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdatePower)
 	}
 
 	// Scenario 2
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeCharge); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeCharge) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateEnergyCharged)
 	}
 
 	// Scenario 3
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeDischarge); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeDischarge) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateEnergyDischarged)
 	}
 
 	// Scenario 4
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeStateOfCharge); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeStateOfCharge) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateStateOfCharge)
 	}
 }

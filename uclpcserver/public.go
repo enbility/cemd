@@ -30,16 +30,17 @@ func (e *UCLPCServer) ConsumptionLimit() (limit api.LoadLimit, resultErr error) 
 	}
 	resultErr = eebusapi.ErrDataNotAvailable
 
-	description := util.GetLocalLimitDescriptionsForTypeCategoryDirectionScope(
+	descriptions := util.GetLocalLimitDescriptionsForTypeCategoryDirectionScope(
 		e.service,
 		model.LoadControlLimitTypeTypeSignDependentAbsValueLimit,
 		model.LoadControlCategoryTypeObligation,
 		model.EnergyDirectionTypeConsume,
 		model.ScopeTypeTypeActivePowerLimit,
 	)
-	if description.LimitId == nil {
+	if len(descriptions) != 1 || descriptions[0].LimitId == nil {
 		return
 	}
+	description := descriptions[0]
 
 	value := util.GetLocalLimitValueForLimitId(e.service, *description.LimitId)
 	if value.LimitId == nil || value.Value == nil {
@@ -62,16 +63,17 @@ func (e *UCLPCServer) ConsumptionLimit() (limit api.LoadLimit, resultErr error) 
 func (e *UCLPCServer) SetConsumptionLimit(limit api.LoadLimit) (resultErr error) {
 	resultErr = eebusapi.ErrDataNotAvailable
 
-	description := util.GetLocalLimitDescriptionsForTypeCategoryDirectionScope(
+	descriptions := util.GetLocalLimitDescriptionsForTypeCategoryDirectionScope(
 		e.service,
 		model.LoadControlLimitTypeTypeSignDependentAbsValueLimit,
 		model.LoadControlCategoryTypeObligation,
 		model.EnergyDirectionTypeConsume,
 		model.ScopeTypeTypeActivePowerLimit,
 	)
-	if description.LimitId == nil {
+	if len(descriptions) != 1 || descriptions[0].LimitId == nil {
 		return
 	}
+	description := descriptions[0]
 
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 

@@ -54,6 +54,14 @@ func (s *UCEVCEMSuite) Test_evElectricalConnectionDescriptionDataUpdate() {
 	s.sut.evElectricalConnectionDescriptionDataUpdate(payload)
 
 	descData := &model.ElectricalConnectionDescriptionListDataType{
+		ElectricalConnectionDescriptionData: []model.ElectricalConnectionDescriptionDataType{},
+	}
+
+	payload.Data = descData
+
+	s.sut.evElectricalConnectionDescriptionDataUpdate(payload)
+
+	descData = &model.ElectricalConnectionDescriptionListDataType{
 		ElectricalConnectionDescriptionData: []model.ElectricalConnectionDescriptionDataType{
 			{
 				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
@@ -62,9 +70,7 @@ func (s *UCEVCEMSuite) Test_evElectricalConnectionDescriptionDataUpdate() {
 		},
 	}
 
-	rFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.evEntity, model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer)
-	fErr := rFeature.UpdateData(model.FunctionTypeElectricalConnectionDescriptionListData, descData, nil, nil)
-	assert.Nil(s.T(), fErr)
+	payload.Data = descData
 
 	s.sut.evElectricalConnectionDescriptionDataUpdate(payload)
 }
@@ -119,9 +125,7 @@ func (s *UCEVCEMSuite) Test_evMeasurementDataUpdate() {
 			},
 		},
 	}
-
-	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, data, nil, nil)
-	assert.Nil(s.T(), fErr)
+	payload.Data = data
 
 	s.sut.evMeasurementDataUpdate(payload)
 }

@@ -7,9 +7,17 @@ func (s *UtilSuite) Test_Features() {
 	assert.Nil(s.T(), feature1)
 	assert.NotNil(s.T(), err)
 
-	feature2, err := DeviceConfiguration(s.service, s.monitoredEntity)
+	feature11, err := DeviceClassification(s.service, s.monitoredEntity)
+	assert.NotNil(s.T(), feature11)
+	assert.Nil(s.T(), err)
+
+	feature2, err := DeviceConfiguration(s.service, s.evseEntity)
 	assert.Nil(s.T(), feature2)
 	assert.NotNil(s.T(), err)
+
+	feature21, err := DeviceConfiguration(s.service, s.monitoredEntity)
+	assert.NotNil(s.T(), feature21)
+	assert.Nil(s.T(), err)
 
 	feature3, err := DeviceDiagnosis(s.service, s.monitoredEntity)
 	assert.Nil(s.T(), feature3)

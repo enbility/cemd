@@ -84,11 +84,11 @@ func (s *UCEVCCSuite) Test_evConfigurationDataUpdate() {
 	descData := &model.DeviceConfigurationKeyValueDescriptionListDataType{
 		DeviceConfigurationKeyValueDescriptionData: []model.DeviceConfigurationKeyValueDescriptionDataType{
 			{
-				KeyId:   eebusutil.Ptr(model.DeviceConfigurationKeyIdType(0)),
+				KeyId:   eebusutil.Ptr(model.DeviceConfigurationKeyIdType(1)),
 				KeyName: eebusutil.Ptr(model.DeviceConfigurationKeyNameTypeCommunicationsStandard),
 			},
 			{
-				KeyId:   eebusutil.Ptr(model.DeviceConfigurationKeyIdType(1)),
+				KeyId:   eebusutil.Ptr(model.DeviceConfigurationKeyIdType(2)),
 				KeyName: eebusutil.Ptr(model.DeviceConfigurationKeyNameTypeAsymmetricChargingSupported),
 			},
 		},
@@ -102,15 +102,28 @@ func (s *UCEVCCSuite) Test_evConfigurationDataUpdate() {
 	assert.False(s.T(), s.eventCBInvoked)
 
 	data := &model.DeviceConfigurationKeyValueListDataType{
+		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{},
+	}
+
+	payload.Data = data
+
+	s.sut.evConfigurationDataUpdate(payload)
+	assert.False(s.T(), s.eventCBInvoked)
+
+	data = &model.DeviceConfigurationKeyValueListDataType{
 		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{
 			{
 				KeyId: eebusutil.Ptr(model.DeviceConfigurationKeyIdType(0)),
+				Value: eebusutil.Ptr(model.DeviceConfigurationKeyValueValueType{}),
+			},
+			{
+				KeyId: eebusutil.Ptr(model.DeviceConfigurationKeyIdType(1)),
 				Value: eebusutil.Ptr(model.DeviceConfigurationKeyValueValueType{
 					String: eebusutil.Ptr(model.DeviceConfigurationKeyValueStringTypeISO151182ED2),
 				}),
 			},
 			{
-				KeyId: eebusutil.Ptr(model.DeviceConfigurationKeyIdType(1)),
+				KeyId: eebusutil.Ptr(model.DeviceConfigurationKeyIdType(2)),
 				Value: eebusutil.Ptr(model.DeviceConfigurationKeyValueValueType{
 					Boolean: eebusutil.Ptr(false),
 				}),
@@ -118,8 +131,7 @@ func (s *UCEVCCSuite) Test_evConfigurationDataUpdate() {
 		},
 	}
 
-	fErr = rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueListData, data, nil, nil)
-	assert.Nil(s.T(), fErr)
+	payload.Data = data
 
 	s.sut.evConfigurationDataUpdate(payload)
 	assert.True(s.T(), s.eventCBInvoked)

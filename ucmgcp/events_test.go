@@ -154,8 +154,7 @@ func (s *UCMGCPSuite) Test_gridMeasurementDataUpdate() {
 		},
 	}
 
-	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, data, nil, nil)
-	assert.Nil(s.T(), fErr)
+	payload.Data = data
 
 	s.sut.gridMeasurementDataUpdate(payload)
 }

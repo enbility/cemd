@@ -202,3 +202,108 @@ func (s *UCLPCServerSuite) Test_multipleDeviceDiagServer() {
 
 	s.sut.subscribeHeartbeatWorkaround(payload)
 }
+
+func (s *UCLPCServerSuite) Test_loadControlLimitDataUpdate() {
+	localDevice := s.service.LocalDevice()
+	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
+
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.monitoredEntity,
+	}
+	s.sut.loadControlLimitDataUpdate(payload)
+
+	descData := &model.LoadControlLimitDescriptionListDataType{
+		LoadControlLimitDescriptionData: []model.LoadControlLimitDescriptionDataType{
+			{
+				LimitId:        eebusutil.Ptr(model.LoadControlLimitIdType(0)),
+				LimitType:      eebusutil.Ptr(model.LoadControlLimitTypeTypeSignDependentAbsValueLimit),
+				LimitCategory:  eebusutil.Ptr(model.LoadControlCategoryTypeObligation),
+				LimitDirection: eebusutil.Ptr(model.EnergyDirectionTypeConsume),
+				ScopeType:      eebusutil.Ptr(model.ScopeTypeTypeActivePowerLimit),
+			},
+		},
+	}
+
+	lFeature := localEntity.FeatureOfTypeAndRole(model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
+	lFeature.SetData(model.FunctionTypeLoadControlLimitDescriptionListData, descData)
+
+	s.sut.loadControlLimitDataUpdate(payload)
+
+	data := &model.LoadControlLimitListDataType{
+		LoadControlLimitData: []model.LoadControlLimitDataType{},
+	}
+
+	payload.Data = data
+
+	s.sut.loadControlLimitDataUpdate(payload)
+
+	data = &model.LoadControlLimitListDataType{
+		LoadControlLimitData: []model.LoadControlLimitDataType{
+			{
+				LimitId: eebusutil.Ptr(model.LoadControlLimitIdType(0)),
+				Value:   model.NewScaledNumberType(16),
+			},
+		},
+	}
+
+	payload.Data = data
+
+	s.sut.loadControlLimitDataUpdate(payload)
+}
+
+func (s *UCLPCServerSuite) Test_configurationDataUpdate() {
+	localDevice := s.service.LocalDevice()
+	localEntity := localDevice.EntityForType(model.EntityTypeTypeCEM)
+
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.monitoredEntity,
+	}
+	s.sut.configurationDataUpdate(payload)
+
+	descData := &model.DeviceConfigurationKeyValueDescriptionListDataType{
+		DeviceConfigurationKeyValueDescriptionData: []model.DeviceConfigurationKeyValueDescriptionDataType{
+			{
+				KeyId:   eebusutil.Ptr(model.DeviceConfigurationKeyIdType(1)),
+				KeyName: eebusutil.Ptr(model.DeviceConfigurationKeyNameTypeFailsafeConsumptionActivePowerLimit),
+			},
+			{
+				KeyId:   eebusutil.Ptr(model.DeviceConfigurationKeyIdType(2)),
+				KeyName: eebusutil.Ptr(model.DeviceConfigurationKeyNameTypeFailsafeDurationMinimum),
+			},
+		},
+	}
+
+	lFeature := localEntity.FeatureOfTypeAndRole(model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer)
+	lFeature.SetData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, descData)
+
+	s.sut.configurationDataUpdate(payload)
+
+	data := &model.DeviceConfigurationKeyValueListDataType{
+		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{},
+	}
+
+	payload.Data = data
+
+	s.sut.configurationDataUpdate(payload)
+
+	data = &model.DeviceConfigurationKeyValueListDataType{
+		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{
+			{
+				KeyId: eebusutil.Ptr(model.DeviceConfigurationKeyIdType(1)),
+				Value: eebusutil.Ptr(model.DeviceConfigurationKeyValueValueType{}),
+			},
+			{
+				KeyId: eebusutil.Ptr(model.DeviceConfigurationKeyIdType(2)),
+				Value: eebusutil.Ptr(model.DeviceConfigurationKeyValueValueType{}),
+			},
+		},
+	}
+
+	payload.Data = data
+
+	s.sut.configurationDataUpdate(payload)
+}

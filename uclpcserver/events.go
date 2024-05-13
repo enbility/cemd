@@ -136,17 +136,22 @@ func (e *UCLPCServer) subscribeHeartbeatWorkaround(payload spineapi.EventPayload
 
 // the load control limit data was updated
 func (e *UCLPCServer) loadControlLimitDataUpdate(payload spineapi.EventPayload) {
-	if _, err := e.ConsumptionLimit(); err == nil {
+	if util.LoadControlLimitsCheckPayloadDataForTypeCategoryDirectionScope(
+		true, e.service, payload,
+		model.LoadControlLimitTypeTypeSignDependentAbsValueLimit,
+		model.LoadControlCategoryTypeObligation,
+		model.EnergyDirectionTypeConsume,
+		model.ScopeTypeTypeActivePowerLimit) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateLimit)
 	}
 }
 
 // the configuration key data of an SMGW was updated
 func (e *UCLPCServer) configurationDataUpdate(payload spineapi.EventPayload) {
-	if _, _, err := e.FailsafeConsumptionActivePowerLimit(); err == nil {
+	if util.DeviceConfigurationCheckDataPayloadForKeyName(true, e.service, payload, model.DeviceConfigurationKeyNameTypeFailsafeConsumptionActivePowerLimit) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateFailsafeConsumptionActivePowerLimit)
 	}
-	if _, _, err := e.FailsafeDurationMinimum(); err == nil {
+	if util.DeviceConfigurationCheckDataPayloadForKeyName(true, e.service, payload, model.DeviceConfigurationKeyNameTypeFailsafeDurationMinimum) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateFailsafeDurationMinimum)
 	}
 }

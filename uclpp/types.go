@@ -20,8 +20,6 @@ const (
 	//   - the entity of the e.g. EVSE
 	//
 	// Use Case LPC, Scenario 2
-	//
-	// Note: the referred data may be updated together with all other configuration items of this use case
 	DataUpdateFailsafeProductionActivePowerLimit api.EventType = "DataUpdateFailsafeProductionActivePowerLimit"
 
 	// Minimum time the Controllable System remains in "failsafe state" unless conditions
@@ -32,7 +30,5 @@ const (
 	//   - the entity of the e.g. EVSE
 	//
 	// Use Case LPC, Scenario 2
-	//
-	// Note: the referred data may be updated together with all other configuration items of this use case
 	DataUpdateFailsafeDurationMinimum api.EventType = "DataUpdateFailsafeDurationMinimum"
 )

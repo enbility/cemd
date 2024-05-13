@@ -56,8 +56,11 @@ func (s *UCLPPSuite) Test_loadControlLimitDataUpdate() {
 	descData := &model.LoadControlLimitDescriptionListDataType{
 		LoadControlLimitDescriptionData: []model.LoadControlLimitDescriptionDataType{
 			{
-				LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(0)),
-				LimitCategory: eebusutil.Ptr(model.LoadControlCategoryTypeObligation),
+				LimitId:        eebusutil.Ptr(model.LoadControlLimitIdType(0)),
+				LimitType:      eebusutil.Ptr(model.LoadControlLimitTypeTypeSignDependentAbsValueLimit),
+				LimitCategory:  eebusutil.Ptr(model.LoadControlCategoryTypeObligation),
+				LimitDirection: eebusutil.Ptr(model.EnergyDirectionTypeProduce),
+				ScopeType:      eebusutil.Ptr(model.ScopeTypeTypeActivePowerLimit),
 			},
 		},
 	}
@@ -69,6 +72,14 @@ func (s *UCLPPSuite) Test_loadControlLimitDataUpdate() {
 	s.sut.loadControlLimitDataUpdate(payload)
 
 	data := &model.LoadControlLimitListDataType{
+		LoadControlLimitData: []model.LoadControlLimitDataType{},
+	}
+
+	payload.Data = data
+
+	s.sut.loadControlLimitDataUpdate(payload)
+
+	data = &model.LoadControlLimitListDataType{
 		LoadControlLimitData: []model.LoadControlLimitDataType{
 			{
 				LimitId: eebusutil.Ptr(model.LoadControlLimitIdType(0)),
@@ -77,8 +88,60 @@ func (s *UCLPPSuite) Test_loadControlLimitDataUpdate() {
 		},
 	}
 
-	fErr = rFeature.UpdateData(model.FunctionTypeLoadControlLimitListData, data, nil, nil)
-	assert.Nil(s.T(), fErr)
+	payload.Data = data
 
 	s.sut.loadControlLimitDataUpdate(payload)
+}
+
+func (s *UCLPPSuite) Test_configurationDataUpdate() {
+	payload := spineapi.EventPayload{
+		Ski:    remoteSki,
+		Device: s.remoteDevice,
+		Entity: s.monitoredEntity,
+	}
+	s.sut.configurationDataUpdate(payload)
+
+	descData := &model.DeviceConfigurationKeyValueDescriptionListDataType{
+		DeviceConfigurationKeyValueDescriptionData: []model.DeviceConfigurationKeyValueDescriptionDataType{
+			{
+				KeyId:   eebusutil.Ptr(model.DeviceConfigurationKeyIdType(1)),
+				KeyName: eebusutil.Ptr(model.DeviceConfigurationKeyNameTypeFailsafeProductionActivePowerLimit),
+			},
+			{
+				KeyId:   eebusutil.Ptr(model.DeviceConfigurationKeyIdType(2)),
+				KeyName: eebusutil.Ptr(model.DeviceConfigurationKeyNameTypeFailsafeDurationMinimum),
+			},
+		},
+	}
+
+	rFeature := s.remoteDevice.FeatureByEntityTypeAndRole(s.monitoredEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeServer)
+	fErr := rFeature.UpdateData(model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData, descData, nil, nil)
+	assert.Nil(s.T(), fErr)
+
+	s.sut.configurationDataUpdate(payload)
+
+	data := &model.DeviceConfigurationKeyValueListDataType{
+		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{},
+	}
+
+	payload.Data = data
+
+	s.sut.configurationDataUpdate(payload)
+
+	data = &model.DeviceConfigurationKeyValueListDataType{
+		DeviceConfigurationKeyValueData: []model.DeviceConfigurationKeyValueDataType{
+			{
+				KeyId: eebusutil.Ptr(model.DeviceConfigurationKeyIdType(1)),
+				Value: &model.DeviceConfigurationKeyValueValueType{},
+			},
+			{
+				KeyId: eebusutil.Ptr(model.DeviceConfigurationKeyIdType(2)),
+				Value: &model.DeviceConfigurationKeyValueValueType{},
+			},
+		},
+	}
+
+	payload.Data = data
+
+	s.sut.configurationDataUpdate(payload)
 }

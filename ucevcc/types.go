@@ -46,7 +46,6 @@ const (
 	//   - the entity of the EV
 	//
 	// Use Case EVCC, Scenario 2
-	// Note: the referred data may be updated together with all other configuration items of this use case
 	DataUpdateCommunicationStandard api.EventType = "DataUpdateCommunicationStandard"
 
 	// EV asymmetric charging data was updated
@@ -54,8 +53,6 @@ const (
 	// The callback with this message provides:
 	//   - the device of the EVSE the EV is connected to
 	//   - the entity of the EV
-	//
-	// Note: the referred data may be updated together with all other configuration items of this use case
 	DataUpdateAsymmetricChargingSupport api.EventType = "DataUpdateAsymmetricChargingSupport"
 
 	// EV identificationdata was updated

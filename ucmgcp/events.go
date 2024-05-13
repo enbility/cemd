@@ -111,32 +111,32 @@ func (e *UCMGCP) gridMeasurementDescriptionDataUpdate(entity spineapi.EntityRemo
 // the measurement data of an SMGW was updated
 func (e *UCMGCP) gridMeasurementDataUpdate(payload spineapi.EventPayload) {
 	// Scenario 2
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACPowerTotal); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeACPowerTotal) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdatePower)
 	}
 
 	// Scenario 3
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeGridFeedIn); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeGridFeedIn) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateEnergyFeedIn)
 	}
 
 	// Scenario 4
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeGridConsumption); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeGridConsumption) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateEnergyConsumed)
 	}
 
 	// Scenario 5
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACCurrent); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeACCurrent) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateCurrentPerPhase)
 	}
 
 	// Scenario 6
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACVoltage); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeACVoltage) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateVoltagePerPhase)
 	}
 
 	// Scenario 7
-	if _, err := util.MeasurementValueForScope(e.service, payload.Entity, model.ScopeTypeTypeACFrequency); err == nil {
+	if util.MeasurementCheckPayloadDataForScope(e.service, payload, model.ScopeTypeTypeACFrequency) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateFrequency)
 	}
 }

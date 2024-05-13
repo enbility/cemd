@@ -71,28 +71,10 @@ func (e *UCOPEV) evLoadControlLimitDescriptionDataUpdate(entity spineapi.EntityR
 
 // the load control limit data of an EV was updated
 func (e *UCOPEV) evLoadControlLimitDataUpdate(payload spineapi.EventPayload) {
-	evLoadControl, err := util.LoadControl(e.service, payload.Entity)
-	if err != nil {
-		return
-	}
-
-	data, err := evLoadControl.GetLimitDescriptionsForCategory(model.LoadControlCategoryTypeObligation)
-	if err != nil {
-		return
-	}
-
-	for _, item := range data {
-		if item.LimitId == nil {
-			continue
-		}
-
-		_, err := evLoadControl.GetLimitValueForLimitId(*item.LimitId)
-		if err != nil {
-			continue
-		}
-
+	if util.LoadControlLimitsCheckPayloadDataForTypeCategoryDirectionScope(false,
+		e.service, payload, model.LoadControlLimitTypeTypeMaxValueLimit,
+		model.LoadControlCategoryTypeObligation, "", model.ScopeTypeTypeOverloadProtection) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateLimit)
-		return
 	}
 }
 

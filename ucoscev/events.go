@@ -32,28 +32,11 @@ func (e *UCOSCEV) HandleEvent(payload spineapi.EventPayload) {
 
 // the load control limit data of an EV was updated
 func (e *UCOSCEV) evLoadControlLimitDataUpdate(payload spineapi.EventPayload) {
-	evLoadControl, err := util.LoadControl(e.service, payload.Entity)
-	if err != nil {
-		return
-	}
-
-	data, err := evLoadControl.GetLimitDescriptionsForCategory(model.LoadControlCategoryTypeRecommendation)
-	if err != nil {
-		return
-	}
-
-	for _, item := range data {
-		if item.LimitId == nil {
-			continue
-		}
-
-		_, err := evLoadControl.GetLimitValueForLimitId(*item.LimitId)
-		if err != nil {
-			continue
-		}
-
+	if util.LoadControlLimitsCheckPayloadDataForTypeCategoryDirectionScope(false,
+		e.service, payload, model.LoadControlLimitTypeTypeMaxValueLimit,
+		model.LoadControlCategoryTypeRecommendation, "",
+		model.ScopeTypeTypeSelfConsumption) {
 		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateLimit)
-		return
 	}
 }
 

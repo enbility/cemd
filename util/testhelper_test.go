@@ -87,6 +87,8 @@ func setupDevices(
 	localEntity.AddFeature(f)
 	f = spine.NewFeatureLocal(4, localEntity, model.FeatureTypeTypeDeviceClassification, model.RoleTypeClient)
 	localEntity.AddFeature(f)
+	f = spine.NewFeatureLocal(5, localEntity, model.FeatureTypeTypeDeviceConfiguration, model.RoleTypeClient)
+	localEntity.AddFeature(f)
 	f = spine.NewFeatureLocal(1, localEntity, model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeLoadControlLimitDescriptionListData, true, false)
 	f.AddFunctionType(model.FunctionTypeLoadControlLimitListData, true, true)
@@ -110,7 +112,7 @@ func setupDevices(
 	sender := spine.NewSender(writeHandler)
 	remoteDevice := spine.NewDeviceRemote(localDevice, remoteSki, sender)
 
-	var clientRemoteFeatures = []struct {
+	var remoteFeatures = []struct {
 		featureType   model.FeatureTypeType
 		role          model.RoleType
 		supportedFcts []model.FunctionType
@@ -144,12 +146,19 @@ func setupDevices(
 				model.FunctionTypeDeviceClassificationUserData,
 			},
 		},
+		{model.FeatureTypeTypeDeviceConfiguration,
+			model.RoleTypeServer,
+			[]model.FunctionType{
+				model.FunctionTypeDeviceConfigurationKeyValueDescriptionListData,
+				model.FunctionTypeDeviceConfigurationKeyValueListData,
+			},
+		},
 	}
 
 	remoteDeviceName := "remote"
 
 	var featureInformations []model.NodeManagementDetailedDiscoveryFeatureInformationType
-	for index, feature := range clientRemoteFeatures {
+	for index, feature := range remoteFeatures {
 		supportedFcts := []model.FunctionPropertyType{}
 		for _, fct := range feature.supportedFcts {
 			supportedFct := model.FunctionPropertyType{

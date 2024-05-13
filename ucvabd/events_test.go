@@ -101,8 +101,7 @@ func (s *UCVABDSuite) Test_inverterMeasurementDataUpdate() {
 		},
 	}
 
-	fErr = rFeature.UpdateData(model.FunctionTypeMeasurementListData, data, nil, nil)
-	assert.Nil(s.T(), fErr)
+	payload.Data = data
 
 	s.sut.inverterMeasurementDataUpdate(payload)
 }

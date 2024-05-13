@@ -8,29 +8,32 @@ import (
 	"github.com/enbility/spine-go/model"
 )
 
-// return the measurement value for a scope or an error
-func MeasurementValueForScope(
-	service eebusapi.ServiceInterface,
-	entity spineapi.EntityRemoteInterface,
-	scope model.ScopeTypeType) (float64, error) {
-	measurementF, err := Measurement(service, entity)
-	if err != nil {
-		return 0, eebusapi.ErrFunctionNotSupported
+// Check the payload data if it contains measurementId values for a given scope
+func MeasurementCheckPayloadDataForScope(service eebusapi.ServiceInterface, payload spineapi.EventPayload, scope model.ScopeTypeType) bool {
+	measurementF, err := Measurement(service, payload.Entity)
+	if err != nil || payload.Data == nil {
+		return false
 	}
 
 	if data, err := measurementF.GetDescriptionsForScope(scope); err == nil {
+		measurements := payload.Data.(*model.MeasurementListDataType)
+
 		for _, item := range data {
 			if item.MeasurementId == nil {
 				continue
 			}
 
-			if value, err := measurementF.GetValueForMeasurementId(*item.MeasurementId); err == nil {
-				return value, nil
+			for _, measurement := range measurements.MeasurementData {
+				if measurement.MeasurementId != nil &&
+					*measurement.MeasurementId == *item.MeasurementId &&
+					measurement.Value != nil {
+					return true
+				}
 			}
 		}
 	}
 
-	return 0, eebusapi.ErrDataNotAvailable
+	return false
 }
 
 // return the phase specific voltage details

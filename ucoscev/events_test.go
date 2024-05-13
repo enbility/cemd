@@ -125,6 +125,8 @@ func (s *UCOSCEVSuite) Test_evLoadControlLimitDataUpdate() {
 			{
 				LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(0)),
 				LimitCategory: eebusutil.Ptr(model.LoadControlCategoryTypeRecommendation),
+				LimitType:     eebusutil.Ptr(model.LoadControlLimitTypeTypeMaxValueLimit),
+				ScopeType:     eebusutil.Ptr(model.ScopeTypeTypeSelfConsumption),
 			},
 		},
 	}
@@ -136,6 +138,14 @@ func (s *UCOSCEVSuite) Test_evLoadControlLimitDataUpdate() {
 	s.sut.evLoadControlLimitDataUpdate(payload)
 
 	data := &model.LoadControlLimitListDataType{
+		LoadControlLimitData: []model.LoadControlLimitDataType{},
+	}
+
+	payload.Data = data
+
+	s.sut.evLoadControlLimitDataUpdate(payload)
+
+	data = &model.LoadControlLimitListDataType{
 		LoadControlLimitData: []model.LoadControlLimitDataType{
 			{
 				LimitId: eebusutil.Ptr(model.LoadControlLimitIdType(0)),
@@ -144,8 +154,7 @@ func (s *UCOSCEVSuite) Test_evLoadControlLimitDataUpdate() {
 		},
 	}
 
-	fErr = rFeature.UpdateData(model.FunctionTypeLoadControlLimitListData, data, nil, nil)
-	assert.Nil(s.T(), fErr)
+	payload.Data = data
 
 	s.sut.evLoadControlLimitDataUpdate(payload)
 }
