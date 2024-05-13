@@ -10,6 +10,115 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func (s *UtilSuite) Test_LoadControlLimitsCheckPayloadDataForTypeCategoryDirectionScopeLocal() {
+	limitType := model.LoadControlLimitTypeTypeMaxValueLimit
+	scope := model.ScopeTypeTypeSelfConsumption
+	category := model.LoadControlCategoryTypeObligation
+	direction := model.EnergyDirectionType("")
+
+	payload := spineapi.EventPayload{
+		Entity: s.mockRemoteEntity,
+	}
+
+	exists := LoadControlLimitsCheckPayloadDataForTypeCategoryDirectionScope(true, s.service, payload, limitType, category, direction, scope)
+	assert.False(s.T(), exists)
+
+	payload.Entity = s.monitoredEntity
+
+	exists = LoadControlLimitsCheckPayloadDataForTypeCategoryDirectionScope(true, s.service, payload, limitType, category, direction, scope)
+	assert.False(s.T(), exists)
+
+	descData := &model.LoadControlLimitDescriptionListDataType{
+		LoadControlLimitDescriptionData: []model.LoadControlLimitDescriptionDataType{
+			{
+				LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(0)),
+				LimitCategory: eebusutil.Ptr(category),
+				MeasurementId: eebusutil.Ptr(model.MeasurementIdType(0)),
+				LimitType:     eebusutil.Ptr(limitType),
+				ScopeType:     eebusutil.Ptr(scope),
+			},
+			{
+				LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(1)),
+				LimitCategory: eebusutil.Ptr(category),
+				MeasurementId: eebusutil.Ptr(model.MeasurementIdType(1)),
+				LimitType:     eebusutil.Ptr(limitType),
+				ScopeType:     eebusutil.Ptr(scope),
+			},
+			{
+				LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(2)),
+				LimitCategory: eebusutil.Ptr(category),
+				MeasurementId: eebusutil.Ptr(model.MeasurementIdType(2)),
+				LimitType:     eebusutil.Ptr(limitType),
+				ScopeType:     eebusutil.Ptr(scope),
+			},
+		},
+	}
+
+	entity := s.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
+	feature := entity.FeatureOfTypeAndRole(model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
+	feature.SetData(model.FunctionTypeLoadControlLimitDescriptionListData, descData)
+
+	exists = LoadControlLimitsCheckPayloadDataForTypeCategoryDirectionScope(true, s.service, payload, limitType, category, direction, scope)
+	assert.False(s.T(), exists)
+
+	paramData := &model.ElectricalConnectionParameterDescriptionListDataType{
+		ElectricalConnectionParameterDescriptionData: []model.ElectricalConnectionParameterDescriptionDataType{
+			{
+				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
+				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(0)),
+				MeasurementId:          eebusutil.Ptr(model.MeasurementIdType(0)),
+				AcMeasuredPhases:       eebusutil.Ptr(model.ElectricalConnectionPhaseNameTypeA),
+			},
+			{
+				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
+				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(1)),
+				MeasurementId:          eebusutil.Ptr(model.MeasurementIdType(1)),
+				AcMeasuredPhases:       eebusutil.Ptr(model.ElectricalConnectionPhaseNameTypeB),
+			},
+			{
+				ElectricalConnectionId: eebusutil.Ptr(model.ElectricalConnectionIdType(0)),
+				ParameterId:            eebusutil.Ptr(model.ElectricalConnectionParameterIdType(2)),
+				MeasurementId:          eebusutil.Ptr(model.MeasurementIdType(2)),
+				AcMeasuredPhases:       eebusutil.Ptr(model.ElectricalConnectionPhaseNameTypeC),
+			},
+		},
+	}
+
+	elFeature := entity.FeatureOfTypeAndRole(model.FeatureTypeTypeElectricalConnection, model.RoleTypeServer)
+	elFeature.SetData(model.FunctionTypeElectricalConnectionParameterDescriptionListData, paramData)
+
+	exists = LoadControlLimitsCheckPayloadDataForTypeCategoryDirectionScope(true, s.service, payload, limitType, category, direction, scope)
+	assert.False(s.T(), exists)
+
+	limitData := &model.LoadControlLimitListDataType{
+		LoadControlLimitData: []model.LoadControlLimitDataType{},
+	}
+
+	payload.Data = limitData
+	exists = LoadControlLimitsCheckPayloadDataForTypeCategoryDirectionScope(true, s.service, payload, limitType, category, direction, scope)
+	assert.False(s.T(), exists)
+
+	limitData = &model.LoadControlLimitListDataType{
+		LoadControlLimitData: []model.LoadControlLimitDataType{
+			{
+				LimitId: eebusutil.Ptr(model.LoadControlLimitIdType(0)),
+				Value:   model.NewScaledNumberType(16),
+			},
+			{
+				LimitId: eebusutil.Ptr(model.LoadControlLimitIdType(1)),
+				Value:   model.NewScaledNumberType(16),
+			},
+			{
+				LimitId: eebusutil.Ptr(model.LoadControlLimitIdType(2)),
+			},
+		},
+	}
+
+	payload.Data = limitData
+	exists = LoadControlLimitsCheckPayloadDataForTypeCategoryDirectionScope(true, s.service, payload, limitType, category, direction, scope)
+	assert.True(s.T(), exists)
+}
+
 func (s *UtilSuite) Test_LoadControlLimitsCheckPayloadDataForTypeCategoryDirectionScope() {
 	limitType := model.LoadControlLimitTypeTypeMaxValueLimit
 	scope := model.ScopeTypeTypeSelfConsumption

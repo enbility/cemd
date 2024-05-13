@@ -22,7 +22,7 @@ func DeviceConfigurationCheckDataPayloadForKeyName(localServer bool, service eeb
 		desc = GetLocalDeviceConfigurationDescriptionForKeyName(service, keyName)
 	} else {
 		deviceconfigF, err := DeviceConfiguration(service, payload.Entity)
-		if err != nil || payload.Data == nil {
+		if err != nil {
 			return false
 		}
 
