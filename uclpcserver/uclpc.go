@@ -52,7 +52,33 @@ func (e *UCLPCServer) loadControlWriteCB(msg *spineapi.Message) {
 	e.pendingMux.Lock()
 	defer e.pendingMux.Unlock()
 
-	if msg.RequestHeader == nil || msg.RequestHeader.MsgCounter == nil {
+	if msg.RequestHeader == nil || msg.RequestHeader.MsgCounter == nil ||
+		msg.Cmd.LoadControlLimitListData == nil {
+		return
+	}
+
+	descriptions := util.GetLocalLimitDescriptionsForTypeCategoryDirectionScope(
+		e.service,
+		model.LoadControlLimitTypeTypeSignDependentAbsValueLimit,
+		model.LoadControlCategoryTypeObligation,
+		model.EnergyDirectionTypeConsume,
+		model.ScopeTypeTypeActivePowerLimit,
+	)
+	if len(descriptions) != 1 || descriptions[0].LimitId == nil {
+		return
+	}
+	description := descriptions[0]
+
+	data := msg.Cmd.LoadControlLimitListData
+
+	if data == nil || data.LoadControlLimitData == nil || len(data.LoadControlLimitData) == 0 {
+		return
+	}
+
+	// we assume there is always only one limit
+	element := data.LoadControlLimitData[0]
+
+	if description.LimitId == nil || element.LimitId == nil || *description.LimitId != *element.LimitId {
 		return
 	}
 

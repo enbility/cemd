@@ -1,6 +1,8 @@
 package uclpcserver
 
 import (
+	"time"
+
 	eebusutil "github.com/enbility/eebus-go/util"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
@@ -15,6 +17,42 @@ func (s *UCLPCServerSuite) Test_loadControlWriteCB() {
 	msg = &spineapi.Message{
 		RequestHeader: &model.HeaderType{
 			MsgCounter: eebusutil.Ptr(model.MsgCounterType(500)),
+		},
+		Cmd: model.CmdType{
+			LoadControlLimitListData: &model.LoadControlLimitListDataType{},
+		},
+	}
+
+	s.sut.loadControlWriteCB(msg)
+
+	msg.Cmd = model.CmdType{
+		LoadControlLimitListData: &model.LoadControlLimitListDataType{
+			LoadControlLimitData: []model.LoadControlLimitDataType{},
+		},
+	}
+
+	s.sut.loadControlWriteCB(msg)
+
+	msg.Cmd = model.CmdType{
+		LoadControlLimitListData: &model.LoadControlLimitListDataType{
+			LoadControlLimitData: []model.LoadControlLimitDataType{
+				{},
+			},
+		},
+	}
+
+	s.sut.loadControlWriteCB(msg)
+
+	msg.Cmd = model.CmdType{
+		LoadControlLimitListData: &model.LoadControlLimitListDataType{
+			LoadControlLimitData: []model.LoadControlLimitDataType{
+				{
+					LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(0)),
+					IsLimitActive: eebusutil.Ptr(true),
+					Value:         model.NewScaledNumberType(1000),
+					TimePeriod:    model.NewTimePeriodTypeWithRelativeEndTime(time.Minute * 2),
+				},
+			},
 		},
 	}
 
