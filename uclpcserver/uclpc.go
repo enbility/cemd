@@ -1,6 +1,7 @@
 package uclpcserver
 
 import (
+	"errors"
 	"sync"
 
 	"github.com/enbility/cemd/api"
@@ -48,14 +49,9 @@ func (c *UCLPCServer) UseCaseName() model.UseCaseNameType {
 	return model.UseCaseNameTypeLimitationOfPowerConsumption
 }
 
-func (e *UCLPCServer) loadControlWriteCB(msg *spineapi.Message) {
-	e.pendingMux.Lock()
-	defer e.pendingMux.Unlock()
-
-	if msg.RequestHeader == nil || msg.RequestHeader.MsgCounter == nil ||
-		msg.Cmd.LoadControlLimitListData == nil {
-		return
-	}
+func (e *UCLPCServer) loadControlLimitId() (limitid model.LoadControlLimitIdType, err error) {
+	limitid = model.LoadControlLimitIdType(0)
+	err = errors.New("not found")
 
 	descriptions := util.GetLocalLimitDescriptionsForTypeCategoryDirectionScope(
 		e.service,
@@ -69,16 +65,34 @@ func (e *UCLPCServer) loadControlWriteCB(msg *spineapi.Message) {
 	}
 	description := descriptions[0]
 
-	data := msg.Cmd.LoadControlLimitListData
-
-	if data == nil || data.LoadControlLimitData == nil || len(data.LoadControlLimitData) == 0 {
+	if description.LimitId == nil {
 		return
 	}
 
-	// we assume there is always only one limit
-	element := data.LoadControlLimitData[0]
+	return *description.LimitId, nil
+}
 
-	if description.LimitId == nil || element.LimitId == nil || *description.LimitId != *element.LimitId {
+func (e *UCLPCServer) loadControlWriteCB(msg *spineapi.Message) {
+	e.pendingMux.Lock()
+	defer e.pendingMux.Unlock()
+
+	if msg.RequestHeader == nil || msg.RequestHeader.MsgCounter == nil ||
+		msg.Cmd.LoadControlLimitListData == nil {
+		return
+	}
+
+	limitId, err := e.loadControlLimitId()
+	if err != nil {
+		return
+	}
+
+	data := msg.Cmd.LoadControlLimitListData
+
+	// we assume there is always only one limit
+	if data == nil || data.LoadControlLimitData == nil ||
+		len(data.LoadControlLimitData) == 0 ||
+		data.LoadControlLimitData[0].LimitId == nil ||
+		limitId != *data.LoadControlLimitData[0].LimitId {
 		return
 	}
 

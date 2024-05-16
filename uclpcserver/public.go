@@ -110,31 +110,14 @@ func (e *UCLPCServer) PendingConsumptionLimits() map[model.MsgCounterType]api.Lo
 
 	result := make(map[model.MsgCounterType]api.LoadLimit)
 
-	descriptions := util.GetLocalLimitDescriptionsForTypeCategoryDirectionScope(
-		e.service,
-		model.LoadControlLimitTypeTypeSignDependentAbsValueLimit,
-		model.LoadControlCategoryTypeObligation,
-		model.EnergyDirectionTypeConsume,
-		model.ScopeTypeTypeActivePowerLimit,
-	)
-	if len(descriptions) != 1 || descriptions[0].LimitId == nil {
-		return result
-	}
-	description := descriptions[0]
-
 	for key, msg := range e.pendingLimits {
 		data := msg.Cmd.LoadControlLimitListData
 
-		if data == nil || data.LoadControlLimitData == nil || len(data.LoadControlLimitData) == 0 {
-			continue
-		}
+		// elements are only added to the map if all required fields exist
+		// therefor not check for these are needed here
 
 		// we assume there is always only one limit
 		element := data.LoadControlLimitData[0]
-
-		if description.LimitId == nil || element.LimitId == nil || *description.LimitId != *element.LimitId {
-			continue
-		}
 
 		limit := api.LoadLimit{}
 

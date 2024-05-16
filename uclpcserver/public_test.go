@@ -40,47 +40,14 @@ func (s *UCLPCServerSuite) Test_PendingConsumptionLimits() {
 			MsgCounter: eebusutil.Ptr(msgCounter),
 		},
 		Cmd: model.CmdType{
-			LoadControlLimitListData: &model.LoadControlLimitListDataType{},
-		},
-	}
-
-	s.sut.loadControlWriteCB(msg)
-
-	data = s.sut.PendingConsumptionLimits()
-	assert.Equal(s.T(), 0, len(data))
-
-	msg.Cmd = model.CmdType{
-		LoadControlLimitListData: &model.LoadControlLimitListDataType{
-			LoadControlLimitData: []model.LoadControlLimitDataType{},
-		},
-	}
-
-	s.sut.loadControlWriteCB(msg)
-
-	data = s.sut.PendingConsumptionLimits()
-	assert.Equal(s.T(), 0, len(data))
-
-	msg.Cmd = model.CmdType{
-		LoadControlLimitListData: &model.LoadControlLimitListDataType{
-			LoadControlLimitData: []model.LoadControlLimitDataType{
-				{},
-			},
-		},
-	}
-
-	s.sut.loadControlWriteCB(msg)
-
-	data = s.sut.PendingConsumptionLimits()
-	assert.Equal(s.T(), 0, len(data))
-
-	msg.Cmd = model.CmdType{
-		LoadControlLimitListData: &model.LoadControlLimitListDataType{
-			LoadControlLimitData: []model.LoadControlLimitDataType{
-				{
-					LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(0)),
-					IsLimitActive: eebusutil.Ptr(true),
-					Value:         model.NewScaledNumberType(1000),
-					TimePeriod:    model.NewTimePeriodTypeWithRelativeEndTime(time.Minute * 2),
+			LoadControlLimitListData: &model.LoadControlLimitListDataType{
+				LoadControlLimitData: []model.LoadControlLimitDataType{
+					{
+						LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(0)),
+						IsLimitActive: eebusutil.Ptr(true),
+						Value:         model.NewScaledNumberType(1000),
+						TimePeriod:    model.NewTimePeriodTypeWithRelativeEndTime(time.Minute * 2),
+					},
 				},
 			},
 		},
