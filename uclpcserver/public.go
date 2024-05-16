@@ -154,7 +154,15 @@ func (e *UCLPCServer) ApproveOrDenyConsumptionLimit(msgCounter model.MsgCounterT
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
 	f := localEntity.FeatureOfTypeAndRole(model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
-	f.ApproveOrDenyWrite(msg, approve, reason)
+
+	result := model.ErrorType{
+		ErrorNumber: model.ErrorNumberType(0),
+	}
+	if !approve {
+		result.ErrorNumber = model.ErrorNumberType(7)
+		result.Description = eebusutil.Ptr(model.DescriptionType(reason))
+	}
+	f.ApproveOrDenyWrite(msg, result)
 }
 
 // Scenario 2
