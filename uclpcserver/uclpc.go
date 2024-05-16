@@ -1,6 +1,8 @@
 package uclpcserver
 
 import (
+	"sync"
+
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
 	eebusapi "github.com/enbility/eebus-go/api"
@@ -17,6 +19,9 @@ type UCLPCServer struct {
 
 	validEntityTypes []model.EntityTypeType
 
+	pendingMux    sync.Mutex
+	pendingLimits map[model.MsgCounterType]*spineapi.Message
+
 	heartbeatKeoWorkaround bool // required because KEO Stack uses multiple identical entities for the same functionality, and it is not clear which to use
 }
 
@@ -24,8 +29,9 @@ var _ UCLPCServerInterface = (*UCLPCServer)(nil)
 
 func NewUCLPC(service eebusapi.ServiceInterface, eventCB api.EntityEventCallback) *UCLPCServer {
 	uc := &UCLPCServer{
-		service: service,
-		eventCB: eventCB,
+		service:       service,
+		eventCB:       eventCB,
+		pendingLimits: make(map[model.MsgCounterType]*spineapi.Message),
 	}
 
 	uc.validEntityTypes = []model.EntityTypeType{
@@ -42,6 +48,19 @@ func (c *UCLPCServer) UseCaseName() model.UseCaseNameType {
 	return model.UseCaseNameTypeLimitationOfPowerConsumption
 }
 
+func (e *UCLPCServer) loadControlWriteCB(msg *spineapi.Message) {
+	e.pendingMux.Lock()
+	defer e.pendingMux.Unlock()
+
+	if msg.RequestHeader == nil || msg.RequestHeader.MsgCounter == nil {
+		return
+	}
+
+	if _, ok := e.pendingLimits[*msg.RequestHeader.MsgCounter]; !ok {
+		e.pendingLimits[*msg.RequestHeader.MsgCounter] = msg
+	}
+}
+
 func (e *UCLPCServer) AddFeatures() {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
@@ -52,6 +71,7 @@ func (e *UCLPCServer) AddFeatures() {
 	f := localEntity.GetOrAddFeature(model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeLoadControlLimitDescriptionListData, true, false)
 	f.AddFunctionType(model.FunctionTypeLoadControlLimitListData, true, true)
+	_ = f.AddWriteApprovalCallback(e.loadControlWriteCB)
 
 	var limitId model.LoadControlLimitIdType = 0
 	// get the highest limitId

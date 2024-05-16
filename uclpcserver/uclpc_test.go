@@ -2,9 +2,24 @@ package uclpcserver
 
 import (
 	eebusutil "github.com/enbility/eebus-go/util"
+	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
 )
+
+func (s *UCLPCServerSuite) Test_loadControlWriteCB() {
+	msg := &spineapi.Message{}
+
+	s.sut.loadControlWriteCB(msg)
+
+	msg = &spineapi.Message{
+		RequestHeader: &model.HeaderType{
+			MsgCounter: eebusutil.Ptr(model.MsgCounterType(500)),
+		},
+	}
+
+	s.sut.loadControlWriteCB(msg)
+}
 
 func (s *UCLPCServerSuite) Test_UpdateUseCaseAvailability() {
 	s.sut.UpdateUseCaseAvailability(true)

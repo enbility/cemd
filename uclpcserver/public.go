@@ -103,6 +103,77 @@ func (e *UCLPCServer) SetConsumptionLimit(limit api.LoadLimit) (resultErr error)
 	return nil
 }
 
+// return the currently pending incoming consumption write limits
+func (e *UCLPCServer) PendingConsumptionLimits() map[model.MsgCounterType]api.LoadLimit {
+	e.pendingMux.Lock()
+	defer e.pendingMux.Unlock()
+
+	result := make(map[model.MsgCounterType]api.LoadLimit)
+
+	descriptions := util.GetLocalLimitDescriptionsForTypeCategoryDirectionScope(
+		e.service,
+		model.LoadControlLimitTypeTypeSignDependentAbsValueLimit,
+		model.LoadControlCategoryTypeObligation,
+		model.EnergyDirectionTypeConsume,
+		model.ScopeTypeTypeActivePowerLimit,
+	)
+	if len(descriptions) != 1 || descriptions[0].LimitId == nil {
+		return result
+	}
+	description := descriptions[0]
+
+	for key, msg := range e.pendingLimits {
+		data := msg.Cmd.LoadControlLimitListData
+
+		if data == nil || data.LoadControlLimitData == nil || len(data.LoadControlLimitData) == 0 {
+			continue
+		}
+
+		// we assume there is always only one limit
+		element := data.LoadControlLimitData[0]
+
+		if description.LimitId == nil || element.LimitId == nil || *description.LimitId != *element.LimitId {
+			continue
+		}
+
+		limit := api.LoadLimit{}
+
+		if element.TimePeriod != nil {
+			if duration, err := element.TimePeriod.GetDuration(); err == nil {
+				limit.Duration = duration
+			}
+		}
+
+		if element.IsLimitActive != nil {
+			limit.IsActive = *element.IsLimitActive
+		}
+
+		if element.Value != nil {
+			limit.Value = element.Value.GetValue()
+		}
+
+		result[key] = limit
+	}
+
+	return result
+}
+
+// accept or deny an incoming consumption write limit
+func (e *UCLPCServer) ApproveOrDenyConsumptionLimit(msgCounter model.MsgCounterType, approve bool, reason string) {
+	e.pendingMux.Lock()
+	defer e.pendingMux.Unlock()
+
+	msg, ok := e.pendingLimits[msgCounter]
+	if !ok {
+		return
+	}
+
+	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
+
+	f := localEntity.FeatureOfTypeAndRole(model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
+	f.ApproveOrDenyWrite(msg, approve, reason)
+}
+
 // Scenario 2
 
 // return Failsafe limit for the consumed active (real) power of the

@@ -4,6 +4,9 @@ import (
 	"time"
 
 	"github.com/enbility/cemd/api"
+	eebusutil "github.com/enbility/eebus-go/util"
+	spineapi "github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,6 +27,73 @@ func (s *UCLPCServerSuite) Test_ConsumptionLimit() {
 	limit, err = s.sut.ConsumptionLimit()
 	assert.Equal(s.T(), 16.0, limit.Value)
 	assert.Nil(s.T(), err)
+}
+
+func (s *UCLPCServerSuite) Test_PendingConsumptionLimits() {
+	data := s.sut.PendingConsumptionLimits()
+	assert.Equal(s.T(), 0, len(data))
+
+	msgCounter := model.MsgCounterType(500)
+
+	msg := &spineapi.Message{
+		RequestHeader: &model.HeaderType{
+			MsgCounter: eebusutil.Ptr(msgCounter),
+		},
+		Cmd: model.CmdType{
+			LoadControlLimitListData: &model.LoadControlLimitListDataType{},
+		},
+	}
+
+	s.sut.loadControlWriteCB(msg)
+
+	data = s.sut.PendingConsumptionLimits()
+	assert.Equal(s.T(), 0, len(data))
+
+	msg.Cmd = model.CmdType{
+		LoadControlLimitListData: &model.LoadControlLimitListDataType{
+			LoadControlLimitData: []model.LoadControlLimitDataType{},
+		},
+	}
+
+	s.sut.loadControlWriteCB(msg)
+
+	data = s.sut.PendingConsumptionLimits()
+	assert.Equal(s.T(), 0, len(data))
+
+	msg.Cmd = model.CmdType{
+		LoadControlLimitListData: &model.LoadControlLimitListDataType{
+			LoadControlLimitData: []model.LoadControlLimitDataType{
+				{},
+			},
+		},
+	}
+
+	s.sut.loadControlWriteCB(msg)
+
+	data = s.sut.PendingConsumptionLimits()
+	assert.Equal(s.T(), 0, len(data))
+
+	msg.Cmd = model.CmdType{
+		LoadControlLimitListData: &model.LoadControlLimitListDataType{
+			LoadControlLimitData: []model.LoadControlLimitDataType{
+				{
+					LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(0)),
+					IsLimitActive: eebusutil.Ptr(true),
+					Value:         model.NewScaledNumberType(1000),
+					TimePeriod:    model.NewTimePeriodTypeWithRelativeEndTime(time.Minute * 2),
+				},
+			},
+		},
+	}
+
+	s.sut.loadControlWriteCB(msg)
+
+	data = s.sut.PendingConsumptionLimits()
+	assert.Equal(s.T(), 1, len(data))
+
+	s.sut.ApproveOrDenyConsumptionLimit(model.MsgCounterType(499), true, "")
+
+	s.sut.ApproveOrDenyConsumptionLimit(msgCounter, true, "")
 }
 
 func (s *UCLPCServerSuite) Test_Failsafe() {
