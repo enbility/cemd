@@ -72,6 +72,9 @@ func (e *UCLPCServer) loadControlLimitId() (limitid model.LoadControlLimitIdType
 	return *description.LimitId, nil
 }
 
+// callback invoked on incoming write messages to this
+// loadcontrol server feature.
+// the implementation only considers write messages for this use case
 func (e *UCLPCServer) loadControlWriteCB(msg *spineapi.Message) {
 	e.pendingMux.Lock()
 	defer e.pendingMux.Unlock()
