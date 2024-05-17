@@ -33,6 +33,10 @@ func (e *UCLPCServer) HandleEvent(payload spineapi.EventPayload) {
 		return
 	}
 
+	if util.IsHeartbeat(localEntity, payload) {
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, Heartbeat)
+	}
+
 	if localEntity == nil ||
 		payload.EventType != spineapi.EventTypeDataChange ||
 		payload.ChangeType != spineapi.ElementChangeUpdate ||
@@ -98,6 +102,7 @@ func (e *UCLPCServer) deviceConnected(payload spineapi.EventPayload) {
 	// we only found one matching entity, as it should be, subscribe
 	if len(deviceDiagEntites) == 1 {
 		if localDeviceDiag, err := util.DeviceDiagnosis(e.service, deviceDiagEntites[0]); err == nil {
+			e.heartbeatDiag = localDeviceDiag
 			if _, err := localDeviceDiag.Subscribe(); err != nil {
 				logging.Log().Debug(err)
 			}
@@ -124,6 +129,7 @@ func (e *UCLPCServer) subscribeHeartbeatWorkaround(payload spineapi.EventPayload
 	}
 
 	if localDeviceDiag, err := util.DeviceDiagnosis(e.service, payload.Entity); err == nil {
+		e.heartbeatDiag = localDeviceDiag
 		if _, err := localDeviceDiag.Subscribe(); err != nil {
 			logging.Log().Debug(err)
 		}

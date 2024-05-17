@@ -76,6 +76,9 @@ type UCLPCServerInterface interface {
 	// Scenario 3
 
 	// this is automatically covered by the SPINE implementation
+	//
+	// returns true, if the last heartbeat is within 2 minutes, otherwise false
+	IsHeartbeatWithinDuration() bool
 
 	// Scenario 4
 

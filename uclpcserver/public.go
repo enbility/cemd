@@ -237,6 +237,12 @@ func (e *UCLPCServer) SetFailsafeDurationMinimum(duration time.Duration, changea
 	return util.SetLocalDeviceConfigurationKeyValue(e.service, keyName, changeable, keyValue)
 }
 
+// Scenario 3
+
+func (e *UCLPCServer) IsHeartbeatWithinDuration() bool {
+	return e.heartbeatDiag.IsHeartbeatWithinDuration(2 * time.Minute)
+}
+
 // Scenario 4
 
 // return nominal maximum active (real) power the Controllable System is
