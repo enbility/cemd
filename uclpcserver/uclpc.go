@@ -74,7 +74,8 @@ func (e *UCLPCServer) loadControlLimitId() (limitid model.LoadControlLimitIdType
 
 // callback invoked on incoming write messages to this
 // loadcontrol server feature.
-// the implementation only considers write messages for this use case
+// the implementation only considers write messages for this use case and
+// approves all others
 func (e *UCLPCServer) loadControlWriteCB(msg *spineapi.Message) {
 	e.pendingMux.Lock()
 	defer e.pendingMux.Unlock()
@@ -106,8 +107,13 @@ func (e *UCLPCServer) loadControlWriteCB(msg *spineapi.Message) {
 
 		if _, ok := e.pendingLimits[*msg.RequestHeader.MsgCounter]; !ok {
 			e.pendingLimits[*msg.RequestHeader.MsgCounter] = msg
+			e.eventCB(msg.DeviceRemote.Ski(), msg.DeviceRemote, msg.EntityRemote, WriteApprovalRequired)
+			return
 		}
 	}
+
+	// approve, because this is no request for this usecase
+	e.ApproveOrDenyConsumptionLimit(*msg.RequestHeader.MsgCounter, true, "")
 }
 
 func (e *UCLPCServer) AddFeatures() {
