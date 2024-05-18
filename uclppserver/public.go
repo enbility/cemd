@@ -30,19 +30,12 @@ func (e *UCLPPServer) ProductionLimit() (limit api.LoadLimit, resultErr error) {
 	}
 	resultErr = eebusapi.ErrDataNotAvailable
 
-	descriptions := util.GetLocalLimitDescriptionsForTypeCategoryDirectionScope(
-		e.service,
-		model.LoadControlLimitTypeTypeSignDependentAbsValueLimit,
-		model.LoadControlCategoryTypeObligation,
-		model.EnergyDirectionTypeProduce,
-		model.ScopeTypeTypeActivePowerLimit,
-	)
-	if len(descriptions) != 1 || descriptions[0].LimitId == nil {
+	limidId, err := e.loadControlLimitId()
+	if err != nil {
 		return
 	}
-	description := descriptions[0]
 
-	value := util.GetLocalLimitValueForLimitId(e.service, *description.LimitId)
+	value := util.GetLocalLimitValueForLimitId(e.service, limidId)
 	if value.LimitId == nil || value.Value == nil {
 		return
 	}
@@ -63,17 +56,10 @@ func (e *UCLPPServer) ProductionLimit() (limit api.LoadLimit, resultErr error) {
 func (e *UCLPPServer) SetProductionLimit(limit api.LoadLimit) (resultErr error) {
 	resultErr = eebusapi.ErrDataNotAvailable
 
-	descriptions := util.GetLocalLimitDescriptionsForTypeCategoryDirectionScope(
-		e.service,
-		model.LoadControlLimitTypeTypeSignDependentAbsValueLimit,
-		model.LoadControlCategoryTypeObligation,
-		model.EnergyDirectionTypeProduce,
-		model.ScopeTypeTypeActivePowerLimit,
-	)
-	if len(descriptions) != 1 || descriptions[0].LimitId == nil {
+	limidId, err := e.loadControlLimitId()
+	if err != nil {
 		return
 	}
-	description := descriptions[0]
 
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
@@ -83,7 +69,7 @@ func (e *UCLPPServer) SetProductionLimit(limit api.LoadLimit) (resultErr error) 
 	}
 
 	limitData := model.LoadControlLimitDataType{
-		LimitId:           description.LimitId,
+		LimitId:           eebusutil.Ptr(limidId),
 		IsLimitChangeable: eebusutil.Ptr(limit.IsChangeable),
 		IsLimitActive:     eebusutil.Ptr(limit.IsActive),
 		Value:             model.NewScaledNumberType(limit.Value),
@@ -101,6 +87,80 @@ func (e *UCLPPServer) SetProductionLimit(limit api.LoadLimit) (resultErr error) 
 	loadControl.SetData(model.FunctionTypeLoadControlLimitListData, limits)
 
 	return nil
+}
+
+// return the currently pending incoming consumption write limits
+func (e *UCLPPServer) PendingProductionLimits() map[model.MsgCounterType]api.LoadLimit {
+	result := make(map[model.MsgCounterType]api.LoadLimit)
+
+	limitId, err := e.loadControlLimitId()
+	if err != nil {
+		return result
+	}
+
+	e.pendingMux.Lock()
+	defer e.pendingMux.Unlock()
+
+	for key, msg := range e.pendingLimits {
+		data := msg.Cmd.LoadControlLimitListData
+
+		// elements are only added to the map if all required fields exist
+		// therefor not check for these are needed here
+
+		// find the item which contains the limit for this usecase
+		for _, item := range data.LoadControlLimitData {
+			if item.LimitId == nil ||
+				limitId != *item.LimitId {
+				continue
+			}
+
+			limit := api.LoadLimit{}
+
+			if item.TimePeriod != nil {
+				if duration, err := item.TimePeriod.GetDuration(); err == nil {
+					limit.Duration = duration
+				}
+			}
+
+			if item.IsLimitActive != nil {
+				limit.IsActive = *item.IsLimitActive
+			}
+
+			if item.Value != nil {
+				limit.Value = item.Value.GetValue()
+			}
+
+			result[key] = limit
+		}
+	}
+
+	return result
+}
+
+// accept or deny an incoming consumption write limit
+//
+// use PendingProductionLimits to get the list of currently pending requests
+func (e *UCLPPServer) ApproveOrDenyProductionLimit(msgCounter model.MsgCounterType, approve bool, reason string) {
+	e.pendingMux.Lock()
+	defer e.pendingMux.Unlock()
+
+	msg, ok := e.pendingLimits[msgCounter]
+	if !ok {
+		return
+	}
+
+	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
+
+	f := localEntity.FeatureOfTypeAndRole(model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
+
+	result := model.ErrorType{
+		ErrorNumber: model.ErrorNumberType(0),
+	}
+	if !approve {
+		result.ErrorNumber = model.ErrorNumberType(7)
+		result.Description = eebusutil.Ptr(model.DescriptionType(reason))
+	}
+	f.ApproveOrDenyWrite(msg, result)
 }
 
 // Scenario 2

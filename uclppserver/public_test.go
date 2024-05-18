@@ -4,6 +4,9 @@ import (
 	"time"
 
 	"github.com/enbility/cemd/api"
+	eebusutil "github.com/enbility/eebus-go/util"
+	spineapi "github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,6 +27,42 @@ func (s *UCLPPServerSuite) Test_LoadControlLimit() {
 	limit, err = s.sut.ProductionLimit()
 	assert.Equal(s.T(), 16.0, limit.Value)
 	assert.Nil(s.T(), err)
+}
+
+func (s *UCLPPServerSuite) Test_PendingProductionLimits() {
+	data := s.sut.PendingProductionLimits()
+	assert.Equal(s.T(), 0, len(data))
+
+	msgCounter := model.MsgCounterType(500)
+
+	msg := &spineapi.Message{
+		RequestHeader: &model.HeaderType{
+			MsgCounter: eebusutil.Ptr(msgCounter),
+		},
+		Cmd: model.CmdType{
+			LoadControlLimitListData: &model.LoadControlLimitListDataType{
+				LoadControlLimitData: []model.LoadControlLimitDataType{
+					{
+						LimitId:       eebusutil.Ptr(model.LoadControlLimitIdType(0)),
+						IsLimitActive: eebusutil.Ptr(true),
+						Value:         model.NewScaledNumberType(1000),
+						TimePeriod:    model.NewTimePeriodTypeWithRelativeEndTime(time.Minute * 2),
+					},
+				},
+			},
+		},
+		DeviceRemote: s.remoteDevice,
+		EntityRemote: s.monitoredEntity,
+	}
+
+	s.sut.loadControlWriteCB(msg)
+
+	data = s.sut.PendingProductionLimits()
+	assert.Equal(s.T(), 1, len(data))
+
+	s.sut.ApproveOrDenyProductionLimit(model.MsgCounterType(499), true, "")
+
+	s.sut.ApproveOrDenyProductionLimit(msgCounter, false, "leave me alone")
 }
 
 func (s *UCLPPServerSuite) Test_Failsafe() {

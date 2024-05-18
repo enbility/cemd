@@ -1,6 +1,9 @@
 package uclppserver
 
 import (
+	"errors"
+	"sync"
+
 	"github.com/enbility/cemd/api"
 	"github.com/enbility/cemd/util"
 	eebusapi "github.com/enbility/eebus-go/api"
@@ -17,6 +20,9 @@ type UCLPPServer struct {
 
 	validEntityTypes []model.EntityTypeType
 
+	pendingMux    sync.Mutex
+	pendingLimits map[model.MsgCounterType]*spineapi.Message
+
 	heartbeatKeoWorkaround bool // required because KEO Stack uses multiple identical entities for the same functionality, and it is not clear which to use
 }
 
@@ -24,8 +30,9 @@ var _ UCLPPServerInterface = (*UCLPPServer)(nil)
 
 func NewUCLPP(service eebusapi.ServiceInterface, eventCB api.EntityEventCallback) *UCLPPServer {
 	uc := &UCLPPServer{
-		service: service,
-		eventCB: eventCB,
+		service:       service,
+		eventCB:       eventCB,
+		pendingLimits: make(map[model.MsgCounterType]*spineapi.Message),
 	}
 
 	uc.validEntityTypes = []model.EntityTypeType{
@@ -42,6 +49,73 @@ func (c *UCLPPServer) UseCaseName() model.UseCaseNameType {
 	return model.UseCaseNameTypeLimitationOfPowerProduction
 }
 
+func (e *UCLPPServer) loadControlLimitId() (limitid model.LoadControlLimitIdType, err error) {
+	limitid = model.LoadControlLimitIdType(0)
+	err = errors.New("not found")
+
+	descriptions := util.GetLocalLimitDescriptionsForTypeCategoryDirectionScope(
+		e.service,
+		model.LoadControlLimitTypeTypeSignDependentAbsValueLimit,
+		model.LoadControlCategoryTypeObligation,
+		model.EnergyDirectionTypeProduce,
+		model.ScopeTypeTypeActivePowerLimit,
+	)
+	if len(descriptions) != 1 || descriptions[0].LimitId == nil {
+		return
+	}
+	description := descriptions[0]
+
+	if description.LimitId == nil {
+		return
+	}
+
+	return *description.LimitId, nil
+}
+
+// callback invoked on incoming write messages to this
+// loadcontrol server feature.
+// the implementation only considers write messages for this use case and
+// approves all others
+func (e *UCLPPServer) loadControlWriteCB(msg *spineapi.Message) {
+	e.pendingMux.Lock()
+	defer e.pendingMux.Unlock()
+
+	if msg.RequestHeader == nil || msg.RequestHeader.MsgCounter == nil ||
+		msg.Cmd.LoadControlLimitListData == nil {
+		return
+	}
+
+	limitId, err := e.loadControlLimitId()
+	if err != nil {
+		return
+	}
+
+	data := msg.Cmd.LoadControlLimitListData
+
+	// we assume there is always only one limit
+	if data == nil || data.LoadControlLimitData == nil ||
+		len(data.LoadControlLimitData) == 0 {
+		return
+	}
+
+	// check if there is a matching limitId in the data
+	for _, item := range data.LoadControlLimitData {
+		if item.LimitId == nil ||
+			limitId != *item.LimitId {
+			continue
+		}
+
+		if _, ok := e.pendingLimits[*msg.RequestHeader.MsgCounter]; !ok {
+			e.pendingLimits[*msg.RequestHeader.MsgCounter] = msg
+			e.eventCB(msg.DeviceRemote.Ski(), msg.DeviceRemote, msg.EntityRemote, WriteApprovalRequired)
+			return
+		}
+	}
+
+	// approve, because this is no request for this usecase
+	go e.ApproveOrDenyProductionLimit(*msg.RequestHeader.MsgCounter, true, "")
+}
+
 func (e *UCLPPServer) AddFeatures() {
 	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
 
@@ -52,6 +126,7 @@ func (e *UCLPPServer) AddFeatures() {
 	f := localEntity.GetOrAddFeature(model.FeatureTypeTypeLoadControl, model.RoleTypeServer)
 	f.AddFunctionType(model.FunctionTypeLoadControlLimitDescriptionListData, true, false)
 	f.AddFunctionType(model.FunctionTypeLoadControlLimitListData, true, true)
+	_ = f.AddWriteApprovalCallback(e.loadControlWriteCB)
 
 	var limitId model.LoadControlLimitIdType = 0
 	// get the highest limitId

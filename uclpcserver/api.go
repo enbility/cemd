@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/enbility/cemd/api"
+	"github.com/enbility/spine-go/model"
 )
 
 //go:generate mockery
@@ -26,6 +27,17 @@ type UCLPCServerInterface interface {
 
 	// set the current loadcontrol limit data
 	SetConsumptionLimit(limit api.LoadLimit) (resultErr error)
+
+	// return the currently pending incoming consumption write limits
+	PendingConsumptionLimits() map[model.MsgCounterType]api.LoadLimit
+
+	// accept or deny an incoming consumption write limit
+	//
+	// parameters:
+	//  - msg: the incoming write message
+	//  - approve: if the write limit for msg should be approved or not
+	//  - reason: the reason why the approval is denied, otherwise an empty string
+	ApproveOrDenyConsumptionLimit(msgCounter model.MsgCounterType, approve bool, reason string)
 
 	// Scenario 2
 
