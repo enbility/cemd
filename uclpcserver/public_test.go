@@ -51,6 +51,8 @@ func (s *UCLPCServerSuite) Test_PendingConsumptionLimits() {
 				},
 			},
 		},
+		DeviceRemote: s.remoteDevice,
+		EntityRemote: s.monitoredEntity,
 	}
 
 	s.sut.loadControlWriteCB(msg)

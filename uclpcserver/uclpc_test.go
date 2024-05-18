@@ -21,6 +21,8 @@ func (s *UCLPCServerSuite) Test_loadControlWriteCB() {
 		Cmd: model.CmdType{
 			LoadControlLimitListData: &model.LoadControlLimitListDataType{},
 		},
+		DeviceRemote: s.remoteDevice,
+		EntityRemote: s.monitoredEntity,
 	}
 
 	s.sut.loadControlWriteCB(msg)
