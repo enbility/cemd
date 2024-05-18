@@ -105,10 +105,15 @@ func (e *UCLPCServer) SetConsumptionLimit(limit api.LoadLimit) (resultErr error)
 
 // return the currently pending incoming consumption write limits
 func (e *UCLPCServer) PendingConsumptionLimits() map[model.MsgCounterType]api.LoadLimit {
+	result := make(map[model.MsgCounterType]api.LoadLimit)
+
+	limitId, err := e.loadControlLimitId()
+	if err != nil {
+		return result
+	}
+
 	e.pendingMux.Lock()
 	defer e.pendingMux.Unlock()
-
-	result := make(map[model.MsgCounterType]api.LoadLimit)
 
 	for key, msg := range e.pendingLimits {
 		data := msg.Cmd.LoadControlLimitListData
@@ -116,32 +121,39 @@ func (e *UCLPCServer) PendingConsumptionLimits() map[model.MsgCounterType]api.Lo
 		// elements are only added to the map if all required fields exist
 		// therefor not check for these are needed here
 
-		// we assume there is always only one limit
-		element := data.LoadControlLimitData[0]
-
-		limit := api.LoadLimit{}
-
-		if element.TimePeriod != nil {
-			if duration, err := element.TimePeriod.GetDuration(); err == nil {
-				limit.Duration = duration
+		// find the item which contains the limit for this usecase
+		for _, item := range data.LoadControlLimitData {
+			if item.LimitId == nil ||
+				limitId != *item.LimitId {
+				continue
 			}
-		}
 
-		if element.IsLimitActive != nil {
-			limit.IsActive = *element.IsLimitActive
-		}
+			limit := api.LoadLimit{}
 
-		if element.Value != nil {
-			limit.Value = element.Value.GetValue()
-		}
+			if item.TimePeriod != nil {
+				if duration, err := item.TimePeriod.GetDuration(); err == nil {
+					limit.Duration = duration
+				}
+			}
 
-		result[key] = limit
+			if item.IsLimitActive != nil {
+				limit.IsActive = *item.IsLimitActive
+			}
+
+			if item.Value != nil {
+				limit.Value = item.Value.GetValue()
+			}
+
+			result[key] = limit
+		}
 	}
 
 	return result
 }
 
 // accept or deny an incoming consumption write limit
+//
+// use PendingConsumptionLimits to get the list of currently pending requests
 func (e *UCLPCServer) ApproveOrDenyConsumptionLimit(msgCounter model.MsgCounterType, approve bool, reason string) {
 	e.pendingMux.Lock()
 	defer e.pendingMux.Unlock()

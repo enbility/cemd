@@ -14,6 +14,9 @@ const (
 
 	// An incoming load control obligation limit needs to be approved or denied
 	//
+	// Use `PendingConsumptionLimits` to get the currently pending write approval requests
+	// and invoke `ApproveOrDenyConsumptionLimit` for each
+	//
 	// Use Case LPC, Scenario 1
 	WriteApprovalRequired api.EventType = "WriteApprovalRequired"
 

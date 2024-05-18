@@ -93,14 +93,20 @@ func (e *UCLPCServer) loadControlWriteCB(msg *spineapi.Message) {
 
 	// we assume there is always only one limit
 	if data == nil || data.LoadControlLimitData == nil ||
-		len(data.LoadControlLimitData) == 0 ||
-		data.LoadControlLimitData[0].LimitId == nil ||
-		limitId != *data.LoadControlLimitData[0].LimitId {
+		len(data.LoadControlLimitData) == 0 {
 		return
 	}
 
-	if _, ok := e.pendingLimits[*msg.RequestHeader.MsgCounter]; !ok {
-		e.pendingLimits[*msg.RequestHeader.MsgCounter] = msg
+	// check if there is a matching limitId in the data
+	for _, item := range data.LoadControlLimitData {
+		if item.LimitId == nil ||
+			limitId != *item.LimitId {
+			continue
+		}
+
+		if _, ok := e.pendingLimits[*msg.RequestHeader.MsgCounter]; !ok {
+			e.pendingLimits[*msg.RequestHeader.MsgCounter] = msg
+		}
 	}
 }
 

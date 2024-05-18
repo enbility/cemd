@@ -60,7 +60,7 @@ func (s *UCLPCServerSuite) Test_PendingConsumptionLimits() {
 
 	s.sut.ApproveOrDenyConsumptionLimit(model.MsgCounterType(499), true, "")
 
-	s.sut.ApproveOrDenyConsumptionLimit(msgCounter, true, "")
+	s.sut.ApproveOrDenyConsumptionLimit(msgCounter, false, "leave me alone")
 }
 
 func (s *UCLPCServerSuite) Test_Failsafe() {
