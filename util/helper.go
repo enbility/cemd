@@ -1,41 +1,57 @@
 package util
 
 import (
-	"github.com/enbility/eebus-go/features"
-	"github.com/enbility/eebus-go/service"
-	"github.com/enbility/eebus-go/spine"
-	"github.com/enbility/eebus-go/spine/model"
+	"slices"
+
+	spineapi "github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
 )
 
 var PhaseNameMapping = []model.ElectricalConnectionPhaseNameType{model.ElectricalConnectionPhaseNameTypeA, model.ElectricalConnectionPhaseNameTypeB, model.ElectricalConnectionPhaseNameTypeC}
 
-// check if the given usecase, actor is supported by the remote device
-func IsUsecaseSupported(usecase model.UseCaseNameType, actor model.UseCaseActorType, remoteDevice *spine.DeviceRemoteImpl) bool {
-	uci := remoteDevice.UseCaseManager().UseCaseInformation()
-	for _, element := range uci {
-		if *element.Actor != actor {
-			continue
-		}
-		for _, uc := range element.UseCaseSupport {
-			if uc.UseCaseName != nil && *uc.UseCaseName == usecase {
-				return true
-			}
-		}
+func IsCompatibleEntity(entity spineapi.EntityRemoteInterface, entityTypes []model.EntityTypeType) bool {
+	if entity == nil {
+		return false
+	}
+
+	return slices.Contains(entityTypes, entity.EntityType())
+}
+
+func IsDeviceConnected(payload spineapi.EventPayload) bool {
+	return payload.Device != nil &&
+		payload.EventType == spineapi.EventTypeDeviceChange &&
+		payload.ChangeType == spineapi.ElementChangeAdd
+}
+
+func IsDeviceDisconnected(payload spineapi.EventPayload) bool {
+	return payload.Device != nil &&
+		payload.EventType == spineapi.EventTypeDeviceChange &&
+		payload.ChangeType == spineapi.ElementChangeRemove
+}
+
+func IsEntityConnected(payload spineapi.EventPayload) bool {
+	if payload.Entity != nil &&
+		payload.EventType == spineapi.EventTypeEntityChange &&
+		payload.ChangeType == spineapi.ElementChangeAdd {
+		return true
 	}
 
 	return false
 }
 
-// return the remote entity of a given type and device ski
-func EntityOfTypeForSki(service *service.EEBUSService, entityType model.EntityTypeType, ski string) (*spine.EntityRemoteImpl, error) {
-	rDevice := service.RemoteDeviceForSki(ski)
-
-	entities := rDevice.Entities()
-	for _, entity := range entities {
-		if entity.EntityType() == entityType {
-			return entity, nil
-		}
+func IsEntityDisconnected(payload spineapi.EventPayload) bool {
+	if payload.Entity != nil &&
+		payload.EventType == spineapi.EventTypeEntityChange &&
+		payload.ChangeType == spineapi.ElementChangeRemove {
+		return true
 	}
 
-	return nil, features.ErrEntityNotFound
+	return false
+}
+
+func Deref(v *string) string {
+	if v != nil {
+		return string(*v)
+	}
+	return ""
 }

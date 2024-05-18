@@ -1,0 +1,25 @@
+with-expecter: true
+inpackage: false
+dir: "{{ .InterfaceDir }}/../mocks"
+mockname: "{{.InterfaceName}}"
+outpkg: "mocks"
+filename: "{{.InterfaceName}}.go"
+all: true
+packages:
+  github.com/enbility/cemd/api:
+  github.com/enbility/cemd/cem:
+  github.com/enbility/cemd/uccevc:
+  github.com/enbility/cemd/ucevcc:
+  github.com/enbility/cemd/ucevcem:
+  github.com/enbility/cemd/ucevsecc:
+  github.com/enbility/cemd/ucevsoc:
+  github.com/enbility/cemd/uclpc:
+  github.com/enbility/cemd/uclpcserver:
+  github.com/enbility/cemd/uclpp:
+  github.com/enbility/cemd/uclppserver:
+  github.com/enbility/cemd/ucmgcp:
+  github.com/enbility/cemd/ucmpc:
+  github.com/enbility/cemd/ucopev:
+  github.com/enbility/cemd/ucoscev:
+  github.com/enbility/cemd/ucvabd:
+  github.com/enbility/cemd/ucvapd:

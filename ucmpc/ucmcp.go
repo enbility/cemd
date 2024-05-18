@@ -1,0 +1,127 @@
+package ucmpc
+
+import (
+	"github.com/enbility/cemd/api"
+	"github.com/enbility/cemd/util"
+	eebusapi "github.com/enbility/eebus-go/api"
+	spineapi "github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
+	"github.com/enbility/spine-go/spine"
+)
+
+type UCMPC struct {
+	service eebusapi.ServiceInterface
+
+	eventCB api.EntityEventCallback
+
+	validEntityTypes []model.EntityTypeType
+}
+
+var _ UCMCPInterface = (*UCMPC)(nil)
+
+func NewUCMPC(service eebusapi.ServiceInterface, eventCB api.EntityEventCallback) *UCMPC {
+	uc := &UCMPC{
+		service: service,
+		eventCB: eventCB,
+	}
+
+	uc.validEntityTypes = []model.EntityTypeType{
+		model.EntityTypeTypeCompressor,
+		model.EntityTypeTypeElectricalImmersionHeater,
+		model.EntityTypeTypeEVSE,
+		model.EntityTypeTypeHeatPumpAppliance,
+		model.EntityTypeTypeInverter,
+		model.EntityTypeTypeSmartEnergyAppliance,
+		model.EntityTypeTypeSubMeterElectricity,
+	}
+
+	_ = spine.Events.Subscribe(uc)
+
+	return uc
+}
+
+func (c *UCMPC) UseCaseName() model.UseCaseNameType {
+	return model.UseCaseNameTypeMonitoringOfPowerConsumption
+}
+
+func (e *UCMPC) AddFeatures() {
+	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
+
+	// client features
+	var clientFeatures = []model.FeatureTypeType{
+		model.FeatureTypeTypeElectricalConnection,
+		model.FeatureTypeTypeMeasurement,
+	}
+	for _, feature := range clientFeatures {
+		_ = localEntity.GetOrAddFeature(feature, model.RoleTypeClient)
+	}
+}
+
+func (e *UCMPC) AddUseCase() {
+	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
+
+	localEntity.AddUseCaseSupport(
+		model.UseCaseActorTypeMonitoringAppliance,
+		e.UseCaseName(),
+		model.SpecificationVersionType("1.0.0"),
+		"release",
+		true,
+		[]model.UseCaseScenarioSupportType{1, 2, 3, 4, 5})
+}
+
+func (e *UCMPC) UpdateUseCaseAvailability(available bool) {
+	localEntity := e.service.LocalDevice().EntityForType(model.EntityTypeTypeCEM)
+
+	localEntity.SetUseCaseAvailability(model.UseCaseActorTypeMonitoringAppliance, e.UseCaseName(), available)
+}
+
+// returns if the entity supports the usecase
+//
+// possible errors:
+//   - ErrDataNotAvailable if that information is not (yet) available
+//   - and others
+func (e *UCMPC) IsUseCaseSupported(entity spineapi.EntityRemoteInterface) (bool, error) {
+	if !util.IsCompatibleEntity(entity, e.validEntityTypes) {
+		return false, api.ErrNoCompatibleEntity
+	}
+
+	// check if the usecase and mandatory scenarios are supported and
+	// if the required server features are available
+	if !entity.Device().VerifyUseCaseScenariosAndFeaturesSupport(
+		model.UseCaseActorTypeMonitoredUnit,
+		e.UseCaseName(),
+		[]model.UseCaseScenarioSupportType{1},
+		[]model.FeatureTypeType{
+			model.FeatureTypeTypeElectricalConnection,
+			model.FeatureTypeTypeMeasurement,
+		},
+	) {
+		return false, nil
+	}
+
+	// check if measurement description contain data for the required scope
+	measurement, err := util.Measurement(e.service, entity)
+	if err != nil {
+		return false, eebusapi.ErrFunctionNotSupported
+	}
+
+	if _, err := measurement.GetDescriptionsForScope(model.ScopeTypeTypeACPowerTotal); err != nil {
+		return false, eebusapi.ErrDataNotAvailable
+	}
+
+	// check if electrical connection descriptions is provided
+	electricalConnection, err := util.ElectricalConnection(e.service, entity)
+	if err != nil {
+		return false, eebusapi.ErrFunctionNotSupported
+	}
+
+	if _, err = electricalConnection.GetDescriptions(); err != nil {
+		return false, err
+	}
+
+	if _, err = electricalConnection.GetParameterDescriptions(); err != nil {
+		return false, err
+	}
+
+	return true, nil
+}

@@ -1,121 +1,64 @@
 package cem
 
 import (
-	"github.com/enbility/cemd/emobility"
-	"github.com/enbility/cemd/grid"
-	"github.com/enbility/cemd/inverterbatteryvis"
-	"github.com/enbility/cemd/inverterpvvis"
-	"github.com/enbility/cemd/scenarios"
-	"github.com/enbility/eebus-go/logging"
+	"github.com/enbility/cemd/api"
+	eebusapi "github.com/enbility/eebus-go/api"
 	"github.com/enbility/eebus-go/service"
-	"github.com/enbility/eebus-go/spine"
-	"github.com/enbility/eebus-go/spine/model"
+	"github.com/enbility/ship-go/logging"
+	"github.com/enbility/spine-go/model"
+	"github.com/enbility/spine-go/spine"
 )
 
 // Generic CEM implementation
-type CemImpl struct {
-	service *service.EEBUSService
-
-	emobilityScenario, gridScenario, inverterBatteryVisScenario, inverterPVVisScenario scenarios.ScenariosI
+type Cem struct {
+	Service eebusapi.ServiceInterface
 
 	Currency model.CurrencyType
+
+	eventCB api.DeviceEventCallback
+
+	usecases []api.UseCaseInterface
 }
 
-func NewCEM(serviceDescription *service.Configuration, serviceHandler service.EEBUSServiceHandler, log logging.Logging) *CemImpl {
-	cem := &CemImpl{
-		service:  service.NewEEBUSService(serviceDescription, serviceHandler),
+func NewCEM(
+	serviceDescription *eebusapi.Configuration,
+	serviceHandler eebusapi.ServiceReaderInterface,
+	eventCB api.DeviceEventCallback,
+	log logging.LoggingInterface) *Cem {
+	cem := &Cem{
+		Service:  service.NewService(serviceDescription, serviceHandler),
 		Currency: model.CurrencyTypeEur,
+		eventCB:  eventCB,
 	}
 
-	cem.service.SetLogging(log)
+	cem.Service.SetLogging(log)
+
+	_ = spine.Events.Subscribe(cem)
 
 	return cem
 }
 
-// Set up the supported usecases and features
-func (h *CemImpl) Setup() error {
-	if err := h.service.Setup(); err != nil {
-		return err
-	}
+var _ api.CemInterface = (*Cem)(nil)
 
-	spine.Events.Subscribe(h)
-
-	return nil
+// Set up the eebus service
+func (h *Cem) Setup() error {
+	return h.Service.Setup()
 }
 
-// Enable the supported usecases and features
-
-func (h *CemImpl) EnableEmobility(configuration emobility.EmobilityConfiguration) {
-	h.emobilityScenario = emobility.NewEMobilityScenario(h.service, h.Currency, configuration)
-	h.emobilityScenario.AddFeatures()
-	h.emobilityScenario.AddUseCases()
+// Start the EEBUS service
+func (h *Cem) Start() {
+	h.Service.Start()
 }
 
-func (h *CemImpl) EnableGrid() {
-	h.gridScenario = grid.NewGridScenario(h.service)
-	h.gridScenario.AddFeatures()
-	h.gridScenario.AddUseCases()
+// Shutdown the EEBUS servic
+func (h *Cem) Shutdown() {
+	h.Service.Shutdown()
 }
 
-func (h *CemImpl) EnableBatteryVisualization() {
-	h.inverterBatteryVisScenario = inverterbatteryvis.NewInverterVisScenario(h.service)
-	h.inverterBatteryVisScenario.AddFeatures()
-	h.inverterBatteryVisScenario.AddUseCases()
-}
+// Add a use case implementation
+func (h *Cem) AddUseCase(usecase api.UseCaseInterface) {
+	h.usecases = append(h.usecases, usecase)
 
-func (h *CemImpl) EnablePVVisualization() {
-	h.inverterPVVisScenario = inverterpvvis.NewInverterVisScenario(h.service)
-	h.inverterPVVisScenario.AddFeatures()
-	h.inverterPVVisScenario.AddUseCases()
-}
-
-func (h *CemImpl) Start() {
-	h.service.Start()
-}
-
-func (h *CemImpl) Shutdown() {
-	h.service.Shutdown()
-}
-
-func (h *CemImpl) RegisterEmobilityRemoteDevice(details *service.ServiceDetails, dataProvider emobility.EmobilityDataProvider) *emobility.EMobilityImpl {
-	var impl any
-
-	if dataProvider != nil {
-		impl = h.emobilityScenario.RegisterRemoteDevice(details, dataProvider)
-	} else {
-		impl = h.emobilityScenario.RegisterRemoteDevice(details, nil)
-	}
-
-	return impl.(*emobility.EMobilityImpl)
-}
-
-func (h *CemImpl) UnRegisterEmobilityRemoteDevice(remoteDeviceSki string) error {
-	return h.emobilityScenario.UnRegisterRemoteDevice(remoteDeviceSki)
-}
-
-func (h *CemImpl) RegisterGridRemoteDevice(details *service.ServiceDetails) *grid.GridImpl {
-	impl := h.gridScenario.RegisterRemoteDevice(details, nil)
-	return impl.(*grid.GridImpl)
-}
-
-func (h *CemImpl) UnRegisterGridRemoteDevice(remoteDeviceSki string) error {
-	return h.gridScenario.UnRegisterRemoteDevice(remoteDeviceSki)
-}
-
-func (h *CemImpl) RegisterInverterBatteryVisRemoteDevice(details *service.ServiceDetails) *grid.GridImpl {
-	impl := h.inverterBatteryVisScenario.RegisterRemoteDevice(details, nil)
-	return impl.(*grid.GridImpl)
-}
-
-func (h *CemImpl) UnRegisterInverterBatteryVisRemoteDevice(remoteDeviceSki string) error {
-	return h.inverterBatteryVisScenario.UnRegisterRemoteDevice(remoteDeviceSki)
-}
-
-func (h *CemImpl) RegisterInverterPVVisRemoteDevice(details *service.ServiceDetails) *grid.GridImpl {
-	impl := h.inverterPVVisScenario.RegisterRemoteDevice(details, nil)
-	return impl.(*grid.GridImpl)
-}
-
-func (h *CemImpl) UnRegisterInverterPVVisRemoteDevice(remoteDeviceSki string) error {
-	return h.inverterPVVisScenario.UnRegisterRemoteDevice(remoteDeviceSki)
+	usecase.AddFeatures()
+	usecase.AddUseCase()
 }
