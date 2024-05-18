@@ -5,10 +5,6 @@ import "github.com/enbility/cemd/api"
 const (
 	// Load control obligation limit data update received
 	//
-	// The callback with this message provides:
-	//   - the device of the e.g. SMGW
-	//   - the entity of the e.g. SMGW
-	//
 	// Use `ConsumptionLimit` to get the current data
 	//
 	// Use Case LPC, Scenario 1
