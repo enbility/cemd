@@ -30,8 +30,9 @@ var _ UCLPPServerInterface = (*UCLPPServer)(nil)
 
 func NewUCLPP(service eebusapi.ServiceInterface, eventCB api.EntityEventCallback) *UCLPPServer {
 	uc := &UCLPPServer{
-		service: service,
-		eventCB: eventCB,
+		service:       service,
+		eventCB:       eventCB,
+		pendingLimits: make(map[model.MsgCounterType]*spineapi.Message),
 	}
 
 	uc.validEntityTypes = []model.EntityTypeType{
