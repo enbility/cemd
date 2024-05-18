@@ -113,7 +113,7 @@ func (e *UCLPCServer) loadControlWriteCB(msg *spineapi.Message) {
 	}
 
 	// approve, because this is no request for this usecase
-	e.ApproveOrDenyConsumptionLimit(*msg.RequestHeader.MsgCounter, true, "")
+	go e.ApproveOrDenyConsumptionLimit(*msg.RequestHeader.MsgCounter, true, "")
 }
 
 func (e *UCLPCServer) AddFeatures() {
