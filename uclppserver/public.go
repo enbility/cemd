@@ -240,6 +240,10 @@ func (e *UCLPPServer) SetFailsafeDurationMinimum(duration time.Duration, changea
 // Scenario 3
 
 func (e *UCLPPServer) IsHeartbeatWithinDuration() bool {
+	if e.heartbeatDiag == nil {
+		return false
+	}
+
 	return e.heartbeatDiag.IsHeartbeatWithinDuration(2 * time.Minute)
 }
 

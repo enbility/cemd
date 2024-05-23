@@ -36,6 +36,7 @@ const (
 
 	// Indicates a notify heartbeat event the application should care of.
 	// E.g. going into or out of the Failsafe state
+	//
 	// Use Case LPC, Scenario 3
-	Heartbeat api.EventType = "Heartbeat"
+	DataUpdateHeartbeat api.EventType = "uclpcserver-DataUpdateHeartbeat"
 )

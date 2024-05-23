@@ -52,6 +52,14 @@ func (s *UCLPCServerSuite) Test_Events() {
 	payload.ChangeType = spineapi.ElementChangeAdd
 	payload.LocalFeature = s.loadControlFeature
 	s.sut.HandleEvent(payload)
+
+	payload.EventType = spineapi.EventTypeDataChange
+	payload.ChangeType = spineapi.ElementChangeUpdate
+	payload.Function = model.FunctionTypeDeviceDiagnosisHeartbeatData
+	payload.LocalFeature = s.deviceDiagnosisFeature
+	payload.CmdClassifier = eebusutil.Ptr(model.CmdClassifierTypeNotify)
+	payload.Data = eebusutil.Ptr(model.DeviceDiagnosisHeartbeatDataType{})
+	s.sut.HandleEvent(payload)
 }
 
 func (s *UCLPCServerSuite) Test_deviceConnected() {

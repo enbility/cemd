@@ -34,7 +34,8 @@ func (e *UCLPCServer) HandleEvent(payload spineapi.EventPayload) {
 	}
 
 	if util.IsHeartbeat(localEntity, payload) {
-		e.eventCB(payload.Ski, payload.Device, payload.Entity, Heartbeat)
+		e.eventCB(payload.Ski, payload.Device, payload.Entity, DataUpdateHeartbeat)
+		return
 	}
 
 	if localEntity == nil ||

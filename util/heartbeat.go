@@ -9,7 +9,11 @@ func IsHeartbeat(localEntity spineapi.EntityLocalInterface, payload spineapi.Eve
 	//revive:disable-next-line
 	switch payload.Data.(type) {
 	case *model.DeviceDiagnosisHeartbeatDataType:
-		return payload.Function == "" && *payload.CmdClassifier == model.CmdClassifierTypeNotify
+		return payload.Function == model.FunctionTypeDeviceDiagnosisHeartbeatData &&
+			payload.EventType == spineapi.EventTypeDataChange &&
+			payload.ChangeType == spineapi.ElementChangeUpdate &&
+			payload.CmdClassifier != nil &&
+			*payload.CmdClassifier == model.CmdClassifierTypeNotify
 	default:
 		return false
 	}

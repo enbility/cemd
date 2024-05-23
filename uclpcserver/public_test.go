@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/enbility/cemd/api"
+	"github.com/enbility/cemd/util"
 	eebusutil "github.com/enbility/eebus-go/util"
 	spineapi "github.com/enbility/spine-go/api"
 	"github.com/enbility/spine-go/model"
@@ -100,6 +101,43 @@ func (s *UCLPCServerSuite) Test_Failsafe() {
 	assert.Equal(s.T(), time.Duration(time.Hour*2), duration)
 	assert.Equal(s.T(), true, changeable)
 	assert.Nil(s.T(), err)
+}
+
+func (s *UCLPCServerSuite) Test_IsHeartbeatWithinDuration() {
+	assert.Nil(s.T(), s.sut.heartbeatDiag)
+
+	value := s.sut.IsHeartbeatWithinDuration()
+	assert.False(s.T(), value)
+
+	remoteDiagServer := s.monitoredEntity.FeatureOfTypeAndRole(model.FeatureTypeTypeDeviceDiagnosis, model.RoleTypeServer)
+	assert.NotNil(s.T(), remoteDiagServer)
+
+	var err error
+	s.sut.heartbeatDiag, err = util.DeviceDiagnosis(s.service, s.monitoredEntity)
+	assert.NotNil(s.T(), remoteDiagServer)
+	assert.Nil(s.T(), err)
+
+	// add heartbeat data to the remoteDiagServer
+	timestamp := time.Now().Add(-time.Second * 121)
+	data := &model.DeviceDiagnosisHeartbeatDataType{
+		Timestamp:        model.NewAbsoluteOrRelativeTimeTypeFromTime(timestamp),
+		HeartbeatCounter: eebusutil.Ptr(uint64(1)),
+		HeartbeatTimeout: model.NewDurationType(time.Second * 120),
+	}
+	err1 := remoteDiagServer.UpdateData(model.FunctionTypeDeviceDiagnosisHeartbeatData, data, nil, nil)
+	assert.Nil(s.T(), err1)
+
+	value = s.sut.IsHeartbeatWithinDuration()
+	assert.False(s.T(), value)
+
+	timestamp = time.Now()
+	data.Timestamp = model.NewAbsoluteOrRelativeTimeTypeFromTime(timestamp)
+
+	err1 = remoteDiagServer.UpdateData(model.FunctionTypeDeviceDiagnosisHeartbeatData, data, nil, nil)
+	assert.Nil(s.T(), err1)
+
+	value = s.sut.IsHeartbeatWithinDuration()
+	assert.True(s.T(), value)
 }
 
 func (s *UCLPCServerSuite) Test_ContractualConsumptionNominalMax() {
