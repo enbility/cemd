@@ -8,7 +8,7 @@ const (
 	// Use `ConsumptionLimit` to get the current data
 	//
 	// Use Case LPC, Scenario 1
-	DataUpdateLimit api.EventType = "DataUpdateLimit"
+	DataUpdateLimit api.EventType = "uclpc-DataUpdateLimit"
 
 	// Failsafe limit for the consumed active (real) power of the
 	// Controllable System data updated
@@ -16,7 +16,7 @@ const (
 	// Use `FailsafeConsumptionActivePowerLimit` to get the current data
 	//
 	// Use Case LPC, Scenario 2
-	DataUpdateFailsafeConsumptionActivePowerLimit api.EventType = "DataUpdateFailsafeConsumptionActivePowerLimit"
+	DataUpdateFailsafeConsumptionActivePowerLimit api.EventType = "uclpc-DataUpdateFailsafeConsumptionActivePowerLimit"
 
 	// Minimum time the Controllable System remains in "failsafe state" unless conditions
 	// specified in this Use Case permit leaving the "failsafe state" data updated
@@ -24,5 +24,5 @@ const (
 	// Use `FailsafeDurationMinimum` to get the current data
 	//
 	// Use Case LPC, Scenario 2
-	DataUpdateFailsafeDurationMinimum api.EventType = "DataUpdateFailsafeDurationMinimum"
+	DataUpdateFailsafeDurationMinimum api.EventType = "uclpc-DataUpdateFailsafeDurationMinimum"
 )

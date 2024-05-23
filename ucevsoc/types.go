@@ -8,5 +8,5 @@ const (
 	// Use `StateOfCharge` to get the current data
 	//
 	// Use Case EVSOC, Scenario 1
-	DataUpdateStateOfCharge api.EventType = "DataUpdateStateOfCharge"
+	DataUpdateStateOfCharge api.EventType = "ucevsoc-DataUpdateStateOfCharge"
 )

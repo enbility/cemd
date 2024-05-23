@@ -4,10 +4,10 @@ import "github.com/enbility/cemd/api"
 
 const (
 	// An EVSE was connected
-	EvseConnected api.EventType = "EvseConnected"
+	EvseConnected api.EventType = "ucevsecc-EvseConnected"
 
 	// An EVSE was disconnected
-	EvseDisconnected api.EventType = "EvseDisconnected"
+	EvseDisconnected api.EventType = "ucevsecc-EvseDisconnected"
 
 	// EVSE manufacturer data was updated
 	//
@@ -16,7 +16,7 @@ const (
 	// Use Case EVSECC, Scenario 1
 	//
 	// The entity of the message is the entity of the EVSE
-	DataUpdateManufacturerData api.EventType = "DataUpdateManufacturerData"
+	DataUpdateManufacturerData api.EventType = "ucevsecc-DataUpdateManufacturerData"
 
 	// EVSE operation state was updated
 	//
@@ -25,5 +25,5 @@ const (
 	// Use Case EVSECC, Scenario 2
 	//
 	// The entity of the message is the entity of the EVSE
-	DataUpdateOperatingState api.EventType = "DataUpdateOperatingState"
+	DataUpdateOperatingState api.EventType = "ucevsecc-DataUpdateOperatingState"
 )
