@@ -9,47 +9,47 @@ const (
 	// Use `PowerLimitationFactor` to get the current data
 	//
 	// Use Case MGCP, Scenario 2
-	DataUpdatePowerLimitationFactor api.EventType = "DataUpdatePowerLimitationFactor"
+	DataUpdatePowerLimitationFactor api.EventType = "ucmgcp-DataUpdatePowerLimitationFactor"
 
 	// Grid momentary power consumption/production data updated
 	//
 	// Use `Power` to get the current data
 	//
 	// Use Case MGCP, Scenario 2
-	DataUpdatePower api.EventType = "DataUpdatePower"
+	DataUpdatePower api.EventType = "ucmgcp-DataUpdatePower"
 
 	// Total grid feed in energy data updated
 	//
 	// Use `EnergyFeedIn` to get the current data
 	//
 	// Use Case MGCP, Scenario 3
-	DataUpdateEnergyFeedIn api.EventType = "DataUpdateEnergyFeedIn"
+	DataUpdateEnergyFeedIn api.EventType = "ucmgcp-DataUpdateEnergyFeedIn"
 
 	// Total grid consumed energy data updated
 	//
 	// Use `EnergyConsumed` to get the current data
 	//
 	// Use Case MGCP, Scenario 4
-	DataUpdateEnergyConsumed api.EventType = "DataUpdateEnergyConsumed"
+	DataUpdateEnergyConsumed api.EventType = "ucmgcp-DataUpdateEnergyConsumed"
 
 	// Phase specific momentary current consumption/production phase detail data updated
 	//
 	// Use `CurrentPerPhase` to get the current data
 	//
 	// Use Case MGCP, Scenario 5
-	DataUpdateCurrentPerPhase api.EventType = "DataUpdateCurrentPerPhase"
+	DataUpdateCurrentPerPhase api.EventType = "ucmgcp-DataUpdateCurrentPerPhase"
 
 	// Phase specific voltage at the grid connection point
 	//
 	// Use `VoltagePerPhase` to get the current data
 	//
 	// Use Case MGCP, Scenario 6
-	DataUpdateVoltagePerPhase api.EventType = "DataUpdateVoltagePerPhase"
+	DataUpdateVoltagePerPhase api.EventType = "ucmgcp-DataUpdateVoltagePerPhase"
 
 	// Grid frequency data updated
 	//
 	// Use `Frequency` to get the current data
 	//
 	// Use Case MGCP, Scenario 7
-	DataUpdateFrequency api.EventType = "DataUpdateFrequency"
+	DataUpdateFrequency api.EventType = "ucmgcp-DataUpdateFrequency"
 )

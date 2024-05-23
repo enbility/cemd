@@ -8,19 +8,19 @@ const (
 	// Use `Power` to get the current data
 	//
 	// Use Case VAPD, Scenario 1
-	DataUpdatePower api.EventType = "DataUpdatePower"
+	DataUpdatePower api.EventType = "ucvapd-DataUpdatePower"
 
 	// PV System nominal peak power data updated
 	//
 	// Use `PowerNominalPeak` to get the current data
 	//
 	// Use Case VAPD, Scenario 2
-	DataUpdatePowerNominalPeak api.EventType = "DataUpdatePowerNominalPeak"
+	DataUpdatePowerNominalPeak api.EventType = "ucvapd-DataUpdatePowerNominalPeak"
 
 	// PV System total yield data updated
 	//
 	// Use `PVYieldTotal` to get the current data
 	//
 	// Use Case VAPD, Scenario 3
-	DataUpdatePVYieldTotal api.EventType = "DataUpdatePVYieldTotal"
+	DataUpdatePVYieldTotal api.EventType = "ucvapd-DataUpdatePVYieldTotal"
 )

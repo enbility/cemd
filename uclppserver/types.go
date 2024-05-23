@@ -8,7 +8,7 @@ const (
 	// Use `ProductionLimit` to get the current data
 	//
 	// Use Case LPC, Scenario 1
-	DataUpdateLimit api.EventType = "DataUpdateLimit"
+	DataUpdateLimit api.EventType = "uclppserver-DataUpdateLimit"
 
 	// An incoming load control obligation limit needs to be approved or denied
 	//
@@ -16,7 +16,7 @@ const (
 	// and invoke `ApproveOrDenyProductionLimit` for each
 	//
 	// Use Case LPC, Scenario 1
-	WriteApprovalRequired api.EventType = "WriteApprovalRequired"
+	WriteApprovalRequired api.EventType = "uclppserver-WriteApprovalRequired"
 
 	// Failsafe limit for the produced active (real) power of the
 	// Controllable System data update received
@@ -24,7 +24,7 @@ const (
 	// Use `FailsafeProductionActivePowerLimit` to get the current data
 	//
 	// Use Case LPC, Scenario 2
-	DataUpdateFailsafeProductionActivePowerLimit api.EventType = "DataUpdateFailsafeProductionActivePowerLimit"
+	DataUpdateFailsafeProductionActivePowerLimit api.EventType = "uclppserver-DataUpdateFailsafeProductionActivePowerLimit"
 
 	// Minimum time the Controllable System remains in "failsafe state" unless conditions
 	// specified in this Use Case permit leaving the "failsafe state" data update received
@@ -32,7 +32,7 @@ const (
 	// Use `FailsafeDurationMinimum` to get the current data
 	//
 	// Use Case LPC, Scenario 2
-	DataUpdateFailsafeDurationMinimum api.EventType = "DataUpdateFailsafeDurationMinimum"
+	DataUpdateFailsafeDurationMinimum api.EventType = "uclppserver-DataUpdateFailsafeDurationMinimum"
 
 	// Indicates a notify heartbeat event the application should care of.
 	// E.g. going into or out of the Failsafe state
