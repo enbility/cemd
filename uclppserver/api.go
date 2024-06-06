@@ -28,10 +28,10 @@ type UCLPPServerInterface interface {
 	// set the current loadcontrol limit data
 	SetProductionLimit(limit api.LoadLimit) (resultErr error)
 
-	// return the currently pending incoming consumption write limits
+	// return the currently pending incoming production write limits
 	PendingProductionLimits() map[model.MsgCounterType]api.LoadLimit
 
-	// accept or deny an incoming consumption write limit
+	// accept or deny an incoming production write limit
 	//
 	// parameters:
 	//  - msg: the incoming write message
