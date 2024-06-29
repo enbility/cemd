@@ -12,6 +12,10 @@ The goal is to provide an EEBUS CEM implementation
 
 This repository will __NOT__ be continued as of 16th June 2024. Instead all use case implementations, fixes and improvements are being moved into the [eebus-go](https://github.com/enbility/eebus-go) library and are then useable by any type of service.
 
+As of June 29th 2024 all the use case implementations are part of the [eebus-go](https://github.com/enbility/eebus-go) starting with its release [v0.6.0](https://github.com/enbility/eebus-go/releases/tag/v0.6.0)
+
+This repository is now deprecated.
+
 ## Introduction
 
 This library provides a foundation to implement energy management solutions using the [eebus-go](https://github.com/enbility/eebus-go) library. It is designed to be included either directly into go projects, or it will be able to run as a daemon for other systems interact with (to be implemented).
